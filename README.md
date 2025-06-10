@@ -86,8 +86,8 @@ http://localhost/phpmyadmin
 ```
 
 #### 2. Import the Database
-- Create a new database named `aralsipnayan_db`
-- Import the `aralsipnayandb.sql` file from the `db` folder
+- Create a new database named `aralsipnayandb`
+- Import the `aralsipnayandb.sql` file from the `dbfolder` folder
 - Click on "Import" tab in phpMyAdmin
 - Choose the SQL file and click "Go"
 
