@@ -1,4 +1,4 @@
-## 📘 AralSipnayan
+# 📘 AralSipnayan
 
 **AralSipnayan** is an intelligent mathematics assessment tool designed for elementary students (Grades 3 and 4). The system dynamically evaluates students' understanding of mathematical concepts through adaptive testing, fair question distribution, and personalized tracking of learning progress.
 
@@ -31,3 +31,92 @@ AralSipnayan is developed to support:
 - Personalized and adaptive learning in mathematics  
 - Data-driven intervention strategies by educators  
 - Real-time insight into learner progress and concept mastery
+
+---
+
+## 🔧 Installation & Setup
+
+### 🔑 Setting Up Laravel `.env` and `APP_KEY`
+
+Follow these steps after cloning the project:
+
+#### 1. Copy `.env` Example File
+```bash
+cp .env.example .env
+```
+
+#### 2. Edit `.env` File
+Open `.env` and set your local database configuration:
+
+```env
+APP_NAME=AralSipnayan
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=aralsipnayan_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+#### 3. Generate Laravel APP_KEY
+```bash
+php artisan key:generate
+```
+
+#### 4. Clear and Cache Config (Recommended)
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan config:cache
+```
+
+## 🗄️ Database Setup
+
+### Importing the SQL File into phpMyAdmin
+
+#### 1. Open phpMyAdmin
+Usually accessible at:
+```
+http://localhost/phpmyadmin
+```
+
+#### 2. Import the Database
+- Create a new database named `aralsipnayan_db`
+- Import the `aralsipnayandb.sql` file from the `db` folder
+- Click on "Import" tab in phpMyAdmin
+- Choose the SQL file and click "Go"
+
+## 🚀 Running the Application
+
+After completing the setup steps above:
+
+1. **Start your local server:**
+   ```bash
+   php artisan serve
+   ```
+
+2. **Access the application:**
+   ```
+   http://localhost:8000
+   ```
+
+## 📋 Requirements
+
+- PHP >= 8.0
+- Laravel Framework
+- MySQL Database
+- Composer
+- XAMPP/WAMP (for local development)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
