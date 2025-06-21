@@ -113,9 +113,9 @@ After completing the setup steps above:
 - Composer
 - XAMPP/WAMP (for local development)
 
-## 🤝 Contributing
+## 🤝 Contributors
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions: Ejay Buscato, Krissa Beringuel, Joshua Fernandez, Sean Sicat
 
 ## 📄 License
 
