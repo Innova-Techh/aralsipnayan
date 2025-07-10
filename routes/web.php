@@ -17,4 +17,9 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 //Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
 //Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
 
+// User Dashboard
+Route::get('/dashboard', function () {
+    return view('user.user_dashboard');
+})->name('dashboard');
+
 
