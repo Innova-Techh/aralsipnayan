@@ -52,7 +52,7 @@
     <!-- Header -->
      <nav class="navbar navbar-light bg-white px-5 py-3 shadow-sm">
         <a class="navbar-brand fw-bold fs-3" href="#">Aral<span class="text-primary">Sipnayan</span></a>
-        <a href="#" class="btn btn-primary btn-lg px-4 py-2">Login</a>
+        <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4 py-2">Login</a>
     </nav>
 
     <!-- Hero -->
