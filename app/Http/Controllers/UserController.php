@@ -9,11 +9,11 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    //
-public function create()
-{
-    return view('homepage');
-}
+// function to show homepage
+// public function create()
+// {
+//     return view('homepage');
+// }
 
 public function store(Request $request)
 {
