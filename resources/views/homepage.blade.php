@@ -19,6 +19,10 @@
             background-color: #ffb300;
             color: white;
         }
+
+
+
+        
         .features {
             background: #f7f9fc;
             padding: 60px 20px;
