@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Achievements')
+@section('title', 'AralSipnayan')
 
 @section('content')
 <div class="min-h-screen bg-gray-100">

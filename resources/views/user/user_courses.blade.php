@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'My Courses')
+@section('title', 'AralSipnayan')
 
 @push('styles')
 <style>

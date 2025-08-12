@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Lesson Detail')
+@section('title', 'AralSipnayan')
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6">
