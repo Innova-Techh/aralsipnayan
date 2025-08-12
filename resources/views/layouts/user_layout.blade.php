@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') - Math Learning Platform</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind (Vite) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Custom CSS -->
     <style>
@@ -33,8 +33,8 @@
         <!-- Top Navigation Bar -->
         <nav class="bg-white shadow-sm border-b border-gray-200">
             <div class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12">
-                <div class="flex justify-between h-16">
-                    <!-- Left side - Logo and Navigation -->
+                <div class="flex items-center justify-between h-16">
+                    <!-- Left: Brand -->
                     <div class="flex items-center">
                         <!-- Mobile menu button -->
                         <button id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 mr-3">
@@ -48,7 +48,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
-                        
+
+                        <!-- Brand -->
                         <div class="flex items-center">
                             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
                                 <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -57,59 +58,48 @@
                             </div>
                             <h1 class="text-lg font-semibold text-gray-900">AralSipnayan</h1>
                         </div>
-                        
-                        <!-- Desktop Navigation Links -->
-                        <div class="hidden md:ml-16 md:flex md:space-x-10">
-                            <a href="{{ route('dashboard') }}" class="border-b-2 {{ request()->routeIs('dashboard') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- BarChart icon -->
+                    </div>
+
+                    <!-- Center: Desktop Navigation Links -->
+                    <div class="hidden lg:flex lg:items-center lg:justify-center lg:flex-1 lg:px-8">
+                        <div class="flex space-x-6 xl:space-x-8 2xl:space-x-10">
+                            <a href="{{ route('dashboard') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('dashboard') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                                 <span>Dashboard</span>
                             </a>
-                            
-                            <a href="{{ route('courses') }}" class="border-b-2 {{ request()->routeIs('courses.*') || request()->routeIs('user.courses') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- BookOpen icon -->
+                            <a href="{{ route('courses') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('courses.*') || request()->routeIs('user.courses') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                 </svg>
-                                <span>My Courses</span>
+                                <span class="whitespace-nowrap">My Courses</span>
                             </a>
-                            
-                            <a href="{{ route('assessments.index') }}" class="border-b-2 {{ request()->routeIs('assessments.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- FileText icon -->
+                            <a href="{{ route('assessments.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('assessments.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                                 <span>Assessments</span>
                             </a>
-                            
-                            <a href="{{ route('achievements.index') }}" class="border-b-2 {{ request()->routeIs('achievements.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- Award icon -->
+                            <a href="{{ route('achievements.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('achievements.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
                                 </svg>
                                 <span>Achievements</span>
                             </a>
-                            
-                            <a href="{{ route('progression.index') }}" class="border-b-2 {{ request()->routeIs('progression.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- TrendingUp icon -->
+                            <a href="{{ route('progression.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('progression.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                                 </svg>
                                 <span>Progression</span>
                             </a>
-                            
-                            <a href="{{ route('leaderboard.index') }}" class="border-b-2 {{ request()->routeIs('leaderboard.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- Trophy icon -->
+                            <a href="{{ route('leaderboard.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('leaderboard.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
                                 </svg>
                                 <span>Leaderboard</span>
                             </a>
-                            
-                            <a href="{{ route('resources.index') }}" class="border-b-2 {{ request()->routeIs('resources.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <!-- Library icon -->
+                            <a href="{{ route('resources.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('resources.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
                                 </svg>
@@ -118,7 +108,7 @@
                         </div>
                     </div>
 
-                    <!-- Right side - User menu -->
+                    <!-- Right: User menu -->
                     <div class="flex items-center">
                         <div class="relative">
                             <button id="user-menu-button" class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
