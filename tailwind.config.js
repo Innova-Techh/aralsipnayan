@@ -16,6 +16,9 @@ export default {
         },
         extend: {
             colors: {
+                'primary-blue': '#1E3A8A',
+                'primary-red': '#D62839',
+                'primary-yellow': '#FBBF24',
                 border: "#E2E8F0", // hsl(var(--border)) replaced with hex
                 input: "#E2E8F0", // hsl(var(--input)) replaced with hex
                 ring: "#E2E8F0", // hsl(var(--ring)) replaced with hex
