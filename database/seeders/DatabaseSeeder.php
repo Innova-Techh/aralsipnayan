@@ -75,5 +75,10 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Seed Questions
+        $this->call([
+            QuestionsSeeder::class,
+        ]);
     }
 }

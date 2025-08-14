@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\AlgorithmController;
 
 // Homepage
 Route::get('/', function () {
@@ -56,9 +57,16 @@ Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])
     ->name('dashboard.stats');
 
 // Assessments
-Route::get('/assessments', fn() => view('user.assessments'))
+Route::get('/assessments', [App\Http\Controllers\AssessmentController::class, 'index'])
     ->middleware('auth')
     ->name('assessments.index');
+
+// Assessment API endpoints
+Route::middleware('auth')->group(function () {
+    Route::post('/assessments/start', [App\Http\Controllers\AssessmentController::class, 'startAssessment'])->name('assessments.start');
+    Route::post('/assessments/submit-answer', [App\Http\Controllers\AssessmentController::class, 'submitAnswer'])->name('assessments.submit-answer');
+    Route::post('/assessments/complete', [App\Http\Controllers\AssessmentController::class, 'completeAssessment'])->name('assessments.complete');
+});
 
 // Achievements
 Route::get('/achievements', [AchievementController::class, 'index'])
@@ -87,3 +95,5 @@ Route::get('/profile/edit', fn() => view('user.profile.edit'))
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+//ALGORITHM INTEGRATION
+Route::post('/run-bkt', [App\Http\Controllers\AssessmentController::class, 'runBkt']);
