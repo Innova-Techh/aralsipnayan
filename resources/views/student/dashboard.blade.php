@@ -96,7 +96,6 @@
                         </div>
                         <h2 class="text-lg font-semibold text-gray-900">Continue Learning</h2>
                     </div>
-                    <a href="{{ route('lessons.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All Lessons</a>
                 </div>
                 
                 <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between">

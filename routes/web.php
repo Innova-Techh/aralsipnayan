@@ -2,66 +2,88 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\AchievementController;
 
-//show homepage
+// Homepage
 Route::get('/', function () {
     return view('homepage');
 });
 
-// Show login page
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+// Auth Routes
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-//Test route to check if timestamp is synch with Philippine Timezone
-//Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-//Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+// General dashboard redirect (based on role)
+Route::get('/dashboard', function() {
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
 
-// Dashboard home
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+    switch(Auth::user()->role) {
+        case 'Admin':
+            return redirect()->route('admin.dashboard');
+        case 'Teacher':
+            return redirect()->route('teacher.dashboard');
+        case 'Student':
+            return redirect()->route('student.dashboard');
+        default:
+            return redirect('/');
+    }
+})->name('dashboard');
 
-// User dashboard routes
-Route::prefix('user')->name('user.')->group(function () {
-    Route::get('/courses', [CoursesController::class, 'index'])->name('courses');
-    Route::get('/courses/{id}', [CoursesController::class, 'show'])->name('courses.show');
-});
+// Student Dashboard
+Route::get('/student/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'role:Student'])
+    ->name('student.dashboard');
 
-// Alternative routes (you can choose which structure you prefer)
-Route::get('/courses', [CoursesController::class, 'index'])->name('courses');
-Route::get('/courses/{id}', [CoursesController::class, 'show'])->name('courses.show');
-Route::get('/lessons', function () {
-    return view('user.lessons');
-})->name('lessons.index');
+// Teacher Dashboard (placeholder)
+Route::get('/teacher/dashboard', function () {
+    return 'Teacher Dashboard (Coming Soon)';
+})->middleware(['auth', 'role:Teacher'])->name('teacher.dashboard');
 
-// Missing routes that are referenced in the layout
-Route::get('/assessments', function () {
-    return view('user.assessments');
-})->name('assessments.index');
+// Admin Dashboard (placeholder)
+Route::get('/admin/dashboard', function () {
+    return 'Admin Dashboard (Coming Soon)';
+})->middleware(['auth', 'role:Admin'])->name('admin.dashboard');
 
-Route::get('/achievements', [App\Http\Controllers\AchievementController::class, 'index'])->name('achievements.index');
+// Dashboard stats (accessible to authenticated users only)
+Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])
+    ->middleware('auth')
+    ->name('dashboard.stats');
 
-Route::get('/progression', function () {
-    return view('user.progression');
-})->name('progression.index');
+// Assessments
+Route::get('/assessments', fn() => view('user.assessments'))
+    ->middleware('auth')
+    ->name('assessments.index');
 
-Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
-Route::get('/leaderboard/data', [App\Http\Controllers\LeaderboardController::class, 'getLeaderboardData'])->name('leaderboard.data');
+// Achievements
+Route::get('/achievements', [AchievementController::class, 'index'])
+    ->middleware('auth')
+    ->name('achievements.index');
 
-Route::get('/resources', function () {
-    return view('user.resources');
-})->name('resources.index');
+// Progression
+Route::get('/progression', fn() => view('user.progression'))
+    ->middleware('auth')
+    ->name('progression.index');
 
-Route::get('/profile/edit', function () {
-    return view('user.profile.edit');
-})->name('profile.edit');
+// Leaderboard
+Route::get('/leaderboard', [LeaderboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('leaderboard.index');
+Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardData'])
+    ->middleware('auth')
+    ->name('leaderboard.data');
+
+// Profile edit
+Route::get('/profile/edit', fn() => view('user.profile.edit'))
+    ->middleware('auth')
+    ->name('profile.edit');
 
 // Logout route
-Route::post('/logout', function () {
-    return redirect('/');
-})->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
