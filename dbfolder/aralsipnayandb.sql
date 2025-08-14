@@ -159,7 +159,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 
 CREATE TABLE `users` (
     `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `username` VARCHAR(50) UNIQUE,
+    `username` VARCHAR(50) UNIQUE NOT NULL,
     `email` VARCHAR(100) UNIQUE,
     `password` VARCHAR(255) NOT NULL,
     `role` ENUM('Student', 'Teacher', 'Admin') NOT NULL,

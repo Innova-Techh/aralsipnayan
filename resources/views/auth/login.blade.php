@@ -23,30 +23,32 @@
          <!-- Login Card -->
          <div class="bg-primary-blue rounded-2xl p-8 w-full max-w-sm shadow-lg">
             <h2 class="text-white text-xl font-semibold text-center mb-8">Student Login</h2>
-            <form method="GET" action="{{ route('dashboard') }}">
-                 <div class="mb-5">
-                     <label for="student_number" class="block text-white text-sm font-medium mb-2">Student Number</label>
-                     <input type="text" 
+                <form method="POST" action="{{ route('login.submit') }}">
+                    @csrf
+                    <div class="mb-5">
+                        <label for="username" class="block text-white text-sm font-medium mb-2">Username</label>
+                        <input type="text" 
                             class="w-full px-4 py-3 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30" 
-                            name="student_number" 
-                            id="student_number" 
-                            placeholder="180584294" 
-                            ><!--required-->
-                 </div>
-                 <div class="mb-8">
-                     <label for="password" class="block text-white text-sm font-medium mb-2">Password</label>
-                     <input type="password" 
+                            name="username" 
+                            id="username" 
+                            placeholder="Enter your username"
+                            required>
+                    </div>
+                    <div class="mb-8">
+                        <label for="password" class="block text-white text-sm font-medium mb-2">Password</label>
+                        <input type="password" 
                             class="w-full px-4 py-3 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30" 
                             name="password" 
                             id="password" 
-                            placeholder="••••••••" 
-                            ><!--required-->
-                 </div>
-                 <button type="submit" 
-                         class="w-full bg-primary-yellow text-primary-blue font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-yellow-400 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-yellow-300">
-                     Login
-                 </button>
-             </form>
+                            placeholder="••••••••"
+                            required>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-primary-yellow text-primary-blue font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-yellow-400 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-yellow-300">
+                        Login
+                    </button>
+                </form>
+
          </div>
      </div>
 
@@ -69,21 +71,22 @@
         <div class="flex-1 bg-gray-100 flex items-center justify-center">
             <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
                 <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Student Login</h2>
-                <form method="GET" action="{{ route('dashboard') }}">
+                <form method="POST" action="{{ route('login.submit') }}">
+                        @csrf
                                          <div class="mb-6">
-                         <label for="student_number_desktop" class="block text-gray-700 text-base font-medium mb-2">Student Number</label>
+                         <label for="username" class="block text-gray-700 text-base font-medium mb-2">Student Number</label>
                          <input type="text" 
                                 class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue" 
-                                name="student_number" 
-                                id="student_number_desktop" 
+                                name="username" 
+                                id="password" 
                                  ><!--required-->
                      </div>
                      <div class="mb-8">
-                         <label for="password_desktop" class="block text-gray-700 text-base font-medium mb-2">Password</label>
+                         <label for="password" class="block text-gray-700 text-base font-medium mb-2">Password</label>
                          <input type="password" 
                                 class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue" 
                                 name="password" 
-                                id="password_desktop" 
+                                id="password" 
                                  ><!--required-->
                      </div>
                      <button type="submit" 
@@ -96,3 +99,27 @@
     </div>
 </body>
 </html>
+
+@if ($errors->any())
+<div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-lg w-96 p-6 relative">
+        <!-- Close button - moved to upper right -->
+        <button onclick="document.getElementById('errorModal').classList.add('hidden')"
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+
+        <!-- Logo -->
+        <div class="flex flex-col items-center">
+            <img src="{{ asset('images/Icons/Icon1.png') }}" alt="AralSipnayan Logo" class="w-12 h-12 rounded-xl mb-2">
+            <h2 class="text-lg font-bold text-primary-blue mb-3">Login Failed</h2>
+            
+            <!-- Error Messages -->
+            <ul class="text-red-600 text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        
+        </div>
+    </div>
+</div>
+@endif

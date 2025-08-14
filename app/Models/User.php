@@ -10,9 +10,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable (allowable for mass assignment).
-     */
     protected $fillable = [
         'username',
         'email',
@@ -22,19 +19,54 @@ class User extends Authenticatable
         'status',
     ];
 
-    /**
-     * Attributes hidden from JSON serialization.
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Attribute type casting.
-     */
     protected $casts = [
         'last_login_date' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+    public function studentProfile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    public function teacherProfile()
+    {
+        return $this->hasOne(TeacherProfile::class);
+    }
+
+    public function adminProfile()
+    {
+        return $this->hasOne(AdminProfile::class);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Role Helpers
+    |--------------------------------------------------------------------------
+    */
+    public function isStudent(): bool
+    {
+        return $this->role === 'Student';
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->role === 'Teacher';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'Admin';
+    }
 }
