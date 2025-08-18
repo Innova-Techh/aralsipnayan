@@ -140,6 +140,8 @@ export default {
                 float: "float 6s ease-in-out infinite",
                 "pulse-slow": "pulse-slow 4s ease-in-out infinite",
                 "gradient-x": "gradient-x 15s ease infinite",
+                "float": "float 6s ease-in-out infinite",
+                "pulse-slow": "pulse-slow 4s ease-in-out infinite",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
