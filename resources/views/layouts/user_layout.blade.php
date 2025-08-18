@@ -51,10 +51,8 @@
 
                         <!-- Brand -->
                         <div class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
+                            <div class="w-10 h-10 flex items-center justify-center mr-3">
+                                <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo" class="w-10 h-10 rounded-xl"> 
                             </div>
                             <h1 class="text-lg font-semibold text-gray-900">AralSipnayan</h1>
                         </div>
