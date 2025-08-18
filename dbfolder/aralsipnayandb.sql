@@ -350,6 +350,38 @@ CREATE TABLE questions (
     CONSTRAINT fk_question_creator FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+- Individual competency mastery tracking
+CREATE TABLE student_competency_mastery (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    competency ENUM('Number_Algebra', 'Measurement_Geometry', 'Data_Probability') NOT NULL,
+    current_difficulty_level ENUM('Beginner', 'Intermediate', 'Advanced') DEFAULT 'Beginner',
+    mastery_probability DECIMAL(4,3) DEFAULT 0.300,  -- BKT probability (0.000-1.000)
+    
+    -- Performance statistics
+    total_questions_answered INT DEFAULT 0,
+    correct_answers INT DEFAULT 0,
+    accuracy_rate DECIMAL(4,3) GENERATED ALWAYS AS (
+        CASE WHEN total_questions_answered > 0 
+        THEN correct_answers / total_questions_answered 
+        ELSE 0 END
+    ) STORED,
+    
+    -- BKT parameters (can be adjusted per student)
+    p_learn DECIMAL(4,3) DEFAULT 0.100,    -- Probability of learning
+    p_guess DECIMAL(4,3) DEFAULT 0.250,    -- Probability of guessing correctly
+    p_slip DECIMAL(4,3) DEFAULT 0.100,     -- Probability of slip
+    
+    -- Diagnostic status
+    diagnostic_completed BOOLEAN DEFAULT FALSE,
+    diagnostic_date DATETIME NULL,
+    
+    last_assessment_date DATETIME NULL,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE KEY unique_user_competency (user_id, competency),
+    CONSTRAINT fk_mastery_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 -- Assessment templates (both built-in and custom)
 CREATE TABLE assessments (
     assessment_id VARCHAR(30) PRIMARY KEY,  -- Format: NA-B-BUILTIN-001, MG-CUSTOM-001
