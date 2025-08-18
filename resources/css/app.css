@@ -1,3 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/*font */ 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap'); 
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Custom animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Custom components */
+@layer components {
+    /* Reusable carousel styles for the homepage 2nd section */
+    .carousel {
+        @apply flex overflow-x-auto gap-6 px-4 pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding-left: 1rem;
+        scroll-padding-right: 1rem;
+        margin-top: 1rem;
+    }
+
+    .carousel-card {
+        @apply snap-center p-0 shadow-none transition-all duration-300 hover:-translate-y-2;
+        flex: 0 0 75%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        margin: 10px;
+    }
+
+    @screen md {
+        .carousel-card { flex-basis: 60%; }
+    }
+
+    @screen lg {
+        .carousel-card { flex-basis: 50%; }
+    }
+
+    .carousel-image {
+        @apply w-full h-auto object-contain mb-0 block;
+        max-height: 20rem; /* slightly smaller images */
+    }
+    @screen lg {
+        .carousel-image { max-height: 24rem; }
+    }
+    .bg-gradient-math {
+        background: 
+            linear-gradient(135deg, #667eea 0%, #764ba2 100%), /* base gradient */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='white' fill-opacity='0.1' d='M10 3l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z'/%3E%3C/svg%3E");
+       
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-pulse-slow {
+        animation: pulse-slow 4s ease-in-out infinite;
+    }
+    
+    .glass-card {
+        @apply bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-300;
+    }
+    
+    /* Reusable hover pop utility for cards */
+    .hover-pop {
+        @apply transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-2xl;
+    }
+
+    .card-hover {
+        @apply transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl;
+    }
+    
+    .full-screen-section {
+        @apply min-h-screen flex flex-col justify-center;
+    }
+}
+
+/* Custom utilities */
+@layer utilities {
+    .font-poppins {
+        font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+    }
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .backdrop-blur-custom {
+        backdrop-filter: blur(10px);
+    }
+    
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
