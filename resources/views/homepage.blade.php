@@ -2,171 +2,314 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AralSipnayan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .hero {
-            background: linear-gradient(135deg, #003c8f, #1976d2);
-            color: white;
-            padding: 100px 20px;
-            text-align: center;
-        }
-        .btn-yellow {
-            background-color: #ffb300;
-            color: white;
-        }
-
-
-
-        
-        .features {
-            background: #f7f9fc;
-            padding: 60px 20px;
-        }
-        .features .card {
-            border: none;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .footer-section {
-            padding: 60px 20px;
-        }
-        .vector-bg {
-        position: absolute;
-        top: -40px; /* adjust as needed */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50%;
-        height: auto;
-        z-index: 0;
-        pointer-events: none;
-        opacity: 1;
-        }
-    </style>
-    <script
-    src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
-    type="module"
-    ></script>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-
+<body class="bg-gray-50 font-poppins">
     <!-- Header -->
-     <nav class="navbar navbar-light bg-white px-5 py-3 shadow-sm">
-        <a class="navbar-brand fw-bold fs-3" href="#">Aral<span class="text-primary">Sipnayan</span></a>
-        <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4 py-2">Login</a>
-    </nav>
-
-    <!-- Hero -->
-    <section class="hero d-flex align-items-center" style="height: 100vh;">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <!-- Text Left -->
-                <div class="col-md-6 text-start text-white px-5">
-                    <h1 class="fw-bold display-3">
-                        Master <span class="text-warning">Advanced Mathematics</span><br>with Interactive Learning
-                    </h1>
-                    <p class="mt-3 fs-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam cursus mauris ut diam vehicula vehicula.
-                    </p>
-                    <div class="mt-4">
-                        <a href="#" class="btn btn-yellow btn-lg me-2">Start Your Journey</a>
-                        <a href="#" class="btn btn-outline-light btn-lg">Know More</a>
+    <header class="bg-white shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10  rounded-lg flex items-center justify-center">
+                        <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo" class="w-10 h-10 rounded-xl">
                     </div>
+                    <h1 class="text-3xl font-bold">
+                        <span class="text-primary-blue">Aral</span><span class="text-primary-red">Sipnayan</span>
+                    </h1>
                 </div>
-
-                <!-- Animation Right -->
-                <div class="col-md-6 text-center">
-                    <dotlottie-player
-                        src="https://lottie.host/49f63dad-e594-456d-ad02-f96acca6a471/MkfFKJ2FTZ.lottie"
-                        background="transparent"
-                        speed="1"
-                        style="width: 100%; max-width: 450px; height: auto;"
-                        loop
-                        autoplay>
-                    </dotlottie-player>
-                </div>
+                <a href="{{ route('login') }}" class="btn bg-primary-blue btn-lg px-4 py-2 rounded-xl text-white">Login</a>
             </div>
-        </div>
-    </section>
+        </nav>
+    </header>
 
-    <!-- Features -->
-    <section class="features position-relative style="z-index: 1; background-color: #f7f9fc; style="height: 100vh;">
-     <img src="{{ asset('images/homepage/Vector 1.png') }}" alt="Decorative Curve" class="vector-bg">
-        <div class="container position-relative" style="z-index: 2;">
-            <h2 class="fw-bold mb-3 display-6 display-md-5 display-lg-4 text-center">How AralSipnayan <span class="text-primary">transforms</span> learning</h2>
-            <p class="mb-4 lead text-center">Experience the future of mathematics education for grade 6 students</p>
-            <div class="row row-cols-1 row-cols-md-5 g-4">
-                @php
-                    $features = [
-                        [
-                            'icon' => '<img src="' . asset('images/homepage/Property 1=book-open.png') . '" width="50">',
-                            'title' => 'Advanced Lessons',
-                            'desc' => 'Comprehensive grade 6 math content',
-                        ],
-                        [
-                            'icon' => '<img src="' . asset('images/homepage/Property 1=smartphone.png') . '" width="50">',
-                            'title' => 'Cross-Platform',
-                            'desc' => 'Access anytime on any device',
-                        ],
-                        [
-                            'icon' => '<img src="' . asset('images/homepage/Property 1=target.png') . '" width="50">',
-                            'title' => 'Interactive Learning',
-                            'desc' => 'Engaging, step-by-step lessons',
-                        ],
-                        [
-                            'icon' => '<img src="' . asset('images/homepage/Property 1=users.png') . '" width="50">',
-                            'title' => 'Progress Tracking',
-                            'desc' => 'Monitor scores and achievements',
-                        ],
-                        [
-                            'icon' => '<img src="' . asset('images/homepage/Property 1=star.png') . '" width="50">',
-                            'title' => 'Gamified Experience',
-                            'desc' => 'Fun, rewards, and leaderboards',
-                        ],
-                    ];
-                @endphp
+    <!-- Section 1 -->
+     <section class="bg-gradient-math text-white full-screen-section relative overflow-hidden">
+         <!-- Decorative Elements -->
+         <div class="absolute top-32 left-8 w-2 h-2 bg-red-400 rounded-full opacity-80 animate-pulse-slow"></div>
+         <div class="absolute top-40 right-12 text-yellow-400 opacity-60 text-2xl animate-float">✦</div>
+         <div class="absolute top-64 left-16 w-1 h-1 bg-blue-300 rounded-full animate-float"></div>
+         <div class="absolute top-80 right-8 w-2 h-2 bg-pink-400 rounded-full opacity-70 animate-float"></div>
+         <div class="absolute bottom-80 left-12 w-2 h-2 bg-green-400 rounded-full opacity-60 animate-pulse-slow"></div>
+         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float">✦</div>
+         
+         <!-- Mathematical Symbols -->
+         <div class="absolute top-20 right-20 text-white opacity-20 text-4xl animate-float">÷</div>
+         <div class="absolute bottom-40 left-20 text-white opacity-20 text-4xl animate-float">+</div>
+         
+         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+             <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                 Master <span class="text-yellow-400">Advanced<br>Mathematics</span> with<br>
+                 <span class="text-white">Interactive Learning</span>
+             </h1>
+             <p class="text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed text-center">
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ut aliquip ex ea commodo consequat mauris ut diam vitae
+             </p>
+             <button class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto">
+                 <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                     <path d="M8 5v14l11-7z"/>
+                 </svg>
+                 Start Your Journey
+             </button>
+             
+             <!-- Quiz Section -->
+             <div class="glass-card rounded-2xl p-6 mt-12 max-w-md mx-auto">
+                 <p class="text-white font-medium mb-4 text-lg">What is the quotient of 3/4 ÷ 1/2 = ?</p>
+                 <div class="grid grid-cols-2 gap-3 mb-4">
+                     <button class="bg-green-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-green-600 transition-colors hover-pop">1.2</button>
+                     <button class="bg-blue-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors hover-pop">1.5</button>
+                     <button class="bg-red-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-red-600 transition-colors hover-pop">2.0</button>
+                     <button class="bg-purple-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-purple-600 transition-colors hover-pop">1.7</button>
+                 </div>
+                 <div class="flex justify-between items-center mb-2">
+                     <span class="text-white text-opacity-70 text-sm">Lessons Completed</span>
+                     <span class="text-white font-bold">75%</span>
+                 </div>
+                 <div class="w-full bg-white bg-opacity-20 rounded-full h-2">
+                     <div class="bg-yellow-400 h-2 rounded-full" style="width: 75%"></div>
+                 </div>
+             </div>
+         </div>
+     </section>
 
-                @foreach ($features as $feature)
-                    <div class="col">
-                        <div class="card p-4 h-100 text-center">
-                            <div class="display-5">{!! $feature['icon'] !!}</div>
-                            <h5 class="fw-bold mt-3">{{ $feature['title'] }}</h5>
-                            <p>{{ $feature['desc'] }}</p>
+    <!-- Section 2 -->
+     <section class="py-12 md:py-14 bg-white full-screen-section">
+         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl md:text-5xl font-bold text-center mb-8 md:mb-10 text-gray-900">
+                 How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms learning</span>
+             </h2>
+             <p class="text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
+                 Experience the future of mathematics education with our innovative platform designed specifically for Grade 6 students
+             </p>
+             
+             <!-- Features Carousel -->
+             <div class="relative mb-10 md:mb-12">
+                 <div id="features-carousel" class="carousel">
+                     <!-- Placeholder Card 1 -->
+                     <div class="carousel-card">
+                         <img src="{{ asset('images/carousel/Frame 368.png') }}" alt="Frame 368" class="carousel-image">
+                     </div>
+
+                     <!-- Placeholder Card 2 -->
+                     <div class="carousel-card">
+                         <img src="{{ asset('images/carousel/Frame 369.png') }}" alt="Frame 369" class="carousel-image">
+                     </div>
+
+                     <!-- Placeholder Card 3 -->
+                     <div class="carousel-card">
+                         <img src="{{ asset('images/carousel/Frame 370.png') }}" alt="Frame 370" class="carousel-image">
+                     </div>
+
+                     <!-- Placeholder Card 4 -->
+                     <div class="carousel-card">
+                         <img src="{{ asset('images/carousel/Frame 371.png') }}" alt="Frame 371" class="carousel-image">
+                     </div>
+
+                     <!-- Placeholder Card 5 -->
+                     <div class="carousel-card">
+                         <img src="{{ asset('images/carousel/Frame 372.png') }}" alt="Frame 372" class="carousel-image">
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Bottom Section -->
+             <div class="text-center">
+                 <h3 class="text-2xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+                     Transform your <span class="text-blue-600">mathematical journey</span> today
+                 </h3>
+                 <p class="text-gray-600 text-center max-w-2xl mx-auto leading-relaxed text-base md:text-lg">
+                     Join fellow Grade 6 students who are wanting to improved their mathematics skills through our innovative platform. Experience personalized learning that adapts to your pace and style
+                 </p>
+             </div>
+         </div>
+     </section>
+
+    <!-- Section 3 -->
+     <section class="pt-12 md:py-14 bg-white md:bg-blue-900 relative">
+        <!-- Mobile design (only) -->
+        <div class="block md:hidden relative z-10 py-4">
+            <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-blue-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl relative z-10">
+                    <div class="text-center pb-4">
+                        <h2 class="text-2xl font-extrabold text-yellow-300">AralSipnayan</h2>
+                        <p class="text-white/80 text-sm">Features Overview</p>
+                    </div>
+
+                    <!-- Card: Adaptive Learning -->
+                    <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        <div class="flex items-start gap-3">
+                        <img src="{{ asset('images/features/features1.png') }}" alt="Achievements" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
+                            <div class="flex-1">
+                                <h3 class="text-white font-semibold">Adaptive Learning</h3>
+                                <p class="text-white/70 text-sm">Engaging quizzes & lessons</p>
+                                <div class="bg-white/20 rounded-lg p-3 mt-3 text-center border border-white/10">
+                                    <div class="text-white/70 text-xs">Current Lesson</div>
+                                    <div class="text-yellow-300 font-semibold text-sm">Fractions</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                @endforeach
+
+                    <!-- Card: Achievements -->
+                    <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        <div class="flex items-start gap-3">
+                            <img src="{{ asset('images/features/features2.png') }}" alt="Achievements" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
+                            <div class="flex-1">
+                                <h3 class="text-white font-semibold">Achievements</h3>
+                                <p class="text-white/70 text-sm">Badges and XP</p>
+                                <div class="bg-white/20 rounded-lg p-3 mt-3 text-center border border-white/10">
+                                    <div class="text-white/70 text-xs">Badges Earned</div>
+                                    <div class="text-yellow-300 font-semibold">15/20</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Progress Tracking -->
+                    <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        <div class="flex items-start gap-3">
+                            <img src="{{ asset('images/features/features3.png') }}" alt="Achievements" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
+                            <div class="flex-1">
+                                <h3 class="text-white font-semibold">Progress Tracking</h3>
+                                <p class="text-white/70 text-sm">Real-time progress</p>
+                                <div class="bg-white/20 rounded-lg p-3 mt-3 border border-white/10">
+                                    <div class="text-white/70 text-xs mb-1">Progress</div>
+                                    <div class="w-full h-2 bg-white/20 rounded-full mb-2">
+                                        <div class="h-2 bg-yellow-300 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                    <div class="text-center text-white/80 text-sm">Level 4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Leaderboard -->
+                    <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        <div class="flex items-start gap-3">
+                            <img src="{{ asset('images/features/features4.png') }}" alt="Achievements" class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
+                            <div class="flex-1">
+                                <h3 class="text-white font-semibold">Leaderboard</h3>
+                                <p class="text-white/70 text-sm">Your ranking</p>
+                                <div class="bg-white/20 rounded-lg p-3 mt-3 border border-white/10">
+                                    <div class="flex items-center justify-between text-sm mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-yellow-300">1</span>
+                                            <span class="text-white/90">Mario S.</span>
+                                        </div>
+                                        <div class="text-yellow-300 font-semibold">1580</div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-yellow-300">2</span>
+                                            <span class="text-white/90">You</span>
+                                        </div>
+                                        <div class="text-yellow-300 font-semibold">1250</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Desktop/Tablet design (md and up) -->
+        <div class="hidden md:block relative z-10">
+            <div class="max-w-7xl mx-auto px-8 lg:px-12">
+                <div class="p-12">
+                    <div class="text-center pb-6">
+                        <h2 class="text-4xl font-extrabold text-yellow-300">AralSipnayan</h2>
+                        <p class="text-white/80 text-lg">Features Overview</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <!-- Adaptive Learning -->
+                        <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            <div class="flex items-start gap-4">
+                                <img src="{{ asset('images/features/features1.png') }}" alt="Achievements" class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h3 class="text-white font-semibold">Adaptive Learning</h3>
+                                    <p class="text-white/70 text-sm">Engaging quizzes & lessons</p>
+                                    <div class="bg-white/20 rounded-lg p-4 mt-4 text-center border border-white/10">
+                                        <div class="text-white/70 text-xs">Current Lesson</div>
+                                        <div class="text-yellow-300 font-semibold">Fractions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            <div class="flex items-start gap-4">
+                                <img src="{{ asset('images/features/features2.png') }}" alt="Achievements" class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h3 class="text-white font-semibold">Achievements</h3>
+                                    <p class="text-white/70 text-sm">Badges and XP</p>
+                                    <div class="bg-white/20 rounded-lg p-4 mt-4 text-center border border-white/10">
+                                        <div class="text-white/70 text-xs">Badges Earned</div>
+                                        <div class="text-yellow-300 font-semibold">15/20</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Tracking -->
+                        <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            <div class="flex items-start gap-4">
+                                <img src="{{ asset('images/features/features3.png') }}" alt="Achievements" class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h3 class="text-white font-semibold">Progress Tracking</h3>
+                                    <p class="text-white/70 text-sm">Real-time progress</p>
+                                    <div class="bg-white/20 rounded-lg p-4 mt-4 border border-white/10">
+                                        <div class="text-white/70 text-xs mb-2">Progress</div>
+                                        <div class="w-full h-2 bg-white/20 rounded-full mb-2">
+                                            <div class="h-2 bg-yellow-300 rounded-full" style="width: 100%"></div>
+                                        </div>
+                                        <div class="text-center text-white/80 text-sm">Level 4</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Leaderboard -->
+                        <div class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            <div class="flex items-start gap-4">
+                                <img src="{{ asset('images/features/features4.png') }}" alt="Achievements" class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h3 class="text-white font-semibold">Leaderboard</h3>
+                                    <p class="text-white/70 text-sm">Your ranking</p>
+                                    <div class="bg-white/20 rounded-lg p-4 mt-4 border border-white/10">
+                                        <div class="flex items-center justify-between text-sm mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-yellow-300">1</span>
+                                                <span class="text-white/90">Mario S.</span>
+                                            </div>
+                                            <div class="text-yellow-300 font-semibold">1580</div>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-yellow-300">2</span>
+                                                <span class="text-white/90">You</span>
+                                            </div>
+                                            <div class="text-yellow-300 font-semibold">1250</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="container-fluid position-relative text-left">
-            <div class="row align-items-center ">
-                <!-- Image Column -->
-                <div class="col-md-6 mb-4 p-5">
-                    <img src="{{ asset('images/homepage/placeholder1.jpg') }}" alt="Math Illustration" class="img-fluid">
-                </div>
-
-                <!-- Text Content Column -->
-                <div class="col-md-6 p-5">
-                    <h2 class="fw-bold mb-3 display-4 text-left">
-                        Transform your <span class="text-primary">mathematical journey</span> today!
-                    </h2>
-                    <p class="mt-3 lead text-justify" style="font-size: 1.5rem;">
-                        Join fellow Grade 6 students who are wanting to improved their mathematics
-                        skills </br> through our innovative platform. Experience personalized learning that adapts 
-                        </br>to your pace and style
-                    </p>
-                    <a href="#" class="btn btn-primary mt-3 btn-lg" style="font-size: 1.3rem;">Start Learning Now</a>
-                </div>
-            </div>
+        <!-- Bottom decorative waves (stick to section bottom, mobile only) -->
+        <div class="absolute bottom-0 left-0 w-full md:hidden pointer-events-none select-none z-0 mt-6">
+            <svg viewBox="0 0 375 120" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <path d="M0 40 C80 80 160 0 240 30 C300 52 340 60 375 40 L375 120 L0 120 Z" fill="#FACC15"/>
+                <path d="M0 70 C90 100 180 40 260 70 C310 90 350 95 375 80 L375 120 L0 120 Z" fill="#3B82F6"/>
+            </svg>
         </div>
     </section>
-
-    <!-- Footer Section -->
-    <section class="footer-section text-center text-md-start">
-
-    </section>
-
 </body>
 </html>
