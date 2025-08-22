@@ -10,22 +10,22 @@
     <!-- Header -->
     <header class="bg-white shadow-sm">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10  rounded-lg flex items-center justify-center">
-                        <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo" class="w-10 h-10 rounded-xl">
+            <div class="flex flex-row justify-between items-center py-3 sm:py-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10  rounded-lg flex items-center justify-center">
+                        <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl">
                     </div>
-                    <h1 class="text-3xl font-bold">
+                    <h1 class="text-2xl sm:text-3xl font-bold">
                         <span class="text-primary-blue">Aral</span><span class="text-primary-red">Sipnayan</span>
                     </h1>
                 </div>
-                <a href="{{ route('login') }}" class="btn bg-primary-blue btn-lg px-4 py-2 rounded-xl text-white">Login</a>
+                <a href="{{ route('login') }}" class="btn bg-primary-blue btn-lg px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">Login</a>
             </div>
         </nav>
     </header>
 
     <!-- Section 1 -->
-     <section class="bg-gradient-math text-white full-screen-section relative overflow-hidden">
+     <section class="py-12 md:py-12 bg-gradient-math text-white full-screen-section relative overflow-hidden">
          <!-- Decorative Elements -->
          <div class="absolute top-32 left-8 w-2 h-2 bg-red-400 rounded-full opacity-80 animate-pulse-slow"></div>
          <div class="absolute top-40 right-12 text-yellow-400 opacity-60 text-2xl animate-float">✦</div>
@@ -74,7 +74,7 @@
      </section>
 
     <!-- Section 2 -->
-     <section class="py-12 md:py-14 bg-white full-screen-section">
+     <section class="py-12 md:py-12 bg-white">
          <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
              <h2 class="text-3xl md:text-5xl font-bold text-center mb-8 md:mb-10 text-gray-900">
                  How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms learning</span>
@@ -126,7 +126,7 @@
      </section>
 
     <!-- Section 3 -->
-     <section class="pt-12 md:py-14 bg-white md:bg-blue-900 relative">
+     <section class="pb-6 md:pb-6 bg-white md:bg-blue-900 relative">
         <!-- Mobile design (only) -->
         <div class="block md:hidden relative z-10 py-4">
             <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
