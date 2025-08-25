@@ -5,8 +5,7 @@
 @section('content')
 <div class="space-y-6 sm:space-y-8">
     <!-- Welcome Header (Hero) -->
-    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 text-white overflow-hidden bg-center bg-cover" style="background-image: url('{{ asset('images/assessments/bg.png') }}');">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0A3D91]/80 to-[#133B87]/80"></div>
+    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 text-white overflow-hidden bg-center bg-cover" style="background-image: url('{{ asset('images/dashboard/bg.png') }}');">
         <div class="relative z-10 px-6 sm:px-8 lg:px-12">
             <h1 class="text-[22px] sm:text-base md:text-xl lg:text-3xl font-extrabold leading-tight">
                 Welcome back, {{ Auth::user()->username }}! 👋
