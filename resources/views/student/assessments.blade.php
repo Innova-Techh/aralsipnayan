@@ -5,22 +5,60 @@
 @section('content')
 <div class="space-y-8">
     <!-- My Assessments Header -->
-    <div class="relative bg-gradient-to-r from-blue-800 to-blue-900 rounded-xl shadow-lg overflow-hidden">
-        <div class="absolute inset-0">
-            <img src="{{ asset('images/assessments/bg.png') }}" alt="Background" class="w-full h-full object-cover opacity-30">
+    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 text-white overflow-hidden bg-center bg-cover" style="background-image: url('{{ asset('images/assessments/bg.png') }}');">
+        <div class="relative z-10 px-6 sm:px-8 lg:px-12">
+            <h1 class="text-[22px] sm:text-base md:text-xl lg:text-3xl font-extrabold leading-tight">My Assessments</h1>
+            <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">Test your mathematical knowledge across different 
+            competencies and track your learning progress with adaptive assessments</p>
         </div>
-        <div class="relative p-8">
-            <h1 class="text-3xl font-bold text-white mb-2 font-baloo2">My Assessments</h1>
-            <p class="text-blue-100">Choose a category to test your knowledge and skills</p>
+    </div>
+
+    <!-- Feature Cards Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Ready for a Challenge Card -->
+        <div class="relative overflow-hidden rounded-2xl p-6 text-white" style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
+            <div class="relative z-10 w-[60%]">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold">🎯 Ready for a Challenge?</h3>
+                </div>
+                <p class="text-white mb-4">Test your math skills with fun assessments! Choose from geometry, numbers, or fractions and start your learning adventure!</p>
+            </div>
+        </div>
+
+        <!-- Level Up Your Skills Card -->
+        <div class="relative overflow-hidden rounded-2xl p-6 text-white" style="background-image: url('{{ asset('images/assessments/card2.png') }}'); background-size: cover; background-position: center;">
+            <div class="relative z-10 w-[60%]">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold">🌟 Level Up Your Skills!</h3>
+                </div>
+                <p class="text-white mb-4">Adaptive learning just for you. Our smart system adjusts questions to match your learning pace perfectly!</p>
+            </div>
+        </div>
+
+        <!-- Learning is Fun Card -->
+        <div class="relative overflow-hidden rounded-2xl p-6 text-white" style="background-image: url('{{ asset('images/assessments/card3.png') }}'); background-size: cover; background-position: center;">
+            <div class="relative z-10 w-[60%]">
+                <div class="flex items-center mb-4">
+                    <h3 class="text-xl font-bold"> 🎮 Learning is Fun!</h3>
+                </div>
+                <p class="text-white mb-4">Gamified math assessments. Earn points, unlock achievements, and compete with friends while learning!</p>
+            </div>
         </div>
     </div>
 
     <!-- Assessment Categories Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Number and Algebra Card -->
-        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start mb-4">
-                <div>
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden">
+            <!-- Background Vector -->
+            <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
+                <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
+                <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class=" relative w-[100%]">
                     <h3 class="text-lg font-bold text-gray-900 mb-1">Number and Algebra</h3>
                     <p class="text-sm text-gray-600">Test your knowledge of numbers, operations, and algebraic concepts</p>
                 </div>
@@ -33,7 +71,7 @@
             </div>
             
             <!-- Progress Bar -->
-            <div class="mb-4">
+            <div class="mb-4 relative z-10">
                 <div class="flex justify-between text-sm text-gray-600 mb-1">
                     <span>Mastery Level</span>
                     <span>{{ $naProgress }}%</span>
@@ -44,7 +82,7 @@
             </div>
 
             <!-- Stats -->
-            <div class="flex justify-between mb-4">
+            <div class="flex justify-between mb-4 relative z-10">
                 <div class="text-center">
                     <div class="flex items-center justify-center mb-1">
                         <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
@@ -70,73 +108,81 @@
                 </div>
             </div>
 
-            <button onclick="startAssessment('Number_Algebra')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                Start Assessment
+            <button onclick="startAssessment('Number_Algebra')" class="w-full bg-primary-blue text-white py-2 px-4 rounded-xl font-medium hover:bg-blue-700 transition-colors relative z-10">
+                View Assessment
             </button>
         </div>
 
         <!-- Measurement and Geometry Card -->
-        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Measurement and Geometry</h3>
-                    <p class="text-sm text-gray-600">Practice measurement, geometry, and spatial reasoning</p>
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden">
+            <!-- Background Vector -->
+            <div class="absolute top-0 left-0 w-32 h-32 opacity-80 z-0">
+                <img src="{{ asset('images/assessments/vector3.png') }}" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 opacity-80 z-0">
+                <img src="{{ asset('images/assessments/vector4.png') }}" alt="" class="w-full h-full object-cover">
+            </div>
+            <div class="flex justify-between items-start mb-4 relative z-20">
+                <div class=" relative w-[100%]">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1 relative">Measurement and Geometry</h3>
+                    <p class="text-sm text-gray-600 relative">Test your knowledge of shapes, angles, and spatial relationships</p>
                 </div>
                 @php
                     $mgMastery = $masteryData['Measurement_Geometry'] ?? null;
                     $mgLevel = $mgMastery ? $mgMastery->current_difficulty_level : 'Beginner';
                     $mgProgress = $mgMastery ? round($mgMastery->mastery_probability * 100) : 30;
                 @endphp
-                <span class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $mgLevel }}</span>
+                <span class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full relative z-20">{{ $mgLevel }}</span>
             </div>
             
-            <div class="mb-4">
-                <div class="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>Mastery Level</span>
-                    <span>{{ $mgProgress }}%</span>
+            <div class="mb-4 relative z-20">
+                <div class="flex justify-between text-sm text-gray-600 mb-1 relative ">
+                    <span class="relative">Mastery Level</span>
+                    <span class="relative ">{{ $mgProgress }}%</span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-{{ $mgProgress >= 70 ? 'green' : ($mgProgress >= 40 ? 'orange' : 'red') }}-400 h-2 rounded-full" style="width: {{ $mgProgress }}%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2 relative">
+                    <div class="bg-{{ $mgProgress >= 70 ? 'green' : ($mgProgress >= 40 ? 'orange' : 'red') }}-400 h-2 rounded-full relative " style="width: {{ $mgProgress }}%"></div>
                 </div>
             </div>
 
-            <div class="flex justify-between mb-4">
-                <div class="text-center">
-                    <div class="flex items-center justify-center mb-1">
-                        <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
-                            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <div class="flex justify-between mb-4 relative z-20">
+                <div class="text-center relative">
+                    <div class="flex items-center justify-center mb-1 relative">
+                        <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 relative">
+                            <svg class="w-4 h-4 text-green-600 relative" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                             </svg>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">{{ $mgMastery ? $mgMastery->correct_answers : 0 }}</span>
+                        <span class="text-xl font-bold text-gray-900 relative">{{ $mgMastery ? $mgMastery->correct_answers : 0 }}</span>
                     </div>
-                    <span class="text-xs text-gray-600">Correct</span>
+                    <span class="text-xs text-gray-600 relative">Correct</span>
                 </div>
-                <div class="text-center">
-                    <div class="flex items-center justify-center mb-1">
-                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="text-center relative">
+                    <div class="flex items-center justify-center mb-1 relative">
+                        <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 relative">
+                            <svg class="w-4 h-4 text-blue-600 relative" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
                             </svg>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">{{ $mgMastery ? $mgMastery->total_questions_answered : 0 }}</span>
+                        <span class="text-xl font-bold text-gray-900 relative">{{ $mgMastery ? $mgMastery->total_questions_answered : 0 }}</span>
                     </div>
-                    <span class="text-xs text-gray-600">Total</span>
+                    <span class="text-xs text-gray-600 relative">Total</span>
                 </div>
             </div>
 
-            <button onclick="startAssessment('Measurement_Geometry')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                Start Assessment
+            <button onclick="startAssessment('Measurement_Geometry')" class="w-full bg-primary-blue text-white py-2 px-4 rounded-xl font-medium hover:bg-blue-700 transition-colors relative z-20">
+                View Assessment
             </button>
         </div>
 
         <!-- Data and Probability Card -->
-        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start mb-4">
-                <div>
+        <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden">
+
+            <div class="flex justify-between items-start mb-4 relative z-10">
+                <div class=" relative w-[100%]">
                     <h3 class="text-lg font-bold text-gray-900 mb-1">Data and Probability</h3>
-                    <p class="text-sm text-gray-600">Explore data analysis, statistics, and probability</p>
+                    <p class="text-sm text-gray-600">Explore data tables, bar graphs, line plots, mean, and chance events</p>
                 </div>
                 @php
                     $dpMastery = $masteryData['Data_Probability'] ?? null;
@@ -146,7 +192,7 @@
                 <span class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $dpLevel }}</span>
             </div>
             
-            <div class="mb-4">
+            <div class="mb-4 relative z-10">
                 <div class="flex justify-between text-sm text-gray-600 mb-1">
                     <span>Mastery Level</span>
                     <span>{{ $dpProgress }}%</span>
@@ -156,7 +202,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-between mb-4">
+            <div class="flex justify-between mb-4 relative z-10">
                 <div class="text-center">
                     <div class="flex items-center justify-center mb-1">
                         <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
@@ -182,8 +228,8 @@
                 </div>
             </div>
 
-            <button onclick="startAssessment('Data_Probability')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                Start Assessment
+            <button onclick="startAssessment('Data_Probability')" class="w-full bg-primary-blue text-white py-2 px-4 rounded-xl font-medium hover:bg-blue-700 transition-colors z-10">
+                View Assessment
             </button>
         </div>
     </div>
