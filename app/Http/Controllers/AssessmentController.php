@@ -224,7 +224,8 @@ class AssessmentController extends Controller
         $tempFile = tempnam(sys_get_temp_dir(), 'bkt_input_');
         file_put_contents($tempFile, $input);
 
-        $pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+       // $pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+        $pythonPath = $this->findPythonExecutable();
         $command = "\"{$pythonPath}\" \"{$scriptPath}\" \"{$tempFile}\"";
         $output = shell_exec($command . ' 2>&1');
 
@@ -270,7 +271,8 @@ class AssessmentController extends Controller
         $tempFile = tempnam(sys_get_temp_dir(), 'bkt_input_');
         file_put_contents($tempFile, $input);
 
-        $pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+        //$pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+        $pythonPath = $this->findPythonExecutable();
         $command = "\"{$pythonPath}\" \"{$scriptPath}\" \"{$tempFile}\"";
         $output = shell_exec($command . ' 2>&1');
 
@@ -309,7 +311,8 @@ class AssessmentController extends Controller
         $tempFile = tempnam(sys_get_temp_dir(), 'bkt_input_');
         file_put_contents($tempFile, $input);
 
-        $pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+        //$pythonPath = 'C:/Users/USER/AppData/Local/Programs/Python/Python313/python.exe';
+        $pythonPath = $this->findPythonExecutable();
         $command = "\"{$pythonPath}\" \"{$scriptPath}\" \"{$tempFile}\"";
         $output = shell_exec($command . ' 2>&1');
 
@@ -327,6 +330,39 @@ class AssessmentController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * Find Python executable path
+     */
+    private function findPythonExecutable()
+    {
+        // Try common Python paths
+        $pythonPaths = [
+            'python',
+            'python3',
+            'python.exe',
+            'python3.exe',
+            'C:/Python313/python.exe',
+            'C:/Python312/python.exe',
+            'C:/Python311/python.exe',
+            'C:/Python310/python.exe',
+            'C:/Python39/python.exe',
+            'C:/Users/' . get_current_user() . '/AppData/Local/Programs/Python/Python313/python.exe',
+            'C:/Users/' . get_current_user() . '/AppData/Local/Programs/Python/Python312/python.exe',
+            'C:/Users/' . get_current_user() . '/AppData/Local/Programs/Python/Python311/python.exe',
+            'C:/Users/' . get_current_user() . '/AppData/Local/Programs/Python/Python310/python.exe',
+        ];
+
+        foreach ($pythonPaths as $path) {
+            $output = shell_exec("$path --version 2>&1");
+            if (strpos($output, 'Python') !== false) {
+                return $path;
+            }
+        }
+
+        // If no Python found, throw an exception
+        throw new \Exception('Python executable not found. Please ensure Python is installed and accessible.');
     }
 
     /**
