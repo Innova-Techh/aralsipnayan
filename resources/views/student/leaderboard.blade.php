@@ -3,125 +3,160 @@
 @section('title', 'AralSipnayan')
 
 @section('content')
-<div class="space-y-8">
-    <!-- Header -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $leaderboardData['title'] }}</h1>
-                <p class="text-gray-600">{{ $leaderboardData['subtitle'] }}</p>
+<div class="min-h-screen bg-gray-100">
+    <!-- Top Section with Blue Background -->
+    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 pt-2 sm:pt-2 overflow-hidden bg-gradient-to-b bg-center bg-cover from-blue-600 to-blue-700 text-white">
+        <!-- Toggle Switch -->
+        <div class="flex justify-center pt-6 pb-4">
+            <div class="bg-white rounded-full p-1 flex">
+                <button class="px-6 py-2 rounded-full bg-primary-blue text-white font-medium text-sm transition-all">
+                    Section
+                </button>
+                <button class="px-6 py-2 rounded-full text-primary-blue font-medium text-sm transition-all">
+                    School
+                </button>
             </div>
-            <button class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                </svg>
-                Top 10 Students
-            </button>
         </div>
+
+        <!-- Podium Section -->
+        <div class="px-6">
+            <div class = "flex flex-col items-center">
+                <!-- Top Three -->
+                <div class="flex items-end justify-center space-x-6">   
+                    <!-- Second Place -->
+                    <div class="flex flex-col items-center transform translate-y-4 ">
+                        <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
+                            <span class="text-gray-600 font-bold text-lg">M</span>
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="font-semibold text-sm text-white">Mary Soberano</div>
+                            <div class="text-yellow-300 text-xs">1,000 pts</div>
+                        </div>
+                    </div>
+
+                    <!-- First Place -->
+                    <div class="flex flex-col items-center ">
+                        <div class="w-20 h-20 bg-red-400 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
+                            <span class="text-white font-bold text-xl">J</span>
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="font-semibold text-white">John Llyod</div>
+                            <div class="text-yellow-300 text-sm">1,250 pts</div>
+                        </div>
+                    </div>
+
+                    <!-- Third Place -->
+                    <div class="flex flex-col items-center transform translate-y-8">
+                        <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
+                            <span class="text-gray-600 font-bold text-lg">C</span>
+                        </div>
+                        <div class="text-center mb-2">
+                            <div class="font-semibold text-sm text-white">Christian Alexis</div>
+                            <div class="text-yellow-300 text-xs">700 pts</div>
+                        </div>
+                    </div>
+                </div>
+
+                  <!-- Image Podium -->
+                    <div class="relative">
+                        <img src="{{ asset('images/leaderboards/Group 26.png') }}" alt="podium" class="w-max h-max object-cover">
+                        <!-- 2nd place background -->
+                        <img src="{{ asset('images/leaderboards/Group 25.png') }}" alt="2nd place bg" class="absolute" style="left: 60px; top: 81%; width: max; height: max; z-index: 10; transform: translate(-50%, -80%);">
+                        <!-- 3rd place background -->
+                        <img src="{{ asset('images/leaderboards/Group 24.png') }}" alt="3rd place bg" class="absolute" style="right: 60px; top: 81%; width: max; height: max; z-index: 10; transform: translate(50%, -80%);">
+                        <!-- Position numbers with proper centering -->
+                        <span class="absolute inset-0 flex items-center justify-center text-white font-bold text-4xl drop-shadow-lg transform translate-y-[-10px]">1</span>
+                        <!-- 2nd place number - centered on left podium -->
+                        <span class="absolute text-white font-bold text-2xl drop-shadow-lg" style="left: 55px; top: 60%; transform: translate(-50%, -50%); z-index: 20;">2</span>
+                        <!-- 3rd place number - centered on right podium -->
+                        <span class="absolute text-white font-bold text-2xl drop-shadow-lg" style="right: 55px; top: 60%; transform: translate(50%, -50%); z-index: 20;">3</span>
+                    </div>
+                </div>
+            </div>
     </div>
 
-    <!-- Top 3 Students -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">Top 3 Students</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($leaderboardData['top_students'] as $student)
-            <div class="{{ $student['bg_color'] }} rounded-xl p-6 text-center {{ $student['text_color'] }}">
-                <!-- Icon -->
-                <div class="flex justify-center mb-4">
-                    @if($student['icon'] === 'crown')
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                        </svg>
-                    @elseif($student['icon'] === 'medal')
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                        </svg>
-                    @elseif($student['icon'] === 'trophy')
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-                        </svg>
-                    @endif
+    <!-- Bottom Section with Ranked List -->
+    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10 shadow-lg">
+        <div class="bg-white px-6 py-6 space-y-3">
+            <!-- Ranked List Items -->
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">A</span>
                 </div>
-                
-                <!-- Rank -->
-                <div class="text-lg font-semibold mb-2">
-                    @if($student['rank'] === 1)
-                        1st Place
-                    @elseif($student['rank'] === 2)
-                        2nd Place
-                    @elseif($student['rank'] === 3)
-                        3rd Place
-                    @endif
-                </div>
-                
-                <!-- Avatar Placeholder -->
-                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-xl font-bold">{{ substr($student['name'], 0, 1) }}</span>
-                </div>
-                
-                <!-- Name -->
-                <div class="font-bold text-lg mb-2">{{ $student['name'] }}</div>
-                
-                <!-- Stats -->
-                <div class="flex flex-col gap-2">
-                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {{ number_format($student['points']) }} pts
-                    </span>
-                    <span class="text-sm opacity-90">{{ $student['lessons'] }} lessons</span>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-
-    <!-- Ranking List -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
-        <div class="flex items-center gap-2 mb-6">
-            <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-            </svg>
-            <h2 class="text-xl font-semibold text-gray-900">Ranking</h2>
-        </div>
-        
-        <div class="space-y-3">
-            @foreach($leaderboardData['ranking_list'] as $student)
-            <div class="flex items-center p-4 rounded-lg {{ $student['highlight'] ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-gray-50' }}">
-                <!-- Rank Number -->
-                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                    <span class="font-semibold text-gray-700">{{ $student['rank'] }}</span>
-                </div>
-                
-                <!-- Avatar Placeholder -->
-                <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                    <span class="font-semibold text-gray-600">{{ substr($student['name'], 0, 1) }}</span>
-                </div>
-                
-                <!-- Student Info -->
                 <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                        <span class="font-medium text-gray-900">{{ $student['name'] }}</span>
-                        @if($student['is_current_user'])
-                            <span class="text-blue-600 text-sm font-medium">(You)</span>
-                        @endif
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        {{ $student['lessons'] }} lessons • {{ number_format($student['points']) }} pts
-                    </div>
+                    <div class="text-white font-semibold">Anderson Silva</div>
+                    <div class="text-blue-100 text-sm">VI - Sampaguita</div>
                 </div>
-                
-                <!-- Grade -->
-                <div class="text-sm text-gray-500 font-medium">
-                    {{ $student['grade'] }}
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    698 pts
                 </div>
             </div>
-            @endforeach
-        </div>
-        
-        <!-- Load More Button -->
-        <div class="text-center mt-6">
-            <button class="text-blue-600 hover:text-blue-700 font-medium">
-                Load More Students
-            </button>
+
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">K</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-white font-semibold">Kate Villamor</div>
+                    <div class="text-blue-100 text-sm">VI - Orchid</div>
+                </div>
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    698 pts
+                </div>
+            </div>
+
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">A</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-white font-semibold">Angel Lopez</div>
+                    <div class="text-blue-100 text-sm">VI - Yellow Bell</div>
+                </div>
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    698 pts
+                </div>
+            </div>
+
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">J</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-white font-semibold">Johnson Spear</div>
+                    <div class="text-blue-100 text-sm">VI - Jasmin</div>
+                </div>
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    698 pts
+                </div>
+            </div>
+
+            <!-- Continue with more entries as needed -->
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">S</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-white font-semibold">Sarah Johnson</div>
+                    <div class="text-blue-100 text-sm">VI - Rose</div>
+                </div>
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    650 pts
+                </div>
+            </div>
+
+            <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 font-bold">M</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-white font-semibold">Michael Chen</div>
+                    <div class="text-blue-100 text-sm">VI - Lily</div>
+                </div>
+                <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    620 pts
+                </div>
+            </div>
         </div>
     </div>
 </div>
