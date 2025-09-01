@@ -7,127 +7,72 @@ class AchievementController extends Controller
 {
     public function index()
     {
-        // All achievements with rarity levels
+        // All achievements with rarity levels and image paths
         $allAchievements = [
             [
                 'id' => 1,
-                'title' => 'First Steps',
-                'description' => 'Complete your first lesson',
+                'title' => 'First Step',
+                'description' => 'Completed your first assessment',
                 'icon' => 'book',
                 'rarity' => 'Common',
                 'rarity_color' => 'gray',
                 'is_earned' => true,
-                'earned_date' => '2024-01-15'
+                'earned_date' => '2024-01-15',
+                'front_image' => 'a/firststep1.png',
+                'back_image' => 'a/firststep2.png',
+                'reward' => '+50 XP'
             ],
             [
                 'id' => 2,
                 'title' => 'Quick Learner',
-                'description' => 'Complete 5 lessons in a day',
+                'description' => 'Completed your first assessment',
                 'icon' => 'lightning',
                 'rarity' => 'Uncommon',
                 'rarity_color' => 'green',
                 'is_earned' => true,
-                'earned_date' => '2024-01-20'
-            ],
-            [
-                'id' => 3,
-                'title' => 'Math Explorer',
-                'description' => 'Try lessons from 3 different categories',
-                'icon' => 'rocket',
-                'rarity' => 'Rare',
-                'rarity_color' => 'blue',
-                'is_earned' => true,
-                'earned_date' => '2024-01-25'
-            ],
-            [
-                'id' => 4,
-                'title' => 'Perfect Score',
-                'description' => 'Get 100% on any quiz',
-                'icon' => 'star',
-                'rarity' => 'Uncommon',
-                'rarity_color' => 'green',
-                'is_earned' => true,
-                'earned_date' => '2024-01-30'
+                'earned_date' => '2024-01-20',
+                'front_image' => 'a/quicklearner1.png',
+                'back_image' => 'a/quicklearner2.png',
+                'reward' => '+50 XP'
             ],
             [
                 'id' => 5,
                 'title' => 'Math Whiz',
-                'description' => 'Complete 20 lessons with 90%+ accuracy',
+                'description' => 'Earn 3000+ points',
                 'icon' => 'brain',
                 'rarity' => 'Epic',
                 'rarity_color' => 'purple',
                 'is_earned' => false,
-                'earned_date' => null
-            ],
-            [
-                'id' => 6,
-                'title' => 'Addition Master',
-                'description' => 'Master all addition concepts',
-                'icon' => 'medal',
-                'rarity' => 'Rare',
-                'rarity_color' => 'blue',
-                'is_earned' => false,
-                'earned_date' => null
+                'earned_date' => null,
+                'front_image' => 'a/mathwhiz1.png',
+                'back_image' => 'a/mathwhiz2.png',
+                'reward' => '+50 XP'
             ],
             [
                 'id' => 7,
-                'title' => 'Subtraction Master',
+                'title' => 'Grade Champion',
                 'description' => 'Master all subtraction concepts',
                 'icon' => 'medal',
                 'rarity' => 'Rare',
                 'rarity_color' => 'blue',
                 'is_earned' => false,
-                'earned_date' => null
-            ],
-            [
-                'id' => 8,
-                'title' => 'Counting Master',
-                'description' => 'Master all counting concepts',
-                'icon' => 'medal',
-                'rarity' => 'Rare',
-                'rarity_color' => 'blue',
-                'is_earned' => false,
-                'earned_date' => null
-            ],
-            [
-                'id' => 9,
-                'title' => 'Multiplication Master',
-                'description' => 'Master all multiplication concepts',
-                'icon' => 'medal',
-                'rarity' => 'Rare',
-                'rarity_color' => 'blue',
-                'is_earned' => false,
-                'earned_date' => null
-            ],
-            [
-                'id' => 10,
-                'title' => 'Grade Champion',
-                'description' => 'Complete all lessons in a grade level',
-                'icon' => 'crown',
-                'rarity' => 'Legendary',
-                'rarity_color' => 'yellow',
-                'is_earned' => false,
-                'earned_date' => null
+                'earned_date' => null,
+                'front_image' => 'a/gradechampion1.png', // Placeholder - will need actual image
+                'back_image' => 'a/gradechampion2.png', // Placeholder - will need actual image
+                'reward' => '+50 XP'
             ],
             [
                 'id' => 11,
                 'title' => 'On Fire',
-                'description' => 'Maintain a 7-day learning streak',
+                'description' => 'Earn 3000+ points',
                 'icon' => 'flame',
                 'rarity' => 'Epic',
                 'rarity_color' => 'purple',
                 'is_earned' => false,
-                'earned_date' => null
-            ],
-            [
-                'id' => 12,
-                'title' => 'Point Collector',
-                'description' => 'Earn 10,000 total points',
-                'icon' => 'trophy',
-                'rarity' => 'Uncommon',
-                'rarity_color' => 'green',
-                'is_earned' => false,
-                'earned_date' => null
+                'earned_date' => null,
+                'front_image' => 'a/onfire1.png',
+                'back_image' => 'a/onfire2.png',
+                'reward' => '+50 XP'
             ]
         ];
 

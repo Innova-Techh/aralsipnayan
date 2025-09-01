@@ -133,6 +133,14 @@ export default {
                         "background-position": "right center",
                     },
                 },
+                "flip": {
+                    "0%": { transform: "rotateY(0deg)" },
+                    "100%": { transform: "rotateY(180deg)" },
+                },
+                "flip-back": {
+                    "0%": { transform: "rotateY(180deg)" },
+                    "100%": { transform: "rotateY(0deg)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
@@ -142,6 +150,8 @@ export default {
                 "gradient-x": "gradient-x 15s ease infinite",
                 "float": "float 6s ease-in-out infinite",
                 "pulse-slow": "pulse-slow 4s ease-in-out infinite",
+                "flip": "flip 0.7s ease-in-out",
+                "flip-back": "flip-back 0.7s ease-in-out",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
