@@ -157,6 +157,6 @@ class AchievementController extends Controller
         $earnedCount = collect($allAchievements)->where('is_earned', true)->count();
         $totalCount = count($allAchievements);
 
-        return view('user.achievements', compact('filteredAchievements', 'earnedCount', 'totalCount', 'filter', 'sort'));
+        return view('student.achievements', compact('filteredAchievements', 'earnedCount', 'totalCount', 'filter', 'sort'));
     }
 }

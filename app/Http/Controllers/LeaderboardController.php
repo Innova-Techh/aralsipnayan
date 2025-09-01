@@ -118,7 +118,7 @@ class LeaderboardController extends Controller
             'total_students' => 25,
         ];
         
-        return view('user.leaderboard', compact('leaderboardData'));
+        return view('student.leaderboard', compact('leaderboardData'));
     }
     
     /**
