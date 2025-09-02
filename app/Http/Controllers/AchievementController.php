@@ -18,9 +18,10 @@ class AchievementController extends Controller
                 'rarity_color' => 'gray',
                 'is_earned' => true,
                 'earned_date' => '2024-01-15',
-                'front_image' => 'a/firststep1.png',
-                'back_image' => 'a/firststep2.png',
-                'reward' => '+50 XP'
+                'front_image' => 'a/firststep.png',
+                'reward' => '+50 XP',
+                'background_light' => '#646565',
+                'background_dark' => '#2E343C'
             ],
             [
                 'id' => 2,
@@ -31,9 +32,10 @@ class AchievementController extends Controller
                 'rarity_color' => 'green',
                 'is_earned' => true,
                 'earned_date' => '2024-01-20',
-                'front_image' => 'a/quicklearner1.png',
-                'back_image' => 'a/quicklearner2.png',
-                'reward' => '+50 XP'
+                'front_image' => 'a/quicklearner.png',
+                'reward' => '+50 XP',
+                'background_light' => '#1E8646',
+                'background_dark' => '#163522'
             ],
             [
                 'id' => 5,
@@ -44,37 +46,100 @@ class AchievementController extends Controller
                 'rarity_color' => 'purple',
                 'is_earned' => false,
                 'earned_date' => null,
-                'front_image' => 'a/mathwhiz1.png',
-                'back_image' => 'a/mathwhiz2.png',
-                'reward' => '+50 XP'
+                'front_image' => 'a/mathwhiz.png',
+                'reward' => '+50 XP',
+                'background_light' => '#2C1B68',
+                'background_dark' => '#100A23'
             ],
             [
                 'id' => 7,
                 'title' => 'Grade Champion',
                 'description' => 'Master all subtraction concepts',
                 'icon' => 'medal',
-                'rarity' => 'Rare',
-                'rarity_color' => 'blue',
+                'rarity' => 'Legendary',
+                'rarity_color' => 'yellow',
                 'is_earned' => false,
                 'earned_date' => null,
-                'front_image' => 'a/gradechampion1.png', // Placeholder - will need actual image
-                'back_image' => 'a/gradechampion2.png', // Placeholder - will need actual image
-                'reward' => '+50 XP'
+                'front_image' => 'a/gradechampion.png',
+                'reward' => '+50 XP',
+                'background_light' => '#D17A09',
+                'background_dark' => '#512500'
             ],
             [
                 'id' => 11,
                 'title' => 'On Fire',
                 'description' => 'Earn 3000+ points',
                 'icon' => 'flame',
-                'rarity' => 'Epic',
-                'rarity_color' => 'purple',
-                'is_earned' => false,
-                'earned_date' => null,
-                'front_image' => 'a/onfire1.png',
-                'back_image' => 'a/onfire2.png',
-                'reward' => '+50 XP'
+                'rarity' => 'Rare',
+                'rarity_color' => 'red',
+                'is_earned' => true,
+                'earned_date' => '2024-01-20',
+                'front_image' => 'a/onfire.png',
+                'reward' => '+50 XP',
+                'background_light' => '#913311',
+                'background_dark' => '#591E09'
             ]
         ];
+        
+        // Achievement card color mapping
+        $achievementColors = [
+            // Blue theme (like your current cards)
+            'blue-light' => '#165A9A',
+            'blue-dark' => '#104373',
+            // Brown/Orange theme
+            'brown-light' => '#913311',
+            'brown-dark' => '#591E09',
+            // Gray theme
+            'gray-light' => '#646565',
+            'gray-dark' => '#2E343C',
+            // Green theme
+            'green-light' => '#1E8646',
+            'green-dark' => '#163522',
+            // Purple theme
+            'purple-light' => '#2C1B68',
+            'purple-dark' => '#100A23',
+            // Gold/Yellow theme
+            'gold-light' => '#D17A09',
+            'gold-dark' => '#512500',
+        ];
+        
+        // Function to get background colors based on rarity
+        function getBackgroundColors($rarity) {
+            global $achievementColors;
+            
+            switch(strtolower($rarity)) {
+                case 'common':
+                    return [
+                        'light' => $achievementColors['gray-light'],
+                        'dark' => $achievementColors['gray-dark']
+                    ];
+                case 'uncommon':
+                    return [
+                        'light' => $achievementColors['green-light'],
+                        'dark' => $achievementColors['green-dark']
+                    ];
+                case 'rare':
+                    return [
+                        'light' => $achievementColors['brown-light'],
+                        'dark' => $achievementColors['brown-dark']
+                    ];
+                case 'epic':
+                    return [
+                        'light' => $achievementColors['purple-light'],
+                        'dark' => $achievementColors['purple-dark']
+                    ];
+                case 'legendary':
+                    return [
+                        'light' => $achievementColors['gold-light'],
+                        'dark' => $achievementColors['gold-dark']
+                    ];
+                default:
+                    return [
+                        'light' => $achievementColors['blue-light'],
+                        'dark' => $achievementColors['blue-dark']
+                    ];
+            }
+        };
 
         // Filter achievements based on request
         $filter = request('filter', 'all');
