@@ -20,6 +20,32 @@ body {
     50% { opacity: 0.5; }
 }
 
+@keyframes shake {
+    0%, 100% { 
+        transform: translateX(0); 
+    }
+    10%, 30%, 50%, 70%, 90% { 
+        transform: translateX(-4px); 
+    }
+    20%, 40%, 60%, 80% { 
+        transform: translateX(4px); 
+    }
+}
+
+/* Optional: Add a subtle pulse effect for locked achievements */
+@keyframes pulse-lock {
+    0%, 100% { 
+        opacity: 0.6; 
+    }
+    50% { 
+        opacity: 0.8; 
+    }
+}
+
+.achievement-locked {
+    animation: pulse-lock 2s infinite;
+}
+
 /* Custom components */
 @layer components {
     /* Reusable carousel styles for the homepage 2nd section */
