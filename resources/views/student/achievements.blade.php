@@ -85,27 +85,92 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 px-4 py-4">             
         @forelse($filteredAchievements as $achievement)                 
             <div class="flip-card-container" style="perspective: 1000px;">                     
-                <div class="flip-card relative w-full aspect-[3/4] cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['is_earned'] ? '' : 'opacity-60' }} {{ $achievement['rarity'] === 'Legendary' ? 'border-2 border-yellow-400' : '' }}"                           
-                    data-achievement-id="{{ $loop->index }}"                          
-                    title="Click to flip">                                                  
+                <div class="flip-card relative w-full aspect-[4/5] cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['rarity'] === 'Legendary' ? 'shadow-lg shadow-yellow-400' : '' }}"                           
+                    data-achievement-id="{{ $loop->index }}"
+                    data-earned="{{ $achievement['is_earned'] ? 'true' : 'false' }}"                          
+                    title="{{ $achievement['is_earned'] ? 'Click to flip' : 'Achievement locked' }}">                                                  
                     <!-- Front of card -->                         
-                    <div class="flip-card-front absolute w-full h-full rounded-xl overflow-hidden" style="backface-visibility: hidden;">                             
-                        <img src="{{ asset('images/achievements/' . $achievement['front_image']) }}"                                   
-                            alt="{{ $achievement['title'] }}"                                   
-                            class="w-full h-full object-cover">                         
+                    <div class="flip-card-front absolute w-full h-full rounded-xl overflow-hidden shadow-lg {{ !$achievement['is_earned'] ? 'opacity-60' : '' }}" style="background-color: <?= $achievement['background_light'] ?>; backface-visibility: hidden;">
+                            <!-- Rarity Badge - Top Right -->
+                            <div class="absolute top-2 right-2 z-20">
+                                <span class="inline-block px-2 py-1 text-xs rounded-full border-2 shadow-sm text-white" style ="background-color: <?= $achievement['background_light'] ?>;border-color: <?= $achievement['background_dark'] ?>;">
+                                    {{ $achievement['rarity'] }}
+                                </span>
+                            </div>
+                        <!-- Card Header -->
+                            <div class="relative h-2/3 flex items-center justify-center mt-6 mx-4 rounded-xl" style="background-color: <?= $achievement['background_dark'] ?>;">
+                                <!-- Character Image -->
+                                <img src="{{ asset('images/achievements/' . $achievement['front_image']) }}" 
+                                    alt="{{ $achievement['title'] }}" 
+                                    class="w-36 h-36 sm:w-40 sm:h-40 md:w-44 md:h-44 object-contain ">
+                                
+                                <!-- Lock overlay for unearned achievements -->
+                                @if(!$achievement['is_earned'])
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="bg-black/60 rounded-full p-3">
+                                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C8.1 2 5 5.1 5 9v1H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V9c0-3.9-3.1-7-7-7zM12 4c2.8 0 5 2.2 5 5v1H7V9c0-2.8 2.2-5 5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        
+                        
+                        <!-- Card Footer -->
+                        <div class="absolute bottom-2 left-2 right-0 to-transparent p-3 text-white">
+
+                            <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">
+                                {{ $achievement['title'] }}
+                            </h3>
+
+                            <p class="text-[9px] sm:text-sm md:text-sm lg:text-md opacity-80 truncate">
+                                {{ $achievement['description'] }}
+                            </p>
+                        </div>
                     </div>                                                  
                     
-                    <!-- Back of card -->                         
-                    <div class="flip-card-back absolute w-full h-full rounded-xl overflow-hidden" style="backface-visibility: hidden; transform: rotateY(180deg);">                             
-                        <img src="{{ asset('images/achievements/' . $achievement['back_image']) }}"                                   
-                            alt="{{ $achievement['title'] }} back"                                   
-                            class="w-full h-full object-cover">                         
-                    </div>                                                  
+                    <!-- Back of card (only shown for earned achievements) -->      
+                    @if($achievement['is_earned'])                   
+                    <div class="flip-card-back absolute w-full h-full rounded-xl overflow-hidden shadow-lg" 
+                        style="backface-visibility: hidden; transform: rotateY(180deg);">
+                        <div class="p-2 sm:p-4 h-full flex flex-col items-center justify-center text-white text-center border-8 rounded-2xl" style="background-color: <?= $achievement['background_dark'] ?>; border-color: <?= $achievement['background_light'] ?>; ">
+                            
+                            <h3 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{{ $achievement['title'] }}</h3>
+                            <p class="text-sm sm:text-sm opacity-90 mb-6">{{ $achievement['description'] }}</p>
+                            
+                            <!-- Centered Content -->
+                            <div class="flex flex-col gap-4 items-center justify-center flex-1">
+                                <!-- Rarity Section -->
+                                <div class="flex-2 flex-col items-center">
+                                    <span class="text-xs sm:text-sm font-medium">Rarity</span>
+                                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                        @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
+                                        @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
+                                        @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
+                                        @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
+                                        @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
+                                        @endif">
+                                        {{ $achievement['rarity'] }}
+                                    </span>
+                                </div>
+
+                                <!-- Reward Section -->
+                                <div class="flex-2 flex-col items-center">
+                                    <span class="text-xs sm:text-sm font-medium">Reward</span>
+                                    <span class="text-xs sm:text-sm font-semibold">{{ $achievement['reward'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>      
+                    @endif                                      
                     
-                    <!-- Flip indicator -->                         
-                    <div class="flip-indicator absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full opacity-0 transition-opacity duration-200">                             
+                    <!-- Flip indicator (only for earned achievements) -->         
+                    @if($achievement['is_earned'])                
+                    <div class="flip-indicator absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full opacity-0 transition-opacity duration-200">                             
                         Flip                         
-                    </div>                     
+                    </div>   
+                    @endif                  
                 </div>                 
             </div>
             @empty
@@ -119,8 +184,6 @@
                 </div>
             @endforelse
         </div>
-    </div>
-</div>
 
 <!-- Toast for New Badge -->
 @if(session('new_badge'))
@@ -154,11 +217,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     flipCards.forEach(card => {
         let isFlipped = false;
+        const isEarned = card.dataset.earned === 'true';
         
         card.addEventListener('click', function() {
-            const front = this.querySelector('.flip-card-front');
-            const back = this.querySelector('.flip-card-back');
+            if (!isEarned) {
+                // Shake animation for locked achievements
+                this.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 500);
+                return;
+            }
             
+            // Flip animation for earned achievements
             if (!isFlipped) {
                 // Flip to back
                 this.style.transform = 'rotateY(180deg)';
@@ -172,20 +243,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Show flip indicator on hover
-        card.addEventListener('mouseenter', function() {
-            const indicator = this.querySelector('.flip-indicator');
-            if (indicator) {
-                indicator.style.opacity = '1';
-            }
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            const indicator = this.querySelector('.flip-indicator');
-            if (indicator) {
-                indicator.style.opacity = '0';
-            }
-        });
+        // Show flip indicator on hover (only for earned achievements)
+        if (isEarned) {
+            card.addEventListener('mouseenter', function() {
+                const indicator = this.querySelector('.flip-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '1';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const indicator = this.querySelector('.flip-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '0';
+                }
+            });
+        }
     });
 });
 </script>
