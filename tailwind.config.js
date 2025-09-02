@@ -100,6 +100,27 @@ export default {
                     "accent-cyan": "#06B6D4",
                     "accent-navy": "#1E293B",
                 },
+                 // Achievement card colors
+                achievement: {
+                    // Blue theme (like your current cards)
+                    'blue-light': '#165A9A',
+                    'blue-dark': '#104373',
+                    // Brown/Orange theme
+                    'brown-light': '#913311',
+                    'brown-dark': '#591E09',
+                    // Gray theme
+                    'gray-light': '#646565',
+                    'gray-dark': '#2E343C',
+                    // Green theme
+                    'green-light': '#1E8646',
+                    'green-dark': '#163522',
+                    // Purple theme
+                    'purple-light': '#2C1B68',
+                    'purple-dark': '#100A23',
+                    // Gold/Yellow theme
+                    'gold-light': '#D17A09',
+                    'gold-dark': '#512500',
+                }
             },
             borderRadius: {
                 lg: "var(--radius)",
