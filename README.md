@@ -250,8 +250,6 @@ The system uses an enhanced BKT model incorporating:
 
 **Development Team**: Ejay Buscato, Krissa Beringuel, Joshua Fernandez, Sean Sicat
 
-**Academic Supervision**: Prof. Ali A. Naim, MIS (Program Director), Joel B. Mangaba, DT (Dean, College of Computing and Information Sciences)
-
 ## 📄 License
 
 This project is open-sourced software licensed under the [MIT license](LICENSE).
