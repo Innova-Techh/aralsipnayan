@@ -17,7 +17,7 @@ export default {
         extend: {
                   fontFamily: {
                     baloo: ['"Baloo 2"', 'cursive'],
-                },
+                        },
             colors: {
                 'primary-blue': '#1E3A8A',
                 'primary-red': '#D62839',

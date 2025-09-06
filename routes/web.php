@@ -61,12 +61,10 @@ Route::get('/assessments', [App\Http\Controllers\AssessmentController::class, 'i
     ->middleware('auth')
     ->name('assessments.index');
 
-// Assessment API endpoints
-Route::middleware('auth')->group(function () {
-    Route::post('/assessments/start', [App\Http\Controllers\AssessmentController::class, 'startAssessment'])->name('assessments.start');
-    Route::post('/assessments/submit-answer', [App\Http\Controllers\AssessmentController::class, 'submitAnswer'])->name('assessments.submit-answer');
-    Route::post('/assessments/complete', [App\Http\Controllers\AssessmentController::class, 'completeAssessment'])->name('assessments.complete');
-});
+Route::get('/assessments/{category}', [App\Http\Controllers\AssessmentController::class, 'showCategory'])
+    ->middleware('auth')
+    ->name('assessments.category');
+
 
 // Achievements
 Route::get('/achievements', [AchievementController::class, 'index'])
