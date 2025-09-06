@@ -14,7 +14,7 @@
     <!-- Custom CSS -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+        @import "@fontsource/baloo-2";
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -27,6 +27,35 @@
         .mobile-menu.open {
             transform: translateX(0);
         }
+
+        @font-face {
+            font-family: 'Baloo 2';
+            src: url('/font/baloo2/Baloo2-Regular.woff2') format('woff2'),
+                url('/font/baloo2/Baloo2-Regular.woff') format('woff'),
+                url('/font/baloo2/Baloo2-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Baloo 2';
+            src: url('/font/baloo2/Baloo2-Bold.woff2') format('woff2'),
+                url('/font/baloo2/Baloo2-Bold.woff') format('woff'),
+                url('/font/baloo2/Baloo2-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Baloo 2';
+            src: url('/font/baloo2/Baloo2-ExtraBold.woff2') format('woff2'),
+                url('/font/baloo2/Baloo2-ExtraBold.woff') format('woff'),
+                url('/font/baloo2/Baloo2-ExtraBold.ttf') format('truetype');
+            font-weight: 800;
+            font-style: normal;
+        }
+
+
     </style>
     
     @stack('styles')
