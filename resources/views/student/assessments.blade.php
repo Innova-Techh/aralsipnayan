@@ -95,17 +95,42 @@
             </div>
             
             <!-- Progress Bar -->
-            <div class="mb-4 relative z-10">
-                <div class="flex justify-between text-sm text-gray-100 mb-1">
+            <div class="mb-4 relative z-10 flex flex-col gap-2">
+                <!-- Label and percentage -->
+                <div class="flex justify-between w-full text-sm text-gray-100">
                     <span>Mastery Level</span>
-                    <span>{{ $naProgress }}%</span>
+                    <span id="progress-text">{{ $naProgress }}%</span>
                 </div>
-                <div class="w-full bg-gray-300 rounded-full h-2">
-                    <div class="bg-{{ $naProgress >= 70 ? 'green' : ($naProgress >= 40 ? 'orange' : 'red') }}-400 
-                                h-2 rounded-full" style="width: {{ $naProgress }}%">
+
+                <!-- Progress bar container -->
+                <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                    <!-- Gradient progress bar -->
+                    <div id="progress-bar"
+                        class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                        style="width: 0%;
+                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                        <!-- Static shimmer lines -->
+                        <div class="absolute inset-0 flex items-center justify-between px-2">
+                            <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                            <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                            <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const progressBar = document.getElementById('progress-bar');
+                const progress = {{ $naProgress }}; // Blade variable
+
+                // Animate the width to current progress
+                setTimeout(() => {
+                    progressBar.style.width = progress + '%';
+                }, 100);
+            });
+            </script>
+
 
             <!-- Stats -->
             <div class="flex justify-between mb-4 relative z-10">
@@ -139,11 +164,11 @@
             </div>
 
             <!-- Button -->
-            <button onclick="startAssessment('Measurement_Geometry')" 
-                class="w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)]"
-                style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-                View Assessment
-            </button>
+        <a href="{{ route('assessments.category', 'Number_Algebra') }}" 
+        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
+        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+            View Assessments
+        </a>
         </div>
 
         <!-- Measurement and Geometry Card -->
@@ -171,17 +196,41 @@
             </div>
 
             <!-- Progress Bar -->
-            <div class="mb-4 relative z-10">
-                <div class="flex justify-between text-sm text-gray-100 mb-1">
-                    <span>Mastery Level</span>
-                    <span>{{ $mgProgress }}%</span>
-                </div>
-            <div class="w-full bg-gray-300 rounded-full h-2">
-                <div class="bg-{{ $naProgress >= 70 ? 'green' : ($naProgress >= 40 ? 'orange' : 'red') }}-400 
-                            h-2 rounded-full" style="width: {{ $naProgress }}%">
+        <div class="mb-4 relative z-10 flex flex-col gap-2">
+            <!-- Label and percentage -->
+            <div class="flex justify-between w-full text-sm text-gray-100">
+                <span>Mastery Level</span>
+                <span id="progress-text">{{ $mgProgress }}%</span>
+            </div>
+
+            <!-- Progress bar container -->
+            <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                <!-- Gradient progress bar -->
+                <div id="progress-bar"
+                    class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                    style="width: 0%;
+                            background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                    <!-- Static shimmer lines -->
+                    <div class="absolute inset-0 flex items-center justify-between px-2">
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const progressBar = document.getElementById('progress-bar');
+            const progress = {{ $mgProgress }}; // Blade variable
+
+            // Animate the width to current progress
+            setTimeout(() => {
+                progressBar.style.width = progress + '%';
+            }, 100);
+        });
+        </script>
 
         <!-- Stats -->
         <div class="flex justify-between mb-4 relative z-10">
@@ -218,7 +267,7 @@
         <a href="{{ route('assessments.category', 'Measurement_Geometry') }}" 
         class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
         style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-            View Assessment
+            View Assessments
         </a>
     </div>
 
@@ -236,7 +285,7 @@
 
             <div class="flex justify-between items-start mb-4 relative z-10">
                 <div class=" relative w-[100%]">
-                    <h3 class="text-lg font-bold text-white mb-1">Data and Probabilit</h3>
+                    <h3 class="text-lg font-bold text-white mb-1">Data and Probability</h3>
                     <p class="text-sm text-gray-100">Explore data tables, bar graphs, line plots, mean, and chance events</p>
                 </div>
                 @php
@@ -247,18 +296,44 @@
                 <span class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $dpLevel }}</span>
             </div>
             
-                <!-- Progress Bar -->
-            <div class="mb-4 relative z-10">
-                <div class="flex justify-between text-sm text-gray-100 mb-1">
-                    <span>Mastery Level</span>
-                    <span>{{ $mgProgress }}%</span>
-                </div>
-            <div class="w-full bg-gray-300 rounded-full h-2">
-                <div class="bg-{{ $naProgress >= 70 ? 'green' : ($naProgress >= 40 ? 'orange' : 'red') }}-400 
-                            h-2 rounded-full" style="width: {{ $naProgress }}%">
+            <!-- Progress Bar -->
+        <div class="mb-4 relative z-10 flex flex-col gap-2">
+            <!-- Label and percentage -->
+            <div class="flex justify-between w-full text-sm text-gray-100">
+                <span>Mastery Level</span>
+                <span id="progress-text">{{ $mgProgress }}%</span>
+            </div>
+
+            <!-- Progress bar container -->
+            <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                <!-- Gradient progress bar -->
+                <div id="progress-bar"
+                    class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                    style="width: 0%;
+                            background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                    <!-- Static shimmer lines -->
+                    <div class="absolute inset-0 flex items-center justify-between px-2">
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                        <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const progressBar = document.getElementById('progress-bar');
+            const progress = {{ $mgProgress }}; // Blade variable
+
+            // Animate the width to current progress
+            setTimeout(() => {
+                progressBar.style.width = progress + '%';
+            }, 10);
+        });
+        </script>
+
+
 
         <!-- Stats -->
         <div class="flex justify-between mb-4 relative z-10">
@@ -292,99 +367,12 @@
         </div>
 
         <!-- Button -->
-        <button onclick="startAssessment('Measurement_Geometry')" 
-            class="w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)]"
-            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-            View Assessment
-        </button>
+        <a href="{{ route('assessments.category', 'Data_Probability') }}" 
+        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
+        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+            View Assessments
+        </a>
     </div>
-    </div>
-</div>
-
-<!-- Assessment Modal -->
-<div id="assessmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center p-6 border-b">
-            <div>
-                <h2 id="modalTitle" class="text-2xl font-bold text-gray-900">Assessment</h2>
-                <p id="modalSubtitle" class="text-sm text-gray-600 mt-1"></p>
-            </div>
-            <button onclick="closeAssessmentModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
-                &times;
-            </button>
-        </div>
-
-        <!-- Modal Body -->
-        <div class="p-6 overflow-y-auto max-h-[70vh]">
-            <!-- Loading State -->
-            <div id="loadingState" class="text-center py-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p class="text-gray-600">Preparing your assessment...</p>
-            </div>
-
-            <!-- Question Display -->
-            <div id="questionDisplay" class="hidden">
-                <!-- Progress Bar -->
-                <div class="mb-6">
-                    <div class="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">15</span></span>
-                        <span>Mastery: <span id="currentMastery">30%</span></span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 6.67%"></div>
-                    </div>
-                </div>
-
-                <!-- Question Content -->
-                <div id="questionContent" class="mb-6">
-                    <h3 id="questionText" class="text-lg font-semibold text-gray-900 mb-4"></h3>
-                    <div id="questionOptions" class="space-y-3"></div>
-                </div>
-
-                <!-- Question Controls -->
-                <div class="flex justify-between items-center">
-                    <button id="hintButton" onclick="showHint()" class="text-blue-600 hover:text-blue-800 text-sm">
-                        💡 Show Hint
-                    </button>
-                    <div class="space-x-3">
-                        <button id="submitAnswer" onclick="submitCurrentAnswer()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                            Submit Answer
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Hint Display -->
-                <div id="hintDisplay" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-yellow-800" id="hintText"></p>
-                </div>
-
-                <!-- Feedback Display -->
-                <div id="feedbackDisplay" class="hidden mt-4 p-4 rounded-lg">
-                    <p id="feedbackText" class="font-medium"></p>
-                    <p id="explanationText" class="mt-2 text-sm"></p>
-                    <button onclick="nextQuestion()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700">
-                        Next Question
-                    </button>
-                </div>
-            </div>
-
-            <!-- Results Display -->
-            <div id="resultsDisplay" class="hidden">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Assessment Complete!</h3>
-                    <div id="resultsContent"></div>
-                    <button onclick="closeAssessmentModal()" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700">
-                        Continue Learning
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
