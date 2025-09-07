@@ -7,7 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AlgorithmController;
-
+use App\Http\Controllers\QuizController;
 // Homepage
 Route::get('/', function () {
     return view('homepage');
@@ -64,6 +64,8 @@ Route::get('/assessments', [App\Http\Controllers\AssessmentController::class, 'i
 Route::get('/assessments/{category}', [App\Http\Controllers\AssessmentController::class, 'showCategory'])
     ->middleware('auth')
     ->name('assessments.category');
+
+    Route::get('/quiz/{category}', [QuizController::class, 'start'])->name('quiz.start');
 
 
 // Achievements

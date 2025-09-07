@@ -22,31 +22,33 @@
             </div>
         </div>
     </div>
-<div class="mb-1">
-    <a href="{{ route('assessments.index') }}" 
-       class="inline-flex items-center gap-2 p-3 rounded-full hover:scale-110 transition-transform duration-200">
-        <!-- Arrow SVG -->
-        <div class="w-6 h-6">
-            <svg viewBox="0 0 24 24" class="w-full h-full">
-                <defs>
-                    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#4338CA"/>
-                        <stop offset="100%" stop-color="#9333EA"/>
-                    </linearGradient>
-                </defs>
-                <path d="M15 18l-6-6 6-6" 
-                      stroke="url(#arrowGradient)" 
-                      stroke-width="3" 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      fill="none"/>
-            </svg>
-        </div>
 
-        <!-- Text next to arrow -->
-        <span class="text-indigo-500 font-baloo font-extrabold text-xl">Back to Assessments</span>
-    </a>
-</div>
+    {{-- Return to Assessments --}}
+    <div class="mb-1">
+        <a href="{{ route('assessments.index') }}" 
+        class="inline-flex items-center gap-2 p-3 rounded-full hover:scale-110 transition-transform duration-200">
+            <!-- Arrow SVG -->
+            <div class="w-6 h-6">
+                <svg viewBox="0 0 24 24" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4338CA"/>
+                            <stop offset="100%" stop-color="#9333EA"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M15 18l-6-6 6-6" 
+                        stroke="url(#arrowGradient)" 
+                        stroke-width="3" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round" 
+                        fill="none"/>
+                </svg>
+            </div>
+
+            <!-- Text next to arrow -->
+            <span class="text-indigo-500 font-baloo font-extrabold text-xl">Back to Assessments</span>
+        </a>
+    </div>
 
 
     <!-- Category Card -->
@@ -241,15 +243,15 @@
             </div>
 
             <!-- Highlighted Info -->
-            <div class="bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-white text-center text-xs sm:text-sm font-medium rounded-xl p-2 sm:p-3 mt-4 sm:mt-5 border-b-4 border-[#135177] shadow-l">
+            <div class="bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-white text-center text-xs sm:text-sm font-medium rounded-xl p-2 sm:p-3 mt-4 sm:mt-5 border-b-4 border-[#135177] shadow-lg">
                 Every question is a chance to show what you know. You've got this! 💡
             </div>
 
             <!-- Start Button -->
-            <button id="startAssessmentBtn" 
-                class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-sm sm:text-lg font-semibold py-3 mt-5 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
+            <a href="{{ route('quiz.start', $category) }}" 
+            class="block w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-sm sm:text-lg font-semibold py-3 mt-5 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300 text-center">
                 Start Assessment
-            </button>
+            </a>
 
             <!-- Close Button -->
             <button onclick="closeModal()" 

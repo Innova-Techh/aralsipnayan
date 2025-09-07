@@ -52,7 +52,10 @@
 
 
 </head>
-<body class="bg-gray-100">
+<body 
+    class="min-h-screen bg-no-repeat bg-center sm:bg-contain lg:bg-cover"
+    style="background-image: url('{{ asset('images/global/bg.svg') }}');"
+>
     <div class="min-h-screen">
         <!-- Top Navigation Bar -->
         <nav class="bg-white shadow-sm border-b border-gray-200">
