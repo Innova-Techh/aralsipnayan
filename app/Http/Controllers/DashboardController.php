@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\LeaderboardController;
 
 class DashboardController extends Controller
 {
@@ -15,86 +17,42 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        // Sample data
-        $dashboardData = [
-            'user' => $user,
-            'progress' => [
-                'completed_lessons' => 2,
-                'total_lessons' => 8,
-                'percentage' => 25,
-                'points' => 1250,
-                'grade' => 'A',
-                'rank' => 4,
-            ],
-            'current_lesson' => [
-                'title' => 'Evaluate Exponents',
-                'description' => 'Learn how to calculate and evaluate expressions with exponents',
-                'grade' => 'Grade 6',
-                'points' => 120,
-            ],
-            'leaderboard' => [
-                [
-                    'name' => 'Maria Santos',
-                    'lessons' => 3,
-                    'points' => 1580,
-                    'rank' => 1,
-                    'initial' => 'M',
-                ],
-                [
-                    'name' => 'Carlos Reyes',
-                    'lessons' => 2,
-                    'points' => 1420,
-                    'rank' => 2,
-                    'initial' => 'C',
-                ],
-                [
-                    'name' => 'Ana Garcia',
-                    'lessons' => 2,
-                    'points' => 1350,
-                    'rank' => 3,
-                    'initial' => 'A',
-                ],
-                [
-                    'name' => $user ? $user->name : 'Juan Dela Cruz',
-                    'lessons' => 2,
-                    'points' => 1250,
-                    'rank' => 4,
-                    'initial' => $user ? substr($user->name, 0, 1) : 'J',
-                    'is_current_user' => true,
-                ],
-                [
-                    'name' => 'Miguel Torres',
-                    'lessons' => 1,
-                    'points' => 1190,
-                    'rank' => 5,
-                    'initial' => 'M',
-                ],
-            ],
-            'achievements' => [
-                [
-                    'title' => 'First Steps',
-                    'icon' => 'book',
-                    'color' => 'blue',
-                ],
-                [
-                    'title' => 'Math Whiz',
-                    'icon' => 'check',
-                    'color' => 'green',
-                ],
-                [
-                    'title' => 'Grade Champion',
-                    'icon' => 'star',
-                    'color' => 'yellow',
-                ],
-                [
-                    'title' => 'Point Collector',
-                    'icon' => 'trophy',
-                    'color' => 'orange',
-                ],
-            ],
-        ];
+        // Get user profile with avatar
+        $userProfile = $user->studentProfile;
+        $userAvatarUrl = $userProfile && $userProfile->avatar_url 
+            ? asset($userProfile->avatar_url)
+            : asset('images/profile/avatar5.png'); // Default avatar
         
-        return view('student.dashboard', compact('dashboardData'));
+        // Get recent achievements data
+        $achievementController = new AchievementController();
+        $allAchievements = collect($achievementController->getAllAchievements());
+        
+        // Filter to get only owned/earned achievements and take the first 6
+        $recentAchievements = $allAchievements
+            ->where('is_earned', true)
+            ->take(6)
+            ->map(function ($achievement) {
+                return [
+                    'title' => $achievement['title'],
+                    'front_image' => $achievement['front_image'],
+                    'background_dark' => $achievement['background_dark'],
+                    'background_light' => $achievement['background_light']
+                ];
+            })
+            ->values()
+            ->toArray();
+        
+        // Get leaderboard data
+        $leaderboardController = new LeaderboardController();
+        $leaderboardData = $leaderboardController->getLeaderboardDataForView();
+        
+        // Build a Top 5 list (top_students 1-3 + next 2 from ranking_list)
+        $leaderboardTop5 = array_merge(
+            $leaderboardData['top_students'] ?? [],
+            array_slice($leaderboardData['ranking_list'] ?? [], 0, 2)
+        );
+
+        return view('student.dashboard', compact('recentAchievements', 'leaderboardData', 'leaderboardTop5', 'userAvatarUrl'));
     }
     
     /**
