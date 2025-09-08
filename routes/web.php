@@ -8,6 +8,8 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AlgorithmController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\ProfileController;
 // Homepage
 Route::get('/', function () {
     return view('homepage');
@@ -86,10 +88,24 @@ Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardDa
     ->middleware('auth')
     ->name('leaderboard.data');
 
-// Profile edit
-Route::get('/profile/edit', fn() => view('user.profile.edit'))
+// Sections
+Route::get('/sections', [SectionController::class, 'index'])
+    ->middleware('auth')
+    ->name('sections.index');
+Route::get('/sections/data', [SectionController::class, 'getSectionsData'])
+    ->middleware('auth')
+    ->name('sections.data');
+
+// Profile routes
+Route::get('/profile/edit', [ProfileController::class, 'edit'])
     ->middleware('auth')
     ->name('profile.edit');
+Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])
+    ->middleware('auth')
+    ->name('profile.update.avatar');
+Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])
+    ->middleware('auth')
+    ->name('profile.get.avatar');
 
 // Logout route
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
