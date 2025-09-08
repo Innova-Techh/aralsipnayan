@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-white">
     <div class="space-y-6 sm:space-y-8">
         <!-- Header -->
         <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 text-white overflow-hidden bg-center bg-cover" style="background-image: url('{{ asset('images/achievements/background.png') }}');">
