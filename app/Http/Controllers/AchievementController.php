@@ -5,10 +5,12 @@ use Illuminate\Http\Request;
 
 class AchievementController extends Controller
 {
-    public function index()
+    /**
+     * Get all achievements data (for use by other controllers)
+     */
+    public function getAllAchievements()
     {
-        // All achievements with rarity levels and image paths
-        $allAchievements = [
+        return [
             [
                 'id' => 1,
                 'title' => 'First Step',
@@ -80,6 +82,12 @@ class AchievementController extends Controller
                 'background_dark' => '#591E09'
             ]
         ];
+    }
+
+    public function index()
+    {
+        // Get all achievements data
+        $allAchievements = $this->getAllAchievements();
         
         // Achievement card color mapping
         $achievementColors = [
