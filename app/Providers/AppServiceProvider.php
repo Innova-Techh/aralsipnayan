@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +30,18 @@ class AppServiceProvider extends ServiceProvider
         logger()->warning('Failed to set SQL timezone: ' . $e->getMessage());
     }
 
+    // Share user avatar with all views
+    View::composer('*', function ($view) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userProfile = $user->studentProfile;
+            $userAvatarUrl = $userProfile && $userProfile->avatar_url 
+                ? asset($userProfile->avatar_url)
+                : asset('images/profile/avatar5.png'); // Default avatar
+            
+            $view->with('userAvatarUrl', $userAvatarUrl);
+        }
+    });
     
     }
 }
