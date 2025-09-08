@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard')</title>
     
     <!-- Tailwind (Vite) -->
@@ -45,6 +46,13 @@
         font-style: normal;
         font-display: swap;
     }
+
+    /* Show global background image only on large screens and up */
+    @media (min-width: 1024px) {
+        body.page-bg {
+            background-image: url('{{ asset('images/global/bg.svg') }}');
+        }
+    }
 </style>
 
     
@@ -53,89 +61,102 @@
 
 </head>
 <body 
-    class="min-h-screen bg-no-repeat bg-center sm:bg-contain lg:bg-cover"
-    style="background-image: url('{{ asset('images/global/bg.svg') }}');"
+    class="min-h-screen {{ request()->routeIs('profile.edit') || request()->routeIs('leaderboard.*') || request()->routeIs('sections.*') || request()->routeIs('achievements.*') ? '' : 'bg-no-repeat bg-center sm:bg-contain lg:bg-cover page-bg' }}"
 >
     <div class="min-h-screen">
-        <!-- Top Navigation Bar -->
-        <nav class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12">
-                <div class="flex items-center justify-between h-16">
-                    <!-- Left: Brand -->
-                    <div class="flex items-center">
-                        <!-- Brand -->
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 flex items-center justify-center mr-3">
+    <nav class="bg-white border-b border-gray-200">
+    <div class="w-full mx-auto px-6 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Left: Brand -->
+            <div class="flex items-center">
+                <div class="flex items-center">
+                    <div class="w-50 h-50 flex items-center justify-center mr-3">
+                        <!-- Replace with your actual logo -->
+                        <div class="w-full h-full flex items-center justify-center ">
                                 <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo" class="w-10 h-10 rounded-xl"> 
-                            </div>
-                            <h1 class="text-lg font-semibold text-gray-900">AralSipnayan</h1>
                         </div>
                     </div>
+                    <h1 class="text-lg font-semibold text-gray-900">
+                        Aral<span class="text-red-600">Sipnayan</span>
+                    </h1>
+                </div>
+            </div>
 
-                    <!-- Center: Desktop Navigation Links -->
-                    <div class="hidden lg:flex lg:items-center lg:justify-center lg:flex-1 lg:px-8">
-                        <div class="flex space-x-6 xl:space-x-8 2xl:space-x-10">
-                            <a href="{{ route('dashboard') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('dashboard') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                                <span>Dashboard</span>
-                            </a>
-                            <a href="{{ route('assessments.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('assessments.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span>Assessments</span>
-                            </a>
-                            <a href="{{ route('achievements.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('achievements.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                                </svg>
-                                <span>Achievements</span>
-                            </a>
+            <!-- Center: Navigation Links -->
+            <div class="hidden md:flex md:items-center md:space-x-1">
+                <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('dashboard') || request()->routeIs('student.dashboard') ? 'text-blue-600' : 'text-gray-500' }}">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
+                    </svg>
+                    Dashboard
+                </a>
 
-                            <a href="{{ route('leaderboard.index') }}" class="whitespace-nowrap border-b-2 {{ request()->routeIs('leaderboard.*') ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-300' }} px-3 pt-1 pb-4 text-sm font-medium transition-colors duration-200 flex items-center space-x-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                                </svg>
-                                <span>Leaderboard</span>
-                            </a>
+                <a href="{{ route('assessments.index') }}" class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('assessments.*') ? 'text-blue-600' : 'text-gray-500'  }}">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Assessments
+                </a>
 
+                <a href="{{ route('achievements.index') }}" class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('achievements.*') ?'text-blue-600' : 'text-gray-500' }}">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                    Achievements
+                </a>
+
+                <a href="{{ route('sections.index') }}" class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('sections.index') ?'text-blue-600' : 'text-gray-500' }}">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    My Section
+                </a>
+
+                <a href="{{ route('leaderboard.index') }}" class="flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ request()->routeIs('leaderboard.*') ? 'text-blue-600' : 'text-gray-500' }}">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Leaderboard
+                </a>
+            </div>
+
+            <!-- Right: User menu -->
+            <div class="flex items-center">
+                <div class="relative">
+                    <div class="flex items-center space-x-3 text-sm">
+                        <div class="flex flex-col items-end">
+                            <span class="text-sm font-medium text-gray-900">{{ Auth::user()->username }}</span>
+                            <span class="text-xs text-gray-500 bg-green-200 px-2 py-1 rounded-full">Sampaguita</span>
                         </div>
+                        <div class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center border-2 border-gray-200">
+                            <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}" 
+                                 alt="{{ Auth::user()->username ?? 'Student' }}" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <button class="ml-1 p-1 rounded hover:bg-gray-100 focus:outline-none transition-colors duration-200" id="user-menu-button">
+                            <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </div>
-
-                    <!-- Right: User menu -->
-                    <div class="flex items-center">
-                        <div class="relative">
-                            <button id="user-menu-button" class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                    <span class="text-blue-600 font-semibold">{{ Auth::user() ? substr(Auth::user()->name, 0, 1) : 'J' }}</span>
-                                </div>
-                                <span class="hidden md:block">{{ Auth::user() ? Auth::user()->name : 'Juan Dela Cruz' }}</span>
-                                <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                    
+                    <!-- User dropdown menu -->
+                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200">
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">Profile</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                                Sign out
                             </button>
-                            
-                            <!-- User dropdown menu -->
-                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Sign out
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </nav>
+        </div>
+    </div>
+</nav>
 
 
-        <!-- Mobile menu overlay -->
-        <div id="mobile-overlay" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-40 md:hidden"></div>
 
         <!-- Main Content -->
         <main class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 pb-24 md:pb-8">
@@ -144,7 +165,7 @@
 
         <!-- Bottom Navigation (Mobile) -->
         <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.04)] z-40">
-            <div class="grid grid-cols-4 gap-1">
+            <div class="grid grid-cols-5 gap-1">
                 <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center py-2 {{ request()->routeIs('dashboard') || request()->routeIs('student.dashboard') ? 'text-blue-600' : 'text-gray-500' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
@@ -163,6 +184,12 @@
                     </svg>
                     <span class="text-[11px]">Achievements</span>
                 </a>
+                <a href="{{ route('sections.index') }}" class="flex flex-col items-center justify-center py-2 {{ request()->routeIs('sections.*') ? 'text-blue-600' : 'text-gray-500' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span class="text-[11px]">My Section</span>
+                </a>
                 <a href="{{ route('leaderboard.index') }}" class="flex flex-col items-center justify-center py-2 {{ request()->routeIs('leaderboard.*') ? 'text-blue-600' : 'text-gray-500' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h4v11H3V10zm7-6h4v17h-4V4zm7 9h4v8h-4v-8z"/>
@@ -173,64 +200,37 @@
         </nav>
     </div>
 
-    <!-- JavaScript for interactive functionality -->
+    <!-- JavaScript for dropdown functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu functionality
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileOverlay = document.getElementById('mobile-overlay');
-            const mobileMenuClose = document.getElementById('mobile-menu-close');
-            const menuIcon = document.getElementById('menu-icon');
-            const closeIcon = document.getElementById('close-icon');
-
-            function openMobileMenu() {
-                mobileMenu.classList.add('open');
-                mobileOverlay.classList.remove('hidden');
-                menuIcon.classList.add('hidden');
-                closeIcon.classList.remove('hidden');
-            }
-
-            function closeMobileMenu() {
-                mobileMenu.classList.remove('open');
-                mobileOverlay.classList.add('hidden');
-                menuIcon.classList.remove('hidden');
-                closeIcon.classList.add('hidden');
-            }
-
-            mobileMenuButton.addEventListener('click', function() {
-                if (mobileMenu.classList.contains('open')) {
-                    closeMobileMenu();
-                } else {
-                    openMobileMenu();
-                }
-            });
-
-            mobileMenuClose.addEventListener('click', closeMobileMenu);
-            mobileOverlay.addEventListener('click', closeMobileMenu);
-
-            // User dropdown functionality
+            // Simple dropdown functionality
             const userMenuButton = document.getElementById('user-menu-button');
-            const userDropdown = document.getElementById('user-dropdown');
+            const dropdown = document.getElementById('userDropdown');
 
-            userMenuButton.addEventListener('click', function() {
-                userDropdown.classList.toggle('hidden');
-            });
+            if (userMenuButton && dropdown) {
+                // Toggle dropdown on button click
+                userMenuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
-                    userDropdown.classList.add('hidden');
-                }
-            });
-
-            // Close mobile menu when window is resized to desktop
-            window.addEventListener('resize', function() {
-                if (window.innerWidth >= 768) {
-                    closeMobileMenu();
-                }
-            });
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            }
         });
+
+        // Global function for inline onclick (backup)
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
     </script>
     
     @stack('scripts')
