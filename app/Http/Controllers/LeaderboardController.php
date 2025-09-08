@@ -9,11 +9,17 @@ use Illuminate\Support\Facades\Auth;
 class LeaderboardController extends Controller
 {
     /**
-     * Display the leaderboard page.
+     * Provide leaderboard data as an array suitable for blade views.
      */
-    public function index(): View
+    public function getLeaderboardDataForView(): array
     {
         $user = Auth::user();
+        
+        // Get user profile with avatar for current user
+        $userProfile = $user->studentProfile;
+        $currentUserAvatarUrl = $userProfile && $userProfile->avatar_url 
+            ? asset($userProfile->avatar_url)
+            : asset('images/profile/avatar5.png'); // Default avatar
         
         // Sample data for Grade 6 Leaderboard
         $leaderboardData = [
@@ -116,8 +122,17 @@ class LeaderboardController extends Controller
             ],
             'current_user_rank' => 4,
             'total_students' => 25,
+            'current_user_avatar' => $currentUserAvatarUrl,
         ];
-        
+
+        return $leaderboardData;
+    }
+    /**
+     * Display the leaderboard page.
+     */
+    public function index(): View
+    {
+        $leaderboardData = $this->getLeaderboardDataForView();
         return view('student.leaderboard', compact('leaderboardData'));
     }
     
