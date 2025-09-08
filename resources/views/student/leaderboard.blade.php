@@ -46,7 +46,7 @@
                     </div>
 
                     <!-- Third Place -->
-                    <div class="flex flex-col items-center transform translate-y-8">
+                    <div class="flex flex-col items-center transform translate-y-4">
                         <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
                             <span class="text-gray-600 font-bold text-lg">C</span>
                         </div>
@@ -76,7 +76,7 @@
     </div>
 
     <!-- Bottom Section with Ranked List -->
-    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10 shadow-lg">
+    <div class="relative -mx-6 sm:-mx-8 lg:-mx-12 p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10">
         <div class="bg-white px-6 py-6 space-y-3">
             <!-- Ranked List Items -->
             <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
