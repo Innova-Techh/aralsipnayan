@@ -76,5 +76,16 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
+        $this->call([
+        MasteryThresholdsSeeder::class,
+        BktParametersSeeder::class,
+        LevelConfigSeeder::class,
+        RankConfigSeeder::class,
+        BadgeConfigSeeder::class,
+        TrophiesSeeder::class,
+        QuestionsTableSeeder::class,
+        // add any other seeders you created
+        ]);
+
     }
 }
