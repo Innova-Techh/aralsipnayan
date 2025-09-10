@@ -16,6 +16,13 @@ class StudentProfile extends Model
         'grade_level',
         'school_name',
         'avatar_url',
+        'has_completed_onboarding',
+        'onboarding_completed_at',
+    ];
+
+    protected $casts = [
+        'has_completed_onboarding' => 'boolean',
+        'onboarding_completed_at' => 'datetime',
     ];
 
     public function user()

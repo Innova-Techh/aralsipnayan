@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -41,16 +42,34 @@ class DatabaseSeeder extends Seeder
 
         // Student profile
         DB::table('student_profile')->insert([
-            'user_id' => $student->id,
-            'firstname' => 'John',
-            'lastname' => 'Doe',
-            'section' => 'A',
-            'grade_level' => '6',
-            'school_name' => 'Pembo Elementary School',
-            'avatar_url' => '/avatars/default.png',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+                        'user_id' => $student->id,
+                        'student_id' => 'LRN' . rand(100000, 999999),
+                        'firstname' => 'John',
+                        'lastname' => 'Doe',
+                        'middlename' => 'Michael',
+                        'section' => 'A',
+                        'grade_level' => '6',
+                        'school_name' => 'Pembo Elementary School',
+                        'school_year' => '2024-2025',
+
+                        // Onboarding
+                        'has_completed_onboarding' => false,
+                        'onboarding_completed_at' => null,
+                        'is_first_login' => true,
+
+                        // Assessments
+                        'has_viewed_assessments' => false,
+                        'first_assessment_view_at' => null,
+
+                        // Gamification
+                        'current_streak' => 0,
+                        'longest_streak' => 0,
+                        'last_activity_date' => null,
+                        'total_points' => 0,
+
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
 
         // Teacher profile
         DB::table('teacher_profile')->insert([

@@ -94,6 +94,7 @@
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const avatars = [
@@ -167,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
         selectAvatarBtn.textContent = 'Saving...';
         selectAvatarBtn.disabled = true;
         
-        // Send AJAX request to save avatar
-        fetch('{{ route("profile.update.avatar") }}', {
+        // Send AJAX request to complete onboarding with selected avatar
+        fetch('{{ route("student.onboarding.complete") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,11 +182,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Avatar updated successfully!');
-                // Optionally redirect to dashboard
-                window.location.href = '{{ route("dashboard") }}';
+                // Show success message
+                alert(data.message);
+                // Redirect to dashboard
+                window.location.href = data.redirect_url;
             } else {
-                alert('Error updating avatar: ' + (data.message || 'Unknown error'));
+                alert('Error: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
@@ -200,4 +202,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endsection 
+@endsection
