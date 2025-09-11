@@ -12,6 +12,7 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\OnboardingController;
 use App\Http\Controllers\Student\AssessmentController;
+use App\Http\Controllers\Student\QuizController as StudentQuizController;
 
 // Homepage
 Route::get('/', function () {
@@ -65,17 +66,32 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         return app(DashboardController::class)->index();
     })->name('dashboard');
     
-    // Assessments - check onboarding completion  
+    // Assessments - main page
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments');
     
-    // Assessment actions
-    Route::post('/assessments/start', [AssessmentController::class, 'startAssessment'])->name('assessments.start');
-    Route::post('/assessments/submit-answer', [AssessmentController::class, 'submitAnswer'])->name('assessments.submit');
-    Route::post('/assessments/complete', [AssessmentController::class, 'completeAssessment'])->name('assessments.complete');
-    
-    // Assessment category and quiz routes
+    // Assessment category routes
     Route::get('/assessments/{category}', [AssessmentController::class, 'showCategory'])->name('assessments.category');
-    Route::get('/quiz/{category}', [QuizController::class, 'start'])->name('quiz.start');
+    
+    // Assessment complete page
+    Route::get('/assessments/complete/{category}', [AssessmentController::class, 'showComplete'])->name('assessments.complete');
+    
+    // Assessment review page
+    Route::get('/assessments/review/{category}', [AssessmentController::class, 'showReview'])->name('assessments.review');
+    
+    // Quiz routes
+    Route::prefix('quiz')->name('quiz.')->group(function () {
+        // Start diagnostic for a category
+        Route::get('/diagnostic/{category}', [AssessmentController::class, 'startDiagnostic'])->name('diagnostic');
+        
+        // Show quiz interface (diagnostic or regular)
+        Route::get('/{category}', [StudentQuizController::class, 'show'])->name('show');
+        
+        // Submit diagnostic answer
+        Route::post('/diagnostic/submit', [AssessmentController::class, 'submitDiagnosticAnswer'])->name('diagnostic.submit');
+        
+        // Submit regular assessment answer
+        Route::post('/submit', [StudentQuizController::class, 'submitAnswer'])->name('submit');
+    });
 });
 
 // Teacher Dashboard (placeholder)
@@ -105,6 +121,14 @@ Route::middleware(['auth'])->group(function () {
         }
         return redirect()->route('dashboard');
     })->name('assessments.category');
+    
+    // Legacy quiz start route
+    Route::get('/quiz/{category}', function($category) {
+        if (Auth::user()->role === 'Student') {
+            return redirect()->route('student.quiz.show', $category);
+        }
+        return redirect()->route('dashboard');
+    })->name('quiz.start');
 });
 
 // Other protected routes (require auth + completed onboarding for students)
@@ -132,6 +156,3 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
     Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
 });
-
-// Algorithm integration
-// Route::post('/run-bkt', [App\Http\Controllers\Student\AssessmentController::class, 'runBkt']);

@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS student_mastery;
 
 
 
-CREATE TABLE student_mastery (
+CREATE TABLE IF NOT EXISTS student_mastery (
     mastery_id VARCHAR(50) PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     competency ENUM('number_algebra', 'measurement_geometry', 'data_probability') NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE student_mastery (
     bkt_score DECIMAL(5,4) NOT NULL DEFAULT 0.5000, -- BKT component (45% weight) - starts at 0.5
     
     -- Final Mastery Score (0-100 scale)
-    final_mastery_score DECIMAL(5,2) NOT NULL DEFAULT 0.00, -- (Wacc × ACC) + (Wbkt × BKT)
+    final_mastery_score DECIMAL(5,2) NOT NULL DEFAULT 22.50, -- (0.55 × 0) + (0.45 × 0.5) × 100
     
     -- BKT Parameters
     prior_knowledge DECIMAL(5,4) DEFAULT 0.1000, -- P(L0) - initial knowledge probability
@@ -53,7 +53,7 @@ CREATE TABLE student_mastery (
 );
 
 
-CREATE TABLE mastery_thresholds (
+CREATE TABLE IF NOT EXISTS mastery_thresholds (
     threshold_id INT PRIMARY KEY AUTO_INCREMENT,
     difficulty_level ENUM('beginner', 'intermediate', 'advanced') NOT NULL,
     
@@ -76,7 +76,8 @@ CREATE TABLE mastery_thresholds (
     UNIQUE KEY unique_difficulty (difficulty_level)
 );
 
-CREATE TABLE bkt_parameters (
+-- 8. BKT Parameters Configuration Table
+CREATE TABLE IF NOT EXISTS bkt_parameters (
     config_id INT PRIMARY KEY AUTO_INCREMENT,
     competency ENUM('number_algebra', 'measurement_geometry', 'data_probability') NOT NULL,
     difficulty_level ENUM('beginner', 'intermediate', 'advanced') NOT NULL,

@@ -14,49 +14,50 @@ DROP TABLE IF EXISTS questions;
 -- 1. QUESTION BANK TABLES
 -- =====================================================
 
-CREATE TABLE questions (
+CREATE TABLE IF NOT EXISTS questions (
     question_id VARCHAR(50) PRIMARY KEY,
     competency ENUM('number_algebra', 'measurement_geometry', 'data_probability') NOT NULL,
     difficulty_level ENUM('beginner', 'intermediate', 'advanced') NOT NULL,
     topic_tag VARCHAR(100) NOT NULL, -- subcategory like 'polygons', 'fractions', etc.
-    question_type ENUM('multiple_choice', 'fill_blanks', 'true_false', 'drag_drop', 'connect_dots') NOT NULL,
+
+    -- Question Content
     question_text TEXT NOT NULL,
-    
-    -- Multiple Choice Options (nullable for non-MC questions)
+    question_type ENUM('multiple_choice', 'fill_blanks', 'true_false', 'drag_drop', 'connect_dots') DEFAULT 'multiple_choice',
     choice_a TEXT,
     choice_b TEXT,
     choice_c TEXT,
     choice_d TEXT,
-    
-    -- Correct Answer (format depends on question type)
     correct_answer TEXT NOT NULL,
-    
-    -- Additional Question Details
-    hint_text TEXT NOT NULL, -- single hint as string
-    explanation TEXT, -- detailed explanation for learning
-    max_allowed_time INT NOT NULL, -- seconds (30/45/60 based on difficulty)
-    
-    -- Question Source and Status
+    hint_text TEXT,
+    explanation TEXT,
+    max_allowed_time INT NOT NULL, -- in seconds (30/45/60 based on difficulty)
+
+    -- Timing and Difficulty
+    estimated_difficulty_weight DECIMAL(3,2) DEFAULT 1.0,
+
+    -- Question Metadata
     question_source ENUM('built_in', 'custom') NOT NULL DEFAULT 'built_in',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    
-    -- Gamification Points
-    base_points INT NOT NULL, -- 3 for beginner, 6 for intermediate, 10 for advanced
-    
-    -- Metadata
-    created_by BIGINT UNSIGNED, -- teacher_id for custom questions
+    usage_count INT DEFAULT 0,
+    success_rate DECIMAL(5,4) DEFAULT 0.0000,
+    base_points INT NOT NULL,
+    created_by BIGINT UNSIGNED NULL,
+
+    -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Foreign Keys
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-    
-    -- Indexes for performance
+    CONSTRAINT fk_questions_created_by FOREIGN KEY (created_by)
+        REFERENCES users(id) ON DELETE SET NULL,
+
+    -- Indexes
     INDEX idx_competency_difficulty (competency, difficulty_level),
-    INDEX idx_topic_tag (topic_tag),
-    INDEX idx_active_questions (is_active),
-    INDEX idx_question_source (question_source)
+    INDEX idx_topic_active (topic_tag, is_active),
+    INDEX idx_difficulty_usage (difficulty_level, usage_count)
 );
+
+
 
 CREATE TABLE question_media (
     media_id VARCHAR(50) PRIMARY KEY,

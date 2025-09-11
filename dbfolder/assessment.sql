@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS diagnostic_sessions;
 DROP TABLE IF EXISTS assessments;
 
 
-CREATE TABLE assessments (
+CREATE TABLE IF NOT EXISTS assessments (
     assessment_id VARCHAR(50) PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     competency ENUM('number_algebra', 'measurement_geometry', 'data_probability') NOT NULL,
@@ -55,7 +55,6 @@ CREATE TABLE assessments (
     INDEX idx_diagnostic_tracking (user_id, assessment_type, competency)
 );
 
-
 CREATE TABLE diagnostic_sessions (
     session_id VARCHAR(50) PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
@@ -69,7 +68,7 @@ CREATE TABLE diagnostic_sessions (
     phase_1_score DECIMAL(5,4), -- MS1 (beginner phase mastery)
     phase_1_questions INT DEFAULT 15, -- Q1
     phase_2_score DECIMAL(5,4), -- MS2 (intermediate phase mastery) 
-    phase_2_questions INT DEFAULT 10, -- Q2
+    phase_2_questions INT DEFAULT 15, -- Q2
     phase_3_score DECIMAL(5,4), -- MS3 (advanced phase mastery)
     phase_3_questions INT DEFAULT 10, -- Q3
     
@@ -89,7 +88,7 @@ CREATE TABLE diagnostic_sessions (
     INDEX idx_user_diagnostics (user_id, completed_at DESC)
 );
 
-CREATE TABLE assessment_questions (
+CREATE TABLE IF NOT EXISTS assessment_questions (
     pool_id VARCHAR(50) PRIMARY KEY,
     assessment_id VARCHAR(50) NOT NULL,
     question_id VARCHAR(50) NOT NULL,
@@ -111,7 +110,7 @@ CREATE TABLE assessment_questions (
     INDEX idx_current_question (assessment_id, is_current)
 );
 
-CREATE TABLE question_responses (
+CREATE TABLE IF NOT EXISTS question_responses (
     response_id VARCHAR(50) PRIMARY KEY,
     assessment_id VARCHAR(50) NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,

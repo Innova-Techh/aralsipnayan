@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'AralSipnayan')
+@section('title', 'Assessment List}}')
 
 @section('content')
 
@@ -14,10 +14,10 @@
                     padding-left: clamp(2rem, 8vw, 18rem);">
             <div class="relative z-10 pr-6">
                 <h1 class="text-3xl sm:text-3xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
-                    My Assessments
+                    {{ $data['title'] }} Assessments
                 </h1>
                 <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
-                    Test your mathematical knowledge across different competencies and track your learning progress with adaptive assessments
+                    {{ $data['description'] }}
                 </p>
             </div>
         </div>
@@ -25,7 +25,7 @@
 
     {{-- Return to Assessments --}}
     <div class="mb-1">
-        <a href="{{ route('assessments.index') }}" 
+        <a href="{{ route('student.assessments') }}" 
         class="inline-flex items-center gap-2 p-3 rounded-full hover:scale-110 transition-transform duration-200">
             <!-- Arrow SVG -->
             <div class="w-6 h-6">
@@ -44,26 +44,18 @@
                         fill="none"/>
                 </svg>
             </div>
-
-            <!-- Text next to arrow -->
             <span class="text-indigo-500 font-baloo font-extrabold text-xl">Back to Assessments</span>
         </a>
     </div>
-
 
     <!-- Category Card -->
     <div class="relative overflow-hidden">
         <div class="mx-auto max-w-10xl rounded-2xl text-white transition-all duration-300 
                     border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
-            style="
-                background: linear-gradient(to bottom, #4338CA, #9333EA);
-                min-height: clamp(70px, 5vw + 30px, 100px);     ">
+            style="background: linear-gradient(to bottom, #4338CA, #9333EA); min-height: clamp(70px, 5vw + 30px, 100px);">
             
             <!-- Mobile Layout: Vertical Stack -->
-            <div class="lg:hidden relative z-10 h-full flex flex-col justify-center
-                        pl-6 sm:pl-10 md:pl-16 lg:pl-24
-                        pt-2 sm:pt-6 md:pt-8 lg:pt-6">
-                
+            <div class="lg:hidden relative z-10 h-full flex flex-col justify-center pl-6 sm:pl-10 md:pl-16 lg:pl-24 pt-2 sm:pt-6 md:pt-8 lg:pt-6">
                 <!-- Title Row -->
                 <div class="flex items-center gap-3 sm:gap-4 mb-1">
                     <span class="text-xl sm:text-2xl md:text-3xl lg:text-4xl">{{ $data['icon'] }}</span>
@@ -72,24 +64,16 @@
                     </h2>
                 </div>
                 
-            <!-- Status Badge - Mobile -->
-            <div class="ml-[2.5rem] mb-[1rem] sm:ml-[3rem] md:ml-[3.5rem] lg:ml-[4.5rem]">
-            <span
-                class="inline-flex items-center justify-center px-4 py-1 rounded-full text-xs font-medium
-                    bg-white/20 text-white border border-white/30
-                    lg:text-lg lg:px-6 lg:py-2 lg:min-w-[5.2rem] lg:h-10"
-            >
-                Intermediate
-            </span>
-            </div>
-
+                <!-- Status Badge - Mobile -->
+                <div class="ml-[2.5rem] mb-[1rem] sm:ml-[3rem] md:ml-[3.5rem] lg:ml-[4.5rem]">
+                    <span class="inline-flex items-center justify-center px-4 py-1 rounded-full text-xs font-medium bg-white/20 text-white border border-white/30 lg:text-lg lg:px-6 lg:py-2 lg:min-w-[5.2rem] lg:h-10">
+                        {{ ucfirst($mastery->current_difficulty ?? 'Beginner') }}
+                    </span>
+                </div>
             </div>
 
             <!-- Desktop Layout: Horizontal -->
-            <div class="hidden lg:flex relative z-10 h-full items-center justify-between
-                        pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6
-                        pt-2 sm:pt-6 md:pt-8 lg:pt-6">
-                
+            <div class="hidden lg:flex relative z-10 h-full items-center justify-between pl-6 sm:pl-10 md:pl-16 lg:pl-24 pr-6 pt-2 sm:pt-6 md:pt-8 lg:pt-6">
                 <!-- Left: Title -->
                 <div class="flex items-center gap-3 sm:gap-4">
                     <span class="text-xl sm:text-2xl md:text-3xl lg:text-4xl">{{ $data['icon'] }}</span>
@@ -100,177 +84,281 @@
                 
                 <!-- Right: Status Badge -->
                 <div>
-                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium 
-                            bg-white/20 text-white border border-white/30">
-                        Intermediate
+                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-medium bg-white/20 text-white border border-white/30">
+                        {{ ucfirst($mastery->current_difficulty ?? 'Beginner') }}
                     </span>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Assessment List Content -->
-    <div class="mx-auto max-w-10xl">
-        <!-- Add your assessment list content here -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-baloo ">
-            <!-- Sample assessment items -->
-            <div class="w-full max-w-sm bg-gradient-to-br from-[#2077AF] to-[#4720AF]
-                        rounded-xl border-b-4 border-[#0b1d30] shadow-lg
-                        transition-all p-4 flex flex-col justify-between h-auto">
-
-                <!-- Title + Time Row -->
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-white">Sample Assessment 1</h3>
-                    <div class="flex items-center gap-1 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#FF6B6B]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 8a1 1 0 0 1 1 1v3.28l2.72 1.64a1 1 0 1 1-1.04 1.72l-3.2-1.92A1 1 0 0 1 11 13V9a1 1 0 0 1 1-1zm0-6a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+    <!-- Current Progress Summary -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mx-auto max-w-10xl">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Your Progress in {{ $data['title'] }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Mastery Score -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Mastery Score</p>
+                        <p class="text-2xl font-bold text-indigo-600">{{ round($mastery->final_mastery_score ?? 0, 1) }}%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
-                        <span class="text-sm font-semibold">30 mins</span>
                     </div>
                 </div>
-
-                <!-- Attributes Section -->
-                <div class="space-y-3 mb-4">
-
-                    <!-- Number of Questions -->
-                    <div class="flex items-center gap-3">
-                        <!-- Questions Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#4ADE80]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 5h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2z"/>
-                        </svg>
-                        <span class="text-lg text-white font-bold font-baloo">10 Questions</span>
-                    </div>
-
-                    <!-- Difficulty Tag -->
-                    <div class="flex items-center gap-3">
-                        <!-- Difficulty Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#FFD93D]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 .587l3.668 7.571 8.332 1.151-6.064 5.879 1.524 8.229L12 18.897l-7.46 4.52 1.524-8.229L0 9.309l8.332-1.151z"/>
-                        </svg>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold
-                                    bg-yellow-200 text-yellow-900 shadow-md">
-                            Intermediate
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Trigger Button -->
-                <button onclick="openModal()" 
-                    class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-xl font-semibold 
-                    shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200">
-                    Start Assessment
-                </button>
             </div>
-   
+
+            <!-- Questions Answered -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Questions Answered</p>
+                        <p class="text-2xl font-bold text-emerald-600">{{ $mastery->total_questions_answered ?? 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accuracy Rate -->
+            <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Accuracy Rate</p>
+                        <p class="text-2xl font-bold text-violet-600">
+                            {{ $mastery->total_questions_answered > 0 ? round(($mastery->correct_answers / $mastery->total_questions_answered) * 100, 1) : 0 }}%
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-violet-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-violet-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12a1 1 0 002 0V7a1 1 0 00-2 0v5zM9 15a1 1 0 112 0 1 1 0 01-2 0z"/>
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Assessment List Content -->
+    <div class="mx-auto max-w-10xl">
+        @if($availableQuestions > 0)
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Available Assessments</h2>
+                <p class="text-gray-600">Based on your current level: {{ ucfirst($mastery->current_difficulty ?? 'Beginner') }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ $availableQuestions }} questions available ({{ $questionsInCooldown }} in cooldown)</p>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-baloo">
+                @foreach($assessmentOptions as $index => $assessment)
+                <div class="w-full bg-gradient-to-br from-[#2077AF] to-[#4720AF] rounded-xl border-b-4 border-[#0b1d30] shadow-lg transition-all p-4 flex flex-col justify-between h-auto">
+                    <!-- Title + Time Row -->
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-bold text-white">{{ $assessment['title'] }}</h3>
+                        <div class="flex items-center gap-1 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#FF6B6B]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 8a1 1 0 0 1 1 1v3.28l2.72 1.64a1 1 0 1 1-1.04 1.72l-3.2-1.92A1 1 0 0 1 11 13V9a1 1 0 0 1 1-1zm0-6a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+                            </svg>
+                            <span class="text-sm font-semibold">{{ $assessment['time_limit'] }} mins</span>
+                        </div>
+                    </div>
 
+                    <!-- Attributes Section -->
+                    <div class="space-y-3 mb-4">
+                        <!-- Number of Questions -->
+                        <div class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#4ADE80]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 5h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2z"/>
+                            </svg>
+                            <span class="text-lg text-white font-bold font-baloo">{{ $assessment['question_count'] }} Questions</span>
+                        </div>
+
+                        <!-- Difficulty Tag -->
+                        <div class="flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#FFD93D]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 .587l3.668 7.571 8.332 1.151-6.064 5.879 1.524 8.229L12 18.897l-7.46 4.52 1.524-8.229L0 9.309l8.332-1.151z"/>
+                            </svg>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-200 text-yellow-900 shadow-md">
+                                {{ ucfirst($assessment['difficulty']) }}
+                            </span>
+                        </div>
+
+                        <!-- Topics Covered -->
+                        <div class="flex items-start gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#8B5CF6] mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12a1 1 0 002 0V7a1 1 0 00-2 0v5zM9 15a1 1 0 112 0 1 1 0 01-2 0z"/>
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="text-white text-sm">
+                                <div class="font-semibold mb-1">Topics:</div>
+                                <div class="text-xs text-gray-200">{{ implode(', ', $assessment['topics']) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assessment Details -->
+                    <div class="bg-white/10 rounded-lg p-3 mb-4">
+                        <div class="text-xs text-white/80 space-y-1">
+                            <div>Estimated Points: {{ $assessment['estimated_points'] }}</div>
+                            <div>Best Time: {{ $assessment['best_completion_time'] ?? 'Not attempted' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Trigger Button -->
+                    <button onclick="openAssessmentModal({{ $index }})" 
+                        class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200">
+                        Start Assessment
+                    </button>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <!-- No Questions Available -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <div class="text-yellow-600 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-yellow-800 mb-2">No Assessments Available</h3>
+                <p class="text-yellow-700 mb-4">All questions for your current level are in cooldown period. Please wait or try a different competency.</p>
+                <div class="text-sm text-yellow-600">
+                    <p>Questions return to availability after:</p>
+                    <p class="font-semibold">• 30 minutes (if answered correctly)</p>
+                    <p class="font-semibold">• 60 minutes (if answered incorrectly)</p>
+                </div>
+                <a href="{{ route('student.assessments') }}" class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                    Try Other Competencies
+                </a>
+            </div>
+        @endif
+    </div>
 </div>
 
-<!-- Modal Background -->
+<!-- Assessment Modal -->
 <div id="assessmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4 sm:px-0">
-    <!-- Modal Container -->
-    <div class="w-full max-w-lg sm:max-w-lg md:max-w-xl lg:max-w-md xl:max-w-md bg-[#FFF7E6] 
-                rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden sm:mx-auto 
-                max-h-[90vh] sm:max-h-none flex flex-col">
-
+    <div class="w-full max-w-lg bg-[#FFF7E6] rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-[#2077AF] to-[#4720AF] p-3 sm:p-4 flex items-center gap-2">
-            <!-- Icon for Title -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2m5-6.5A9.985 9.985 0 0012 2a9.985 9.985 0 00-9 5.5M12 22a9.985 9.985 0 009-5.5" />
-            </svg>
-            <h2 class="text-lg sm:text-xl font-extrabold text-white">Geometry</h2>
+        <div class="bg-gradient-to-r from-[#2077AF] to-[#4720AF] p-4 flex items-center gap-2">
+            <span class="text-2xl" id="modal-icon">{{ $data['icon'] }}</span>
+            <h2 class="text-xl font-extrabold text-white" id="modal-title">Assessment Preview</h2>
         </div>
 
         <!-- Content -->
-        <div class="p-4 sm:p-6 overflow-y-auto">
-            
-            <!-- Topic Overview -->
-            <div class="mb-4 sm:mb-5">
-                <h3 class="text-base sm:text-lg font-semibold text-gray-900">Topic Overview</h3>
-                <p class="text-gray-700 text-xs sm:text-sm leading-relaxed mt-1 sm:mt-2">
-                    Explore the fascinating world of shapes, angles, lines, and spatial relationships.
-                    This competency covers fundamental geometric concepts including area,
-                    perimeter, volume, and coordinate geometry.
-                </p>
+        <div class="p-6 overflow-y-auto">
+            <!-- Assessment Info -->
+            <div id="modal-content">
+                <!-- Content will be populated by JavaScript -->
             </div>
 
             <!-- Time & Questions Cards -->
             <div class="flex gap-3 mb-5">
                 <!-- Time Limit Card -->
-                <div class="flex-1 bg-gradient-to-b from-[#F5A623] to-[#F5D70B] rounded-xl shadow-[0_5px_0px_rgba(0,0,0,0.25)] p-3 text-white flex flex-col items-center">
+                <div class="flex-1 bg-gradient-to-b from-[#F5A623] to-[#F5D70B] rounded-xl shadow-lg p-3 text-white flex flex-col items-center">
                     <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs sm:text-sm font-medium">Time Limit</span>
+                        <span class="text-sm font-medium">Time Limit</span>
                     </div>
-                    <span class="text-sm sm:text-base font-bold mt-1">25 minutes</span>
+                    <span class="text-base font-bold mt-1" id="modal-time">0 minutes</span>
                 </div>
 
                 <!-- Number of Questions Card -->
-                <div class="flex-1 bg-gradient-to-b from-[#34D399] to-[#059669] rounded-xl shadow-[0_5px_0px_rgba(0,0,0,0.25)] p-3 text-white flex flex-col items-center">
+                <div class="flex-1 bg-gradient-to-b from-[#34D399] to-[#059669] rounded-xl shadow-lg p-3 text-white flex flex-col items-center">
                     <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 8H7a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z" />
                         </svg>
-                        <span class="text-xs sm:text-sm font-medium">Questions</span>
+                        <span class="text-sm font-medium">Questions</span>
                     </div>
-                    <span class="text-sm sm:text-base font-bold mt-1">20 Questions</span>
+                    <span class="text-base font-bold mt-1" id="modal-questions">0 Questions</span>
                 </div>
             </div>
 
             <!-- Instructions -->
-            <div>
-                <h3 class="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
-                    <!-- Icon for Instructions -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6 text-[#2077AF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6 2V7a2 2 0 00-2-2h-3l-2-3H10L8 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2z" />
-                    </svg>
-                    Instructions
-                </h3>
-                <ul class="list-disc list-inside text-gray-700 space-y-1 sm:space-y-2 text-xs sm:text-sm">
-                    <li>Read each question carefully before answering</li>
-                    <li>You can use hints, but they will cost points</li>
-                    <li>Submit your answer to see your score</li>
+            <div class="mb-5">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Instructions</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 text-sm">
+                    <li>Answer all questions to the best of your ability</li>
                     <li>You cannot go back to previous questions</li>
-                    <li>Complete all questions within the time limit</li>
+                    <li>Your progress will be automatically saved</li>
+                    <li>Complete within the time limit for best results</li>
                 </ul>
             </div>
 
-            <!-- Highlighted Info -->
-            <div class="bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] text-white text-center text-xs sm:text-sm font-medium rounded-xl p-2 sm:p-3 mt-4 sm:mt-5 border-b-4 border-[#135177] shadow-lg">
-                Every question is a chance to show what you know. You've got this! 💡
+            <!-- Warning -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-5">
+                <p class="text-blue-800 text-sm font-medium">
+                    Once started, this assessment cannot be paused. Make sure you have enough time to complete it.
+                </p>
             </div>
 
             <!-- Start Button -->
-            <a href="{{ route('quiz.start', $category) }}" 
-            class="block w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-sm sm:text-lg font-semibold py-3 mt-5 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300 text-center">
+            <button id="modal-start-btn" 
+                class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
                 Start Assessment
-            </a>
+            </button>
 
             <!-- Close Button -->
-            <button onclick="closeModal()" 
-                class="w-full text-center text-xs sm:text-sm text-gray-600 mt-2 sm:mt-3 hover:underline">
+            <button onclick="closeAssessmentModal()" 
+                class="w-full text-center text-sm text-gray-600 mt-3 hover:underline">
                 Cancel
             </button>
         </div>
     </div>
 </div>
 
-<!-- JavaScript for Modal -->
 <script>
-    function openModal() {
-        document.getElementById("assessmentModal").classList.remove("hidden");
-    }
-    function closeModal() {
-        document.getElementById("assessmentModal").classList.add("hidden");
-    }
-</script>
+let assessmentOptions = @json($assessmentOptions ?? []);
+let selectedAssessmentIndex = null;
 
+function openAssessmentModal(index) {
+    selectedAssessmentIndex = index;
+    const assessment = assessmentOptions[index];
+    
+    // Populate modal content
+    document.getElementById('modal-title').textContent = assessment.title;
+    document.getElementById('modal-time').textContent = assessment.time_limit + ' minutes';
+    document.getElementById('modal-questions').textContent = assessment.question_count + ' Questions';
+    
+    // Update start button
+    const startBtn = document.getElementById('modal-start-btn');
+    startBtn.onclick = function() {
+        startAssessment(assessment.assessment_id);
+    };
+    
+    // Show modal
+    document.getElementById('assessmentModal').classList.remove('hidden');
+}
+
+function closeAssessmentModal() {
+    document.getElementById('assessmentModal').classList.add('hidden');
+    selectedAssessmentIndex = null;
+}
+
+function startAssessment(assessmentId) {
+    // Show loading state
+    const startBtn = document.getElementById('modal-start-btn');
+    startBtn.disabled = true;
+    startBtn.textContent = 'Starting...';
+    
+    // Redirect to quiz
+    window.location.href = `{{ route('student.quiz.show', $category) }}?assessment_id=${assessmentId}`;
+}
+
+// Close modal when clicking outside
+document.getElementById('assessmentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAssessmentModal();
+    }
+});
+</script>
 
 @endsection
