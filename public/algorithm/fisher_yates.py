@@ -1,345 +1,295 @@
 #!/usr/bin/env python3
 """
-Fisher-Yates Shuffle Algorithm Implementation
-
-This module provides an implementation of the Fisher-Yates shuffle algorithm
-for randomizing question order in educational assessments. The Fisher-Yates
-shuffle ensures uniform distribution and unbiased randomization compared to
-simple random selection methods.
-
-Author: AralSipnayan BKT System
-Date: August 15, 2025
+Fisher-Yates Shuffle Algorithm for AralSipnayan
+Provides unbiased randomization of question order
 """
 
 import random
-from typing import List, Any, Optional
-
+import sys
+import json
+import mysql.connector
+from datetime import datetime
 
 class FisherYatesShuffle:
-    """
-    Implementation of the Fisher-Yates shuffle algorithm for unbiased randomization.
-    
-    The Fisher-Yates shuffle (also known as the Knuth shuffle) is an algorithm 
-    for generating a random permutation of a finite sequence. It ensures that
-    every permutation is equally likely, providing true randomization.
-    """
-    
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self):
+        self.db_config = {
+            'host': 'localhost',
+            'user': 'root',
+            'password': '',
+            'database': 'aralsipnayandb',
+            'charset': 'utf8mb4'
+        }
+
+    def connect_db(self):
+        """Establish database connection"""
+        try:
+            return mysql.connector.connect(**self.db_config)
+        except mysql.connector.Error as e:
+            print(f"ERROR: Database connection failed: {e}", file=sys.stderr)
+            return None
+
+    def fisher_yates_shuffle(self, array):
         """
-        Initialize the Fisher-Yates shuffle with optional random seed.
-        
-        Args:
-            seed (Optional[int]): Random seed for reproducible results.
-                                 If None, uses system time for randomization.
+        Implement Fisher-Yates shuffle algorithm
+        Time Complexity: O(n)
+        Space Complexity: O(1)
         """
-        if seed is not None:
-            random.seed(seed)
-    
-    def shuffle(self, items: List[Any]) -> List[Any]:
-        """
-        Perform Fisher-Yates shuffle on a list of items.
+        if not array:
+            return array
         
-        The algorithm works by:
-        1. Starting from the last element
-        2. Picking a random index from 0 to current position
-        3. Swapping the current element with the randomly selected element
-        4. Moving to the previous element and repeating
+        # Work with a copy to avoid modifying original
+        shuffled = array.copy()
+        n = len(shuffled)
         
-        Args:
-            items (List[Any]): List of items to shuffle
-            
-        Returns:
-            List[Any]: A new list with items shuffled using Fisher-Yates algorithm
-            
-        Example:
-            >>> shuffler = FisherYatesShuffle(seed=42)
-            >>> original = [1, 2, 3, 4, 5]
-            >>> shuffled = shuffler.shuffle(original)
-            >>> print(shuffled)  # [3, 1, 5, 2, 4] (example output)
-        """
-        if not items:
-            return []
-        
-        # Create a copy to avoid modifying the original list
-        shuffled_items = items.copy()
-        n = len(shuffled_items)
-        
-        # Fisher-Yates shuffle algorithm
+        # Start from the last element and work backwards
         for i in range(n - 1, 0, -1):
             # Pick a random index from 0 to i (inclusive)
             j = random.randint(0, i)
             
             # Swap elements at positions i and j
-            shuffled_items[i], shuffled_items[j] = shuffled_items[j], shuffled_items[i]
+            shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
         
-        return shuffled_items
-    
-    def shuffle_in_place(self, items: List[Any]) -> None:
-        """
-        Perform Fisher-Yates shuffle in-place (modifies the original list).
-        
-        This version modifies the original list instead of creating a new one,
-        which can be more memory efficient for large lists.
-        
-        Args:
-            items (List[Any]): List of items to shuffle in-place
-            
-        Example:
-            >>> shuffler = FisherYatesShuffle()
-            >>> my_list = [1, 2, 3, 4, 5]
-            >>> shuffler.shuffle_in_place(my_list)
-            >>> print(my_list)  # [3, 1, 5, 2, 4] (example output, original list modified)
-        """
-        n = len(items)
-        
-        for i in range(n - 1, 0, -1):
-            j = random.randint(0, i)
-            items[i], items[j] = items[j], items[i]
-    
-    def shuffle_with_constraints(self, items: List[Any], 
-                               constraint_func: callable = None) -> List[Any]:
-        """
-        Perform Fisher-Yates shuffle with optional constraints.
-        
-        This method allows for constrained shuffling where certain conditions
-        must be met. Useful for educational assessments where you want randomization
-        but with some rules (e.g., no two questions of the same topic adjacent).
-        
-        Args:
-            items (List[Any]): List of items to shuffle
-            constraint_func (callable): Function that takes the current shuffled list
-                                       and returns True if constraints are satisfied
-                                       
-        Returns:
-            List[Any]: Shuffled list that satisfies the constraints
-            
-        Note:
-            This method has a maximum of 1000 attempts to find a valid shuffle.
-            If no valid shuffle is found, it returns the best attempt.
-        """
-        if not items or not constraint_func:
-            return self.shuffle(items)
-        
-        max_attempts = 1000
-        best_shuffle = self.shuffle(items)
-        
-        for attempt in range(max_attempts):
-            shuffled = self.shuffle(items)
-            
-            if constraint_func(shuffled):
-                return shuffled
-            
-            # Keep track of the best attempt (in case we can't satisfy constraints)
-            best_shuffle = shuffled
-        
-        # Return best attempt if constraints couldn't be satisfied
-        return best_shuffle
-    
-    def partial_shuffle(self, items: List[Any], k: int) -> List[Any]:
-        """
-        Perform partial Fisher-Yates shuffle (only shuffle first k elements).
-        
-        This is useful when you only need a subset of shuffled items,
-        which is more efficient than shuffling the entire list.
-        
-        Args:
-            items (List[Any]): List of items to partially shuffle
-            k (int): Number of elements to shuffle from the beginning
-            
-        Returns:
-            List[Any]: List with first k elements shuffled
-            
-        Example:
-            >>> shuffler = FisherYatesShuffle()
-            >>> items = list(range(1, 11))  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            >>> result = shuffler.partial_shuffle(items, 5)
-            >>> # First 5 elements are shuffled, rest remain in original order
-        """
-        if not items or k <= 0:
-            return items.copy()
-        
-        if k > len(items):
-            k = len(items)
-        
-        shuffled_items = items.copy()
-        n = len(shuffled_items)
-        
-        # Only shuffle the first k elements
-        for i in range(min(k, n)):
-            # Pick a random index from i to n-1
-            j = random.randint(i, n - 1)
-            shuffled_items[i], shuffled_items[j] = shuffled_items[j], shuffled_items[i]
-        
-        return shuffled_items
+        return shuffled
 
+    def shuffle_questions_for_assessment(self, questions_list):
+        """
+        Shuffle questions and assign order numbers
+        Returns list of questions with order assigned
+        """
+        if not questions_list:
+            return []
+        
+        # Shuffle the questions
+        shuffled_questions = self.fisher_yates_shuffle(questions_list)
+        
+        # Assign order numbers
+        for index, question in enumerate(shuffled_questions):
+            question['question_order'] = index + 1
+        
+        return shuffled_questions
 
-class AssessmentShuffle:
-    """
-    Specialized shuffle class for educational assessments.
-    
-    This class extends Fisher-Yates shuffle with specific methods
-    for educational content, including topic diversity and difficulty balancing.
-    """
-    
-    def __init__(self, seed: Optional[int] = None):
-        """Initialize assessment shuffle with Fisher-Yates shuffler."""
-        self.shuffler = FisherYatesShuffle(seed)
-    
-    def shuffle_questions(self, questions: List[dict]) -> List[dict]:
+    def create_assessment_pool(self, assessment_id, questions):
         """
-        Shuffle questions using Fisher-Yates algorithm.
+        Create shuffled assessment pool in database
+        """
+        conn = self.connect_db()
+        if not conn:
+            return {'success': False, 'message': 'Database connection failed'}
         
-        Args:
-            questions (List[dict]): List of question dictionaries
+        try:
+            cursor = conn.cursor()
             
-        Returns:
-            List[dict]: Shuffled list of questions
-        """
-        return self.shuffler.shuffle(questions)
-    
-    def shuffle_with_topic_diversity(self, questions: List[dict], 
-                                   topic_key: str = 'topic_tag') -> List[dict]:
-        """
-        Shuffle questions while ensuring topic diversity.
-        
-        This method tries to avoid having consecutive questions from the same topic.
-        
-        Args:
-            questions (List[dict]): List of question dictionaries
-            topic_key (str): Key in question dict that contains topic information
+            # Shuffle questions first
+            shuffled_questions = self.shuffle_questions_for_assessment(questions)
             
-        Returns:
-            List[dict]: Shuffled list with improved topic diversity
-        """
-        def topic_diversity_constraint(shuffled_questions):
-            """Check if consecutive questions have different topics."""
-            if len(shuffled_questions) < 2:
-                return True
-            
-            consecutive_same_topic = 0
-            max_consecutive = 2  # Allow at most 2 consecutive questions from same topic
-            
-            for i in range(1, len(shuffled_questions)):
-                current_topic = shuffled_questions[i].get(topic_key, '')
-                previous_topic = shuffled_questions[i-1].get(topic_key, '')
+            # Insert shuffled questions into assessment_questions table
+            for question in shuffled_questions:
+                pool_id = f"POOL_{assessment_id}_{question['question_id']}_{int(datetime.now().timestamp())}"
                 
-                if current_topic == previous_topic and current_topic != '':
-                    consecutive_same_topic += 1
-                    if consecutive_same_topic >= max_consecutive:
-                        return False
-                else:
-                    consecutive_same_topic = 0
+                cursor.execute("""
+                    INSERT INTO assessment_questions 
+                    (pool_id, assessment_id, question_id, question_order, is_answered, is_current)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (
+                    pool_id, 
+                    assessment_id, 
+                    question['question_id'], 
+                    question['question_order'],
+                    False,
+                    question['question_order'] == 1  # First question is current
+                ))
             
-            return True
-        
-        return self.shuffler.shuffle_with_constraints(questions, topic_diversity_constraint)
-    
-    def shuffle_with_difficulty_balance(self, questions: List[dict],
-                                      difficulty_key: str = 'difficulty_level') -> List[dict]:
+            conn.commit()
+            
+            return {
+                'success': True, 
+                'shuffled_questions': shuffled_questions,
+                'total_questions': len(shuffled_questions)
+            }
+            
+        except mysql.connector.Error as e:
+            conn.rollback()
+            print(f"ERROR: Failed to create assessment pool: {e}", file=sys.stderr)
+            return {'success': False, 'message': 'Failed to create assessment pool'}
+        finally:
+            conn.close()
+
+    def get_next_question(self, assessment_id):
         """
-        Shuffle questions while balancing difficulty progression.
-        
-        This tries to avoid having all hard questions at the end or beginning.
-        
-        Args:
-            questions (List[dict]): List of question dictionaries
-            difficulty_key (str): Key in question dict that contains difficulty level
-            
-        Returns:
-            List[dict]: Shuffled list with balanced difficulty progression
+        Get the next unanswered question in order
         """
-        def difficulty_balance_constraint(shuffled_questions):
-            """Check if difficulty is reasonably distributed."""
-            if len(shuffled_questions) < 4:
-                return True
-            
-            # Check first quarter and last quarter for difficulty balance
-            quarter = len(shuffled_questions) // 4
-            
-            first_quarter = shuffled_questions[:quarter]
-            last_quarter = shuffled_questions[-quarter:]
-            
-            # Count advanced questions in first and last quarters
-            def count_advanced(q_list):
-                return sum(1 for q in q_list 
-                          if q.get(difficulty_key, '').lower() == 'advanced')
-            
-            first_advanced = count_advanced(first_quarter)
-            last_advanced = count_advanced(last_quarter)
-            
-            # Avoid having too many advanced questions concentrated in one quarter
-            max_advanced_per_quarter = max(1, quarter // 2)
-            
-            return (first_advanced <= max_advanced_per_quarter and 
-                   last_advanced <= max_advanced_per_quarter)
+        conn = self.connect_db()
+        if not conn:
+            return {'success': False, 'message': 'Database connection failed'}
         
-        return self.shuffler.shuffle_with_constraints(questions, difficulty_balance_constraint)
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Get current question or next unanswered question
+            cursor.execute("""
+                SELECT aq.*, q.question_text, q.question_type, q.options, 
+                       q.correct_answer, q.difficulty_level, q.max_time_seconds,
+                       q.topic, q.explanation
+                FROM assessment_questions aq
+                JOIN questions q ON aq.question_id = q.question_id
+                WHERE aq.assessment_id = %s 
+                AND aq.is_answered = FALSE
+                ORDER BY aq.question_order ASC
+                LIMIT 1
+            """, (assessment_id,))
+            
+            question = cursor.fetchone()
+            
+            if not question:
+                return {'success': False, 'message': 'No more questions available'}
+            
+            # Mark as current question
+            cursor.execute("""
+                UPDATE assessment_questions 
+                SET is_current = FALSE 
+                WHERE assessment_id = %s
+            """, (assessment_id,))
+            
+            cursor.execute("""
+                UPDATE assessment_questions 
+                SET is_current = TRUE 
+                WHERE pool_id = %s
+            """, (question['pool_id'],))
+            
+            conn.commit()
+            
+            return {
+                'success': True,
+                'question': question
+            }
+            
+        except mysql.connector.Error as e:
+            print(f"ERROR: Failed to get next question: {e}", file=sys.stderr)
+            return {'success': False, 'message': 'Failed to get next question'}
+        finally:
+            conn.close()
 
-
-# Utility functions for easy import
-def fisher_yates_shuffle(items: List[Any], seed: Optional[int] = None) -> List[Any]:
-    """
-    Convenience function for basic Fisher-Yates shuffle.
-    
-    Args:
-        items (List[Any]): Items to shuffle
-        seed (Optional[int]): Random seed for reproducible results
+    def mark_question_answered(self, assessment_id, question_id):
+        """
+        Mark a question as answered
+        """
+        conn = self.connect_db()
+        if not conn:
+            return {'success': False, 'message': 'Database connection failed'}
         
-    Returns:
-        List[Any]: Shuffled items
-    """
-    shuffler = FisherYatesShuffle(seed)
-    return shuffler.shuffle(items)
+        try:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                UPDATE assessment_questions 
+                SET is_answered = TRUE, is_current = FALSE
+                WHERE assessment_id = %s AND question_id = %s
+            """, (assessment_id, question_id))
+            
+            conn.commit()
+            
+            return {'success': True}
+            
+        except mysql.connector.Error as e:
+            conn.rollback()
+            print(f"ERROR: Failed to mark question answered: {e}", file=sys.stderr)
+            return {'success': False, 'message': 'Failed to update question status'}
+        finally:
+            conn.close()
 
-
-def shuffle_assessment_questions(questions: List[dict], 
-                               ensure_diversity: bool = True,
-                               seed: Optional[int] = None) -> List[dict]:
-    """
-    Convenience function for shuffling assessment questions with diversity.
-    
-    Args:
-        questions (List[dict]): Questions to shuffle
-        ensure_diversity (bool): Whether to ensure topic diversity
-        seed (Optional[int]): Random seed for reproducible results
+    def get_assessment_progress(self, assessment_id):
+        """
+        Get current progress of assessment
+        """
+        conn = self.connect_db()
+        if not conn:
+            return {'success': False, 'message': 'Database connection failed'}
         
-    Returns:
-        List[dict]: Shuffled questions
-    """
-    assessment_shuffle = AssessmentShuffle(seed)
-    
-    if ensure_diversity:
-        return assessment_shuffle.shuffle_with_topic_diversity(questions)
-    else:
-        return assessment_shuffle.shuffle_questions(questions)
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_questions,
+                    SUM(CASE WHEN is_answered = TRUE THEN 1 ELSE 0 END) as answered_questions,
+                    MIN(CASE WHEN is_current = TRUE THEN question_order ELSE NULL END) as current_question_number
+                FROM assessment_questions 
+                WHERE assessment_id = %s
+            """, (assessment_id,))
+            
+            progress = cursor.fetchone()
+            
+            return {
+                'success': True,
+                'progress': progress
+            }
+            
+        except mysql.connector.Error as e:
+            print(f"ERROR: Failed to get assessment progress: {e}", file=sys.stderr)
+            return {'success': False, 'message': 'Failed to get progress'}
+        finally:
+            conn.close()
 
+def main():
+    """Main function for command line interface"""
+    if len(sys.argv) < 2:
+        print(json.dumps({
+            'success': False, 
+            'message': 'Usage: python fisher_yates.py <action> [parameters]'
+        }))
+        return
+    
+    action = sys.argv[1]
+    shuffle = FisherYatesShuffle()
+    
+    try:
+        if action == 'shuffle_test':
+            # Test shuffling with sample data
+            test_data = [{'id': i, 'name': f'Item {i}'} for i in range(1, 11)]
+            result = shuffle.shuffle_questions_for_assessment(test_data)
+            print(json.dumps({'success': True, 'shuffled': result}))
+            
+        elif action == 'create_pool':
+            if len(sys.argv) < 4:
+                result = {'success': False, 'message': 'Missing parameters: assessment_id and questions'}
+            else:
+                assessment_id = sys.argv[2]
+                questions_json = sys.argv[3]
+                questions = json.loads(questions_json)
+                result = shuffle.create_assessment_pool(assessment_id, questions)
+            
+        elif action == 'next_question':
+            if len(sys.argv) < 3:
+                result = {'success': False, 'message': 'Missing assessment_id parameter'}
+            else:
+                assessment_id = sys.argv[2]
+                result = shuffle.get_next_question(assessment_id)
+                
+        elif action == 'mark_answered':
+            if len(sys.argv) < 4:
+                result = {'success': False, 'message': 'Missing parameters: assessment_id and question_id'}
+            else:
+                assessment_id = sys.argv[2]
+                question_id = sys.argv[3]
+                result = shuffle.mark_question_answered(assessment_id, question_id)
+                
+        elif action == 'progress':
+            if len(sys.argv) < 3:
+                result = {'success': False, 'message': 'Missing assessment_id parameter'}
+            else:
+                assessment_id = sys.argv[2]
+                result = shuffle.get_assessment_progress(assessment_id)
+                
+        else:
+            result = {'success': False, 'message': f'Unknown action: {action}'}
+        
+        print(json.dumps(result))
+        
+    except Exception as e:
+        print(json.dumps({
+            'success': False, 
+            'message': f'Error executing {action}: {str(e)}'
+        }))
 
-if __name__ == "__main__":
-    # Example usage and testing
-    print("Fisher-Yates Shuffle Algorithm Implementation")
-    print("=" * 50)
-    
-    # Test basic shuffle
-    test_items = list(range(1, 11))
-    shuffler = FisherYatesShuffle(seed=42)  # Use seed for reproducible results
-    
-    print(f"Original: {test_items}")
-    shuffled = shuffler.shuffle(test_items)
-    print(f"Shuffled: {shuffled}")
-    
-    # Test with questions
-    sample_questions = [
-        {"id": "Q1", "topic_tag": "Algebra", "difficulty_level": "Beginner"},
-        {"id": "Q2", "topic_tag": "Geometry", "difficulty_level": "Intermediate"},
-        {"id": "Q3", "topic_tag": "Algebra", "difficulty_level": "Advanced"},
-        {"id": "Q4", "topic_tag": "Statistics", "difficulty_level": "Beginner"},
-        {"id": "Q5", "topic_tag": "Geometry", "difficulty_level": "Intermediate"},
-    ]
-    
-    print(f"\nOriginal questions: {[q['id'] for q in sample_questions]}")
-    
-    assessment_shuffle = AssessmentShuffle(seed=123)
-    shuffled_questions = assessment_shuffle.shuffle_with_topic_diversity(sample_questions)
-    
-    print(f"Shuffled questions: {[q['id'] for q in shuffled_questions]}")
-    print(f"Topics order: {[q['topic_tag'] for q in shuffled_questions]}")
+if __name__ == '__main__':
+    main()

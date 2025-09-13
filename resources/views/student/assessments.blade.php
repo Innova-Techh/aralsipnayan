@@ -86,6 +86,7 @@
                     $naMastery = $masteryData['Number_Algebra'] ?? null;
                     $naLevel = $naMastery ? $naMastery->current_difficulty_level : 'Beginner';
                     $naProgress = $naMastery ? round($naMastery->mastery_probability * 100) : 30;
+                    $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
                 @endphp
                 <span class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-100 
                             text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-700 
@@ -99,13 +100,13 @@
                 <!-- Label and percentage -->
                 <div class="flex justify-between w-full text-sm text-gray-100">
                     <span>Mastery Level</span>
-                    <span id="progress-text">{{ $naProgress }}%</span>
+                    <span id="progress-text-na">{{ $naProgress }}%</span>
                 </div>
 
                 <!-- Progress bar container -->
                 <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
                     <!-- Gradient progress bar -->
-                    <div id="progress-bar"
+                    <div id="progress-bar-na"
                         class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                         style="width: 0%;
                                 background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
@@ -118,19 +119,6 @@
                     </div>
                 </div>
             </div>
-
-            <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const progressBar = document.getElementById('progress-bar');
-                const progress = {{ $naProgress }}; // Blade variable
-
-                // Animate the width to current progress
-                setTimeout(() => {
-                    progressBar.style.width = progress + '%';
-                }, 100);
-            });
-            </script>
-
 
             <!-- Stats -->
             <div class="flex justify-between mb-4 relative z-10">
@@ -164,11 +152,18 @@
             </div>
 
             <!-- Button -->
-        <a href="{{ route('assessments.category', 'Number_Algebra') }}" 
-        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
-        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-            View Assessments
-        </a>
+            @if(!$naHasDiagnostic)
+                <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                    Take Diagnostic Test
+                </a>
+            @else
+                <a href="{{ route('student.assessments.category', 'Number_Algebra') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                    View Assessments
+                </a>
+            @endif
         </div>
 
         <!-- Measurement and Geometry Card -->
@@ -191,6 +186,7 @@
                     $mgMastery = $masteryData['Measurement_Geometry'] ?? null;
                     $mgLevel = $mgMastery ? $mgMastery->current_difficulty_level : 'Beginner';
                     $mgProgress = $mgMastery ? round($mgMastery->mastery_probability * 100) : 30;
+                    $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
                 @endphp
                 <span class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full relative z-20">{{ $mgLevel }}</span>
             </div>
@@ -200,13 +196,13 @@
             <!-- Label and percentage -->
             <div class="flex justify-between w-full text-sm text-gray-100">
                 <span>Mastery Level</span>
-                <span id="progress-text">{{ $mgProgress }}%</span>
+                <span id="progress-text-mg">{{ $mgProgress }}%</span>
             </div>
 
             <!-- Progress bar container -->
             <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
                 <!-- Gradient progress bar -->
-                <div id="progress-bar"
+                <div id="progress-bar-mg"
                     class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                     style="width: 0%;
                             background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
@@ -220,18 +216,6 @@
             </div>
         </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const progressBar = document.getElementById('progress-bar');
-            const progress = {{ $mgProgress }}; // Blade variable
-
-            // Animate the width to current progress
-            setTimeout(() => {
-                progressBar.style.width = progress + '%';
-            }, 100);
-        });
-        </script>
-
         <!-- Stats -->
         <div class="flex justify-between mb-4 relative z-10">
             <div class="text-center">
@@ -242,7 +226,7 @@
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-white">
-                        {{ $naMastery ? $naMastery->correct_answers : 0 }}
+                        {{ $mgMastery ? $mgMastery->correct_answers : 0 }}
                     </span>
                 </div>
                 <span class="text-xs text-gray-100">Correct</span>
@@ -256,7 +240,7 @@
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-white">
-                        {{ $naMastery ? $naMastery->total_questions_answered : 0 }}
+                        {{ $mgMastery ? $mgMastery->total_questions_answered : 0 }}
                     </span>
                 </div>
                 <span class="text-xs text-gray-100">Total</span>
@@ -264,11 +248,18 @@
         </div>
 
         <!-- Button -->
-        <a href="{{ route('assessments.category', 'Measurement_Geometry') }}" 
-        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
-        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-            View Assessments
-        </a>
+        @if(!$mgHasDiagnostic)
+            <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                Take Diagnostic Test
+            </a>
+        @else
+            <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
+            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                View Assessments
+            </a>
+        @endif
     </div>
 
         <!-- Data and Probability Card -->
@@ -292,6 +283,7 @@
                     $dpMastery = $masteryData['Data_Probability'] ?? null;
                     $dpLevel = $dpMastery ? $dpMastery->current_difficulty_level : 'Beginner';
                     $dpProgress = $dpMastery ? round($dpMastery->mastery_probability * 100) : 30;
+                    $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
                 @endphp
                 <span class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $dpLevel }}</span>
             </div>
@@ -301,13 +293,13 @@
             <!-- Label and percentage -->
             <div class="flex justify-between w-full text-sm text-gray-100">
                 <span>Mastery Level</span>
-                <span id="progress-text">{{ $mgProgress }}%</span>
+                <span id="progress-text-dp">{{ $dpProgress }}%</span>
             </div>
 
             <!-- Progress bar container -->
             <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
                 <!-- Gradient progress bar -->
-                <div id="progress-bar"
+                <div id="progress-bar-dp"
                     class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                     style="width: 0%;
                             background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
@@ -321,20 +313,6 @@
             </div>
         </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const progressBar = document.getElementById('progress-bar');
-            const progress = {{ $mgProgress }}; // Blade variable
-
-            // Animate the width to current progress
-            setTimeout(() => {
-                progressBar.style.width = progress + '%';
-            }, 10);
-        });
-        </script>
-
-
-
         <!-- Stats -->
         <div class="flex justify-between mb-4 relative z-10">
             <div class="text-center">
@@ -345,7 +323,7 @@
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-white">
-                        {{ $naMastery ? $naMastery->correct_answers : 0 }}
+                        {{ $dpMastery ? $dpMastery->correct_answers : 0 }}
                     </span>
                 </div>
                 <span class="text-xs text-gray-100">Correct</span>
@@ -359,7 +337,7 @@
                         </svg>
                     </div>
                     <span class="text-xl font-bold text-white">
-                        {{ $naMastery ? $naMastery->total_questions_answered : 0 }}
+                        {{ $dpMastery ? $dpMastery->total_questions_answered : 0 }}
                     </span>
                 </div>
                 <span class="text-xs text-gray-100">Total</span>
@@ -367,14 +345,45 @@
         </div>
 
         <!-- Button -->
-        <a href="{{ route('assessments.category', 'Data_Probability') }}" 
-        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
-        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-            View Assessments
-        </a>
+        @if(!$dpHasDiagnostic)
+            <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                Take Diagnostic Test
+            </a>
+        @else
+            <a href="{{ route('student.assessments.category', 'Data_Probability') }}" 
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
+            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                View Assessments
+            </a>
+        @endif
     </div>
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Animate Number & Algebra progress bar
+    const progressBarNA = document.getElementById('progress-bar-na');
+    const progressNA = {{ $naProgress }};
+    setTimeout(() => {
+        progressBarNA.style.width = progressNA + '%';
+    }, 100);
+
+    // Animate Measurement & Geometry progress bar
+    const progressBarMG = document.getElementById('progress-bar-mg');
+    const progressMG = {{ $mgProgress }};
+    setTimeout(() => {
+        progressBarMG.style.width = progressMG + '%';
+    }, 200);
+
+    // Animate Data & Probability progress bar
+    const progressBarDP = document.getElementById('progress-bar-dp');
+    const progressDP = {{ $dpProgress }};
+    setTimeout(() => {
+        progressBarDP.style.width = progressDP + '%';
+    }, 300);
+});
+</script>
 
 @endsection

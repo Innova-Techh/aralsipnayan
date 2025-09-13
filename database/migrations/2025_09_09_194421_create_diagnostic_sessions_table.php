@@ -4,15 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('diagnostic_sessions', function (Blueprint $table) {
+            // Primary Key
             $table->string('session_id', 50)->primary();
+
+            // Foreign Key Reference to Users Table
             $table->unsignedBigInteger('user_id');
+
+            // Competency Area
             $table->enum('competency', ['number_algebra', 'measurement_geometry', 'data_probability']);
 
             // Diagnostic Configuration
@@ -20,10 +26,12 @@ return new class extends Migration {
             $table->integer('current_phase')->default(1);
 
             // Phase Results
-            $table->decimal('phase_1_score', 5, 4)->nullable(); 
+            $table->decimal('phase_1_score', 5, 4)->nullable();
             $table->integer('phase_1_questions')->default(15);
+
             $table->decimal('phase_2_score', 5, 4)->nullable();
-            $table->integer('phase_2_questions')->default(10);
+            $table->integer('phase_2_questions')->default(15);
+
             $table->decimal('phase_3_score', 5, 4)->nullable();
             $table->integer('phase_3_questions')->default(10);
 
@@ -36,12 +44,19 @@ return new class extends Migration {
             $table->timestamp('started_at')->useCurrent();
             $table->timestamp('completed_at')->nullable();
 
-            // Foreign Key
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // Foreign Key Constraint
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
 
-            // Indexes & Constraints
+            // Unique Constraint — Ensures one diagnostic session per user per competency
             $table->unique(['user_id', 'competency'], 'unique_user_competency_diagnostic');
-            $table->index(['status', 'started_at'], 'idx_diagnostic_status');
+
+            // Indexes for Optimized Queries
+            $table->index('status', 'idx_session_status');
+            $table->index(['user_id', 'competency', 'status'], 'idx_session_lookup');
+            $table->index(['status', 'started_at'], 'idx_status_time');
             $table->index(['user_id', 'completed_at'], 'idx_user_diagnostics');
         });
     }

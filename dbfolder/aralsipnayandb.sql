@@ -268,15 +268,39 @@ COMMIT;
 
 
 
+-- Updated student_profile table (with avatar_url added)
 CREATE TABLE student_profile (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    
+    -- Student Information (pre-populated)
+    student_id VARCHAR(50) UNIQUE, -- Official student ID/LRN
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
-    section VARCHAR(50),
+    middlename VARCHAR(100), -- Optional middle name
+    section VARCHAR(50) NOT NULL, -- Pre-assigned class section
     grade_level VARCHAR(10) DEFAULT '6',
     school_name VARCHAR(150) DEFAULT 'Pembo Elementary School',
-    avatar_url VARCHAR(255) DEFAULT '/avatars/default.png',
+    school_year VARCHAR(20), -- e.g., '2024-2025'
+    
+    -- Avatar field
+    avatar_url VARCHAR(255) DEFAULT '/images/profile/default.png',
+    
+    -- NEW: Onboarding tracking fields
+    has_completed_onboarding BOOLEAN DEFAULT FALSE,
+    onboarding_completed_at TIMESTAMP NULL,
+    is_first_login BOOLEAN DEFAULT TRUE,
+    
+    -- NEW: First assessment tracking (for diagnostic flow)
+    has_viewed_assessments BOOLEAN DEFAULT FALSE,
+    first_assessment_view_at TIMESTAMP NULL,
+    
+    -- NEW: Gamification fields
+    current_streak INT DEFAULT 0,
+    longest_streak INT DEFAULT 0,
+    last_activity_date DATE NULL,
+    total_points INT DEFAULT 0,
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
