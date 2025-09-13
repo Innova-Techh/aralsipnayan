@@ -4,19 +4,19 @@
 
 @section('content')
 
-<div class="min-h-screen px-4 py-8 bg-[#1e3a8a]">
+<div class="min-h-screen px-4 py-8 font-baloo">
     <!-- Assessment Header -->
     <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-10 mb-8">
-        <h1 class="text-2xl md:text-4xl font-bold text-gray-800 mb-2">Review Assessment</h1>
-        <p class="text-gray-600 text-sm md:text-base">Go through each question and review your answers. You can see which answers were correct and incorrect.</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 mb-2">Review Assessment</h1>
+        <p class="text-gray-600 text-sm md:text-xl">Go through each question and review your answers. You can see which answers were correct and incorrect.</p>
         
         <!-- Summary Stats -->
         <div class="mt-4 flex flex-wrap gap-4 text-sm">
             <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                📊 {{ $correctAnswers }}/{{ $totalQuestions }} Correct ({{ $scorePercentage }}%)
+                {{ $correctAnswers }}/{{ $totalQuestions }} Correct ({{ $scorePercentage }}%)
             </span>
             <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
-                📚 Category: {{ str_replace('_', ' ', $category) }}
+                Category: {{ str_replace('_', ' ', $category) }}
             </span>
         </div>
     </div>

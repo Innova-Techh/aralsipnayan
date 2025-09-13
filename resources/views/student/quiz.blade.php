@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="space-y-8 font-baloo mt-10">
+<div class="space-y-8 font-baloo mt-8">
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-6 md:mb-8">
         <!-- Question Counter -->
@@ -35,12 +35,12 @@
     @if(isset($diagnosticMode) && $diagnosticMode)
     <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center shadow-lg">
         <h3 class="font-bold text-lg mb-2">🔬 Diagnostic Assessment</h3>
-        <p class="text-sm">This diagnostic test helps us understand your current skill level. Take your time and do your best!</p>
+        <!-- <p class="text-sm">This diagnostic test helps us understand your current skill level. Take your time and do your best!</p> -->
     </div>
     @endif
 
     <!-- Quiz Card -->
-    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl">
+    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
         
         <!-- Hint Button (if not diagnostic) -->
         @if(!isset($diagnosticMode) || !$diagnosticMode)
@@ -88,23 +88,27 @@
             @endif
         </div>
 
-        <!-- Submit Button -->
-        <div class="flex justify-end">
-            <button id="submit-btn" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#0b830b] shadow-lg">
+        <!-- Buttons Row -->
+        <div class="flex justify-between items-center mt-6">
+            <!-- Submit Button -->
+            <button id="submit-btn" 
+                class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#0b830b] shadow-lg">
                 SUBMIT ANSWER
+            </button>
+
+            <!-- Next Button -->
+            <button id="next-btn" 
+                class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#0b830b] shadow-lg">
+                Next Question
             </button>
         </div>
 
         <!-- Feedback Section (initially hidden) -->
         <div id="feedback-section" class="hidden mt-6 p-4 rounded-lg">
-            <div id="feedback-message" class="font-semibold mb-2"></div>
-            <div id="explanation-text" class="text-sm text-gray-700"></div>
-            <div class="mt-4">
-                <button id="next-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold">
-                    Next Question
-                </button>
-            </div>
+            <div id="feedback-message" class="font-extrabold mb-2 font-baloo"></div>
+            <div id="explanation-text" class="text-xl text-gray-700 font-baloo"></div>
         </div>
+        
     </div>
 </div>
 
@@ -317,12 +321,12 @@ document.addEventListener('DOMContentLoaded', function() {
             feedbackMessage.className = 'font-semibold mb-2 text-orange-800';
             feedbackMessage.textContent = '⏰ Time\'s up!';
         } else if (data.is_correct) {
-            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200';
-            feedbackMessage.className = 'font-semibold mb-2 text-green-800';
+            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-green-200 border border-green-200';
+            feedbackMessage.className = 'font-extrabold mb-2 text-green-800 text-2xl';
             feedbackMessage.textContent = '✅ Correct!';
         } else {
-            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200';
-            feedbackMessage.className = 'font-semibold mb-2 text-red-800';
+            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-red-200 border border-red-200';
+            feedbackMessage.className = 'font-extrabold mb-2 text-red-800 text-2xl';
             feedbackMessage.textContent = '❌ Incorrect';
         }
         
