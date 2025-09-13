@@ -10,11 +10,20 @@
   >
     <div class=" w-full h-full flex flex-col justify-between">
       <!-- Welcome Header -->
-      <div class="text-center px-4 pt-10 mb-4 lg:mb-40 font-baloo font-extrabold ">
-        <h1 class="text-5xl md:text-8xl font-extrabold text-black-600">
-          Welcome, {{ $student->firstname }}! 
-        </h1>
-      </div>
+<div class="text-center px-4 pt-10 mb-4 lg:mb-40 font-baloo font-extrabold">
+  <h1 class="text-7xl md:text-8xl font-extrabold">
+    <span class="relative text-gray-700"
+          style="-webkit-text-stroke: 2px #facc15;">
+      Welcome,
+    </span>
+    <span class="relative "
+          style="-webkit-text-stroke: 2px #06b6d4; color: #dc2626;">
+      {{ $student->firstname }}!
+    </span>
+  </h1>
+</div>
+
+
 
       <!-- Feature Highlights -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 lg:mb-14">
