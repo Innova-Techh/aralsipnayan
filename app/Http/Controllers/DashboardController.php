@@ -15,6 +15,9 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
+        // Optional: Add delay to simulate data fetching (remove in production)
+        sleep(1);
+        
         $user = Auth::user();
         
         // Get user profile with avatar

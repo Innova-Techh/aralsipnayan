@@ -20,6 +20,7 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+
 // General dashboard redirect (based on role)
 Route::get('/dashboard', function() {
     if (!Auth::check()) {
