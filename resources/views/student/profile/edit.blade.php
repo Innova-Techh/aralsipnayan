@@ -11,29 +11,32 @@
         </div>
 
         <!-- Main Avatar Display -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-4">
             <h1 class="text-white text-4xl font-baloo font-bold mb-4">Choose Your Avatar</h1>
             
             <!-- Avatar Carousel Container -->
-            <div class="relative flex items-center justify-center mb-6">
+            <div class="relative flex items-center justify-center mb-2">
                 <!-- Left Arrow -->
-                <button id="prevBtn" class="absolute left-4 md:left-20 text-white hover:text-gray-300 transition-colors z-10">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
+                <div class="relative flex items-center justify-center">
+                    <!-- Left Arrow -->
+                    <button id="prevBtn" class="absolute left-4 md:left-4 text-white hover:text-gray-300 transition-colors z-10">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
 
-                <!-- Main Avatar Display -->
-                <div class="w-64 h-80 bg-white rounded-3xl shadow-lg flex items-center justify-center mx-8">
-                    <img id="mainAvatar" src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}" alt="Selected Avatar" class="w-48 h-60 object-contain">
+                    <!-- Main Avatar Display -->
+                    <div class="w-64 h-100 bg-transparent rounded-3xl flex items-center justify-center mx-8">
+                        <img id="mainAvatar" src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}" alt="Selected Avatar" class="w-48 h-60 object-contain">
+                    </div>
+
+                    <!-- Right Arrow -->
+                    <button id="nextBtn" class="absolute right-4 md:right-4 text-white hover:text-gray-300 transition-colors z-10">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
                 </div>
-
-                <!-- Right Arrow -->
-                <button id="nextBtn" class="absolute right-4 md:right-20 text-white hover:text-gray-300 transition-colors z-10">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
             </div>
         </div>
     </div>
@@ -94,6 +97,7 @@
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const avatars = [
@@ -167,8 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
         selectAvatarBtn.textContent = 'Saving...';
         selectAvatarBtn.disabled = true;
         
-        // Send AJAX request to save avatar
-        fetch('{{ route("profile.update.avatar") }}', {
+        // Send AJAX request to complete onboarding with selected avatar
+        fetch('{{ route("student.onboarding.complete") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,11 +185,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Avatar updated successfully!');
-                // Optionally redirect to dashboard
-                window.location.href = '{{ route("dashboard") }}';
+                // Show success message
+                alert(data.message);
+                // Redirect to dashboard
+                window.location.href = data.redirect_url;
             } else {
-                alert('Error updating avatar: ' + (data.message || 'Unknown error'));
+                alert('Error: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
@@ -200,4 +205,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endsection 
+@endsection

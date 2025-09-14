@@ -13,51 +13,42 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->string('question_id', 50)->primary();
-
-            // Competency & Difficulty Level
             $table->enum('competency', ['number_algebra', 'measurement_geometry', 'data_probability']);
             $table->enum('difficulty_level', ['beginner', 'intermediate', 'advanced']);
+            $table->string('topic_tag', 100);
 
-            // Question Info
-            $table->string('topic_tag', 100); // Subcategory like 'polygons', 'fractions', etc.
-            $table->enum('question_type', ['multiple_choice', 'fill_blanks', 'true_false', 'drag_drop', 'connect_dots']);
+            // Question content
             $table->text('question_text');
-
-            // Multiple Choice Options (nullable for non-MC questions)
+            $table->enum('question_type', ['multiple_choice', 'fill_blanks', 'true_false', 'drag_drop', 'connect_dots'])
+                  ->default('multiple_choice');
             $table->text('choice_a')->nullable();
             $table->text('choice_b')->nullable();
             $table->text('choice_c')->nullable();
             $table->text('choice_d')->nullable();
-
-            // Correct Answer (format depends on question type)
             $table->text('correct_answer');
+            $table->text('hint_text')->nullable();
+            $table->text('explanation')->nullable();
+            $table->integer('max_allowed_time'); // in seconds
 
-            // Additional Question Details
-            $table->text('hint_text'); // Single hint as string
-            $table->text('explanation')->nullable(); // Detailed explanation for learning
-            $table->integer('max_allowed_time'); // In seconds
-
-            // Question Source & Status
+            // Difficulty and scoring
+            $table->decimal('estimated_difficulty_weight', 3, 2)->default(1.0);
             $table->enum('question_source', ['built_in', 'custom'])->default('built_in');
             $table->boolean('is_active')->default(true);
-
-            // Gamification Points
-            $table->integer('base_points'); // 3 for beginner, 6 for intermediate, 10 for advanced
+            $table->integer('usage_count')->default(0);
+            $table->decimal('success_rate', 5, 4)->default(0.0000);
+            $table->integer('base_points');
 
             // Metadata
-            $table->unsignedBigInteger('created_by')->nullable(); // Teacher_id for custom questions
-
-            // Timestamps
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
-            // Foreign Key
+            // Foreign keys
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
 
-            // Indexes for performance
+            // Indexes
             $table->index(['competency', 'difficulty_level'], 'idx_competency_difficulty');
-            $table->index('topic_tag', 'idx_topic_tag');
-            $table->index('is_active', 'idx_active_questions');
-            $table->index('question_source', 'idx_question_source');
+            $table->index(['topic_tag', 'is_active'], 'idx_topic_active');
+            $table->index(['difficulty_level', 'usage_count'], 'idx_difficulty_usage');
         });
     }
 

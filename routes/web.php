@@ -10,6 +10,10 @@ use App\Http\Controllers\AlgorithmController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Student\OnboardingController;
+use App\Http\Controllers\Student\AssessmentController;
+use App\Http\Controllers\Student\QuizController as StudentQuizController;
+
 // Homepage
 Route::get('/', function () {
     return view('homepage');
@@ -39,10 +43,57 @@ Route::get('/dashboard', function() {
     }
 })->name('dashboard');
 
-// Student Dashboard
-Route::get('/student/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'role:Student'])
-    ->name('student.dashboard');
+// Student Onboarding Routes (no middleware restrictions)
+Route::prefix('student/onboarding')->name('student.onboarding.')->group(function () {
+    Route::get('/welcome', [OnboardingController::class, 'showWelcome'])->name('welcome');
+    Route::get('/start', [OnboardingController::class, 'startOnboarding'])->name('start');
+    Route::get('/avatar', [OnboardingController::class, 'showAvatarSelection'])->name('avatar');
+    Route::post('/complete', [OnboardingController::class, 'completeOnboarding'])->name('complete');
+});
+
+// Protected Student Routes (require completed onboarding)
+Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')->group(function () {
+    
+    // Dashboard - check onboarding completion
+    Route::get('/dashboard', function() {
+        $user = Auth::user();
+        $profile = $user->studentProfile;
+        
+        // If onboarding not completed, redirect to welcome
+        if (!$profile || !$profile->has_completed_onboarding) {
+            return redirect()->route('student.onboarding.welcome');
+        }
+        
+        return app(DashboardController::class)->index();
+    })->name('dashboard');
+    
+    // Assessments - main page
+    Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments');
+    
+    // Assessment category routes
+    Route::get('/assessments/{category}', [AssessmentController::class, 'showCategory'])->name('assessments.category');
+    
+    // Assessment complete page
+    Route::get('/assessments/complete/{category}', [AssessmentController::class, 'showComplete'])->name('assessments.complete');
+    
+    // Assessment review page
+    Route::get('/assessments/review/{category}', [AssessmentController::class, 'showReview'])->name('assessments.review');
+    
+    // Quiz routes
+    Route::prefix('quiz')->name('quiz.')->group(function () {
+        // Start diagnostic for a category
+        Route::get('/diagnostic/{category}', [AssessmentController::class, 'startDiagnostic'])->name('diagnostic');
+        
+        // Show quiz interface (diagnostic or regular)
+        Route::get('/{category}', [StudentQuizController::class, 'show'])->name('show');
+        
+        // Submit diagnostic answer
+        Route::post('/diagnostic/submit', [AssessmentController::class, 'submitDiagnosticAnswer'])->name('diagnostic.submit');
+        
+        // Submit regular assessment answer
+        Route::post('/submit', [StudentQuizController::class, 'submitAnswer'])->name('submit');
+    });
+});
 
 // Teacher Dashboard (placeholder)
 Route::get('/teacher/dashboard', function () {
@@ -54,63 +105,55 @@ Route::get('/admin/dashboard', function () {
     return 'Admin Dashboard (Coming Soon)';
 })->middleware(['auth', 'role:Admin'])->name('admin.dashboard');
 
-// Dashboard stats (accessible to authenticated users only)
-Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])
-    ->middleware('auth')
-    ->name('dashboard.stats');
+// Backward compatibility routes for old assessment references (redirects to student routes)
+Route::middleware(['auth'])->group(function () {
+    // Legacy assessment routes (redirects to student assessments)
+    Route::get('/assessments', function() {
+        if (Auth::user()->role === 'Student') {
+            return redirect()->route('student.assessments');
+        }
+        return redirect()->route('dashboard');
+    })->name('assessments.index');
+    
+    // Legacy assessment category route
+    Route::get('/assessments/{category}', function($category) {
+        if (Auth::user()->role === 'Student') {
+            return redirect()->route('student.assessments.category', $category);
+        }
+        return redirect()->route('dashboard');
+    })->name('assessments.category');
+    
+    // Legacy quiz start route
+    Route::get('/quiz/{category}', function($category) {
+        if (Auth::user()->role === 'Student') {
+            return redirect()->route('student.quiz.show', $category);
+        }
+        return redirect()->route('dashboard');
+    })->name('quiz.start');
+});
 
-// Assessments
-Route::get('/assessments', [App\Http\Controllers\AssessmentController::class, 'index'])
-    ->middleware('auth')
-    ->name('assessments.index');
-
-Route::get('/assessments/{category}', [App\Http\Controllers\AssessmentController::class, 'showCategory'])
-    ->middleware('auth')
-    ->name('assessments.category');
-
-    Route::get('/quiz/{category}', [QuizController::class, 'start'])->name('quiz.start');
-
-
-// Achievements
-Route::get('/achievements', [AchievementController::class, 'index'])
-    ->middleware('auth')
-    ->name('achievements.index');
-
-// Progression
-Route::get('/progression', fn() => view('user.progression'))
-    ->middleware('auth')
-    ->name('progression.index');
-
-// Leaderboard
-Route::get('/leaderboard', [LeaderboardController::class, 'index'])
-    ->middleware('auth')
-    ->name('leaderboard.index');
-Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardData'])
-    ->middleware('auth')
-    ->name('leaderboard.data');
-
-// Sections
-Route::get('/sections', [SectionController::class, 'index'])
-    ->middleware('auth')
-    ->name('sections.index');
-Route::get('/sections/data', [SectionController::class, 'getSectionsData'])
-    ->middleware('auth')
-    ->name('sections.data');
-
-// Profile routes
-Route::get('/profile/edit', [ProfileController::class, 'edit'])
-    ->middleware('auth')
-    ->name('profile.edit');
-Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])
-    ->middleware('auth')
-    ->name('profile.update.avatar');
-Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])
-    ->middleware('auth')
-    ->name('profile.get.avatar');
-
-// Logout route
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-//ALGORITHM INTEGRATION
-Route::post('/run-bkt', [App\Http\Controllers\AssessmentController::class, 'runBkt']);
+// Other protected routes (require auth + completed onboarding for students)
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard stats
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+    
+    // Achievements
+    Route::get('/achievements', [AchievementController::class, 'index'])->name('achievements.index');
+    
+    // Progression
+    Route::get('/progression', fn() => view('user.progression'))->name('progression.index');
+    
+    // Leaderboard
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+    Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardData'])->name('leaderboard.data');
+    
+    // Sections
+    Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
+    Route::get('/sections/data', [SectionController::class, 'getSectionsData'])->name('sections.data');
+    
+    // Profile routes
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
+    Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
+});

@@ -85,7 +85,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 px-4 py-4">             
         @forelse($filteredAchievements as $achievement)                 
             <div class="flip-card-container" style="perspective: 1000px;">                     
-                <div class="flip-card relative w-full aspect-[4/5] cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['rarity'] === 'Legendary' ? 'shadow-lg shadow-yellow-400' : '' }}"                           
+                <div class="flip-card relative w-full aspect-[4/5] rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['rarity'] === 'Legendary' ? 'shadow-lg shadow-yellow-400' : '' }}"                           
                     data-achievement-id="{{ $loop->index }}"
                     data-earned="{{ $achievement['is_earned'] ? 'true' : 'false' }}"                          
                     title="{{ $achievement['is_earned'] ? 'Click to flip' : 'Achievement locked' }}">                                                  
