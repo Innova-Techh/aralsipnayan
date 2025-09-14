@@ -40,6 +40,8 @@ class QuizController extends Controller
      */
     private function showDiagnosticQuestion($category)
     {
+        $user = Auth::user();
+        
         // Get current diagnostic question
         $questions = session('diagnostic_questions', []);
         $currentIndex = session('current_question_index', 0);
@@ -59,13 +61,17 @@ class QuizController extends Controller
             'difficulty_level' => $currentQuestion['difficulty_level'] ?? 'beginner'
         ];
         
+        // Check for saved progress
+        $savedProgress = $this->getSavedProgress($user->id, session('diagnostic_session_id'), $currentQuestion['question_id']);
+        
         return view('student.quiz', [
             'category' => $category,
             'question' => (object) $questionData,
             'currentQuestion' => $currentIndex + 1,
             'totalQuestions' => count($questions),
             'diagnosticMode' => true,
-            'diagnosticPhase' => session('diagnostic_phase', 1)
+            'diagnosticPhase' => session('diagnostic_phase', 1),
+            'savedProgress' => $savedProgress
         ]);
     }
     
@@ -130,13 +136,17 @@ class QuizController extends Controller
         // Get progress
         $progress = $this->getAssessmentProgress($assessment->assessment_id);
         
+        // Check for saved progress for this specific question
+        $savedProgress = $this->getSavedProgress($user->id, $assessment->assessment_id, $currentQuestion->question_id);
+        
         return view('student.quiz', [
             'category' => $category,
             'question' => $currentQuestion,
             'currentQuestion' => $progress['answered_questions'] + 1,
             'totalQuestions' => $progress['total_questions'] ?? 15,
             'diagnosticMode' => false,
-            'assessmentId' => $assessment->assessment_id
+            'assessmentId' => $assessment->assessment_id,
+            'savedProgress' => $savedProgress
         ]);
     }
     
@@ -603,6 +613,35 @@ class QuizController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Failed to complete assessment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get saved progress for a specific question
+     */
+    private function getSavedProgress($userId, $sessionId, $questionId)
+    {
+        try {
+            if (!$sessionId || !$questionId) {
+                return null;
+            }
+
+            $progress = DB::table('quiz_progress')
+                ->where('user_id', $userId)
+                ->where('session_id', $sessionId)
+                ->where('question_id', $questionId)
+                ->first();
+
+            return $progress ? [
+                'current_answer' => $progress->current_answer,
+                'time_taken' => $progress->time_taken,
+                'question_index' => $progress->question_index,
+                'saved_at' => $progress->saved_at
+            ] : null;
+
+        } catch (\Exception $e) {
+            Log::error('Failed to get saved progress: ' . $e->getMessage());
+            return null;
         }
     }
 }

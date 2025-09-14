@@ -91,6 +91,15 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         
         // Submit regular assessment answer
         Route::post('/submit', [StudentQuizController::class, 'submitAnswer'])->name('submit');
+        
+        // Save quiz progress
+        Route::post('/save-progress', [AssessmentController::class, 'saveProgress'])->name('save-progress');
+        
+        // Get saved progress
+        Route::get('/get-progress/{sessionId}/{questionId}', [AssessmentController::class, 'getProgress'])->name('get-progress');
+        
+        // Clear progress
+        Route::delete('/clear-progress/{sessionId}', [AssessmentController::class, 'clearProgress'])->name('clear-progress');
     });
 });
 

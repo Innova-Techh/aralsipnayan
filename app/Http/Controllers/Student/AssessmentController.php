@@ -148,6 +148,92 @@ class AssessmentController extends Controller
             return redirect()->route('student.assessments.category', $category);
         }
         
+        // Check for existing incomplete diagnostic session
+        $existingSession = DB::table('diagnostic_sessions')
+            ->where('user_id', $user->id)
+            ->where('competency', $dbCompetency)
+            ->where('status', 'in_progress')
+            ->orderBy('started_at', 'desc')
+            ->first();
+        
+        if ($existingSession) {
+            // Check for saved progress in quiz_progress table
+            $savedProgress = DB::table('quiz_progress')
+                ->where('user_id', $user->id)
+                ->where('session_id', $existingSession->session_id)
+                ->orderBy('question_index', 'desc')
+                ->first();
+            
+            if ($savedProgress) {
+                // Resume from saved progress
+                Log::info("Resuming diagnostic session for user {$user->id}, competency {$dbCompetency}");
+                
+                return $this->resumeDiagnosticSession($existingSession, $savedProgress, $category);
+            } else {
+                // Session exists but no saved progress - resume from session data
+                Log::info("Resuming diagnostic session without saved progress for user {$user->id}, competency {$dbCompetency}");
+                
+                // Get the current state from the database
+                $answeredQuestions = DB::table('question_responses')
+                    ->where('assessment_id', $existingSession->session_id)
+                    ->orderBy('answered_at')
+                    ->get();
+                
+                $currentQuestionIndex = $answeredQuestions->count();
+                
+                // If no questions answered yet, start from beginning
+                if ($currentQuestionIndex == 0) {
+                    // Get initial questions from database
+                    try {
+                        $questions = DB::table('questions')
+                            ->where('competency', $dbCompetency)
+                            ->where('difficulty_level', 'beginner')
+                            ->where('is_active', 1)
+                            ->inRandomOrder()
+                            ->limit(5)
+                            ->get([
+                                'question_id', 'question_text', 'question_type', 'correct_answer', 
+                                'explanation', 'difficulty_level', 'max_allowed_time', 'topic_tag as topic',
+                                'choice_a', 'choice_b', 'choice_c', 'choice_d'
+                            ])
+                            ->toArray();
+                        
+                        if (!empty($questions)) {
+                            // Convert to array format expected by frontend
+                            $questionsArray = array_map(function($q) {
+                                $questionArray = (array) $q;
+                                $questionArray['options'] = json_encode([
+                                    'A' => $questionArray['choice_a'],
+                                    'B' => $questionArray['choice_b'], 
+                                    'C' => $questionArray['choice_c'],
+                                    'D' => $questionArray['choice_d']
+                                ]);
+                                $questionArray['max_time_seconds'] = $questionArray['max_allowed_time'] ?? 30;
+                                return $questionArray;
+                            }, $questions);
+                            
+                            session([
+                                'diagnostic_session_id' => $existingSession->session_id,
+                                'diagnostic_competency' => $category,
+                                'diagnostic_phase' => 1,
+                                'diagnostic_questions' => $questionsArray,
+                                'current_question_index' => 0
+                            ]);
+                            
+                            return redirect()->route('student.quiz.show', $category)
+                                ->with('diagnostic_mode', true)
+                                ->with('success', 'Continuing your diagnostic assessment.');
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Failed to get initial questions for existing session: ' . $e->getMessage());
+                    }
+                }
+                
+                // If some questions answered, use resume method
+                return $this->resumeDiagnosticSession($existingSession, null, $category);
+            }
+        }
+        
         try {
             // Call Python script to start diagnostic
             $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
@@ -481,5 +567,266 @@ class AssessmentController extends Controller
             'scorePercentage' => $scorePercentage,
             'questionsByDifficulty' => $questionsByDifficulty
         ]);
+    }
+
+    /**
+     * Save quiz progress for restoration
+     */
+    public function saveProgress(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|string',
+            'question_id' => 'required|string',
+            'current_answer' => 'nullable|string',
+            'time_taken' => 'required|integer|min:0',
+            'question_index' => 'required|integer|min:0'
+        ]);
+
+        $user = Auth::user();
+
+        try {
+            // Save or update progress in database
+            DB::table('quiz_progress')->updateOrInsert(
+                [
+                    'user_id' => $user->id,
+                    'session_id' => $request->session_id,
+                    'question_id' => $request->question_id
+                ],
+                [
+                    'current_answer' => $request->current_answer,
+                    'time_taken' => $request->time_taken,
+                    'question_index' => $request->question_index,
+                    'saved_at' => now(),
+                    'updated_at' => now()
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress saved successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to save quiz progress: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save progress'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get saved progress for a quiz session
+     */
+    public function getProgress($sessionId, $questionId)
+    {
+        $user = Auth::user();
+
+        try {
+            $progress = DB::table('quiz_progress')
+                ->where('user_id', $user->id)
+                ->where('session_id', $sessionId)
+                ->where('question_id', $questionId)
+                ->first();
+
+            if ($progress) {
+                return response()->json([
+                    'success' => true,
+                    'progress' => [
+                        'current_answer' => $progress->current_answer,
+                        'time_taken' => $progress->time_taken,
+                        'question_index' => $progress->question_index,
+                        'saved_at' => $progress->saved_at
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No progress found'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Failed to get quiz progress: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve progress'
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear progress after successful completion
+     */
+    public function clearProgress($sessionId)
+    {
+        $user = Auth::user();
+
+        try {
+            DB::table('quiz_progress')
+                ->where('user_id', $user->id)
+                ->where('session_id', $sessionId)
+                ->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress cleared successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to clear quiz progress: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear progress'
+            ], 500);
+        }
+    }
+
+    /**
+     * Resume diagnostic session from saved progress
+     */
+    private function resumeDiagnosticSession($existingSession, $savedProgress, $category)
+    {
+        $user = Auth::user();
+        
+        try {
+            // Get all answered questions for this session to determine current question index
+            $answeredQuestions = DB::table('question_responses')
+                ->where('assessment_id', $existingSession->session_id)
+                ->orderBy('answered_at')
+                ->get();
+            
+            $currentQuestionIndex = $answeredQuestions->count();
+            
+            // Determine current phase and difficulty based on questions answered
+            $currentPhase = 1;
+            $difficulty = 'beginner';
+            if ($currentQuestionIndex >= 5) {
+                $currentPhase = 2;
+                $difficulty = 'intermediate';
+            }
+            if ($currentQuestionIndex >= 10) {
+                $currentPhase = 3;
+                $difficulty = 'advanced';
+            }
+            
+            // Get questions for the current phase directly from database
+            $dbCompetency = strtolower(str_replace('_', '_', $category));
+            $questions = DB::table('questions')
+                ->where('competency', $dbCompetency)
+                ->where('difficulty_level', $difficulty)
+                ->where('is_active', 1)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get([
+                    'question_id', 'question_text', 'question_type', 'correct_answer', 
+                    'explanation', 'difficulty_level', 'max_allowed_time', 'topic_tag as topic',
+                    'choice_a', 'choice_b', 'choice_c', 'choice_d'
+                ])
+                ->toArray();
+            
+            if (empty($questions)) {
+                Log::warning("No questions found for competency {$dbCompetency}, difficulty {$difficulty}");
+                return $this->startNewDiagnostic($user->id, $dbCompetency, $category);
+            }
+            
+            // Convert to array format expected by frontend
+            $questionsArray = array_map(function($q) {
+                $questionArray = (array) $q;
+                // Add options array for frontend compatibility
+                $questionArray['options'] = json_encode([
+                    'A' => $questionArray['choice_a'],
+                    'B' => $questionArray['choice_b'], 
+                    'C' => $questionArray['choice_c'],
+                    'D' => $questionArray['choice_d']
+                ]);
+                // Add max_time_seconds for frontend compatibility
+                $questionArray['max_time_seconds'] = $questionArray['max_allowed_time'] ?? 30;
+                return $questionArray;
+            }, $questions);
+            
+            // Calculate the index within the current phase
+            $phaseQuestionIndex = $currentQuestionIndex % 5;
+            
+            // Store session data for resumption
+            session([
+                'diagnostic_session_id' => $existingSession->session_id,
+                'diagnostic_competency' => $category,
+                'diagnostic_phase' => $currentPhase,
+                'diagnostic_questions' => $questionsArray,
+                'current_question_index' => $phaseQuestionIndex
+            ]);
+            
+            $message = $savedProgress ? 
+                'Resuming your diagnostic assessment from where you left off.' :
+                'Continuing your diagnostic assessment.';
+            
+            return redirect()->route('student.quiz.show', $category)
+                ->with('diagnostic_mode', true)
+                ->with('success', $message);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to resume diagnostic session: ' . $e->getMessage());
+            
+            // Fallback: start new diagnostic by clearing existing session
+            return $this->startNewDiagnostic($user->id, $dbCompetency, $category);
+        }
+    }
+
+    /**
+     * Start a new diagnostic session (helper method)
+     */
+    private function startNewDiagnostic($userId, $dbCompetency, $category)
+    {
+        try {
+            // First, clear any existing incomplete sessions for this competency
+            DB::table('diagnostic_sessions')
+                ->where('user_id', $userId)
+                ->where('competency', $dbCompetency)
+                ->where('status', 'in_progress')
+                ->update(['status' => 'abandoned']);
+            
+            // Clear any saved progress for abandoned sessions
+            DB::table('quiz_progress')
+                ->where('user_id', $userId)
+                ->whereIn('session_id', function($query) use ($userId, $dbCompetency) {
+                    $query->select('session_id')
+                          ->from('diagnostic_sessions')
+                          ->where('user_id', $userId)
+                          ->where('competency', $dbCompetency)
+                          ->where('status', 'abandoned');
+                })
+                ->delete();
+            
+            $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+            $command = "python \"{$scriptPath}\" start_diagnostic {$userId} {$dbCompetency}";
+            
+            $output = shell_exec($command);
+            $result = json_decode($output, true);
+            
+            if ($result && $result['success']) {
+                session([
+                    'diagnostic_session_id' => $result['session_id'],
+                    'diagnostic_competency' => $category,
+                    'diagnostic_phase' => $result['phase'],
+                    'diagnostic_questions' => $result['questions'],
+                    'current_question_index' => 0
+                ]);
+                
+                return redirect()->route('student.quiz.show', $category)
+                    ->with('diagnostic_mode', true);
+            } else {
+                throw new \Exception($result['message'] ?? 'Failed to start diagnostic');
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('New diagnostic start failed: ' . $e->getMessage());
+            
+            return redirect()->route('student.assessments')
+                ->with('error', 'Failed to start diagnostic. Please try again.');
+        }
     }
 }

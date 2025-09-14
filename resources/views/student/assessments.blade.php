@@ -7,64 +7,79 @@
 <div class="space-y-8">
     <!-- My Assessments Header -->
     
-<div class="relative overflow-hidden mt-4 lg:mt-8">
-    <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" 
-         style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
-                background-size: 95% clamp(120px, 10vw + 60px, 200px);
-                min-height: clamp(120px, 10vw + 60px, 200px);
-                padding-left: clamp(2rem, 8vw, 18rem);">
-        <div class="relative z-10 pr-6">
-            <h1 class="text-3xl sm:text-3xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
+<div class="relative overflow-hidden">
+    <div class="mx-auto max-w-10xl text-white bg-center bg-cover rounded-2xl flex items-center px-4 sm:px-6 md:px-10"
+         style="
+            background-image: url('{{ asset('images/assessments/bg.png') }}');
+            min-height: clamp(120px, 20vh, 220px);
+         ">
+        <div class="relative z-10 pr-2 sm:pr-4 md:pr-6">
+            <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-5xl leading-snug sm:leading-tight font-baloo font-extrabold">
                 My Assessments
             </h1>
-            <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
+            <p class="text-xs sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
                 Test your mathematical knowledge across different competencies and track your learning progress with adaptive assessments
             </p>
         </div>
     </div>
 </div>
 
+
+
 <!-- Feature Cards Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-            <!-- Ready for a Challenge Card -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#2c014b] shadow-lg"
-            style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
-            <div class="relative z-10 w-[70%] md:w-[60%]">
-                <div class="flex items-center mb-2 md:mb-4">
-                    <h3 class="text-base md:text-xl font-bold">🎯 Ready for a Challenge?</h3>
-                </div>
-                <p class="text-white mb-2 md:mb-4 text-sm md:text-base">
-                    Test your math skills with fun assessments! Choose from geometry, numbers, or fractions and start your learning adventure!
-                </p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 lg:gap-6 mb-6 md:mb-8">
+    <!-- Ready for a Challenge Card -->
+    <div class="relative overflow-hidden rounded-xl md:rounded-2xl 
+                p-3 md:p-4 lg:p-6 text-white 
+                min-h-[100px] sm:min-h-[120px] md:min-h-[130px] lg:min-h-[200px] 
+                border-b-4 border-[#2c014b] shadow-lg"
+        style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
+        <div class="relative z-10 w-[80%] md:w-[70%] lg:w-[60%]">
+            <div class="flex items-center mb-2 md:mb-2 lg:mb-4">
+                <h3 class="text-sm sm:text-base md:text-base lg:text-xl font-bold">🎯 Ready for a Challenge?</h3>
             </div>
+            <p class="text-white mb-2 md:mb-2 lg:mb-4 text-xs sm:text-sm md:text-sm">
+                Test your math skills with fun assessments! Choose from geometry, numbers, or fractions and start your learning adventure!
+            </p>
         </div>
+    </div>
 
-
-        <!-- Level Up Your Skills Card -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#922f26] shadow-lg" 
-            style="background-image: url('{{ asset('images/assessments/card2.png') }}'); background-size: cover; background-position: center;">
-            <div class="relative z-10 w-[70%] md:w-[60%]">
-                <div class="flex items-center mb-2 md:mb-4">
-                    <h3 class="text-base md:text-xl font-bold">🌟 Level Up Your Skills!</h3>
-                </div>
-                <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Adaptive learning just for you. Our smart system adjusts questions to match your learning pace perfectly!</p>
+    <!-- Level Up Your Skills Card -->
+    <div class="relative overflow-hidden rounded-xl md:rounded-2xl 
+                p-3 md:p-4 lg:p-6 text-white 
+                min-h-[100px] sm:min-h-[120px] md:min-h-[130px] lg:min-h-[200px] 
+                border-b-4 border-[#922f26] shadow-lg" 
+        style="background-image: url('{{ asset('images/assessments/card2.png') }}'); background-size: cover; background-position: center;">
+        <div class="relative z-10 w-[80%] md:w-[70%] lg:w-[60%]">
+            <div class="flex items-center mb-2 md:mb-2 lg:mb-4">
+                <h3 class="text-sm sm:text-base md:text-base lg:text-xl font-bold">🌟 Level Up Your Skills!</h3>
             </div>
+            <p class="text-white mb-2 md:mb-2 lg:mb-4 text-xs sm:text-sm md:text-sm">
+                Adaptive learning just for you. Our smart system adjusts questions to match your learning pace perfectly!
+            </p>
         </div>
+    </div>
 
-        <!-- Learning is Fun Card -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#396697] shadow-lg" 
-            style="background-image: url('{{ asset('images/assessments/card3.png') }}'); background-size: cover; background-position: center;">
-            <div class="relative z-10 w-[70%] md:w-[60%]">
-                <div class="flex items-center mb-2 md:mb-4">
-                    <h3 class="text-base md:text-xl font-bold">🎮 Learning is Fun!</h3>
-                </div>
-                <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Gamified math assessments. Earn points, unlock achievements, and compete with friends while learning!</p>
+    <!-- Learning is Fun Card -->
+    <div class="relative overflow-hidden rounded-xl md:rounded-2xl 
+                p-3 md:p-4 lg:p-6 text-white 
+                min-h-[100px] sm:min-h-[120px] md:min-h-[130px] lg:min-h-[200px] 
+                border-b-4 border-[#396697] shadow-lg" 
+        style="background-image: url('{{ asset('images/assessments/card3.png') }}'); background-size: cover; background-position: center;">
+        <div class="relative z-10 w-[80%] md:w-[70%] lg:w-[60%]">
+            <div class="flex items-center mb-2 md:mb-2 lg:mb-4">
+                <h3 class="text-sm sm:text-base md:text-base lg:text-xl font-bold">🎮 Learning is Fun!</h3>
             </div>
+            <p class="text-white mb-2 md:mb-2 lg:mb-4 text-xs sm:text-sm md:text-sm">
+                Gamified math assessments. Earn points, unlock achievements, and compete with friends while learning!
+            </p>
         </div>
+    </div>
 </div>
 
+
     <!-- Assessment Categories Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Number and Algebra Card -->
         <div class="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
         style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -77,7 +92,7 @@
                 <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
             </div>
 
-            <div class="flex justify-between items-start mb-4 relative z-10">
+            <div class="flex justify-between items-start mb-4 relative z-20">
                 <div class="relative w-[100%]">
                     <h3 class="text-lg font-bold text-white mb-1">Number and Algebra</h3>
                     <p class="text-sm text-gray-100">Test your knowledge of numbers, operations, and algebraic concepts</p>
@@ -154,18 +169,18 @@
             <!-- Button -->
             @if(!$naHasDiagnostic)
                 <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-red-500 hover:bg-red-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                     Take Diagnostic Test
                 </a>
             @else
                 <a href="{{ route('student.assessments.category', 'Number_Algebra') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
                 style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
                     View Assessments
                 </a>
             @endif
         </div>
-
+        
         <!-- Measurement and Geometry Card -->
         <div class="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
         style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -263,7 +278,7 @@
     </div>
 
         <!-- Data and Probability Card -->
-           <div class="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
+        <div class="rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
         style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             
             <!-- Background Vector (kept on top for visual enhancement) -->
@@ -357,8 +372,9 @@
                 View Assessments
             </a>
         @endif
+        </div>
     </div>
-    </div>
+
 </div>
 
 <script>

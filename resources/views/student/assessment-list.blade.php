@@ -6,47 +6,61 @@
 
 <div class="space-y-8">
     <!-- My Assessments Header -->
-    <div class="relative overflow-hidden mt-4 lg:mt-8">
-        <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" 
-             style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
-                    background-size: 95% clamp(120px, 10vw + 60px, 200px);
-                    min-height: clamp(120px, 10vw + 60px, 200px);
-                    padding-left: clamp(2rem, 8vw, 18rem);">
-            <div class="relative z-10 pr-6">
-                <h1 class="text-3xl sm:text-3xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
-                    {{ $data['title'] }} Assessments
-                </h1>
-                <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
-                    {{ $data['description'] }}
-                </p>
-            </div>
+<div class="relative overflow-hidden">
+  <div class="mx-auto max-w-10xl text-white rounded-2xl flex items-center
+              relative overflow-hidden"
+       style="padding-left: clamp(1rem, 6vw, 18rem);">
+    
+    <!-- Background image as a responsive element -->
+    <img src="{{ asset('images/assessments/bg.png') }}" 
+         alt="Background"
+         class="absolute inset-0 w-full h-full object-cover rounded-2xl z-0">
+    
+    <!-- Content -->
+    <div class="relative z-10 pr-3 sm:pr-6 py-3 sm:py-4">
+      <h1 class="text-lg sm:text-2xl md:text-4xl lg:text-5xl leading-snug sm:leading-tight font-baloo font-extrabold">
+        {{ $data['title'] }} Assessments
+      </h1>
+      <p class="text-[9px] sm:text-xs md:text-sm lg:text-lg text-blue-100 mt-1 sm:mt-2 md:mt-3 lg:mt-4">
+        {{ $data['description'] }}
+      </p>
+    </div>
+  </div>
+</div>
+
+
+        {{-- Return to Assessments --}}
+    <div class="mb-0">
+    <a href="{{ route('student.assessments') }}" 
+        class="inline-flex items-center gap-2 p-1 sm:p-1.5 md:p-2 lg:p-2 rounded-full 
+                hover:scale-105 transition-transform duration-200 m-0">
+        
+        <!-- Arrow SVG -->
+        <div class="w-8 h-8 sm:w-8 sm:h-8 md:w-9 md:h-7 lg:w-7 lg:h-7">
+        <svg viewBox="0 0 24 24" class="w-full h-full">
+            <defs>
+            <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4338CA"/>
+                <stop offset="100%" stop-color="#9333EA"/>
+            </linearGradient>
+            </defs>
+            <path d="M15 18l-6-6 6-6" 
+                stroke="url(#arrowGradient)" 
+                stroke-width="3" 
+                stroke-linecap="round" 
+                stroke-linejoin="round" 
+                fill="none"/>
+        </svg>
         </div>
+
+        <!-- Text -->
+        <span class="text-indigo-500 font-baloo font-extrabold 
+                    text-lg sm:text-xl md:text-2xl lg:text-3xl">
+        Back to Assessments
+        </span>
+    </a>
     </div>
 
-    {{-- Return to Assessments --}}
-    <div class="mb-1">
-        <a href="{{ route('student.assessments') }}" 
-        class="inline-flex items-center gap-2 p-3 rounded-full hover:scale-110 transition-transform duration-200">
-            <!-- Arrow SVG -->
-            <div class="w-6 h-6">
-                <svg viewBox="0 0 24 24" class="w-full h-full">
-                    <defs>
-                        <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#4338CA"/>
-                            <stop offset="100%" stop-color="#9333EA"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M15 18l-6-6 6-6" 
-                        stroke="url(#arrowGradient)" 
-                        stroke-width="3" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        fill="none"/>
-                </svg>
-            </div>
-            <span class="text-indigo-500 font-baloo font-extrabold text-xl">Back to Assessments</span>
-        </a>
-    </div>
 
     <!-- Category Card -->
     <div class="relative overflow-hidden">

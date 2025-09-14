@@ -128,12 +128,14 @@ class BKTAlgorithm:
         """
         Determine difficulty level based on mastery score
         """
-        if mastery_score < 50:
+        if mastery_score <= 75:
             return 'beginner'
-        elif mastery_score < 75:
+        elif mastery_score > 75 and mastery_score <= 84:
             return 'intermediate'
-        else:
+        elif mastery_score > 84 and mastery_score <= 100:
             return 'advanced'
+        else:
+            return 'beginner'
 
     def start_diagnostic(self, user_id, competency):
         """
