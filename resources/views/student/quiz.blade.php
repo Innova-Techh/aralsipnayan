@@ -7,7 +7,7 @@
 <div class="space-y-8 font-baloo mt-8">
 <!-- Header Section -->
 <!-- Header Section -->
-<div class="flex justify-between items-center mb-4 sm:mb-6 md:mb-8 gap-2 sm:gap-4">
+<div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
     
     <!-- Question Counter -->
     <div class="bg-purple-700 backdrop-blur-sm rounded-full
@@ -24,7 +24,8 @@
         </span>
     </div>
 
-    <!-- Timer -->
+    <!-- Timer (only show for non-diagnostic quizzes) -->
+    @if(!isset($diagnosticMode) || !$diagnosticMode)
     <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full
                 px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
                 flex items-center gap-2 sm:gap-3 md:gap-4
@@ -37,9 +38,10 @@
                   clip-rule="evenodd"/>
         </svg>
         <span class="text-white font-bold
-                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
-              id="timer-display">{{ $question->max_time ?? 30 }}:00</span>
+                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
+              id="timer-display">30:00</span>
     </div>
+    @endif
 </div>
 
 
@@ -155,9 +157,19 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let startTime = Date.now();
-    let maxTime = {{ $question->max_time ?? 30 }};
-    let timeRemaining = maxTime;
+    
+    // Quiz-wide timer settings (30 minutes = 1800 seconds for regular quiz, no timer for diagnostic)
+    const isDiagnostic = {{ isset($diagnosticMode) && $diagnosticMode ? 'true' : 'false' }};
+    const quizTimeLimit = 30 * 60; // 30 minutes in seconds (changeable later)
+    let quizTimeRemaining = isDiagnostic ? null : quizTimeLimit;
+    
+    // Per-question timing (not displayed but still tracked)
+    let questionMaxTime = {{ $question->max_time ?? 30 }};
+    let questionTimeRemaining = questionMaxTime;
+    let questionStartTime = Date.now();
+    
     let timerInterval;
+    let questionTimerInterval;
     let questionSubmitted = false;
     let autoSaveInterval;
     let retryAttempts = 0;
@@ -169,13 +181,14 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionId: '{{ session("diagnostic_session_id") ?? session("quiz_session_id") ?? "quiz_" . time() }}',
         questionId: '{{ $question->question_id }}',
         competency: '{{ session("diagnostic_competency") ?? $category ?? "" }}',
-        isDiagnostic: {{ isset($diagnosticMode) && $diagnosticMode ? 'true' : 'false' }},
+        isDiagnostic: isDiagnostic,
         startTime: startTime,
-        maxTime: maxTime,
+        questionMaxTime: questionMaxTime,
         currentAnswer: '',
-        timeTaken: 0,
+        questionTimeTaken: 0,
         questionIndex: {{ session('current_question_index', 0) }},
-        totalQuestions: {{ $totalQuestions ?? 15 }}
+        totalQuestions: {{ $totalQuestions ?? 15 }},
+        quizTimeRemaining: quizTimeRemaining
     };
     
     // Initialize quiz
@@ -185,8 +198,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Restore progress from localStorage if available
         restoreProgress();
         
-        // Initialize timer
-        startTimer();
+        // Initialize quiz-wide timer (only for non-diagnostic)
+        if (!isDiagnostic) {
+            startQuizTimer();
+        }
+        
+        // Initialize per-question timer (hidden, for tracking only)
+        startQuestionTimer();
         
         // Initialize answer selection
         initializeAnswerSelection();
@@ -207,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function saveProgressToLocalStorage() {
         try {
-            quizState.timeTaken = maxTime - timeRemaining;
+            quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
             quizState.lastSaved = Date.now();
             
             const storageKey = `quiz_progress_${quizState.sessionId}`;
@@ -245,10 +263,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         restoreAnswer(saved.currentAnswer);
                     }
                     
-                    // Adjust timer if needed (don't let users get extra time)
+                    // Adjust question timer if needed (don't let users get extra time)
                     const timeSinceLastSave = Date.now() - saved.lastSaved;
                     if (timeSinceLastSave < 60000) { // If less than 1 minute ago
-                        timeRemaining = Math.max(0, maxTime - saved.timeTaken - Math.floor(timeSinceLastSave / 1000));
+                        questionTimeRemaining = Math.max(0, questionMaxTime - saved.questionTimeTaken - Math.floor(timeSinceLastSave / 1000));
+                    }
+                    
+                    // Restore quiz timer for non-diagnostic
+                    if (!isDiagnostic && saved.quizTimeRemaining !== undefined) {
+                        quizTimeRemaining = Math.max(0, saved.quizTimeRemaining - Math.floor(timeSinceLastSave / 1000));
                     }
                     
                     console.log('Progress restored from localStorage:', saved);
@@ -320,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             session_id: quizState.sessionId,
             question_id: quizState.questionId,
             current_answer: quizState.currentAnswer,
-            time_taken: quizState.timeTaken,
+            time_taken: quizState.questionTimeTaken,
             question_index: quizState.questionIndex,
             _token: '{{ csrf_token() }}'
         };
@@ -419,41 +442,106 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialize timer
-    startTimer();
-    
-    // Initialize answer selection
-    initializeAnswerSelection();
-    
-    // Submit button handler
-    document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-    
-    function startTimer() {
+    // Timer functions
+    function startQuizTimer() {
+        if (isDiagnostic) return; // No timer for diagnostic
+        
         timerInterval = setInterval(function() {
-            timeRemaining--;
-            updateTimerDisplay();
-            
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                if (!questionSubmitted) {
-                    timeoutSubmission();
+            if (quizTimeRemaining > 0) {
+                quizTimeRemaining--;
+                updateQuizTimerDisplay();
+                
+                // Save quiz time remaining to state
+                quizState.quizTimeRemaining = quizTimeRemaining;
+                
+                if (quizTimeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    endQuizDueToTimeout();
                 }
+            } else {
+                clearInterval(timerInterval);
+                updateQuizTimerDisplay();
             }
         }, 1000);
     }
     
-    function updateTimerDisplay() {
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = timeRemaining % 60;
-        const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        document.getElementById('timer-display').textContent = display;
+    function startQuestionTimer() {
+        // This timer tracks per-question time but doesn't display anything
+        questionTimerInterval = setInterval(function() {
+            if (questionTimeRemaining > 0 && !questionSubmitted) {
+                questionTimeRemaining--;
+                quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
+            }
+        }, 1000);
+    }
+    
+    function updateQuizTimerDisplay() {
+        if (isDiagnostic) return; // No display for diagnostic
         
-        // Change color when time is running low
-        const timerElement = document.querySelector('.bg-gradient-to-r.from-orange-500');
-        if (timeRemaining <= 10) {
-            timerElement.classList.remove('from-orange-500', 'to-red-500');
-            timerElement.classList.add('from-red-600', 'to-red-700');
+        const displayTime = Math.max(0, quizTimeRemaining);
+        const minutes = Math.floor(displayTime / 60);
+        const seconds = displayTime % 60;
+        const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        const timerDisplay = document.getElementById('timer-display');
+        if (timerDisplay) {
+            timerDisplay.textContent = display;
         }
+        
+        // Change color when time is running low (5 minutes remaining)
+        const timerElement = document.querySelector('.bg-gradient-to-r.from-orange-500');
+        if (timerElement) {
+            if (quizTimeRemaining <= 300) { // 5 minutes
+                timerElement.classList.remove('from-orange-500', 'to-red-500');
+                timerElement.classList.add('from-red-600', 'to-red-700');
+            }
+        }
+    }
+    
+    function endQuizDueToTimeout() {
+        questionSubmitted = true;
+        clearInterval(questionTimerInterval);
+        clearInterval(autoSaveInterval);
+        
+        alert('Quiz time has ended! Your current progress will be submitted.');
+        
+        // Force submit current answer or empty answer
+        let answerValue = '';
+        @if($question->type === 'fill_blanks')
+            const fillAnswer = document.getElementById('fill-answer');
+            if (fillAnswer && fillAnswer.value.trim()) {
+                answerValue = fillAnswer.value.trim();
+            }
+        @else
+            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (selectedAnswer) {
+                answerValue = selectedAnswer.value;
+            }
+        @endif
+        
+        const requestData = {
+            question_id: '{{ $question->question_id }}',
+            answer: answerValue,
+            time_taken: questionMaxTime - questionTimeRemaining,
+            quiz_timeout: true,
+            _token: '{{ csrf_token() }}'
+        };
+        
+        @if(!isset($diagnosticMode) || !$diagnosticMode)
+            requestData.assessment_id = '{{ $assessmentId ?? "" }}';
+        @endif
+        
+        // Submit and end quiz
+        submitAnswerWithRetry(requestData)
+        .then(data => {
+            alert('Quiz has ended due to timeout. Redirecting to results...');
+            window.location.href = '{{ route("student.assessments") }}';
+        })
+        .catch(error => {
+            console.error('Final timeout submit error:', error);
+            alert('Quiz has ended. Redirecting...');
+            window.location.href = '{{ route("student.assessments") }}';
+        });
     }
     
     function initializeAnswerSelection() {
@@ -507,9 +595,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         questionSubmitted = true;
         clearInterval(timerInterval);
+        clearInterval(questionTimerInterval);
         clearInterval(autoSaveInterval);
         
-        const timeTaken = maxTime - timeRemaining;
+        const questionTimeTaken = questionMaxTime - questionTimeRemaining;
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
@@ -518,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestData = {
             question_id: '{{ $question->question_id }}',
             answer: answerValue,
-            time_taken: timeTaken,
+            time_taken: questionTimeTaken,
             _token: '{{ csrf_token() }}'
         };
         
@@ -528,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update quiz state
         quizState.currentAnswer = answerValue;
-        quizState.timeTaken = timeTaken;
+        quizState.questionTimeTaken = questionTimeTaken;
         saveProgressToLocalStorage();
         
         // Submit with retry mechanism
@@ -575,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestData = {
             question_id: '{{ $question->question_id }}',
             answer: '',
-            time_taken: maxTime,
+            time_taken: questionMaxTime,
             _token: '{{ csrf_token() }}'
         };
         
