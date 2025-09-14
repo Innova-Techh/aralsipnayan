@@ -154,12 +154,12 @@
             <!-- Button -->
             @if(!$naHasDiagnostic)
                 <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}" 
-                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-red-500 hover:bg-red-600 text-center">
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                     Take Diagnostic Test
                 </a>
             @else
                 <a href="{{ route('student.assessments.category', 'Number_Algebra') }}" 
-                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                 style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
                     View Assessments
                 </a>
@@ -250,12 +250,12 @@
         <!-- Button -->
         @if(!$mgHasDiagnostic)
             <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-red-500 hover:bg-red-600 text-center">
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                 Take Diagnostic Test
             </a>
         @else
             <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
             style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
                 View Assessments
             </a>
@@ -347,12 +347,12 @@
         <!-- Button -->
         @if(!$dpHasDiagnostic)
             <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-red-500 hover:bg-red-600 text-center">
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                 Take Diagnostic Test
             </a>
         @else
             <a href="{{ route('student.assessments.category', 'Data_Probability') }}" 
-            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center"
+            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
             style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
                 View Assessments
             </a>

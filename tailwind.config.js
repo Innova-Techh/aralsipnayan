@@ -15,13 +15,23 @@ export default {
             },
         },
         extend: {
-                  fontFamily: {
-                    baloo: ['"Baloo 2"', 'cursive'],
-                        },
+            screens: {
+                xs: "375px", // Small phones
+                sm: "425px", // Larger phones
+                md: "640px", // Small tablets (was sm by default)
+                lg: "768px", // iPads
+                xl: "1024px", // Larger tablets / laptops
+                "2xl": "1280px",
+            },
+            fontFamily: {
+                baloo: ['"Baloo 2"', "cursive"],
+            },
             colors: {
-                'primary-blue': '#1E3A8A',
-                'primary-red': '#D62839',
-                'primary-yellow': '#FBBF24',
+                "primary-blue": "#1E3A8A",
+                "primary-red": "#D62839",
+                "primary-yellow": "#FBBF24",
+                "custom-purple": "#4F46E5",
+                "custom-cyan": "#06B6D4",
                 border: "#E2E8F0", // hsl(var(--border)) replaced with hex
                 input: "#E2E8F0", // hsl(var(--input)) replaced with hex
                 ring: "#E2E8F0", // hsl(var(--ring)) replaced with hex
@@ -34,7 +44,7 @@ export default {
                     100: "#e0f2fe",
                     200: "#bae6fd",
                     300: "#7dd3fc",
-                    400: "#38bdf8", 
+                    400: "#38bdf8",
                     500: "#449EFF",
                     600: "#0284c7",
                     700: "#0369a1",
@@ -103,27 +113,27 @@ export default {
                     "accent-cyan": "#06B6D4",
                     "accent-navy": "#1E293B",
                 },
-                 // Achievement card colors
+                // Achievement card colors
                 achievement: {
                     // Blue theme (like your current cards)
-                    'blue-light': '#165A9A',
-                    'blue-dark': '#104373',
+                    "blue-light": "#165A9A",
+                    "blue-dark": "#104373",
                     // Brown/Orange theme
-                    'brown-light': '#913311',
-                    'brown-dark': '#591E09',
+                    "brown-light": "#913311",
+                    "brown-dark": "#591E09",
                     // Gray theme
-                    'gray-light': '#646565',
-                    'gray-dark': '#2E343C',
+                    "gray-light": "#646565",
+                    "gray-dark": "#2E343C",
                     // Green theme
-                    'green-light': '#1E8646',
-                    'green-dark': '#163522',
+                    "green-light": "#1E8646",
+                    "green-dark": "#163522",
                     // Purple theme
-                    'purple-light': '#2C1B68',
-                    'purple-dark': '#100A23',
+                    "purple-light": "#2C1B68",
+                    "purple-dark": "#100A23",
                     // Gold/Yellow theme
-                    'gold-light': '#D17A09',
-                    'gold-dark': '#512500',
-                }
+                    "gold-light": "#D17A09",
+                    "gold-dark": "#512500",
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",
@@ -157,7 +167,7 @@ export default {
                         "background-position": "right center",
                     },
                 },
-                "flip": {
+                flip: {
                     "0%": { transform: "rotateY(0deg)" },
                     "100%": { transform: "rotateY(180deg)" },
                 },
@@ -172,9 +182,9 @@ export default {
                 float: "float 6s ease-in-out infinite",
                 "pulse-slow": "pulse-slow 4s ease-in-out infinite",
                 "gradient-x": "gradient-x 15s ease infinite",
-                "float": "float 6s ease-in-out infinite",
+                float: "float 6s ease-in-out infinite",
                 "pulse-slow": "pulse-slow 4s ease-in-out infinite",
-                "flip": "flip 0.7s ease-in-out",
+                flip: "flip 0.7s ease-in-out",
                 "flip-back": "flip-back 0.7s ease-in-out",
             },
             backgroundImage: {
