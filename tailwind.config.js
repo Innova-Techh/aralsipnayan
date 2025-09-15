@@ -205,6 +205,8 @@ export default {
                     "linear-gradient(to bottom, #F6510C, #F5D70B)",
                 "hover-secondary":
                     "linear-gradient(to bottom, #D9440B, #E6C308)",
+                "avatar-1":
+                    "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
             },
             dropShadow: {
                 "on-board-earn": "0 4px 0 #C47E06",
