@@ -128,12 +128,14 @@ class BKTAlgorithm:
         """
         Determine difficulty level based on mastery score
         """
-        if mastery_score < 50:
+        if mastery_score <= 75:
             return 'beginner'
-        elif mastery_score < 75:
+        elif mastery_score > 75 and mastery_score <= 84:
             return 'intermediate'
-        else:
+        elif mastery_score > 84 and mastery_score <= 100:
             return 'advanced'
+        else:
+            return 'beginner'
 
     def start_diagnostic(self, user_id, competency):
         """
@@ -628,47 +630,129 @@ class BKTAlgorithm:
             if conn and conn.is_connected():
                 conn.close()
 
+    def cleanup_diagnostic_session(self, session_id):
+        """
+        Cleanup diagnostic session when user abandons it
+        """
+        conn = self.connect_db()
+        if not conn:
+            return {'success': False, 'message': 'Database connection failed'}
+        
+        try:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Check if session exists and is in progress
+            cursor.execute("""
+                SELECT session_id, user_id, competency, status 
+                FROM diagnostic_sessions 
+                WHERE session_id = %s
+            """, (session_id,))
+            
+            session = cursor.fetchone()
+            if not session:
+                return {'success': True, 'message': 'Session not found'}
+            
+            # Only cleanup if session is in progress
+            if session['status'] != 'in_progress':
+                return {'success': True, 'message': 'Session already completed'}
+            
+            # Delete the diagnostic session
+            cursor.execute("""
+                DELETE FROM diagnostic_sessions 
+                WHERE session_id = %s
+            """, (session_id,))
+            
+            # Delete any associated assessment record
+            cursor.execute("""
+                DELETE FROM assessments 
+                WHERE assessment_id = %s
+            """, (session_id,))
+            
+            # Delete any question responses for this session
+            cursor.execute("""
+                DELETE FROM question_responses 
+                WHERE assessment_id = %s
+            """, (session_id,))
+            
+            conn.commit()
+            
+            self.log_error(f"Cleaned up abandoned diagnostic session: {session_id}")
+            
+            return {
+                'success': True,
+                'message': 'Diagnostic session cleaned up successfully'
+            }
+            
+        except mysql.connector.Error as e:
+            conn.rollback()
+            self.log_error(f"Database error in cleanup_diagnostic_session: {e}")
+            return {'success': False, 'message': f'Database error: {str(e)}'}
+        except Exception as e:
+            conn.rollback()
+            self.log_error(f"Unexpected error in cleanup_diagnostic_session: {e}")
+            return {'success': False, 'message': 'Unexpected error occurred'}
+        finally:
+            if conn and conn.is_connected():
+                conn.close()
+
 def main():
     """Main function for command line interface"""
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         print(json.dumps({
             'success': False, 
-            'message': 'Usage: python bkt_algorithm.py <action> <user_id> <competency> [additional_params]'
+            'message': 'Usage: python bkt_algorithm.py <action> [params...]'
         }))
         return
     
     action = sys.argv[1]
-    user_id = int(sys.argv[2])
-    competency = sys.argv[3]
-    
     bkt = BKTAlgorithm()
     
     try:
-        if action == 'start_diagnostic':
-            result = bkt.start_diagnostic(user_id, competency)
-            
-        elif action == 'record_answer':
-            if len(sys.argv) < 7:
-                result = {'success': False, 'message': 'Missing parameters for record_answer'}
+        if action == 'cleanup_diagnostic':
+            # Special case for cleanup - only needs session_id
+            if len(sys.argv) < 3:
+                result = {'success': False, 'message': 'Missing session_id for cleanup'}
             else:
-                session_id = sys.argv[4]
-                question_id = sys.argv[5]
-                user_answer = sys.argv[6]
-                response_time = float(sys.argv[7])
-                is_correct = sys.argv[8].lower() == 'true'
-                
-                result = bkt.record_diagnostic_answer(session_id, question_id, user_answer, response_time, is_correct)
-                
-        elif action == 'complete_phase':
-            session_id = sys.argv[4]
-            result = bkt.complete_diagnostic_phase(session_id)
-            
-        elif action == 'complete_diagnostic':
-            session_id = sys.argv[4]
-            result = bkt.complete_diagnostic(session_id)
-            
+                session_id = sys.argv[2]
+                result = bkt.cleanup_diagnostic_session(session_id)
+        
+        elif len(sys.argv) < 4:
+            # Other actions need at least user_id and competency
+            print(json.dumps({
+                'success': False, 
+                'message': 'Usage: python bkt_algorithm.py <action> <user_id> <competency> [additional_params]'
+            }))
+            return
+        
         else:
-            result = {'success': False, 'message': f'Unknown action: {action}'}
+            user_id = int(sys.argv[2])
+            competency = sys.argv[3]
+            
+            if action == 'start_diagnostic':
+                result = bkt.start_diagnostic(user_id, competency)
+            
+            elif action == 'record_answer':
+                if len(sys.argv) < 8:
+                    result = {'success': False, 'message': 'Missing parameters for record_answer'}
+                else:
+                    session_id = sys.argv[4]
+                    question_id = sys.argv[5]
+                    user_answer = sys.argv[6]
+                    response_time = float(sys.argv[7])
+                    is_correct = sys.argv[8].lower() == 'true'
+                    
+                    result = bkt.record_diagnostic_answer(session_id, question_id, user_answer, response_time, is_correct)
+                    
+            elif action == 'complete_phase':
+                session_id = sys.argv[4]
+                result = bkt.complete_diagnostic_phase(session_id)
+                
+            elif action == 'complete_diagnostic':
+                session_id = sys.argv[4]
+                result = bkt.complete_diagnostic(session_id)
+                
+            else:
+                result = {'success': False, 'message': f'Unknown action: {action}'}
         
         print(json.dumps(result))
         

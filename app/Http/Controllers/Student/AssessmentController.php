@@ -149,6 +149,30 @@ class AssessmentController extends Controller
         }
         
         try {
+            // Clear any existing diagnostic session data first
+            $existingSessionId = session('diagnostic_session_id');
+            if ($existingSessionId) {
+                // Cleanup existing session in database
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $cleanupCommand = "python \"{$scriptPath}\" cleanup_diagnostic {$existingSessionId}";
+                shell_exec($cleanupCommand);
+                
+                // Clear session data
+                session()->forget([
+                    'diagnostic_session_id', 
+                    'diagnostic_competency', 
+                    'diagnostic_phase', 
+                    'diagnostic_questions', 
+                    'current_question_index'
+                ]);
+                
+                Log::info("Cleared existing diagnostic session before starting new one", [
+                    'old_session_id' => $existingSessionId,
+                    'user_id' => $user->id,
+                    'competency' => $dbCompetency
+                ]);
+            }
+            
             // Call Python script to start diagnostic
             $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
             $command = "python \"{$scriptPath}\" start_diagnostic {$user->id} {$dbCompetency}";
@@ -481,5 +505,57 @@ class AssessmentController extends Controller
             'scorePercentage' => $scorePercentage,
             'questionsByDifficulty' => $questionsByDifficulty
         ]);
+    }
+    
+    /**
+     * Clear diagnostic session when user navigates away
+     */
+    public function clearDiagnosticSession(Request $request)
+    {
+        try {
+            $sessionId = session('diagnostic_session_id');
+            $competency = session('diagnostic_competency');
+            
+            if ($sessionId && $competency) {
+                // Call Python script to cleanup diagnostic session
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $command = "python \"{$scriptPath}\" cleanup_diagnostic {$sessionId}";
+                
+                $output = shell_exec($command);
+                $result = json_decode($output, true);
+                
+                // Clear session data regardless of Python script result
+                session()->forget([
+                    'diagnostic_session_id', 
+                    'diagnostic_competency', 
+                    'diagnostic_phase', 
+                    'diagnostic_questions', 
+                    'current_question_index'
+                ]);
+                
+                Log::info("Diagnostic session cleared for abandonment", [
+                    'session_id' => $sessionId,
+                    'competency' => $competency,
+                    'user_id' => Auth::id(),
+                    'cleanup_result' => $result
+                ]);
+            }
+            
+            return response()->json(['success' => true]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to clear diagnostic session: ' . $e->getMessage());
+            
+            // Still clear session data to prevent stuck sessions
+            session()->forget([
+                'diagnostic_session_id', 
+                'diagnostic_competency', 
+                'diagnostic_phase', 
+                'diagnostic_questions', 
+                'current_question_index'
+            ]);
+            
+            return response()->json(['success' => true]); // Return success to avoid blocking user
+        }
     }
 }
