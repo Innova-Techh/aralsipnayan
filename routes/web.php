@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\AchievementController;
@@ -19,16 +20,15 @@ Route::get('/', function () {
     return view('homepage');
 });
 
-// Auth Routes
+// Student Auth Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-// Admin/Teacher login page
-Route::get('/adminlogin', function () {
-    return view('admin.auth.login');
-})->name('admin.login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/adminlogin', [AuthController::class, 'adminLogin'])->name('admin.login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+// Admin/Teacher Auth Routes
+Route::get('/adminlogin', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/adminlogin', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
 
 // General dashboard redirect (based on role)
