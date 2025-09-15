@@ -21,8 +21,14 @@ Route::get('/', function () {
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Admin/Teacher login page
+Route::get('/adminlogin', function () {
+    return view('admin.auth.login');
+})->name('admin.login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/adminlogin', [AuthController::class, 'adminLogin'])->name('admin.login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
 
 
 // General dashboard redirect (based on role)
@@ -104,14 +110,14 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     });
 });
 
-// Teacher Dashboard (placeholder)
+// Teacher Dashboard (placeholder view)
 Route::get('/teacher/dashboard', function () {
-    return 'Teacher Dashboard (Coming Soon)';
+    return view('admin.teacher.index');
 })->middleware(['auth', 'role:Teacher'])->name('teacher.dashboard');
 
-// Admin Dashboard (placeholder)
+// Admin Dashboard (placeholder view)
 Route::get('/admin/dashboard', function () {
-    return 'Admin Dashboard (Coming Soon)';
+    return view('admin.admin.index');
 })->middleware(['auth', 'role:Admin'])->name('admin.dashboard');
 
 // Backward compatibility routes for old assessment references (redirects to student routes)

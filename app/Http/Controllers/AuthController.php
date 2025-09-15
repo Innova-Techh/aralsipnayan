@@ -8,36 +8,46 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+    /**
+     * Show the student login form
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
+    /**
+     * Handle student login
+     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'captcha' => 'required|captcha',
+        ], [
+            'captcha.captcha' => 'Invalid Captcha',
         ]);
 
         // delay to test the loader (remove in production)
         sleep(1);
+
+        $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
             $user = Auth::user();
 
-            // Handle different user roles
-            switch ($user->role) {
-                case 'Admin':
-                    return redirect()->route('admin.dashboard');
-                case 'Teacher':
-                    return redirect()->route('teacher.dashboard');
-                case 'Student':
-                    return $this->handleStudentLogin($user);
-                default:
-                    return redirect('/');
+            // Only handle Student role - redirect others to appropriate login
+            if ($user->role === 'Student') {
+                return $this->handleStudentLogin($user);
+            } else {
+                // Non-student users should use admin login
+                Auth::logout();
+                return back()->withErrors([
+                    'username' => 'Please use the admin login for teacher/admin accounts.',
+                ])->withInput($request->only('username'));
             }
         }
 
@@ -76,9 +86,13 @@ class AuthController extends Controller
 
         // Regular login - go to dashboard
         return redirect()->route('student.dashboard')
-            ->with('success', "Welcome back, {$profile->firstname}!");
+        ->with('success', "Welcome back, {$profile->firstname}!");
     }
 
+
+    /**
+     * Handle student logout
+     */
     public function logout(Request $request)
     {
         Auth::logout();
