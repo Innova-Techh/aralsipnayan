@@ -3,69 +3,86 @@
 @section('title', 'Welcome')
 
 @section('content')
-<div class="min-h-screen flex items-start justify-center px-2 mt-10 lg:mt-20">
-  <div 
-    class="w-full max-w-4xl min-h-[600px] rounded-2xl shadow-2xl overflow-hidden flex flex-col justify-between bg-[url('{{ asset('images/onboarding/bg.png') }}')] bg-cover bg-center border-b-8 border-[#532f2b] shadow-lg"
-    style="background-image: url('{{ asset('images/onboarding/bg.png') }}');"
-  >
-    <div class=" w-full h-full flex flex-col justify-between">
-      <!-- Welcome Header -->
-    <div class="text-center px-4 pt-10 mb-4 lg:mb-40 font-baloo font-extrabold">
-      <h1 class="text-7xl md:text-8xl font-extrabold">
-        <span class="relative text-gray-700"
-              style="-webkit-text-stroke: 2px #facc15;">
-          Welcome,
-        </span>
-        <span class="relative "
-              style="-webkit-text-stroke: 2px #06b6d4; color: #dc2626;">
-          {{ $student->firstname }}!
-        </span>
-      </h1>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - AralSipnayan</title>
+</head>
+<body>
+    <main class="min-h-screen flex items-center justify-center px-2 md:px-8 py-8">
+        <div class="w-full max-w-7xl rounded-3xl p-4 relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
+                <!-- Left Column - Character Image -->
+                <aside class="w-full lg:w-2/5 hidden lg:block">
+                    <img src="{{ asset('images/onboarding/on-board-desktop.png') }}" 
+                         alt="Student Characters" 
+                         class="w-full h-auto">
+                </aside>
+>>>>>>> josh-branch
 
+                <!-- Right Column - Content -->
+                <section class="w-full lg:w-3/5 flex flex-col gap-6">
+                    <!-- Welcome Text -->
+                    <header class="text-center lg:text-left">
+                        <h1 class="text-4xl md:text-6xl lg:text-7xl xs:text-5xl font-baloo font-bold">
+                            <span class="text-[#658DFF] drop-shadow-on-welcome">Welcome,</span>
+                            <span class="text-[#658DFF] drop-shadow-on-welcome">{{ $student->firstname }}</span>
+                        </h1>
+                    </header>
 
+                    <!-- Mobile Character Image -->
+                    <div class="lg:hidden w-full max-w-sm mx-auto">
+                        <img src="{{ asset('images/onboarding/on-board-desktop.png') }}" 
+                             alt="Student Characters"
+                             class="w-full h-auto">
+                    </div>
 
-      <!-- Feature Highlights -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 lg:mb-14">
-        <!-- Card 1 -->
-        <div class="relative rounded-xl text-center h-32 md:h-40 lg:h-56 flex flex-col items-center justify-center font-medium text-white transition-transform duration-300 transform hover:scale-105 hover:-translate-y-2 border-b-8 border-[#A12115] shadow-lg"
-             style="background: linear-gradient(135deg, #D8493B 0%, #E18435 50%, #E1B316 100%);">
-          <span class="text-5xl lg:text-8xl">📘</span>
-          <p class="mt-2 text-2xl md:text-3xl font-baloo font-extrabold">
-            Learn through fun challenges
-          </p>
+                    <!-- Text Content -->
+                    <article class="space-y-4 text-gray-600">
+                        <p class="text-lg">{{ $welcomeMessage ?? "We're excited to have you here! Are you ready to earn points, collect badges, and level up your math skills? Dive into fun challenges, unlock achievements, and track your progress every step of the way. Whether you're here to learn, compete, or climb the leaderboards, AralSipnayan is your space to grow and shine. Let the learning adventure begin!" }}</p>
+                        @if(!empty($additionalMessage))
+                            <p class="text-lg">{{ $additionalMessage }}</p>
+                        @endif
+                    </article>
+
+                    <!-- Action Cards -->
+                    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Earn Points Card -->
+                        <div
+                          class="bg-on-board-earn drop-shadow-on-board-earn rounded-xl p-4 text-center text-white hover:scale-105 transition-transform duration-300">
+                          <img src="{{ asset('images/onboarding/on-board-award.png') }}" alt="Trophy" class="w-24 h-24 mx-auto mb-4">
+                          <p class="font-poppins font-bold xl:font-bold lg:text-base xs:font-normal">Earn your points and badges</p>
+                        </div>
+        
+                        <!-- Track Progress Card -->
+                        <div
+                          class="bg-on-board-progress drop-shadow-on-board-progress rounded-xl p-4 text-center text-white hover:scale-105 transition-transform duration-300">
+                          <img src="{{ asset('images/onboarding/on-board-progress.png') }}" alt="Progress"
+                            class="w-24 h-24 mx-auto mb-6">
+                          <p class="font-poppins font-bold xl:font-bold text-sm lg:text-base xs:font-normal">Track your progress</p>
+                        </div>
+        
+                        <!-- Learn Challenges Card -->
+                        <div
+                          class="bg-on-board-learn drop-shadow-on-board-learn rounded-xl p-4 text-center text-white hover:scale-105 transition-transform duration-300">
+                          <img src="{{ asset('images/onboarding/on-board-learn.png') }}" alt="Learn" class="w-24 h-24 mx-auto mb-4">
+                          <p class="font-poppins font-bold xl:font-bold text-sm lg:text-base xs:font-normal ">Learn through fun challenges</p>
+                        </div>
+                      </section>
+
+                    <!-- Select Avatar Button -->
+                    <nav class="text-center">
+                        <a href="{{ route('student.onboarding.avatar') }}"
+                           class="w-full text-xl drop-shadow-select-avatar font-baloo font-bold inline-block bg-gradient-secondary hover:bg-hover-secondary text-white py-3 px-8 rounded-full hover:scale-95 transition-transform duration-300">
+                            Select Avatar
+                        </a>
+                    </nav>
+                </section>
+            </div>
         </div>
-
-        <!-- Card 2 -->
-        <div class="relative rounded-xl text-center h-32 md:h-40 lg:h-56 flex flex-col items-center justify-center font-medium text-white transition-transform duration-300 transform hover:scale-105 hover:-translate-y-2 border-b-8 border-[#28267B] shadow-lg"
-             style="background: linear-gradient(135deg, #615ED9 0%, #B076D9 50%, #D867A8 100%);">
-          <span class="text-6xl lg:text-8xl">🏆</span>
-          <p class="mt-2 text-2xl md:text-3xl font-baloo font-extrabold">
-            Earn points & badges
-          </p>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="relative rounded-xl text-center h-32 md:h-40 lg:h-56 flex flex-col items-center justify-center font-medium text-white transition-transform duration-300 transform hover:scale-105 hover:-translate-y-2 border-b-8 border-[#275D97] shadow-lg"
-             style="background: linear-gradient(135deg, #9154DE 0%, #5596DD 50%, #43C479 100%);">
-          <span class="text-6xl lg:text-8xl">📈</span>
-          <p class="mt-2 text-2xl md:text-3xl font-baloo font-extrabold">
-            Track your progress
-          </p>
-    
-        </div>
-      </div>
-
-      <!-- Start Button -->
-      <div class="px-8 py-6 flex justify-center relative">
-        <a href="{{ route('student.onboarding.avatar') }}"
-          class="relative px-6 py-3 bg-gradient-to-r from-[#F6510C] to-[#F5D70B] text-white font-bold rounded-xl inline-block text-base transition-transform duration-300 hover:scale-105 border-b-8 border-[#A12115] shadow-lg"
-          style="z-index:1;">
-            Choose Your Avatar
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
+    </main>
+</body>
+</html>
 @endsection

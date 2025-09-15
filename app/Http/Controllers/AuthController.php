@@ -20,6 +20,9 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        // delay to test the loader (remove in production)
+        sleep(1);
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
@@ -40,7 +43,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'username' => 'Invalid credentials.',
-        ]);
+        ])->withInput($request->only('username'));
     }
 
     /**
