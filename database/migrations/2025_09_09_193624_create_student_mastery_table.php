@@ -46,6 +46,9 @@ return new class extends Migration
 
             // Cumulative Time Score for F-Time Calculation
             $table->decimal('cumulative_time_score', 8, 4)->default(0.0000);
+            
+            // Current F-Time Factor (for BKT calculations)
+            $table->decimal('current_ftime_factor', 5, 4)->default(1.0000);
 
             // Timestamps
             $table->timestamps();

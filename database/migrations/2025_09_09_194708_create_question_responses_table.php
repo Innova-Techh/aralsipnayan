@@ -33,6 +33,7 @@ return new class extends Migration {
             // Difficulty and Time Factors
             $table->decimal('difficulty_factor', 3, 2)->nullable();
             $table->decimal('time_factor', 5, 4)->nullable();
+            $table->decimal('ftime_factor', 5, 4)->nullable();
 
             // Points Earned
             $table->integer('base_points')->default(0);

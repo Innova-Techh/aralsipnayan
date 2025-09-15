@@ -45,6 +45,13 @@ class BKTAlgorithm:
             'advanced': 60
         }
         
+        # Total questions per difficulty level
+        self.total_questions_per_difficulty = {
+            'beginner': 15,
+            'intermediate': 20,
+            'advanced': 25
+        }
+        
         # Mastery score weights
         self.weights = {
             'accuracy': 0.55,
@@ -86,12 +93,27 @@ class BKTAlgorithm:
         # Timeout case (should be handled before this function)
         return 0.0
 
+    def calculate_ftime_factor(self, cumulative_time_score, total_questions_answered):
+        """
+        Calculate ftime factor for BKT formula
+        ftime = (Σ(timescore) / total_questions)
+        """
+        if total_questions_answered == 0:
+            return 1.0  # Default factor if no questions answered yet
+        
+        return cumulative_time_score / total_questions_answered
+
     def calculate_bkt_update(self, prior_prob, is_correct, params, time_factor, difficulty_factor):
         """
-        Calculate BKT probability update with time and difficulty factors
+        Calculate BKT probability update with correct formulas
+        
+        For Correct Answers:
+        P(Ln+1) = P(Ln)⋅(1−P(S))⋅ftime⋅fdifficulty / [P(Ln)⋅(1−P(S))+(1−P(Ln))⋅P(G)]
+        
+        For Incorrect Answers:
+        P(Ln+1) = P(Ln)⋅P(S) / [P(Ln)⋅P(S)+(1−P(Ln))⋅(1−P(G))⋅ftime⋅fdifficulty]
         """
         P_L = prior_prob
-        P_T = params['learn_rate']
         P_S = params['slip_rate']
         P_G = params['guess_rate']
         
@@ -107,13 +129,8 @@ class BKTAlgorithm:
         if denominator == 0:
             return P_L  # Return prior if denominator is zero
         
-        # Apply learning transition
+        # Calculate new probability (no learning transition applied here)
         P_L_new = numerator / denominator
-        if not is_correct:
-            # Only apply learning for correct answers in traditional BKT
-            P_L_new = P_L_new + (1 - P_L_new) * P_T
-        else:
-            P_L_new = P_L_new + (1 - P_L_new) * P_T
             
         return min(max(P_L_new, 0.0), 1.0)  # Clamp between 0 and 1
 
@@ -127,12 +144,15 @@ class BKTAlgorithm:
     def determine_difficulty_level(self, mastery_score):
         """
         Determine difficulty level based on mastery score
+        beginner: 75 and below
+        intermediate: 76 to 84  
+        advanced: 85 to 100
         """
         if mastery_score <= 75:
             return 'beginner'
-        elif mastery_score > 75 and mastery_score <= 84:
+        elif mastery_score >= 76 and mastery_score <= 84:
             return 'intermediate'
-        elif mastery_score > 84 and mastery_score <= 100:
+        elif mastery_score >= 85 and mastery_score <= 100:
             return 'advanced'
         else:
             return 'beginner'
@@ -282,7 +302,7 @@ class BKTAlgorithm:
 
     def record_diagnostic_answer(self, session_id, question_id, user_answer, response_time, is_correct):
         """
-        Record answer for diagnostic phase
+        Record answer for diagnostic phase with proper BKT calculations
         """
         conn = self.connect_db()
         if not conn:
@@ -301,50 +321,110 @@ class BKTAlgorithm:
             if not session:
                 return {'success': False, 'message': 'Diagnostic session not found'}
             
-            # Get question info for max_allowed_time
+            # Get question info
             cursor.execute("""
-                SELECT max_allowed_time FROM questions
+                SELECT max_allowed_time, difficulty_level FROM questions
                 WHERE question_id = %s
             """, (question_id,))
             
             question = cursor.fetchone()
             max_allowed_time = question['max_allowed_time'] if question else 60
+            difficulty_level = question['difficulty_level'] if question else 'beginner'
             
-            # Get current BKT knowledge state (simplified for diagnostic)
+            # Get or create student mastery record
             cursor.execute("""
-                SELECT bkt_score FROM student_mastery
+                SELECT bkt_score, cumulative_time_score, total_questions_answered,
+                       prior_knowledge, learn_rate, slip_rate, guess_rate
+                FROM student_mastery
                 WHERE user_id = %s AND competency = %s
             """, (session['user_id'], session['competency']))
             
             mastery = cursor.fetchone()
-            bkt_before = float(mastery['bkt_score']) if mastery else 0.5
-            
-            # Simple BKT update for diagnostic (just track correct/incorrect)
-            if is_correct:
-                bkt_after = min(0.95, bkt_before + 0.1)  # Increase knowledge
+            if mastery:
+                bkt_before = float(mastery['bkt_score'])
+                cumulative_time_score = float(mastery['cumulative_time_score'])
+                total_questions = mastery['total_questions_answered']
+                params = {
+                    'prior_knowledge': float(mastery['prior_knowledge']),
+                    'learn_rate': float(mastery['learn_rate']),
+                    'slip_rate': float(mastery['slip_rate']),
+                    'guess_rate': float(mastery['guess_rate'])
+                }
             else:
-                bkt_after = max(0.05, bkt_before - 0.05)  # Slight decrease
+                # Use defaults for new student
+                bkt_before = self.default_params['prior_knowledge']
+                cumulative_time_score = 0.0
+                total_questions = 0
+                params = self.default_params.copy()
             
-            # Record the response with all required fields
+            # Calculate time score
+            time_score = self.calculate_time_score(response_time, max_allowed_time, is_correct)
+            normalized_time = response_time / max_allowed_time
+            
+            # Update cumulative time score and question count
+            new_cumulative_time_score = cumulative_time_score + time_score
+            new_total_questions = total_questions + 1
+            
+            # Calculate ftime factor
+            ftime_factor = self.calculate_ftime_factor(new_cumulative_time_score, new_total_questions)
+            
+            # Get difficulty factor
+            difficulty_factor = self.difficulty_factors.get(difficulty_level, 1.0)
+            
+            # Calculate BKT update
+            bkt_after = self.calculate_bkt_update(
+                bkt_before, is_correct, params, ftime_factor, difficulty_factor
+            )
+            
+            # Record the response with all calculated fields
             response_id = f"RESP_{session_id}_{question_id}_{int(datetime.now().timestamp())}"
             
             cursor.execute("""
                 INSERT INTO question_responses 
                 (response_id, assessment_id, user_id, question_id, user_answer, 
-                 is_correct, response_time, max_allowed_time, bkt_before, bkt_after, answered_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                 is_correct, response_time, max_allowed_time, normalized_time, time_score,
+                 difficulty_factor, time_factor, ftime_factor, bkt_before, bkt_after, answered_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """, (response_id, session_id, session['user_id'], question_id, 
-                  user_answer, is_correct, response_time, max_allowed_time, bkt_before, bkt_after))
+                  user_answer, is_correct, response_time, max_allowed_time, 
+                  normalized_time, time_score, difficulty_factor, ftime_factor, 
+                  ftime_factor, bkt_before, bkt_after))
+            
+            # Update or create student mastery record
+            if mastery:
+                cursor.execute("""
+                    UPDATE student_mastery 
+                    SET bkt_score = %s, 
+                        cumulative_time_score = %s,
+                        total_questions_answered = %s,
+                        current_ftime_factor = %s
+                    WHERE user_id = %s AND competency = %s
+                """, (bkt_after, new_cumulative_time_score, new_total_questions, 
+                      ftime_factor, session['user_id'], session['competency']))
+            else:
+                # Create new mastery record
+                mastery_id = f"MAST_{session['user_id']}_{session['competency']}"
+                cursor.execute("""
+                    INSERT INTO student_mastery 
+                    (mastery_id, user_id, competency, bkt_score, cumulative_time_score,
+                     total_questions_answered, current_ftime_factor, prior_knowledge, 
+                     learn_rate, slip_rate, guess_rate)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (mastery_id, session['user_id'], session['competency'], 
+                      bkt_after, new_cumulative_time_score, new_total_questions, 
+                      ftime_factor, params['prior_knowledge'], params['learn_rate'],
+                      params['slip_rate'], params['guess_rate']))
             
             conn.commit()
             
-            return {'success': True, 'recorded': True}
+            return {'success': True, 'recorded': True, 'bkt_after': bkt_after, 'ftime_factor': ftime_factor}
             
         except mysql.connector.Error as e:
             conn.rollback()
             self.log_error(f"Failed to record diagnostic answer: {e}")
             return {'success': False, 'message': f'Failed to record answer: {str(e)}'}
         finally:
+            conn.close()
             conn.close()
 
     def complete_diagnostic_phase(self, session_id):
@@ -457,19 +537,44 @@ class BKTAlgorithm:
             if session['status'] == 'completed':
                 return {'success': True, 'message': 'Diagnostic already completed'}
             
-            # Calculate final master score
-            ms1 = float(session['phase_1_score']) if session['phase_1_score'] else 0
-            ms2 = float(session['phase_2_score']) if session['phase_2_score'] else 0
-            ms3 = float(session['phase_3_score']) if session['phase_3_score'] else 0
-            q1 = session['phase_1_questions'] or 5
-            q2 = session['phase_2_questions'] or 5
-            q3 = session['phase_3_questions'] or 5
+            # Calculate final mastery score using proper formula
+            # Get total correct answers and final BKT score from student mastery
+            cursor.execute("""
+                SELECT COUNT(qr.response_id) as total_answered,
+                       SUM(qr.is_correct) as correct_answers,
+                       sm.bkt_score
+                FROM question_responses qr
+                LEFT JOIN student_mastery sm ON qr.user_id = sm.user_id 
+                WHERE qr.assessment_id = %s 
+                AND sm.competency = %s
+                GROUP BY sm.bkt_score
+            """, (session_id, session['competency']))
             
-            total_questions = q1 + q2 + q3
-            if total_questions > 0:
-                final_master_score = ((ms1 * q1) + (ms2 * q2) + (ms3 * q3)) / total_questions * 100
+            response_data = cursor.fetchone()
+            if response_data and response_data['total_answered'] > 0:
+                # Calculate accuracy score
+                accuracy_score = response_data['correct_answers'] / response_data['total_answered']
+                
+                # Get current BKT score
+                bkt_score = float(response_data['bkt_score']) if response_data['bkt_score'] else 0.5
+                
+                # Calculate final mastery score using weighted formula
+                final_master_score = self.calculate_mastery_score(accuracy_score, bkt_score)
             else:
-                final_master_score = 0
+                # Fallback to phase-based calculation if no response data
+                ms1 = float(session['phase_1_score']) if session['phase_1_score'] else 0
+                ms2 = float(session['phase_2_score']) if session['phase_2_score'] else 0
+                ms3 = float(session['phase_3_score']) if session['phase_3_score'] else 0
+                q1 = session['phase_1_questions'] or 5
+                q2 = session['phase_2_questions'] or 5
+                q3 = session['phase_3_questions'] or 5
+                
+                total_questions = q1 + q2 + q3
+                if total_questions > 0:
+                    accuracy_score = ((ms1 * q1) + (ms2 * q2) + (ms3 * q3)) / total_questions
+                    final_master_score = self.calculate_mastery_score(accuracy_score, 0.5)  # Default BKT
+                else:
+                    final_master_score = 22.5  # Default from migration
             
             # Determine recommended difficulty
             recommended_difficulty = self.determine_difficulty_level(final_master_score)
@@ -489,8 +594,14 @@ class BKTAlgorithm:
             mastery_conn.autocommit = True  # Immediate commit
             
             if mastery_exists:
-                # Update existing record
+                # Update existing record with proper mastery calculation
                 self.log_error(f"Updating existing mastery record for user {session['user_id']}, competency '{session['competency']}'")
+                
+                # Get accuracy score for update
+                if response_data and response_data['total_answered'] > 0:
+                    accuracy_score = response_data['correct_answers'] / response_data['total_answered']
+                else:
+                    accuracy_score = 0.0
                 
                 # First, let's see what we're trying to update
                 mastery_cursor.execute("""
@@ -504,12 +615,13 @@ class BKTAlgorithm:
                 mastery_cursor.execute("""
                     UPDATE student_mastery 
                     SET current_difficulty = %s,
+                        accuracy_score = %s,
+                        final_mastery_score = %s,
                         has_taken_diagnostic = 1,
                         diagnostic_completed_at = NOW(),
-                        final_mastery_score = %s,
                         updated_at = NOW()
                     WHERE user_id = %s AND competency = %s
-                """, (recommended_difficulty, final_master_score, 
+                """, (recommended_difficulty, accuracy_score, final_master_score, 
                       session['user_id'], session['competency']))
                 
                 affected_rows = mastery_cursor.rowcount
@@ -528,13 +640,28 @@ class BKTAlgorithm:
                 # Create new record with explicit mastery_id
                 mastery_id = f"MAST_{session['user_id']}_{session['competency']}_{int(datetime.now().timestamp())}"
                 self.log_error(f"Creating new mastery record with ID: {mastery_id}")
+                
+                # Calculate accuracy for new record
+                if response_data and response_data['total_answered'] > 0:
+                    accuracy_score = response_data['correct_answers'] / response_data['total_answered']
+                    bkt_score = float(response_data['bkt_score']) if response_data['bkt_score'] else 0.5
+                    total_questions = response_data['total_answered']
+                    correct_answers = response_data['correct_answers']
+                else:
+                    accuracy_score = 0.0
+                    bkt_score = 0.5
+                    total_questions = 0
+                    correct_answers = 0
+                
                 mastery_cursor.execute("""
                     INSERT INTO student_mastery 
-                    (mastery_id, user_id, competency, current_difficulty, has_taken_diagnostic, 
-                     diagnostic_completed_at, final_mastery_score, created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, 1, NOW(), %s, NOW(), NOW())
+                    (mastery_id, user_id, competency, current_difficulty, accuracy_score,
+                     bkt_score, final_mastery_score, total_questions_answered, correct_answers,
+                     has_taken_diagnostic, diagnostic_completed_at, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 1, NOW(), NOW(), NOW())
                 """, (mastery_id, session['user_id'], session['competency'], 
-                      recommended_difficulty, final_master_score))
+                      recommended_difficulty, accuracy_score, bkt_score, final_master_score,
+                      total_questions, correct_answers))
             
             # Close the mastery connection immediately
             mastery_conn.close()
