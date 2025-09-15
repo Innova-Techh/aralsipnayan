@@ -73,9 +73,21 @@
         
         <!-- Hint Button (if not diagnostic) -->
         @if(!isset($diagnosticMode) || !$diagnosticMode)
-        <div class="flex justify-start mb-6">
+        <div class="flex justify-between items-center mb-6">
             <button id="hint-btn" class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#cc4713] shadow-lg">
                 💡 HINT
+            </button>
+            
+            <!-- Audio Toggle Button -->
+            <button id="audio-toggle" class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
+                🔊 AUDIO ON
+            </button>
+        </div>
+        @else
+        <div class="flex justify-end mb-6">
+            <!-- Audio Toggle Button for Diagnostic -->
+            <button id="audio-toggle" class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
+                🔊 AUDIO ON
             </button>
         </div>
         @endif
@@ -147,12 +159,204 @@
 
         <!-- Feedback Section (initially hidden) -->
         <div id="feedback-section" class="hidden mt-6 p-4 rounded-lg">
-            <div id="feedback-message" class="font-extrabold mb-2 font-baloo"></div>
-            <div id="explanation-text" class="text-xl text-gray-700 font-baloo"></div>
+            <div id="feedback-message" class="font-extrabold mb-2 font-baloo text-lg sm:text-xl md:text-2xl"></div>
+            <div id="explanation-text" class="text-base sm:text-lg md:text-xl text-gray-700 font-baloo leading-relaxed"></div>
         </div>
+
         
     </div>
 </div>
+
+<!-- Assessment Loader (initially hidden) -->
+<div id="assessment-loader" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50">
+    <div class="text-center">
+        <!-- Spinner -->
+        <svg class="pl mx-auto mb-6" width="200" height="200" viewBox="0 0 240 240">
+            <circle class="pl__ring pl__ring--a" cx="120" cy="120" r="105" fill="none"></circle>
+            <circle class="pl__ring pl__ring--b" cx="120" cy="120" r="35" fill="none"></circle>
+            <circle class="pl__ring pl__ring--c" cx="85" cy="120" r="70" fill="none"></circle>
+            <circle class="pl__ring pl__ring--d" cx="155" cy="120" r="70" fill="none"></circle>
+        </svg>
+
+        <!-- Loading Text -->
+        <div class="text-white">
+            <h3 class="text-2xl font-bold mb-2">Processing Assessment Results</h3>
+            <p class="text-base opacity-80" id="loader-status">Calculating your performance...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Assessment Loader Styles */
+    .pl {
+        width: 6em;
+        height: 6em;
+    }
+
+    @media (max-width: 480px) {
+        .pl {
+            width: 4em;
+            height: 4em;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .pl {
+            width: 7em;
+            height: 7em;
+        }
+    }
+
+    .pl__ring {
+        animation: ringA 2s linear infinite;
+        stroke-width: 20;
+        stroke-linecap: round;
+    }
+
+    .pl__ring--a {
+        stroke: #f42f25;
+    }
+
+    .pl__ring--b {
+        animation-name: ringB;
+        stroke: #f49725;
+    }
+
+    .pl__ring--c {
+        animation-name: ringC;
+        stroke: #255ff4;
+    }
+
+    .pl__ring--d {
+        animation-name: ringD;
+        stroke: #f42582;
+    }
+
+    /* Spinner Animations */
+    @keyframes ringA {
+        from, 4% {
+            stroke-dasharray: 0 660;
+            stroke-dashoffset: -330;
+        }
+        12% {
+            stroke-dasharray: 60 600;
+            stroke-dashoffset: -335;
+        }
+        32% {
+            stroke-dasharray: 60 600;
+            stroke-dashoffset: -595;
+        }
+        40%, 54% {
+            stroke-dasharray: 0 660;
+            stroke-dashoffset: -660;
+        }
+        62% {
+            stroke-dasharray: 60 600;
+            stroke-dashoffset: -665;
+        }
+        82% {
+            stroke-dasharray: 60 600;
+            stroke-dashoffset: -925;
+        }
+        90%, to {
+            stroke-dasharray: 0 660;
+            stroke-dashoffset: -990;
+        }
+    }
+
+    @keyframes ringB {
+        from, 12% {
+            stroke-dasharray: 0 220;
+            stroke-dashoffset: -110;
+        }
+        20% {
+            stroke-dasharray: 20 200;
+            stroke-dashoffset: -115;
+        }
+        40% {
+            stroke-dasharray: 20 200;
+            stroke-dashoffset: -195;
+        }
+        48%, 62% {
+            stroke-dasharray: 0 220;
+            stroke-dashoffset: -220;
+        }
+        70% {
+            stroke-dasharray: 20 200;
+            stroke-dashoffset: -225;
+        }
+        90% {
+            stroke-dasharray: 20 200;
+            stroke-dashoffset: -305;
+        }
+        98%, to {
+            stroke-dasharray: 0 220;
+            stroke-dashoffset: -330;
+        }
+    }
+
+    @keyframes ringC {
+        from {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: 0;
+        }
+        8% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -5;
+        }
+        28% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -175;
+        }
+        36%, 58% {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: -220;
+        }
+        66% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -225;
+        }
+        86% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -395;
+        }
+        94%, to {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: -440;
+        }
+    }
+
+    @keyframes ringD {
+        from, 8% {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: 0;
+        }
+        16% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -5;
+        }
+        36% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -175;
+        }
+        44%, 50% {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: -220;
+        }
+        58% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -225;
+        }
+        78% {
+            stroke-dasharray: 40 400;
+            stroke-dashoffset: -395;
+        }
+        86%, to {
+            stroke-dasharray: 0 440;
+            stroke-dashoffset: -440;
+        }
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -188,7 +392,8 @@ document.addEventListener('DOMContentLoaded', function() {
         questionTimeTaken: 0,
         questionIndex: {{ session('current_question_index', 0) }},
         totalQuestions: {{ $totalQuestions ?? 15 }},
-        quizTimeRemaining: quizTimeRemaining
+        quizTimeRemaining: quizTimeRemaining,
+        audioEnabled: true // Audio enabled by default
     };
     
     // Initialize quiz
@@ -197,6 +402,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeQuiz() {
         // Restore progress from localStorage if available
         restoreProgress();
+        
+        // Restore audio preference
+        restoreAudioPreference();
         
         // Initialize quiz-wide timer (only for non-diagnostic)
         if (!isDiagnostic) {
@@ -215,9 +423,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add online/offline detection
         addConnectionMonitoring();
         
+        // Initialize audio system
+        initializeAudio();
+        
         // Submit button handler
         document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-
+        
+        // Audio toggle handler
+        document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
         
         // Save progress when user selects answer
         addProgressSaveListeners();
@@ -279,6 +492,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Failed to restore progress:', error);
+        }
+    }
+    
+    function restoreAudioPreference() {
+        try {
+            const savedAudioPreference = localStorage.getItem('quiz_audio_enabled');
+            if (savedAudioPreference !== null) {
+                quizState.audioEnabled = savedAudioPreference === 'true';
+                updateAudioButtonDisplay();
+            }
+        } catch (error) {
+            console.error('Failed to restore audio preference:', error);
+        }
+    }
+    
+    function updateAudioButtonDisplay() {
+        const audioToggleBtn = document.getElementById('audio-toggle');
+        if (quizState.audioEnabled) {
+            audioToggleBtn.innerHTML = '🔊 AUDIO ON';
+            audioToggleBtn.className = 'bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg';
+        } else {
+            audioToggleBtn.innerHTML = '🔇 AUDIO OFF';
+            audioToggleBtn.className = 'bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-gray-500 hover:to-gray-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#5d5d5d] shadow-lg';
         }
     }
     
@@ -378,6 +614,74 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Connection lost - using offline mode');
             showConnectionStatus('Offline - progress saved locally', 'warning');
         });
+    }
+    
+    function initializeAudio() {
+        // Preload audio files for better performance
+        try {
+            window.correctAudio = new Audio('{{ asset("audio/correct.mp3") }}');
+            window.incorrectAudio = new Audio('{{ asset("audio/incorrect.mp3") }}');
+            
+            // Set volume
+            window.correctAudio.volume = 0.7;
+            window.incorrectAudio.volume = 0.7;
+            
+            // Preload the audio files
+            window.correctAudio.preload = 'auto';
+            window.incorrectAudio.preload = 'auto';
+            
+            console.log('Audio system initialized');
+        } catch (error) {
+            console.error('Error initializing audio system:', error);
+        }
+        
+        // Add user interaction listener to enable audio (required by many browsers)
+        function enableAudioOnFirstInteraction() {
+            try {
+                // Try to play and immediately pause to "unlock" audio
+                if (window.correctAudio) {
+                    window.correctAudio.play().then(() => {
+                        window.correctAudio.pause();
+                        window.correctAudio.currentTime = 0;
+                    }).catch(() => {});
+                }
+                if (window.incorrectAudio) {
+                    window.incorrectAudio.play().then(() => {
+                        window.incorrectAudio.pause();
+                        window.incorrectAudio.currentTime = 0;
+                    }).catch(() => {});
+                }
+                
+                // Remove the event listener after first interaction
+                document.removeEventListener('click', enableAudioOnFirstInteraction);
+                document.removeEventListener('touchstart', enableAudioOnFirstInteraction);
+                console.log('Audio enabled after user interaction');
+            } catch (error) {
+                console.error('Error enabling audio:', error);
+            }
+        }
+        
+        // Listen for first user interaction
+        document.addEventListener('click', enableAudioOnFirstInteraction);
+        document.addEventListener('touchstart', enableAudioOnFirstInteraction);
+    }
+    
+    function toggleAudio() {
+        quizState.audioEnabled = !quizState.audioEnabled;
+        updateAudioButtonDisplay();
+        
+        // Play a test sound to confirm audio is working when enabled
+        if (quizState.audioEnabled && window.correctAudio) {
+            window.correctAudio.currentTime = 0;
+            window.correctAudio.play().catch(() => {});
+        }
+        
+        // Save audio preference to localStorage
+        try {
+            localStorage.setItem('quiz_audio_enabled', quizState.audioEnabled);
+        } catch (error) {
+            console.error('Failed to save audio preference:', error);
+        }
     }
     
     function showConnectionStatus(message, type) {
@@ -505,6 +809,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         alert('Quiz time has ended! Your current progress will be submitted.');
         
+        // Show loader for quiz timeout processing
+        showAssessmentLoader('Quiz Time Ended', 'Processing your final answers...');
+        
         // Force submit current answer or empty answer
         let answerValue = '';
         @if($question->type === 'fill_blanks')
@@ -534,11 +841,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Submit and end quiz
         submitAnswerWithRetry(requestData)
         .then(data => {
-            alert('Quiz has ended due to timeout. Redirecting to results...');
-            window.location.href = '{{ route("student.assessments") }}';
+            setTimeout(() => {
+                hideAssessmentLoader();
+                alert('Quiz has ended due to timeout. Redirecting to results...');
+                window.location.href = '{{ route("student.assessments") }}';
+            }, 2000);
         })
         .catch(error => {
             console.error('Final timeout submit error:', error);
+            hideAssessmentLoader();
             alert('Quiz has ended. Redirecting...');
             window.location.href = '{{ route("student.assessments") }}';
         });
@@ -660,6 +971,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function timeoutSubmission() {
         questionSubmitted = true;
         
+        // Show loader for timeout processing
+        showAssessmentLoader('Question Timeout', 'Processing your response...');
+        
         // Auto-submit with no answer (timeout)
         const requestData = {
             question_id: '{{ $question->question_id }}',
@@ -689,18 +1003,96 @@ document.addEventListener('DOMContentLoaded', function() {
         @endif
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                showFeedback(data, true);
-            } else {
-                alert('Session timeout. Redirecting...');
-                window.location.href = '{{ route("student.assessments") }}';
-            }
+            setTimeout(() => {
+                hideAssessmentLoader();
+                if (data.success) {
+                    showFeedback(data, true);
+                } else {
+                    alert('Session timeout. Redirecting...');
+                    window.location.href = '{{ route("student.assessments") }}';
+                }
+            }, 1500);
         })
         .catch(error => {
             console.error('Error:', error);
+            hideAssessmentLoader();
             alert('Session timeout. Redirecting...');
             window.location.href = '{{ route("student.assessments") }}';
         });
+    }
+    
+    function showAssessmentLoader(title = 'Processing Assessment Results', status = 'Calculating your performance...') {
+        const loader = document.getElementById('assessment-loader');
+        const loaderTitle = loader.querySelector('h3');
+        const loaderStatus = document.getElementById('loader-status');
+        
+        // Update loader text
+        loaderTitle.textContent = title;
+        loaderStatus.textContent = status;
+        
+        // Show loader with flex display
+        loader.classList.remove('hidden');
+        loader.style.display = 'flex';
+        
+        // Add different status messages over time for diagnostic assessments
+        if (title === 'Processing Assessment Results') {
+            setTimeout(() => {
+                loaderStatus.textContent = 'Running BKT algorithm...';
+            }, 1000);
+            
+            setTimeout(() => {
+                loaderStatus.textContent = 'Analyzing your knowledge state...';
+            }, 2000);
+            
+            setTimeout(() => {
+                loaderStatus.textContent = 'Finalizing results...';
+            }, 2500);
+        }
+    }
+    
+    function hideAssessmentLoader() {
+        const loader = document.getElementById('assessment-loader');
+        loader.classList.add('hidden');
+        loader.style.display = 'none';
+    }
+    
+    function playAudioFeedback(isCorrect, isTimeout = false) {
+        // Don't play audio if disabled, timeout, or not available
+        if (!quizState.audioEnabled || isTimeout) return;
+        
+        try {
+            let audio;
+            if (isCorrect) {
+                audio = window.correctAudio;
+            } else {
+                audio = window.incorrectAudio;
+            }
+            
+            if (audio) {
+                // Reset audio to beginning
+                audio.currentTime = 0;
+                
+                // Play audio with error handling
+                audio.play().catch(error => {
+                    console.log('Audio playback failed:', error);
+                });
+            } else {
+                console.log('Audio not available - creating new instance');
+                // Fallback: create new audio instance
+                const audioPath = isCorrect ? 
+                    '{{ asset("audio/correct.mp3") }}' : 
+                    '{{ asset("audio/incorrect.mp3") }}';
+                
+                const fallbackAudio = new Audio(audioPath);
+                fallbackAudio.volume = 0.7;
+                fallbackAudio.play().catch(error => {
+                    console.log('Fallback audio playback failed:', error);
+                });
+            }
+            
+        } catch (error) {
+            console.error('Error playing audio feedback:', error);
+        }
     }
     
     function showFeedback(data, isTimeout = false) {
@@ -708,6 +1100,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const feedbackMessage = document.getElementById('feedback-message');
         const explanationText = document.getElementById('explanation-text');
         const nextBtn = document.getElementById('next-btn');
+        
+        // Play audio feedback
+        playAudioFeedback(data.is_correct, isTimeout);
         
         // Show feedback
         if (isTimeout) {
@@ -743,19 +1138,28 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Setting View Results button'); // DEBUG
             nextBtn.textContent = 'View Results';
             nextBtn.onclick = function() {
-                console.log('View Results button clicked, redirecting to:', data.redirect_url); // DEBUG
-                if (data.redirect_url) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    console.log('No redirect_url, going to assessments page'); // DEBUG
-                    window.location.href = '{{ route("student.assessments") }}';
-                }
+                console.log('View Results button clicked, showing assessment loader'); // DEBUG
+                showAssessmentLoader();
+                
+                // Simulate BKT calculation time and redirect
+                setTimeout(() => {
+                    console.log('Redirecting to:', data.redirect_url); // DEBUG
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        console.log('No redirect_url, going to assessments page'); // DEBUG
+                        window.location.href = '{{ route("student.assessments") }}';
+                    }
+                }, 3000); // Show loader for 3 seconds to simulate processing
             };
         } else if (data.phase_complete && !data.diagnostic_complete) {
             console.log('Phase complete but not diagnostic complete, continuing to next phase'); // DEBUG
             nextBtn.textContent = `Continue to ${data.next_phase || 'Next Phase'}`;
             nextBtn.onclick = function() {
-                window.location.reload();
+                showAssessmentLoader('Preparing next phase...', 'Loading questions for the next difficulty level...');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             };
         } else {
             console.log('Regular next question'); // DEBUG
