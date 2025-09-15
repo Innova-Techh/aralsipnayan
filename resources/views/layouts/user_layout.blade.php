@@ -207,7 +207,7 @@
     </nav>
 
     <!-- Main Content with proper padding -->
-    <main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
+    <main>
         @yield('content')
     </main>
 

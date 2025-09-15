@@ -5,68 +5,39 @@
 @section('content')
 
 <div class="space-y-8 font-baloo mt-8">
-<!-- Header Section -->
-<!-- Header Section -->
-<div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
-    
-    <!-- Question Counter -->
-    <div class="bg-purple-700 backdrop-blur-sm rounded-full
-                px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                border-b-6 border-[#4a1377]"
-         style="box-shadow: 0 6px 0 #4a1377;">
-        <span class="text-white font-semibold
-                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
-            @if(isset($diagnosticMode) && $diagnosticMode)
-                Phase {{ $diagnosticPhase ?? 1 }} - Question {{ $currentQuestion }} of {{ $totalQuestions }}
-            @else
-                Question {{ $currentQuestion }} of {{ $totalQuestions }}
-            @endif
-        </span>
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-6 md:mb-8">
+        <!-- Question Counter -->
+        <div class="bg-purple-700 backdrop-blur-sm rounded-full px-6 py-3 md:px-9 md:py-4 border-b-6 border-[#4a1377]"
+             style="box-shadow: 0 8px 0 #4a1377;">
+            <span class="text-white font-semibold text-base md:text-lg">
+                @if(isset($diagnosticMode) && $diagnosticMode)
+                    Phase {{ $diagnosticPhase ?? 1 }} - Question {{ $currentQuestion }} of {{ $totalQuestions }}
+                @else
+                    Question {{ $currentQuestion }} of {{ $totalQuestions }}
+                @endif
+
+
+            </span>
+        </div>
+
+        <!-- Timer -->
+        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-6 py-3 md:px-9 md:py-4 flex items-center gap-3 border-b-6 border-[#cc4713]"
+             style="box-shadow: 0 8px 0 #cc4713;">
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-white font-bold text-base md:text-lg" id="timer-display">{{ $question->max_time ?? 30 }}:00</span>
+        </div>
     </div>
-
-    <!-- Timer (only show for non-diagnostic quizzes) -->
-    @if(!isset($diagnosticMode) || !$diagnosticMode)
-    <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full
-                px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                flex items-center gap-2 sm:gap-3 md:gap-4
-                border-b-6 border-[#cc4713]"
-         style="box-shadow: 0 6px 0 #cc4713;">
-        <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-white"
-             fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clip-rule="evenodd"/>
-        </svg>
-        <span class="text-white font-bold
-                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
-              id="timer-display">30:00</span>
-    </div>
-    @endif
-</div>
-
-
 
     <!-- Diagnostic Mode Banner (if applicable) -->
     @if(isset($diagnosticMode) && $diagnosticMode)
-    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl 
-                p-2 sm:p-3 md:p-4 lg:p-4 
-                text-white text-center shadow-lg">
-        
-        <h3 class="font-bold 
-                text-sm sm:text-base md:text-md lg:text-md xl:text-xl mb-1 sm:mb-2">
-            🔬 Diagnostic Assessment
-        </h3>
-        
-        <!-- Optional description -->
-        <!--
-        <p class="text-xs sm:text-sm md:text-base lg:text-lg">
-            This diagnostic test helps us understand your current skill level. 
-            Take your time and do your best!
-        </p>
-        -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white text-center shadow-lg">
+        <h3 class="font-bold text-lg mb-2">🔬 Diagnostic Assessment</h3>
+        <!-- <p class="text-sm">This diagnostic test helps us understand your current skill level. Take your time and do your best!</p> -->
     </div>
     @endif
-
 
     <!-- Quiz Card -->
     <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
@@ -94,9 +65,9 @@
                 <div class="space-y-4 md:space-y-5" id="multiple-choice-container">
                     @foreach($question->options as $index => $option)
                     <label class="flex items-center p-4 md:p-5 bg-gray-100 border-2 border-transparent rounded-xl md:rounded-2xl cursor-pointer hover:bg-gray-200 transition-all duration-200 option-label">
-                        <input type="radio" name="answer" value="{{ chr(65 + (int)$index) }}" class="hidden">
+                        <input type="radio" name="answer" value="{{ chr(65 + $index) }}" class="hidden">
                         <div class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-gray-500 text-white rounded-full font-bold text-sm md:text-base mr-4 md:mr-5 option-circle">
-                            {{ chr(65 + (int)$index) }}
+                            {{ chr(65 + $index) }}
                         </div>
                         <span class="text-gray-700 font-medium text-base md:text-lg">
                             {{ $option }}
@@ -118,32 +89,19 @@
         </div>
 
         <!-- Buttons Row -->
-        <div class="flex justify-between items-center gap-2 sm:gap-4 mt-6">
+        <div class="flex justify-between items-center mt-6">
             <!-- Submit Button -->
             <button id="submit-btn" 
-                class="bg-gradient-to-r from-green-500 to-green-600 text-white 
-                    px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 
-                    rounded-2xl font-bold 
-                    text-xs sm:text-sm md:text-base lg:text-lg
-                    hover:from-green-600 hover:to-green-700 
-                    transition-all duration-200 transform hover:scale-105 
-                    border-b-4 border-[#0b830b] shadow-lg">
+                class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#0b830b] shadow-lg">
                 SUBMIT ANSWER
             </button>
 
             <!-- Next Button -->
             <button id="next-btn" 
-                class="hidden bg-gradient-to-r from-blue-500 to-blue-600 text-white 
-                    px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 
-                    rounded-2xl font-bold 
-                    text-xs sm:text-sm md:text-base lg:text-lg
-                    hover:from-blue-600 hover:to-blue-700 
-                    transition-all duration-200 transform hover:scale-105 
-                    border-b-4 border-[#0b2783] shadow-lg">
+                class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#0b830b] shadow-lg">
                 Next Question
             </button>
         </div>
-
 
         <!-- Feedback Section (initially hidden) -->
         <div id="feedback-section" class="hidden mt-6 p-4 rounded-lg">
@@ -157,391 +115,46 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let startTime = Date.now();
-    
-    // Quiz-wide timer settings (30 minutes = 1800 seconds for regular quiz, no timer for diagnostic)
-    const isDiagnostic = {{ isset($diagnosticMode) && $diagnosticMode ? 'true' : 'false' }};
-    const quizTimeLimit = 30 * 60; // 30 minutes in seconds (changeable later)
-    let quizTimeRemaining = isDiagnostic ? null : quizTimeLimit;
-    
-    // Per-question timing (not displayed but still tracked)
-    let questionMaxTime = {{ $question->max_time ?? 30 }};
-    let questionTimeRemaining = questionMaxTime;
-    let questionStartTime = Date.now();
-    
+    let maxTime = {{ $question->max_time ?? 30 }};
+    let timeRemaining = maxTime;
     let timerInterval;
-    let questionTimerInterval;
     let questionSubmitted = false;
-    let autoSaveInterval;
-    let retryAttempts = 0;
-    const maxRetryAttempts = 3;
-    const nextBtn = document.getElementById('next-btn');
-
-    // Quiz progress state
-    const quizState = {
-        sessionId: '{{ session("diagnostic_session_id") ?? session("quiz_session_id") ?? "quiz_" . time() }}',
-        questionId: '{{ $question->question_id }}',
-        competency: '{{ session("diagnostic_competency") ?? $category ?? "" }}',
-        isDiagnostic: isDiagnostic,
-        startTime: startTime,
-        questionMaxTime: questionMaxTime,
-        currentAnswer: '',
-        questionTimeTaken: 0,
-        questionIndex: {{ session('current_question_index', 0) }},
-        totalQuestions: {{ $totalQuestions ?? 15 }},
-        quizTimeRemaining: quizTimeRemaining
-    };
     
-    // Initialize quiz
-    initializeQuiz();
+    // Initialize timer
+    startTimer();
     
-    function initializeQuiz() {
-        // Restore progress from localStorage if available
-        restoreProgress();
-        
-        // Initialize quiz-wide timer (only for non-diagnostic)
-        if (!isDiagnostic) {
-            startQuizTimer();
-        }
-        
-        // Initialize per-question timer (hidden, for tracking only)
-        startQuestionTimer();
-        
-        // Initialize answer selection
-        initializeAnswerSelection();
-        
-        // Initialize auto-save
-        startAutoSave();
-        
-        // Add online/offline detection
-        addConnectionMonitoring();
-        
-        // Submit button handler
-        document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-
-        
-        // Save progress when user selects answer
-        addProgressSaveListeners();
-    }
+    // Initialize answer selection
+    initializeAnswerSelection();
     
-    function saveProgressToLocalStorage() {
-        try {
-            quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
-            quizState.lastSaved = Date.now();
-            
-            const storageKey = `quiz_progress_${quizState.sessionId}`;
-            localStorage.setItem(storageKey, JSON.stringify(quizState));
-            
-            console.log('Progress saved to localStorage:', quizState);
-        } catch (error) {
-            console.error('Failed to save progress to localStorage:', error);
-        }
-    }
+    // Submit button handler
+    document.getElementById('submit-btn').addEventListener('click', submitAnswer);
     
-    function restoreProgress() {
-        try {
-            // First try to restore from server-side saved progress
-            @if(isset($savedProgress) && $savedProgress)
-                const serverProgress = @json($savedProgress);
-                if (serverProgress && serverProgress.current_answer) {
-                    restoreAnswer(serverProgress.current_answer);
-                    console.log('Progress restored from server:', serverProgress);
-                    return; // Don't check localStorage if server has progress
-                }
-            @endif
-            
-            // Fall back to localStorage
-            const storageKey = `quiz_progress_${quizState.sessionId}`;
-            const savedProgress = localStorage.getItem(storageKey);
-            
-            if (savedProgress) {
-                const saved = JSON.parse(savedProgress);
-                
-                // Check if this is the same question
-                if (saved.questionId === quizState.questionId) {
-                    // Restore answer if available
-                    if (saved.currentAnswer) {
-                        restoreAnswer(saved.currentAnswer);
-                    }
-                    
-                    // Adjust question timer if needed (don't let users get extra time)
-                    const timeSinceLastSave = Date.now() - saved.lastSaved;
-                    if (timeSinceLastSave < 60000) { // If less than 1 minute ago
-                        questionTimeRemaining = Math.max(0, questionMaxTime - saved.questionTimeTaken - Math.floor(timeSinceLastSave / 1000));
-                    }
-                    
-                    // Restore quiz timer for non-diagnostic
-                    if (!isDiagnostic && saved.quizTimeRemaining !== undefined) {
-                        quizTimeRemaining = Math.max(0, saved.quizTimeRemaining - Math.floor(timeSinceLastSave / 1000));
-                    }
-                    
-                    console.log('Progress restored from localStorage:', saved);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to restore progress:', error);
-        }
-    }
-    
-    function restoreAnswer(answer) {
-        @if($question->type === 'fill_blanks')
-            const fillAnswer = document.getElementById('fill-answer');
-            if (fillAnswer) {
-                fillAnswer.value = answer;
-                quizState.currentAnswer = answer;
-            }
-        @else
-            const option = document.querySelector(`input[name="answer"][value="${answer}"]`);
-            if (option) {
-                option.checked = true;
-                const label = option.closest('.option-label');
-                if (label) {
-                    label.click(); // Trigger the visual selection
-                }
-                quizState.currentAnswer = answer;
-            }
-        @endif
-    }
-    
-    function addProgressSaveListeners() {
-        @if($question->type === 'fill_blanks')
-            const fillAnswer = document.getElementById('fill-answer');
-            if (fillAnswer) {
-                fillAnswer.addEventListener('input', function() {
-                    quizState.currentAnswer = this.value;
-                    saveProgressToLocalStorage();
-                });
-            }
-        @else
-            const labels = document.querySelectorAll('.option-label');
-            labels.forEach(label => {
-                label.addEventListener('click', function() {
-                    const radio = this.querySelector('input[type="radio"]');
-                    if (radio) {
-                        quizState.currentAnswer = radio.value;
-                        saveProgressToLocalStorage();
-                    }
-                });
-            });
-        @endif
-    }
-    
-    function startAutoSave() {
-        // Auto-save progress every 10 seconds
-        autoSaveInterval = setInterval(function() {
-            if (!questionSubmitted) {
-                saveProgressToLocalStorage();
-                syncProgressToServer();
-            }
-        }, 10000);
-    }
-    
-    function syncProgressToServer() {
-        // Only sync if there's an answer to save
-        if (!quizState.currentAnswer || questionSubmitted) return;
-        
-        const syncData = {
-            session_id: quizState.sessionId,
-            question_id: quizState.questionId,
-            current_answer: quizState.currentAnswer,
-            time_taken: quizState.questionTimeTaken,
-            question_index: quizState.questionIndex,
-            _token: '{{ csrf_token() }}'
-        };
-        
-        fetch('{{ route("student.quiz.save-progress") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(syncData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Progress synced to server');
-            }
-        })
-        .catch(error => {
-            console.error('Failed to sync progress to server:', error);
-            // Keep in localStorage for later sync
-        });
-    }
-    
-    function addConnectionMonitoring() {
-        window.addEventListener('online', function() {
-            console.log('Connection restored - syncing progress');
-            syncProgressToServer();
-            showConnectionStatus('Connected', 'success');
-        });
-        
-        window.addEventListener('offline', function() {
-            console.log('Connection lost - using offline mode');
-            showConnectionStatus('Offline - progress saved locally', 'warning');
-        });
-    }
-    
-    function showConnectionStatus(message, type) {
-        // Create or update connection status indicator
-        let statusDiv = document.getElementById('connection-status');
-        if (!statusDiv) {
-            statusDiv = document.createElement('div');
-            statusDiv.id = 'connection-status';
-            statusDiv.className = 'fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-semibold z-50';
-            document.body.appendChild(statusDiv);
-        }
-        
-        statusDiv.textContent = message;
-        statusDiv.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white text-sm font-semibold z-50 ${
-            type === 'success' ? 'bg-green-500' : 
-            type === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-        }`;
-        
-        // Auto-hide after 3 seconds for success messages
-        if (type === 'success') {
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 3000);
-        }
-    }
-    
-    function submitAnswerWithRetry(requestData, attempt = 1) {
-        const url = quizState.isDiagnostic ? 
-            '{{ route("student.quiz.diagnostic.submit") }}' : 
-            '{{ route("student.quiz.submit") }}';
-        
-        return fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            return response.json();
-        })
-        .catch(error => {
-            console.error(`Submit attempt ${attempt} failed:`, error);
-            
-            if (attempt < maxRetryAttempts) {
-                // Exponential backoff: wait 2^attempt seconds
-                const delay = Math.pow(2, attempt) * 1000;
-                
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        submitAnswerWithRetry(requestData, attempt + 1)
-                            .then(resolve)
-                            .catch(reject);
-                    }, delay);
-                });
-            } else {
-                throw error;
-            }
-        });
-    }
-    
-    // Timer functions
-    function startQuizTimer() {
-        if (isDiagnostic) return; // No timer for diagnostic
-        
+    function startTimer() {
         timerInterval = setInterval(function() {
-            if (quizTimeRemaining > 0) {
-                quizTimeRemaining--;
-                updateQuizTimerDisplay();
-                
-                // Save quiz time remaining to state
-                quizState.quizTimeRemaining = quizTimeRemaining;
-                
-                if (quizTimeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    endQuizDueToTimeout();
-                }
-            } else {
+            timeRemaining--;
+            updateTimerDisplay();
+            
+            if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
-                updateQuizTimerDisplay();
+                if (!questionSubmitted) {
+                    timeoutSubmission();
+                }
             }
         }, 1000);
     }
     
-    function startQuestionTimer() {
-        // This timer tracks per-question time but doesn't display anything
-        questionTimerInterval = setInterval(function() {
-            if (questionTimeRemaining > 0 && !questionSubmitted) {
-                questionTimeRemaining--;
-                quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
-            }
-        }, 1000);
-    }
-    
-    function updateQuizTimerDisplay() {
-        if (isDiagnostic) return; // No display for diagnostic
-        
-        const displayTime = Math.max(0, quizTimeRemaining);
-        const minutes = Math.floor(displayTime / 60);
-        const seconds = displayTime % 60;
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
         const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('timer-display').textContent = display;
         
-        const timerDisplay = document.getElementById('timer-display');
-        if (timerDisplay) {
-            timerDisplay.textContent = display;
-        }
-        
-        // Change color when time is running low (5 minutes remaining)
+        // Change color when time is running low
         const timerElement = document.querySelector('.bg-gradient-to-r.from-orange-500');
-        if (timerElement) {
-            if (quizTimeRemaining <= 300) { // 5 minutes
-                timerElement.classList.remove('from-orange-500', 'to-red-500');
-                timerElement.classList.add('from-red-600', 'to-red-700');
-            }
+        if (timeRemaining <= 10) {
+            timerElement.classList.remove('from-orange-500', 'to-red-500');
+            timerElement.classList.add('from-red-600', 'to-red-700');
         }
-    }
-    
-    function endQuizDueToTimeout() {
-        questionSubmitted = true;
-        clearInterval(questionTimerInterval);
-        clearInterval(autoSaveInterval);
-        
-        alert('Quiz time has ended! Your current progress will be submitted.');
-        
-        // Force submit current answer or empty answer
-        let answerValue = '';
-        @if($question->type === 'fill_blanks')
-            const fillAnswer = document.getElementById('fill-answer');
-            if (fillAnswer && fillAnswer.value.trim()) {
-                answerValue = fillAnswer.value.trim();
-            }
-        @else
-            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-            if (selectedAnswer) {
-                answerValue = selectedAnswer.value;
-            }
-        @endif
-        
-        const requestData = {
-            question_id: '{{ $question->question_id }}',
-            answer: answerValue,
-            time_taken: questionMaxTime - questionTimeRemaining,
-            quiz_timeout: true,
-            _token: '{{ csrf_token() }}'
-        };
-        
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
-            requestData.assessment_id = '{{ $assessmentId ?? "" }}';
-        @endif
-        
-        // Submit and end quiz
-        submitAnswerWithRetry(requestData)
-        .then(data => {
-            alert('Quiz has ended due to timeout. Redirecting to results...');
-            window.location.href = '{{ route("student.assessments") }}';
-        })
-        .catch(error => {
-            console.error('Final timeout submit error:', error);
-            alert('Quiz has ended. Redirecting...');
-            window.location.href = '{{ route("student.assessments") }}';
-        });
     }
     
     function initializeAnswerSelection() {
@@ -595,65 +208,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         questionSubmitted = true;
         clearInterval(timerInterval);
-        clearInterval(questionTimerInterval);
-        clearInterval(autoSaveInterval);
         
-        const questionTimeTaken = questionMaxTime - questionTimeRemaining;
+        const timeTaken = maxTime - timeRemaining;
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
-        nextBtn.classList.remove('hidden');
-
+        
         const requestData = {
             question_id: '{{ $question->question_id }}',
             answer: answerValue,
-            time_taken: questionTimeTaken,
+            time_taken: timeTaken,
             _token: '{{ csrf_token() }}'
         };
         
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
+        @if(isset($diagnosticMode) && $diagnosticMode)
+            // Diagnostic mode submission
+            fetch('{{ route("student.quiz.diagnostic.submit") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+        @else
+            // Regular assessment submission
             requestData.assessment_id = '{{ $assessmentId ?? "" }}';
+            fetch('{{ route("student.quiz.submit") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
         @endif
-        
-        // Update quiz state
-        quizState.currentAnswer = answerValue;
-        quizState.questionTimeTaken = questionTimeTaken;
-        saveProgressToLocalStorage();
-        
-        // Submit with retry mechanism
-        submitAnswerWithRetry(requestData)
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Clear progress from localStorage on successful submission
-                const storageKey = `quiz_progress_${quizState.sessionId}`;
-                localStorage.removeItem(storageKey);
-                
                 showFeedback(data);
             } else {
-                throw new Error(data.message || 'Unknown error');
-            }
-        })
-        .catch(error => {
-            console.error('Final submit error:', error);
-            
-            // Show retry option to user
-            const retryBtn = document.createElement('button');
-            retryBtn.textContent = 'Retry Submission';
-            retryBtn.className = 'ml-4 bg-orange-500 text-white px-4 py-2 rounded-lg';
-            retryBtn.onclick = () => {
-                retryBtn.remove();
+                alert('Error: ' + (data.message || 'Unknown error'));
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'SUBMIT ANSWER';
                 questionSubmitted = false;
-                submitAnswer();
-            };
-            
-            submitBtn.parentNode.appendChild(retryBtn);
-            
-            alert('Submission failed. Your progress is saved. You can retry or refresh the page.');
+                startTimer();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'SUBMIT ANSWER';
             questionSubmitted = false;
+            startTimer();
         });
     }
     
@@ -664,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestData = {
             question_id: '{{ $question->question_id }}',
             answer: '',
-            time_taken: questionMaxTime,
+            time_taken: maxTime,
             _token: '{{ csrf_token() }}'
         };
         

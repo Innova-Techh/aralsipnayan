@@ -20,6 +20,7 @@
                          alt="Student Characters" 
                          class="w-full h-auto">
                 </aside>
+
                 <!-- Right Column - Content -->
                 <section class="w-full lg:w-3/5 flex flex-col gap-6">
                     <!-- Welcome Text -->
