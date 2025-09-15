@@ -195,8 +195,26 @@ export default {
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #F59E0B 0px, transparent 50%), radial-gradient(at 0% 50%, #1E293B 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #F59E0B 0px, transparent 50%), radial-gradient(at 80% 100%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 0%, #1E3A8A 0px, transparent 50%)",
                 "blue-mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #1E3A8A 0px, transparent 50%), radial-gradient(at 0% 50%, #06B6D4 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #1E3A8A 0px, transparent 50%), radial-gradient(at 80% 100%, #06B6D4 0px, transparent 50%), radial-gradient(at 0% 0%, #1E293B 0px, transparent 50%)",
+                // Custom linear gradient: from #F59E0B (dark) to #FBBF24 (light), top to bottom
+                "on-board-earn": "linear-gradient(to bottom, #F59E0B, #FBBF24)",
+                "on-board-progress":
+                    "linear-gradient(to bottom, #4F46E5, #06B6D4)",
+                "on-board-learn":
+                    "linear-gradient(to bottom, #D62839, #E9742F, #FBBF24)",
+                "gradient-secondary":
+                    "linear-gradient(to bottom, #F6510C, #F5D70B)",
+                "hover-secondary":
+                    "linear-gradient(to bottom, #D9440B, #E6C308)",
+            },
+            dropShadow: {
+                "on-board-earn": "0 4px 0 #C47E06",
+                "on-board-learn": "0 4px 0 #C1321F",
+                "on-board-progress": "0 4px 0 #1E18CB",
+                "on-welcome": "0 4px 0 #1E3A8A",
+                "select-avatar": "0 4px 0 #7A4305",
             },
         },
     },
+
     plugins: [],
 };

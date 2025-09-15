@@ -27,17 +27,27 @@
         }
 
         .material-symbols-outlined {
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
+        /* Hover effect (all devices) */
         .nav-link:hover .material-symbols-outlined {
-            font-variation-settings: 'FILL' 1;
+            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 28;
+            transform: scale(1.2);
             color: #2563eb;
         }
 
+        /* Active effect (all devices) */
         .nav-link.active .material-symbols-outlined {
-            font-variation-settings: 'FILL' 1;
+            font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
+            transform: scale(1.2);
             color: #2563eb;
+        }
+
+        /* Remove active background (desktop + mobile) */
+        .nav-link.active {
+            background-color: transparent !important;
         }
 
         /* Baloo 2 Regular */
@@ -71,6 +81,13 @@
         @media (min-width: 1024px) {
             body.page-bg {
                 background-image: url('{{ asset('images/global/bg.svg') }}');
+            }
+        }
+
+        @media (max-width: 1279px) {
+            .nav-link.active span:last-child {
+                font-weight: 600;
+                color: #2563eb;
             }
         }
 
@@ -126,7 +143,7 @@
                     <a href="{{ route('achievements.index') }}"
                         class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('achievements.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
                         <span class="material-symbols-outlined mr-2 text-xl">emoji_events</span>
-                        Achievements
+                        Badges
                     </a>
 
                     <a href="{{ route('sections.index') }}"
@@ -215,7 +232,7 @@
                 <a href="{{ route('achievements.index') }}"
                     class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('achievements.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
                     <span class="material-symbols-outlined text-xl sm:text-2xl">emoji_events</span>
-                    <span class="text-xs sm:text-sm font-medium mt-0.5">Achievements</span>
+                    <span class="text-xs sm:text-sm font-medium mt-0.5">Badges</span>
                 </a>
 
                 <a href="{{ route('sections.index') }}"

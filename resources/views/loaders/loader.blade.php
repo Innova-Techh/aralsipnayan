@@ -11,6 +11,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&display=swap');
 
+
         .font-baloo {
             font-family: "Baloo 2", sans-serif;
             font-weight: 800;
@@ -60,7 +61,7 @@
             stroke: #f42582;
         }
 
-        /* Animations for rings */
+        /* Spinner Animations */
         @keyframes ringA {
 
             from,
@@ -251,42 +252,28 @@
             }
         }
 
-        @keyframes logoFadeIn {
+        /* Clean Logo + Text Animations */
+        @keyframes slideUp {
             from {
-                opacity: 0;
-                transform: scale(0.8);
+                transform: translateY(20px);
             }
 
             to {
-                opacity: 1;
-                transform: scale(1);
+                transform: translateY(0);
             }
         }
 
-        .animate-logoFadeIn {
-            animation: logoFadeIn 1.5s ease forwards;
+        .animate-logo {
+            opacity: 1 !important;
+            animation: slideUp 1s ease forwards;
         }
 
         .reveal-text {
-            mask-image: linear-gradient(270deg, transparent 0%, black 100%);
-            -webkit-mask-image: linear-gradient(270deg, transparent 0%, black 100%);
-            mask-repeat: no-repeat;
-            -webkit-mask-repeat: no-repeat;
-            mask-size: 200% 100%;
-            -webkit-mask-size: 200% 100%;
-            animation: revealMask 2.5s ease forwards;
-        }
-
-        @keyframes revealMask {
-            from {
-                mask-position: 100% 0;
-                -webkit-mask-position: 100% 0;
-            }
-
-            to {
-                mask-position: 0 0;
-                -webkit-mask-position: 0 0;
-            }
+            display: inline-block;
+            transform: translateY(20px);
+            opacity: 1 !important;
+            /* no haze */
+            animation: slideUp 1s ease forwards;
         }
 
         /* Responsive text sizes */
@@ -313,17 +300,16 @@
 </head>
 
 <body>
-    <div id="loader-wrapper"
-        class="flex flex-col fixed inset-0 bg-white bg-opacity-95 items-center justify-center z-[9999] px-4"
+    <div id="loader-wrapper" class="flex flex-col fixed inset-0 items-center justify-center z-[9999] px-4"
         style="display: none;">
 
         <!-- Logo + Text -->
         <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4">
             <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
-                class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 opacity-0 animate-logoFadeIn">
-            <span
-                class="font-baloo text-blue-700 relative overflow-hidden inline-block reveal-text text-responsive text-center sm:text-left"
-                style="font-size: 4rem; text-shadow: 0 4px 0px #081846; word-spacing: -0.3rem; letter-spacing: -0.2rem">
+                class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 animate-logo">
+
+            <span class="font-baloo text-blue-700 text-responsive text-center sm:text-left reveal-text"
+                style="font-size: 4rem; text-shadow: 0 4px 0px #081846; word-spacing: -0.3rem; letter-spacing: -0.2rem;">
                 Aral
                 <span class="text-red-600"
                     style="text-shadow: 0 4px 0px #71161F; letter-spacing: -0.2rem;">Sipnayan</span>
@@ -332,14 +318,10 @@
 
         <!-- Spinner -->
         <svg class="pl" width="240" height="240" viewBox="0 0 240 240">
-            <circle class="pl__ring pl__ring--a" cx="120" cy="120" r="105" fill="none" stroke-width="20"
-                stroke-dasharray="0 660" stroke-dashoffset="-330" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--b" cx="120" cy="120" r="35" fill="none" stroke-width="20"
-                stroke-dasharray="0 220" stroke-dashoffset="-110" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--c" cx="85" cy="120" r="70" fill="none" stroke-width="20"
-                stroke-dasharray="0 440" stroke-linecap="round"></circle>
-            <circle class="pl__ring pl__ring--d" cx="155" cy="120" r="70" fill="none" stroke-width="20"
-                stroke-dasharray="0 440" stroke-linecap="round"></circle>
+            <circle class="pl__ring pl__ring--a" cx="120" cy="120" r="105" fill="none"></circle>
+            <circle class="pl__ring pl__ring--b" cx="120" cy="120" r="35" fill="none"></circle>
+            <circle class="pl__ring pl__ring--c" cx="85" cy="120" r="70" fill="none"></circle>
+            <circle class="pl__ring pl__ring--d" cx="155" cy="120" r="70" fill="none"></circle>
         </svg>
     </div>
 </body>
