@@ -8,17 +8,227 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') Aral Sipnayan</title>
     @vite('resources/css/app.css')
+    <style>
+        /* Custom glow animation */
+        @keyframes glow-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 213, 136, 0.8),
+                    0 0 30px rgba(255, 213, 136, 0.6),
+                    0 0 40px rgba(255, 213, 136, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 213, 136, 1),
+                    0 0 40px rgba(255, 213, 136, 0.8),
+                    0 0 50px rgba(255, 213, 136, 0.6);
+            }
+        }
+
+        .avatar-glow-1 {
+            box-shadow: 0 0 20px rgba(255, 213, 136, 0.8), 0 0 30px rgba(255, 213, 136, 0.6), 0 0 40px rgba(255, 213, 136, 0.4);
+            animation: glow-pulse-1 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-1 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 213, 136, 0.8), 0 0 30px rgba(255, 213, 136, 0.6), 0 0 40px rgba(255, 213, 136, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 213, 136, 1), 0 0 40px rgba(255, 213, 136, 0.8), 0 0 50px rgba(255, 213, 136, 0.6);
+            }
+        }
+
+        .avatar-glow-2 {
+            box-shadow: 0 0 20px rgba(255, 192, 203, 0.8), 0 0 30px rgba(255, 192, 203, 0.6), 0 0 40px rgba(255, 192, 203, 0.4);
+            animation: glow-pulse-2 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-2 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 192, 203, 0.8), 0 0 30px rgba(255, 192, 203, 0.6), 0 0 40px rgba(255, 192, 203, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 192, 203, 1), 0 0 40px rgba(255, 192, 203, 0.8), 0 0 50px rgba(255, 192, 203, 0.6);
+            }
+        }
+
+        .avatar-glow-3 {
+            box-shadow: 0 0 20px rgba(255, 135, 128, 0.8), 0 0 30px rgba(255, 135, 128, 0.6), 0 0 40px rgba(255, 135, 128, 0.4);
+            animation: glow-pulse-3 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-3 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 135, 128, 0.8), 0 0 30px rgba(255, 135, 128, 0.6), 0 0 40px rgba(255, 135, 128, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 135, 128, 1), 0 0 40px rgba(255, 135, 128, 0.8), 0 0 50px rgba(255, 135, 128, 0.6);
+            }
+        }
+
+        .avatar-glow-4 {
+            box-shadow: 0 0 20px rgba(232, 232, 232, 0.8), 0 0 30px rgba(232, 232, 232, 0.6), 0 0 40px rgba(232, 232, 232, 0.4);
+            animation: glow-pulse-4 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-4 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(232, 232, 232, 0.8), 0 0 30px rgba(232, 232, 232, 0.6), 0 0 40px rgba(232, 232, 232, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(232, 232, 232, 1), 0 0 40px rgba(232, 232, 232, 0.8), 0 0 50px rgba(232, 232, 232, 0.6);
+            }
+        }
+
+        .avatar-glow-5 {
+            box-shadow: 0 0 20px rgba(67, 255, 250, 0.8), 0 0 30px rgba(67, 255, 250, 0.6), 0 0 40px rgba(67, 255, 250, 0.4);
+            animation: glow-pulse-5 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-5 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(67, 255, 250, 0.8), 0 0 30px rgba(67, 255, 250, 0.6), 0 0 40px rgba(67, 255, 250, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(67, 255, 250, 1), 0 0 40px rgba(67, 255, 250, 0.8), 0 0 50px rgba(67, 255, 250, 0.6);
+            }
+        }
+
+        .avatar-glow-6 {
+            box-shadow: 0 0 20px rgba(255, 162, 115, 0.8), 0 0 30px rgba(255, 162, 115, 0.6), 0 0 40px rgba(255, 162, 115, 0.4);
+            animation: glow-pulse-6 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-6 {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 162, 115, 0.8), 0 0 30px rgba(255, 162, 115, 0.6), 0 0 40px rgba(255, 162, 115, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 162, 115, 1), 0 0 40px rgba(255, 162, 115, 0.8), 0 0 50px rgba(255, 162, 115, 0.6);
+            }
+        }
+
+        /* Smooth transition for glow effects */
+        .avatar-container {
+            transition: all 0.3s ease;
+        }
+
+
+        /* Custom responsive breakpoints for better avatar sizing */
+        @media (min-width: 640px) {
+            .avatar-grid {
+                gap: 1.5rem;
+                /* 24px gap for sm screens */
+            }
+
+            .mobile-scroll-content {
+                padding-bottom: 8rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .avatar-grid {
+                gap: 2rem;
+                /* 32px gap for md screens */
+            }
+
+            .mobile-scroll-content {
+                padding-bottom: 4rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .avatar-grid {
+                gap: 2.5rem;
+                /* 40px gap for lg screens */
+            }
+
+            .mobile-scroll-content {
+                padding-bottom: 4rem;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .avatar-grid {
+                gap: 3rem;
+                /* 48px gap for xl screens */
+            }
+
+            .mobile-scroll-content {
+                padding-bottom: 4rem;
+            }
+        }
+
+        /* Bokeh circles */
+        .bokeh {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(126, 136, 254, 0.25);
+            filter: blur(5px);
+            animation: float 12s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.1);
+            }
+        }
+    </style>
 </head>
 
-
 <body class="bg-gray-100">
-
 
     @section('title', 'Choose Your Avatar')
 
     @section('content')
         <div class="min-h-screen">
-            <div class="relative overflow-hidden" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);">
+            <div class="relative overflow-hidden bg-avatar-selection">
+                <!-- Background Bokeh Circles -->
+                <div class="absolute inset-0 overflow-hidden">
+                    <!-- Bokeh 1 - Always visible, responsive sizing -->
+                    <span
+                        class="bokeh w-32 h-24 sm:w-40 sm:h-32 lg:w-56 lg:h-48 top-[5%] left-[5%] sm:top-[8%] sm:left-[8%] lg:top-[10%] lg:left-[10%]"></span>
+
+                    <!-- Bokeh 2 - Always visible, responsive sizing -->
+                    <span
+                        class="bokeh w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 top-[60%] right-[5%] sm:top-[35%] sm:left-[20%] lg:top-[75%] lg:left-[25%]"></span>
+
+                    <!-- Bokeh 3 - Hidden on mobile, visible on tablet+ -->
+                    <span
+                        class="bokeh hidden sm:block w-36 h-28 lg:w-44 lg:h-36 bottom-[15%] right-[10%] lg:bottom-[20%] lg:right-[10%]"></span>
+
+                    <!-- Bokeh 4 - Hidden on mobile and tablet, visible on desktop only -->
+                    <span class="bokeh hidden lg:block w-40 h-40 bottom-[10%] left-[50%]"></span>
+
+                    <!-- Bokeh 5 - Hidden on mobile and tablet, visible on desktop only -->
+                    <span class="bokeh hidden lg:block w-28 h-28 top-[15%] right-[33%]"></span>
+                </div>
                 <!-- Avatar Header -->
                 <div class="text-white px-6 pt-4">
                     <h2 class="pl-8 text-4xl font-baloo font-bold mb-2">Avatar</h2>
@@ -32,7 +242,6 @@
                     <div class="relative flex items-center justify-center mb-2">
                         <!-- Left Arrow -->
                         <div class="relative flex items-center justify-center">
-                            <!-- Left Arrow -->
                             <button id="prevBtn"
                                 class="absolute left-4 md:left-4 text-white hover:text-gray-300 transition-colors z-10">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,13 +251,18 @@
                                 </svg>
                             </button>
 
-                            <!-- Main Avatar Display -->
-                            <div class="w-64 h-100 bg-transparent rounded-3xl flex items-center justify-center mx-8">
-                                <img id="mainAvatar" src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
-                                    alt="Selected Avatar" class="w-48 h-60 object-contain">
+                            <!-- Main Avatar Container with Background -->
+                            <div class="relative w-[21rem] h-[21rem] flex items-center justify-center">
+                                <!-- Radial Blur Background -->
+                                <div class="absolute inset-0 bg-radial-blur-blue blur-[50px] opacity-70 rounded-full"></div>
+
+                                <!-- Avatar Image -->
+                                <div class="relative z-10">
+                                    <img id="mainAvatar" src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
+                                        alt="Selected Avatar" class="w-[21rem] h-[21rem] object-contain">
+                                </div>
                             </div>
 
-                            <!-- Right Arrow -->
                             <button id="nextBtn"
                                 class="absolute right-4 md:right-4 text-white hover:text-gray-300 transition-colors z-10">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,69 +276,75 @@
             </div>
 
             <!-- Avatar Selection Grid -->
-            <div class="relative p-5 sm:p-6 bg-white rounded-2xl -mt-4 z-10">
-                <div class="max-w-4xl mx-auto">
-                    <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="relative p-5 sm:p-6 min-h-96 bg-white rounded-2xl -mt-4 z-10">
+                <div class="mobile-scroll-content max-w-4xl mx-auto">
+                    <div class="grid grid-cols-3 block-ce xl:gap-6 lg:gap-4 xs:gap-6 mb-8">
                         <!-- Avatar 1 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar1.png">
-                            <div class="w-full h-32 bg-yellow-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-1 drop-shadow-avatar-1 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar1.png') }}" alt="Avatar 1"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[115%]  -translate-y-1/6">
                             </div>
                         </div>
 
                         <!-- Avatar 2 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar2.png">
-                            <div class="w-full h-32 bg-pink-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-2 drop-shadow-avatar-2 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar2.png') }}" alt="Avatar 2"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[120%] object-contain -translate-y-1/6">
                             </div>
                         </div>
 
                         <!-- Avatar 3 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar3.png">
-                            <div class="w-full h-32 bg-red-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-3 drop-shadow-avatar-3 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar3.png') }}" alt="Avatar 3"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[120%] object-contain -translate-y-1/6">
                             </div>
                         </div>
 
                         <!-- Avatar 4 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar4.png">
-                            <div class="w-full h-32 bg-gray-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square  xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-4 drop-shadow-avatar-4 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar4.png') }}" alt="Avatar 4"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[120%] object-contain -translate-y-1/6">
                             </div>
                         </div>
 
                         <!-- Avatar 5 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar5.png">
-                            <div class="w-full h-32 bg-orange-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-5 drop-shadow-avatar-5 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar5.png') }}" alt="Avatar 5"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[120%] object-contain -translate-y-1/6">
                             </div>
                         </div>
 
                         <!-- Avatar 6 -->
-                        <div class="avatar-option cursor-pointer rounded-2xl transform hover:scale-105 transition-transform"
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
                             data-avatar="avatar6.png">
-                            <div class="w-full h-32 bg-teal-400 rounded-2xl shadow-lg flex items-center justify-center">
+                            <div
+                                class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-6 drop-shadow-avatar-6 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
                                 <img src="{{ asset('images/profile/avatar6.png') }}" alt="Avatar 6"
-                                    class="w-20 h-24 object-contain">
+                                    class="absolute bottom-0 w-[100%] h-[120%] object-contain -translate-y-1/6">
                             </div>
                         </div>
                     </div>
 
                     <!-- Select Avatar Button -->
-                    <div class="text-center">
+                    <div class="text-center pt-8 ">
                         <button id="selectAvatarBtn"
-                            class="bg-yellow-400 hover:bg-yellow-500 text-white font-baloo font-bold py-4 px-12 rounded-full text-xl shadow-lg transform hover:scale-105 transition-all">
-                            Select Your Avatar
+                            class="w-3/4 bg-select-avatar drop-shadow-select-avatar text-outline-custom-[#CE8E21]  hover:bg-yellow-500 text-white font-baloo font-bold py-4 px-12 rounded-full xl:text-2xl xs:text-xl shadow-lg transform hover:scale-105 transition-all">
+                            <span>Select Your Avatar</span>
                         </button>
                     </div>
                 </div>
@@ -133,13 +353,25 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // Avatar glow classes corresponding to each avatar
+                const avatarGlowClasses = [
+                    'avatar-glow-1', // Avatar 1 - Yellow/Gold glow
+                    'avatar-glow-2', // Avatar 2 - Pink glow
+                    'avatar-glow-3', // Avatar 3 - Red/Coral glow
+                    'avatar-glow-4', // Avatar 4 - Gray/Silver glow
+                    'avatar-glow-5', // Avatar 5 - Cyan/Teal glow
+                    'avatar-glow-6', // Avatar 6 - Orange glow
+                ];
+
                 const avatars = [
                     'avatar1.png',
                     'avatar2.png',
                     'avatar3.png',
                     'avatar4.png',
                     'avatar5.png',
-                    'avatar6.png'
+                    'avatar6.png',
+                    'avatar7.png',
+                    'avatar8.png'
                 ];
 
                 // Detect current avatar from the main avatar image src
@@ -164,14 +396,22 @@
                     mainAvatar.src = `{{ asset('images/profile/') }}/${avatars[index]}`;
                     currentAvatarIndex = index;
 
-                    // Update selection highlight
+                    // Remove all glow classes from all avatar containers
                     avatarOptions.forEach((option, i) => {
-                        if (i === index) {
-                            option.classList.add('ring-4', 'ring-red-400', 'ring-offset-2');
-                        } else {
-                            option.classList.remove('ring-4', 'ring-red-400', 'ring-offset-2');
-                        }
+                        const container = option.querySelector('.avatar-container');
+                        // Remove all possible glow classes
+                        avatarGlowClasses.forEach(glowClass => {
+                            container.classList.remove(glowClass);
+                        });
                     });
+
+                    // Add glow effect to selected avatar
+                    if (avatarOptions[index]) {
+                        const selectedContainer = avatarOptions[index].querySelector('.avatar-container');
+                        if (avatarGlowClasses[index]) {
+                            selectedContainer.classList.add(avatarGlowClasses[index]);
+                        }
+                    }
                 }
 
                 // Initialize with current avatar selected

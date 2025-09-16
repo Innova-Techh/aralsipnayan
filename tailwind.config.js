@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import plugin from "tailwindcss/plugin";
+
 export default {
     content: [
         "./resources/**/*.blade.php",
@@ -18,9 +20,9 @@ export default {
             screens: {
                 xs: "375px", // Small phones
                 sm: "425px", // Larger phones
-                md: "640px", // Small tablets (was sm by default)
+                md: "640px", // Small tablets
                 lg: "768px", // iPads
-                xl: "1024px", // Larger tablets / laptops
+                xl: "1024px", // Laptops
                 "2xl": "1280px",
             },
             fontFamily: {
@@ -32,13 +34,13 @@ export default {
                 "primary-yellow": "#FBBF24",
                 "custom-purple": "#4F46E5",
                 "custom-cyan": "#06B6D4",
-                border: "#E2E8F0", // hsl(var(--border)) replaced with hex
-                input: "#E2E8F0", // hsl(var(--input)) replaced with hex
-                ring: "#E2E8F0", // hsl(var(--ring)) replaced with hex
-                background: "#F8FAFC", // hsl(var(--background)) replaced with hex
-                foreground: "#1E293B", // hsl(var(--foreground)) replaced with hex
+                border: "#E2E8F0",
+                input: "#E2E8F0",
+                ring: "#E2E8F0",
+                background: "#F8FAFC",
+                foreground: "#1E293B",
                 primary: {
-                    DEFAULT: "#449EFF", // Primary Accent
+                    DEFAULT: "#449EFF",
                     foreground: "#ffffff",
                     50: "#f0f9ff",
                     100: "#e0f2fe",
@@ -50,11 +52,11 @@ export default {
                     700: "#0369a1",
                     800: "#075985",
                     900: "#0c4a6e",
-                    accent: "#449EFF", // Primary Accent
-                    first: "#1E3A8A", // Primary Base
+                    accent: "#449EFF",
+                    first: "#1E3A8A",
                 },
                 secondary: {
-                    DEFAULT: "#F59E0B", // Complementary
+                    DEFAULT: "#F59E0B",
                     foreground: "#1E293B",
                     50: "#fffbeb",
                     100: "#fef3c7",
@@ -66,44 +68,43 @@ export default {
                     700: "#b45309",
                     800: "#92400e",
                     900: "#78350f",
-                    light: "#F8FAFC", // Secondary Light
-                    medium: "#E2E8F0", // Secondary Medium
+                    light: "#F8FAFC",
+                    medium: "#E2E8F0",
                 },
                 accent: {
-                    DEFAULT: "#F8FAFC", // Secondary Light
+                    DEFAULT: "#F8FAFC",
                     foreground: "#1E293B",
-                    cyan: "#06B6D4", // Accent Cyan
-                    navy: "#1E293B", // Accent Navy
+                    cyan: "#06B6D4",
+                    navy: "#1E293B",
                 },
                 muted: {
-                    DEFAULT: "#E2E8F0", // Secondary Medium
+                    DEFAULT: "#E2E8F0",
                     foreground: "#1E293B",
                 },
                 dark: {
-                    DEFAULT: "#1E293B", // Accent Navy
+                    DEFAULT: "#1E293B",
                     foreground: "#F8FAFC",
                 },
                 blue: {
-                    bright: "#449EFF", // Primary Accent
-                    deep: "#1E3A8A", // Primary Base
+                    bright: "#449EFF",
+                    deep: "#1E3A8A",
                 },
                 success: {
                     DEFAULT: "#10b981",
                     foreground: "#ffffff",
                 },
                 destructive: {
-                    DEFAULT: "#EF4444", // hsl(var(--destructive)) replaced with hex
-                    foreground: "#ffffff", // hsl(var(--destructive-foreground)) replaced with hex
+                    DEFAULT: "#EF4444",
+                    foreground: "#ffffff",
                 },
                 popover: {
-                    DEFAULT: "#F8FAFC", // hsl(var(--popover)) replaced with hex
-                    foreground: "#1E293B", // hsl(var(--popover-foreground)) replaced with hex
+                    DEFAULT: "#F8FAFC",
+                    foreground: "#1E293B",
                 },
                 card: {
-                    DEFAULT: "#F8FAFC", // hsl(var(--card)) replaced with hex
-                    foreground: "#1E293B", // hsl(var(--card-foreground)) replaced with hex
+                    DEFAULT: "#F8FAFC",
+                    foreground: "#1E293B",
                 },
-                // Palette-specific colors
                 palette: {
                     "primary-accent": "#449EFF",
                     "primary-base": "#1E3A8A",
@@ -113,24 +114,17 @@ export default {
                     "accent-cyan": "#06B6D4",
                     "accent-navy": "#1E293B",
                 },
-                // Achievement card colors
                 achievement: {
-                    // Blue theme (like your current cards)
                     "blue-light": "#165A9A",
                     "blue-dark": "#104373",
-                    // Brown/Orange theme
                     "brown-light": "#913311",
                     "brown-dark": "#591E09",
-                    // Gray theme
                     "gray-light": "#646565",
                     "gray-dark": "#2E343C",
-                    // Green theme
                     "green-light": "#1E8646",
                     "green-dark": "#163522",
-                    // Purple theme
                     "purple-light": "#2C1B68",
                     "purple-dark": "#100A23",
-                    // Gold/Yellow theme
                     "gold-light": "#D17A09",
                     "gold-dark": "#512500",
                 },
@@ -182,20 +176,31 @@ export default {
                 float: "float 6s ease-in-out infinite",
                 "pulse-slow": "pulse-slow 4s ease-in-out infinite",
                 "gradient-x": "gradient-x 15s ease infinite",
-                float: "float 6s ease-in-out infinite",
-                "pulse-slow": "pulse-slow 4s ease-in-out infinite",
                 flip: "flip 0.7s ease-in-out",
                 "flip-back": "flip-back 0.7s ease-in-out",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+                "radial-center":
+                    "radial-gradient(ellipse at center, var(--tw-gradient-stops))",
+                "radial-blur-blue": `
+          radial-gradient(circle at center,
+            #2563EB 0%,
+            rgba(37, 99, 235, 0.5) 40%,
+            transparent 70%),
+          radial-gradient(circle at center,
+            #5D90FF 0%,
+            rgba(93, 144, 255, 0.5) 60%,
+            transparent 100%)
+        `,
                 "gradient-conic":
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
                 "mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #F59E0B 0px, transparent 50%), radial-gradient(at 0% 50%, #1E293B 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #F59E0B 0px, transparent 50%), radial-gradient(at 80% 100%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 0%, #1E3A8A 0px, transparent 50%)",
                 "blue-mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #1E3A8A 0px, transparent 50%), radial-gradient(at 0% 50%, #06B6D4 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #1E3A8A 0px, transparent 50%), radial-gradient(at 80% 100%, #06B6D4 0px, transparent 50%), radial-gradient(at 0% 0%, #1E293B 0px, transparent 50%)",
-                // Custom linear gradient: from #F59E0B (dark) to #FBBF24 (light), top to bottom
+                "avatar-selection":
+                    "radial-gradient(ellipse at center, #2563EB 0%, #1E3A8A 100%)",
                 "on-board-earn": "linear-gradient(to bottom, #F59E0B, #FBBF24)",
                 "on-board-progress":
                     "linear-gradient(to bottom, #4F46E5, #06B6D4)",
@@ -205,18 +210,57 @@ export default {
                     "linear-gradient(to bottom, #F6510C, #F5D70B)",
                 "hover-secondary":
                     "linear-gradient(to bottom, #D9440B, #E6C308)",
+                "select-avatar":
+                    "linear-gradient(to bottom, #F59E0B 0%, #FBBF24 100%)",
                 "avatar-1":
-                    "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)",
+                    "linear-gradient(to bottom, #FFA500 0%, #FFD588 100%)",
+                "avatar-2":
+                    "linear-gradient(to bottom, #FF657F 0%, #FFC0CB 100%)",
+                "avatar-3":
+                    "linear-gradient(to bottom, #EF362A 0%, #FF8780 100%)",
+                "avatar-4":
+                    "linear-gradient(to bottom, #A9A9A9 0%, #E8E8E8 100%)",
+                "avatar-5":
+                    "linear-gradient(to bottom, #1C8582 0%, #43FFFA 100%)",
+                "avatar-6":
+                    "linear-gradient(to bottom, #EF7436 0%, #FFA273 100%)",
             },
             dropShadow: {
+                "select-avatar": "0 6px 0 #CE8E21",
                 "on-board-earn": "0 4px 0 #C47E06",
                 "on-board-learn": "0 4px 0 #C1321F",
                 "on-board-progress": "0 4px 0 #1E18CB",
                 "on-welcome": "0 4px 0 #1E3A8A",
-                "select-avatar": "0 4px 0 #7A4305",
+                "avatar-1": "6px 4px 0 #FFA705",
+                "avatar-2": "6px 4px 0 #FF6D87",
+                "avatar-3": "6px 4px 0 #F0392D",
+                "avatar-4": "6px 4px 0 #928F8F",
+                "avatar-5": "6px 4px 0 #20908C",
+                "avatar-6": "6px 4px 0 #F07639",
             },
         },
     },
 
-    plugins: [],
+    plugins: [
+        plugin(function ({ matchUtilities, theme }) {
+            // Text outline with variable thickness
+            matchUtilities(
+                {
+                    "text-outline-custom": (value) => {
+                        return {
+                            textShadow: `
+                -1px -1px 0 ${value},
+                1px -1px 0 ${value},
+                -1px  1px 0 ${value},
+                1px  1px 0 ${value},
+                -1px  4px 0 ${value},   /* left bottom extended */
+                1px  4px 0 ${value},   /* right bottom extended */
+                0px  4px 0 ${value}    /* straight bottom */`,
+                        };
+                    },
+                },
+                { values: theme("colors"), type: "color" }
+            );
+        }),
+    ],
 };
