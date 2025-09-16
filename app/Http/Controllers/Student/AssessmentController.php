@@ -30,10 +30,21 @@ class AssessmentController extends Controller
         
         // Get student mastery data for all competencies
         $masteryData = [];
+        $incompleteSessionData = [];
         $competencies = ['Number_Algebra', 'Measurement_Geometry', 'Data_Probability'];
         
         foreach ($competencies as $competency) {
             $dbCompetency = strtolower(str_replace('_', '_', $competency));
+            
+            // Check for incomplete diagnostic session
+            $incompleteSession = DB::table('diagnostic_sessions')
+                ->where('user_id', $user->id)
+                ->where('competency', $dbCompetency)
+                ->where('status', '!=', 'completed')
+                ->orderBy('started_at', 'desc')
+                ->first();
+            
+            $incompleteSessionData[$competency] = $incompleteSession;
             
             $mastery = DB::table('student_mastery')
                 ->where('user_id', $user->id)
@@ -62,7 +73,8 @@ class AssessmentController extends Controller
         
         return view('student.assessments', [
             'student' => $student,
-            'masteryData' => $masteryData
+            'masteryData' => $masteryData,
+            'incompleteSessionData' => $incompleteSessionData
         ]);
     }
     
@@ -146,6 +158,57 @@ class AssessmentController extends Controller
         
         if ($mastery && $mastery->has_taken_diagnostic) {
             return redirect()->route('student.assessments.category', $category);
+        }
+        
+        // Check for incomplete diagnostic session first
+        $incompleteSession = DB::table('diagnostic_sessions')
+            ->where('user_id', $user->id)
+            ->where('competency', $dbCompetency)
+            ->where('status', '!=', 'completed')
+            ->orderBy('started_at', 'desc')
+            ->first();
+        
+        if ($incompleteSession) {
+            // Resume the incomplete diagnostic session
+            Log::info("Resuming incomplete diagnostic session", [
+                'session_id' => $incompleteSession->session_id,
+                'user_id' => $user->id,
+                'competency' => $dbCompetency,
+                'current_phase' => $incompleteSession->current_phase
+            ]);
+            
+            try {
+                // Get current questions for the incomplete session
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $command = "python \"{$scriptPath}\" resume_diagnostic {$user->id} {$dbCompetency} {$incompleteSession->session_id}";
+                
+                $output = shell_exec($command);
+                $result = json_decode($output, true);
+                
+                if ($result && $result['success']) {
+                    // Restore session variables
+                    session([
+                        'diagnostic_session_id' => $incompleteSession->session_id,
+                        'diagnostic_competency' => $category,
+                        'diagnostic_phase' => $result['phase'],
+                        'diagnostic_questions' => $result['questions'],
+                        'current_question_index' => $result['current_question_index'] ?? 0
+                    ]);
+                    
+                    return redirect()->route('student.quiz.show', $category)
+                        ->with('diagnostic_mode', true)
+                        ->with('resumed_session', true);
+                } else {
+                    // If resume fails, continue to start new diagnostic
+                    Log::warning("Failed to resume diagnostic session, starting new one", [
+                        'session_id' => $incompleteSession->session_id,
+                        'error' => $result['message'] ?? 'Unknown error'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to resume diagnostic session: ' . $e->getMessage());
+                // Continue to start new diagnostic if resume fails
+            }
         }
         
         try {

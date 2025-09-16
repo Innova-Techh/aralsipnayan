@@ -54,8 +54,18 @@
         
         <h3 class="font-bold 
                 text-sm sm:text-base md:text-md lg:text-md xl:text-xl mb-1 sm:mb-2">
-            🔬 Diagnostic Assessment
+            @if(session('resumed_session'))
+                � Diagnostic Assessment Resumed
+            @else
+                �🔬 Diagnostic Assessment
+            @endif
         </h3>
+        
+        @if(session('resumed_session'))
+            <p class="text-xs sm:text-sm md:text-base lg:text-lg">
+                Welcome back! You can continue from where you left off.
+            </p>
+        @endif
         
         <!-- Optional description -->
         <!--
