@@ -24,6 +24,8 @@ return new class extends Migration
         $table->enum('assessment_type', ['diagnostic', 'regular']);
         $table->enum('difficulty_level', ['beginner', 'intermediate', 'advanced']);
         $table->integer('total_questions');
+        $table->integer('time_limit')->default(30);
+
 
         // Assessment Status
         $table->enum('status', ['in_progress', 'completed', 'abandoned'])->default('in_progress');
@@ -39,14 +41,19 @@ return new class extends Migration
 
         // Calculated Scores (Filled After Completion)
         $table->decimal('accuracy_percentage', 5, 2)->nullable();
+        $table->decimal('accuracy_component', 5, 4)->nullable();
         $table->decimal('bkt_score_before', 5, 4)->nullable();
         $table->decimal('bkt_score_after', 5, 4)->nullable();
+        $table->decimal('bkt_final_score', 5, 4)->nullable();
+        $table->decimal('bkt_component', 5, 4)->nullable();
         $table->decimal('final_mastery_score', 5, 2)->nullable();
 
         // Time Tracking
         $table->integer('total_time_spent')->default(0); // Seconds spent in total
         $table->decimal('average_response_time', 8, 3)->nullable();
         $table->decimal('time_performance_score', 5, 4)->nullable();
+        $table->decimal('cumulative_time_score', 8, 4)->default(0.0000);
+        $table->decimal('average_time_factor', 5, 4)->nullable();
 
         // Session Management
         $table->timestamp('started_at')->useCurrent();

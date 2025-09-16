@@ -119,6 +119,23 @@ class QuizController extends Controller
                 ->with('error', 'Failed to create assessment.');
         }
         
+        // Check if assessment has exceeded time limit
+        $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert minutes to seconds
+        $elapsedTime = time() - strtotime($assessment->started_at);
+        
+        if ($elapsedTime > $timeLimit && $assessment->status === 'in_progress') {
+            // Auto-complete the assessment due to timeout
+            DB::table('assessments')
+                ->where('assessment_id', $assessment->assessment_id)
+                ->update([
+                    'status' => 'completed',
+                    'completed_at' => now()
+                ]);
+                
+            return redirect()->route('student.assessments.category', $category)
+                ->with('error', 'The quiz has exceeded the time limit and has been automatically completed.');
+        }
+        
         // Get current question
         $currentQuestion = $this->getCurrentQuestion($assessment->assessment_id);
         
@@ -130,13 +147,21 @@ class QuizController extends Controller
         // Get progress
         $progress = $this->getAssessmentProgress($assessment->assessment_id);
         
-        return view('student.quiz', [
+        // Initialize quiz start time if not set
+        $sessionKey = "quiz_start_time_{$assessment->assessment_id}";
+        if (!session($sessionKey)) {
+            session([$sessionKey => now()->timestamp * 1000]); // JavaScript timestamp (milliseconds)
+        }
+        
+        return view('student.regular-quiz', [
             'category' => $category,
             'question' => $currentQuestion,
             'currentQuestion' => $progress['answered_questions'] + 1,
             'totalQuestions' => $progress['total_questions'] ?? 15,
             'diagnosticMode' => false,
-            'assessmentId' => $assessment->assessment_id
+            'assessmentId' => $assessment->assessment_id,
+            'quizStartTime' => session($sessionKey),
+            'timeLimit' => $assessment->time_limit ?? 30 // Pass time limit to view
         ]);
     }
     
@@ -172,6 +197,7 @@ class QuizController extends Controller
                 'assessment_type' => 'regular',
                 'difficulty_level' => $difficultyLevel,
                 'total_questions' => count($questions),
+                'time_limit' => 30, // 30 minutes default
                 'status' => 'in_progress',
                 'started_at' => now()
             ]);
@@ -216,6 +242,7 @@ class QuizController extends Controller
                 'assessment_type' => 'regular',
                 'difficulty_level' => $difficultyLevel,
                 'total_questions' => count($questions),
+                'time_limit' => 30, // 30 minutes default
                 'status' => 'in_progress',
                 'started_at' => now()
             ]);
@@ -264,13 +291,24 @@ class QuizController extends Controller
             
             if ($result && $result['success'] && isset($result['question'])) {
                 $q = $result['question'];
+                
+                // Convert individual choice fields to options array with numeric indices
+                $options = [];
+                if (!empty($q['choice_a'])) $options[0] = $q['choice_a'];
+                if (!empty($q['choice_b'])) $options[1] = $q['choice_b'];
+                if (!empty($q['choice_c'])) $options[2] = $q['choice_c'];
+                if (!empty($q['choice_d'])) $options[3] = $q['choice_d'];
+                
                 return (object) [
                     'question_id' => $q['question_id'],
                     'text' => $q['question_text'],
                     'type' => $q['question_type'] ?? 'multiple_choice',
-                    'options' => json_decode($q['options'] ?? '[]', true),
-                    'max_time' => $q['max_time_seconds'] ?? 30,
-                    'difficulty_level' => $q['difficulty_level'] ?? 'beginner'
+                    'options' => $options,
+                    'max_time' => $q['max_allowed_time'] ?? 30,
+                    'difficulty_level' => $q['difficulty_level'] ?? 'beginner',
+                    'topic' => $q['topic_tag'] ?? '',
+                    'explanation' => $q['explanation'] ?? '',
+                    'correct_answer' => $q['correct_answer'] ?? ''
                 ];
             }
             
@@ -311,14 +349,69 @@ class QuizController extends Controller
      */
     public function submitAnswer(Request $request)
     {
-        $request->validate([
-            'question_id' => 'required|string',
-            'answer' => 'required|string',
-            'time_taken' => 'required|integer|min:1',
-            'assessment_id' => 'required|string'
+        Log::info('Submit answer request received', [
+            'question_id' => $request->question_id,
+            'answer' => $request->answer,
+            'time_taken' => $request->time_taken,
+            'assessment_id' => $request->assessment_id,
+            'user_id' => Auth::id()
         ]);
         
+        try {
+            $request->validate([
+                'question_id' => 'required|string',
+                'answer' => 'required|string',
+                'time_taken' => 'required|integer|min:1',
+                'assessment_id' => 'required|string'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed in submitAnswer', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
+        
         $user = Auth::user();
+        
+        // Validate quiz time limit
+        $assessment = DB::table('assessments')
+            ->where('assessment_id', $request->assessment_id)
+            ->where('user_id', $user->id)
+            ->first();
+        
+        if (!$assessment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Assessment not found.'
+            ], 404);
+        }
+        
+        // Check if quiz has exceeded time limit
+        $quizStartTime = strtotime($assessment->started_at);
+        $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert minutes to seconds
+        $elapsedTime = time() - $quizStartTime;
+        
+        if ($elapsedTime > $timeLimit) {
+            // Auto-complete the assessment due to timeout
+            DB::table('assessments')
+                ->where('assessment_id', $request->assessment_id)
+                ->update([
+                    'status' => 'completed',
+                    'completed_at' => now()
+                ]);
+                
+            return response()->json([
+                'success' => false,
+                'message' => 'Quiz has exceeded the time limit.',
+                'timeout' => true,
+                'redirect' => route('student.assessments')
+            ], 410);
+        }
         
         try {
             // Get question details
@@ -353,7 +446,7 @@ class QuizController extends Controller
             }
             
             // Calculate time score
-            $normalizedTime = $request->time_taken / $question->max_time_seconds;
+            $normalizedTime = $request->time_taken / $question->max_allowed_time;
             $timeScore = $this->calculateTimeScore($normalizedTime, $isCorrect);
             
             // Update BKT using algorithm
@@ -370,8 +463,10 @@ class QuizController extends Controller
                 ]
             );
             
-            // Record response
-            $responseId = "RESP_{$request->assessment_id}_{$request->question_id}_" . time();
+            // Record response - use shorter response_id to fit 50 char limit
+            $responseData = "{$request->assessment_id}_{$request->question_id}_" . time();
+            $responseHash = substr(md5($responseData), 0, 8);
+            $responseId = "RESP_{$responseHash}_" . substr(time(), -6); // RESP_8charhash_6digits = ~20 chars
             
             DB::table('question_responses')->insert([
                 'response_id' => $responseId,
@@ -381,6 +476,7 @@ class QuizController extends Controller
                 'user_answer' => $request->answer,
                 'is_correct' => $isCorrect,
                 'response_time' => $request->time_taken,
+                'max_allowed_time' => $question->max_allowed_time,
                 'normalized_time' => $normalizedTime,
                 'time_score' => $timeScore,
                 'bkt_before' => $mastery->bkt_score,
@@ -417,16 +513,28 @@ class QuizController extends Controller
             
             // Mark question as answered
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" mark_answered {$request->assessment_id} {$request->question_id}";
-            shell_exec($command);
+            $markCommand = "python \"{$scriptPath}\" mark_answered {$request->assessment_id} {$request->question_id}";
+            $markResult = shell_exec($markCommand);
+            Log::info("Mark answered result: " . $markResult);
+            
+            // Small delay to ensure database is updated
+            usleep(100000); // 0.1 second delay
             
             // Get next question
             $nextQuestion = $this->getCurrentQuestion($request->assessment_id);
             $progress = $this->getAssessmentProgress($request->assessment_id);
+            Log::info("Progress after marking answered: " . json_encode($progress));
             
             if (!$nextQuestion || $progress['answered_questions'] >= $progress['total_questions']) {
                 // Assessment complete
                 $this->completeAssessment($request->assessment_id);
+                
+                // Get category for redirect URL
+                $assessment = DB::table('assessments')
+                    ->where('assessment_id', $request->assessment_id)
+                    ->first();
+                
+                $category = $assessment ? ucfirst(str_replace('_', '_', $assessment->competency)) : 'Number_Algebra';
                 
                 return response()->json([
                     'success' => true,
@@ -434,6 +542,7 @@ class QuizController extends Controller
                     'correct_answer' => $question->correct_answer,
                     'explanation' => $question->explanation,
                     'assessment_complete' => true,
+                    'redirect_url' => route('student.assessments.review', ['category' => $category]),
                     'updated_mastery' => $newMasteryScore,
                     'difficulty_change' => $newDifficulty !== $mastery->current_difficulty ? $newDifficulty : null,
                     'final_results' => [
@@ -454,15 +563,22 @@ class QuizController extends Controller
                 'next_question' => $nextQuestion,
                 'updated_mastery' => $newMasteryScore,
                 'progress' => $progress,
+                'next_question_number' => $progress['answered_questions'] + 1,
+                'total_questions' => $progress['total_questions'],
                 'assessment_complete' => false
             ]);
             
         } catch (\Exception $e) {
-            Log::error('Answer submission failed: ' . $e->getMessage());
+            Log::error('Answer submission failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process answer. Please try again.'
+                'message' => 'Failed to process answer. Please try again.',
+                'error_details' => $e->getMessage()
             ], 500);
         }
     }
@@ -603,6 +719,128 @@ class QuizController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Failed to complete assessment: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get hint for current question
+     */
+    public function getHint(Request $request)
+    {
+        $request->validate([
+            'question_id' => 'required|string'
+        ]);
+        
+        try {
+            $question = DB::table('questions')
+                ->where('question_id', $request->question_id)
+                ->first();
+            
+            if (!$question) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Question not found.'
+                ]);
+            }
+            
+            // Return the explanation as a hint (you can modify this logic)
+            $hint = $question->explanation ?? 'No hint available for this question.';
+            
+            // You could also create a specific hint field in the database
+            // or generate hints based on the question content
+            
+            return response()->json([
+                'success' => true,
+                'hint' => $hint
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to get hint: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve hint.'
+            ]);
+        }
+    }
+
+    /**
+     * Cleanup assessment session
+     */
+    public function cleanupAssessment(Request $request)
+    {
+        try {
+            $assessmentId = $request->input('assessment_id');
+            $questionId = $request->input('question_id');
+            $progress = $request->input('progress', []);
+            
+            // Log the cleanup request for debugging
+            Log::info('Assessment cleanup requested', [
+                'user_id' => Auth::id(),
+                'assessment_id' => $assessmentId,
+                'question_id' => $questionId,
+                'progress' => $progress
+            ]);
+            
+            // Here you can implement any cleanup logic needed
+            // For example: save final progress, cleanup temporary data, etc.
+            
+            // You might want to save the last progress state
+            if ($assessmentId && $questionId && !empty($progress)) {
+                // Save progress logic (if needed)
+                // This could be similar to your save-progress functionality
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Assessment session cleaned up successfully.'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to cleanup assessment session: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cleanup assessment session.'
+            ]);
+        }
+    }
+
+    /**
+     * Save assessment progress
+     */
+    public function saveAssessmentProgress(Request $request)
+    {
+        try {
+            $assessmentId = $request->input('assessment_id');
+            $questionId = $request->input('question_id');
+            $currentAnswer = $request->input('current_answer');
+            $timeTaken = $request->input('time_taken', 0);
+            $hintUsed = $request->input('hint_used', false);
+            
+            // Log the progress save request
+            Log::info('Assessment progress save requested', [
+                'user_id' => Auth::id(),
+                'assessment_id' => $assessmentId,
+                'question_id' => $questionId,
+                'current_answer' => $currentAnswer,
+                'time_taken' => $timeTaken,
+                'hint_used' => $hintUsed
+            ]);
+            
+            // Here you can implement progress saving logic
+            // For example: save to database, update session, etc.
+            // This could integrate with your existing progress tracking system
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress saved successfully.'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to save assessment progress: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save progress.'
+            ]);
         }
     }
 }

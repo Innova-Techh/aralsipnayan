@@ -78,6 +78,9 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     // Assessment category routes
     Route::get('/assessments/{category}', [AssessmentController::class, 'showCategory'])->name('assessments.category');
     
+    // Assessment refresh route
+    Route::post('/assessments/{category}/refresh', [AssessmentController::class, 'refreshAssessments'])->name('assessments.refresh');
+    
     // Assessment complete page
     Route::get('/assessments/complete/{category}', [AssessmentController::class, 'showComplete'])->name('assessments.complete');
     
@@ -98,6 +101,9 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         // Submit regular assessment answer
         Route::post('/submit', [StudentQuizController::class, 'submitAnswer'])->name('submit');
         
+        // Get hint for current question
+        Route::post('/hint', [StudentQuizController::class, 'getHint'])->name('hint');
+        
         // Save quiz progress
         Route::post('/save-progress', [AssessmentController::class, 'saveProgress'])->name('save-progress');
         
@@ -109,6 +115,12 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         
         // Clear diagnostic session
         Route::post('/clear-diagnostic', [AssessmentController::class, 'clearDiagnosticSession'])->name('clear-diagnostic');
+        
+        // Assessment session cleanup
+        Route::post('/assessment/cleanup', [StudentQuizController::class, 'cleanupAssessment'])->name('assessment.cleanup');
+        
+        // Assessment progress saving
+        Route::post('/assessment/save-progress', [StudentQuizController::class, 'saveAssessmentProgress'])->name('assessment.save-progress');
     });
 });
 

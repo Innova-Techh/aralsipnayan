@@ -79,12 +79,66 @@ class FisherYatesShuffle:
         try:
             cursor = conn.cursor()
             
+            # First, ensure assessment record exists
+            # Extract details from assessment_id format: ASSESS_{userId}_{competency}_{difficulty}_{i}_{timestamp}
+            parts = assessment_id.split('_')
+            if len(parts) >= 5:
+                user_id = int(parts[1])
+                
+                # Handle competency that might contain underscores (like "number_algebra")
+                # Format: ASSESS_1_number_algebra_beginner_2_1757999999
+                # parts = ['ASSESS', '1', 'number', 'algebra', 'beginner', '2', '1757999999']
+                if len(parts) >= 7:  # Has multiple parts including underscore in competency
+                    competency = f"{parts[2]}_{parts[3]}"  # "number_algebra"
+                    difficulty = parts[4]  # "beginner"
+                else:  # len(parts) >= 5, simple competency without underscore
+                    competency = parts[2]
+                    difficulty = parts[3]
+                
+                # Check if assessment record exists, if not create it
+                cursor.execute("SELECT assessment_id FROM assessments WHERE assessment_id = %s", (assessment_id,))
+                if not cursor.fetchone():
+                    try:
+                        cursor.execute("""
+                            INSERT INTO assessments 
+                            (assessment_id, user_id, competency, assessment_type, difficulty_level, 
+                             total_questions, status, is_diagnostic_phase, correct_answers, 
+                             incorrect_answers, questions_answered, total_time_spent, 
+                             cumulative_time_score)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """, (
+                            assessment_id, 
+                            user_id, 
+                            competency, 
+                            'regular',
+                            difficulty, 
+                            len(questions),
+                            'in_progress',
+                            0,  # is_diagnostic_phase
+                            0,  # correct_answers
+                            0,  # incorrect_answers
+                            0,  # questions_answered
+                            0,  # total_time_spent
+                            0.0000  # cumulative_time_score
+                        ))
+                    except mysql.connector.IntegrityError as e:
+                        # Assessment might already exist, that's okay
+                        if "Duplicate entry" not in str(e):
+                            raise
+            
             # Shuffle questions first
             shuffled_questions = self.shuffle_questions_for_assessment(questions)
             
+            # Clean up any existing questions for this assessment first
+            cursor.execute("DELETE FROM assessment_questions WHERE assessment_id = %s", (assessment_id,))
+            
             # Insert shuffled questions into assessment_questions table
             for question in shuffled_questions:
-                pool_id = f"POOL_{assessment_id}_{question['question_id']}_{int(datetime.now().timestamp())}"
+                # Create unique pool_id using hash to keep it under 50 characters
+                import hashlib
+                combined = f"{assessment_id}_{question['question_id']}"
+                hash_suffix = hashlib.md5(combined.encode()).hexdigest()[:8]
+                pool_id = f"POOL_{hash_suffix}_{question['question_order']:03d}"
                 
                 cursor.execute("""
                     INSERT INTO assessment_questions 
@@ -110,7 +164,11 @@ class FisherYatesShuffle:
         except mysql.connector.Error as e:
             conn.rollback()
             print(f"ERROR: Failed to create assessment pool: {e}", file=sys.stderr)
-            return {'success': False, 'message': 'Failed to create assessment pool'}
+            return {'success': False, 'message': f'Failed to create assessment pool: {str(e)}'}
+        except Exception as e:
+            conn.rollback()
+            print(f"ERROR: Unexpected error: {e}", file=sys.stderr)
+            return {'success': False, 'message': f'Unexpected error: {str(e)}'}
         finally:
             conn.close()
 
@@ -127,9 +185,9 @@ class FisherYatesShuffle:
             
             # Get current question or next unanswered question
             cursor.execute("""
-                SELECT aq.*, q.question_text, q.question_type, q.options, 
-                       q.correct_answer, q.difficulty_level, q.max_time_seconds,
-                       q.topic, q.explanation
+                SELECT aq.*, q.question_text, q.question_type, q.choice_a, q.choice_b, 
+                       q.choice_c, q.choice_d, q.correct_answer, q.difficulty_level, 
+                       q.max_allowed_time, q.topic_tag, q.explanation
                 FROM assessment_questions aq
                 JOIN questions q ON aq.question_id = q.question_id
                 WHERE aq.assessment_id = %s 
@@ -157,6 +215,12 @@ class FisherYatesShuffle:
             """, (question['pool_id'],))
             
             conn.commit()
+            
+            # Convert datetime objects to strings for JSON serialization
+            if question:
+                for key, value in question.items():
+                    if hasattr(value, 'strftime'):  # datetime object
+                        question[key] = value.strftime('%Y-%m-%d %H:%M:%S')
             
             return {
                 'success': True,
@@ -255,8 +319,35 @@ def main():
             else:
                 assessment_id = sys.argv[2]
                 questions_json = sys.argv[3]
-                questions = json.loads(questions_json)
-                result = shuffle.create_assessment_pool(assessment_id, questions)
+                try:
+                    questions = json.loads(questions_json)
+                    result = shuffle.create_assessment_pool(assessment_id, questions)
+                except json.JSONDecodeError as e:
+                    result = {'success': False, 'message': f'Invalid JSON: {str(e)}'}
+                except Exception as e:
+                    result = {'success': False, 'message': f'Error processing questions: {str(e)}'}
+            
+        elif action == 'create_pool_file':
+            if len(sys.argv) < 4:
+                result = {'success': False, 'message': 'Missing parameters: assessment_id and file_path'}
+            else:
+                assessment_id = sys.argv[2]
+                file_path = sys.argv[3]
+                try:
+                    # Try UTF-8 first, then UTF-16 for Windows compatibility
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            questions = json.load(f)
+                    except UnicodeDecodeError:
+                        with open(file_path, 'r', encoding='utf-16') as f:
+                            questions = json.load(f)
+                    result = shuffle.create_assessment_pool(assessment_id, questions)
+                except FileNotFoundError:
+                    result = {'success': False, 'message': 'Questions file not found'}
+                except json.JSONDecodeError as e:
+                    result = {'success': False, 'message': f'Invalid JSON in file: {str(e)}'}
+                except Exception as e:
+                    result = {'success': False, 'message': f'Error processing questions file: {str(e)}'}
             
         elif action == 'next_question':
             if len(sys.argv) < 3:

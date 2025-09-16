@@ -83,6 +83,8 @@ class AssessmentController extends Controller
      */
     public function showCategory($category)
     {
+        Log::info("showCategory method called", ['category' => $category]);
+        
         $user = Auth::user();
         $student = $user->studentProfile;
         
@@ -98,7 +100,7 @@ class AssessmentController extends Controller
         }
         
         // Convert to database format
-        $dbCompetency = strtolower(str_replace('_', '_', $category));
+        $dbCompetency = strtolower($category);
         
         // Get mastery data for this category
         $mastery = DB::table('student_mastery')
@@ -115,22 +117,18 @@ class AssessmentController extends Controller
         // Get category display data
         $categoryData = $this->getCategoryDisplayData($category);
         
-        // Get available assessment options
-        $availableQuestions = 15; // Default, will be calculated from available questions
-        $questionsInCooldown = 0; // Default, will be calculated from cooldown questions
-        $assessmentOptions = []; // Default empty array
-        
-        // You can add logic here to calculate actual available questions
-        // For now, providing default values to prevent the error
+        // Generate dynamic assessments based on current mastery level
+        $currentDifficulty = $mastery->current_difficulty;
+        $assessmentData = $this->generateAssessments($dbCompetency, $currentDifficulty, $user->id);
         
         return view('student.assessment-list', [
             'student' => $student,
             'category' => $category,
             'mastery' => $mastery,
             'data' => $categoryData,
-            'availableQuestions' => $availableQuestions,
-            'questionsInCooldown' => $questionsInCooldown,
-            'assessmentOptions' => $assessmentOptions
+            'availableQuestions' => $assessmentData['availableQuestions'],
+            'questionsInCooldown' => $assessmentData['questionsInCooldown'],
+            'assessmentOptions' => $assessmentData['assessmentOptions']
         ]);
     }
     
@@ -505,6 +503,321 @@ class AssessmentController extends Controller
     }
 
     /**
+     * Generate dynamic assessments based on student's mastery level
+     */
+    private function generateAssessments($competency, $currentDifficulty, $userId)
+    {
+        try {
+            // Define question counts per difficulty
+            $questionCounts = [
+                'beginner' => 15,
+                'intermediate' => 20,
+                'advanced' => 25
+            ];
+            
+            $questionsPerAssessment = $questionCounts[$currentDifficulty];
+            
+            // Get available questions for current difficulty
+            $availableQuestions = DB::table('questions')
+                ->where('competency', $competency)
+                ->where('difficulty_level', $currentDifficulty)
+                ->where('is_active', 1)
+                ->get();
+            
+            if ($availableQuestions->count() < $questionsPerAssessment) {
+                return [
+                    'availableQuestions' => 0,
+                    'questionsInCooldown' => 0,
+                    'assessmentOptions' => []
+                ];
+            }
+            
+            // Filter out questions in cooldown (recently answered)
+            $questionsNotInCooldown = $this->filterQuestionsInCooldown($availableQuestions, $userId);
+            $questionsInCooldown = $availableQuestions->count() - $questionsNotInCooldown->count();
+            
+            // Generate multiple assessment options if we have enough questions
+            $assessmentOptions = [];
+            // Calculate how many full assessments we can create with available questions
+            // Allow up to 10 assessments maximum to keep UI manageable
+            $maxAssessments = 10;
+            $possibleAssessments = floor($questionsNotInCooldown->count() / $questionsPerAssessment);
+            $assessmentCount = min($maxAssessments, $possibleAssessments);
+            
+            // Convert collection to array and shuffle it to ensure unique question sets
+            $availableQuestionsArray = $questionsNotInCooldown->shuffle()->toArray();
+            $questionsUsed = 0;
+            
+            // Convert collection to array and shuffle it to ensure unique question sets
+            $availableQuestionsArray = $questionsNotInCooldown->shuffle()->toArray();
+            $questionsUsed = 0;
+            
+            for ($i = 1; $i <= $assessmentCount; $i++) {
+                // Create unique assessment ID
+                $assessmentId = "ASSESS_{$userId}_{$competency}_{$currentDifficulty}_{$i}_" . time();
+                
+                // Get next batch of questions (no overlap between assessments)
+                $questionsForThisAssessment = array_slice(
+                    $availableQuestionsArray, 
+                    $questionsUsed, 
+                    $questionsPerAssessment
+                );
+                $questionsUsed += $questionsPerAssessment;
+                
+                // Convert array elements back to objects for the Fisher-Yates function
+                $questionsAsObjects = array_map(function($questionArray) {
+                    return (object) $questionArray;
+                }, $questionsForThisAssessment);
+                
+                // Shuffle questions using Fisher-Yates algorithm
+                $shuffledQuestions = $this->shuffleQuestionsWithFisherYates(
+                    $questionsAsObjects,
+                    $assessmentId
+                );
+                
+                if ($shuffledQuestions['success']) {
+                    $assessmentOptions[] = [
+                        'assessment_id' => $assessmentId,
+                        'title' => ucfirst($currentDifficulty) . " Assessment #$i",
+                        'question_count' => $questionsPerAssessment,
+                        'time_limit' => $this->getTimeLimitForDifficulty($currentDifficulty),
+                        'difficulty' => $currentDifficulty,
+                        'topics' => $this->getTopicsForCompetency($competency, $currentDifficulty),
+                        'estimated_points' => $questionsPerAssessment * 10, // Add estimated points
+                        'best_completion_time' => 'Not attempted', // Add completion time
+                        'created_at' => now()
+                    ];
+                }
+            }
+            
+            return [
+                'availableQuestions' => $questionsNotInCooldown->count(),
+                'questionsInCooldown' => $questionsInCooldown,
+                'assessmentOptions' => $assessmentOptions
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('Assessment generation failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return [
+                'availableQuestions' => 0,
+                'questionsInCooldown' => 0,
+                'assessmentOptions' => []
+            ];
+        }
+    }
+
+    /**
+     * Filter out questions that are in cooldown period
+     */
+    private function filterQuestionsInCooldown($questions, $userId)
+    {
+        // Get questions in cooldown from question_cooldowns table
+        $questionsInCooldown = DB::table('question_cooldowns')
+            ->where('user_id', $userId)
+            ->where('cooldown_until', '>', now())
+            ->pluck('question_id')
+            ->toArray();
+        
+        // If no cooldown table entries, fall back to question_responses with time-based cooldown
+        // IMPORTANT: Only include assessment responses, NOT diagnostic responses
+        if (empty($questionsInCooldown)) {
+            // Get questions answered correctly (30 min cooldown)
+            $correctAnswers = DB::table('question_responses')
+                ->where('user_id', $userId)
+                ->where('assessment_id', 'NOT LIKE', 'DIAG%') // Exclude diagnostic questions
+                ->where('assessment_id', 'LIKE', 'ASSESS%') // Only include assessment questions
+                ->where('is_correct', 1)
+                ->where('answered_at', '>=', now()->subMinutes($this->getCorrectAnswerCooldown()))
+                ->pluck('question_id')
+                ->toArray();
+            
+            // Get questions answered incorrectly (60 min cooldown)
+            $incorrectAnswers = DB::table('question_responses')
+                ->where('user_id', $userId)
+                ->where('assessment_id', 'NOT LIKE', 'DIAG%') // Exclude diagnostic questions
+                ->where('assessment_id', 'LIKE', 'ASSESS%') // Only include assessment questions
+                ->where('is_correct', 0)
+                ->where('answered_at', '>=', now()->subMinutes($this->getIncorrectAnswerCooldown()))
+                ->pluck('question_id')
+                ->toArray();
+            
+            $questionsInCooldown = array_merge($correctAnswers, $incorrectAnswers);
+        }
+        
+        // Filter out questions in cooldown
+        return $questions->filter(function($question) use ($questionsInCooldown) {
+            return !in_array($question->question_id, $questionsInCooldown);
+        });
+    }
+
+    /**
+     * Shuffle questions using Fisher-Yates algorithm
+     */
+    private function shuffleQuestionsWithFisherYates($questions, $assessmentId)
+    {
+        try {
+            // Prepare questions data for Fisher-Yates algorithm
+            $questionsData = array_map(function($question) {
+                return [
+                    'question_id' => $question->question_id,
+                    'question_text' => $question->question_text,
+                    'question_type' => $question->question_type,
+                    'correct_answer' => $question->correct_answer,
+                    'difficulty_level' => $question->difficulty_level,
+                    'max_time_seconds' => $question->max_allowed_time ?? 30,
+                    'topic' => $question->topic_tag ?? 'General'
+                ];
+            }, $questions);
+            
+            // Call Fisher-Yates Python script using temporary file to avoid JSON escaping issues
+            $scriptPath = base_path('public/algorithm/fisher_yates.py');
+            $tempFile = storage_path('temp_questions_' . uniqid() . '.json');
+            
+            // Write questions data to temporary file
+            file_put_contents($tempFile, json_encode($questionsData));
+            
+            $command = "python \"{$scriptPath}\" create_pool_file \"{$assessmentId}\" \"{$tempFile}\"";
+            
+            $output = shell_exec($command);
+            
+            // Clean up temporary file
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+            $result = json_decode($output, true);
+            
+            if ($result && $result['success']) {
+                return $result;
+            } else {
+                Log::error('Fisher-Yates shuffle failed: ' . ($result['message'] ?? 'Unknown error'));
+                return ['success' => false, 'message' => 'Shuffle failed'];
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Fisher-Yates shuffle error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Shuffle error'];
+        }
+    }
+
+    /**
+     * Refresh assessments by checking what questions are available after cooldown
+     */
+    public function refreshAssessments($category)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+        
+        // Convert URL format to database format
+        $dbSubject = strtolower($category);
+        
+        // Get user's mastery level for this subject
+        $mastery = DB::table('student_mastery')
+            ->where('user_id', $userId)
+            ->where('competency', $dbSubject)
+            ->first();
+        
+        if (!$mastery || !$mastery->has_taken_diagnostic) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please complete the diagnostic test first.'
+            ]);
+        }
+        
+        // Generate fresh assessments
+        $assessmentData = $this->generateAssessments($dbSubject, $mastery->current_difficulty, $userId);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $assessmentData,
+            'message' => 'Assessments refreshed successfully'
+        ]);
+    }
+
+    /**
+     * Check if enough questions are available for assessment generation
+     */
+    private function checkAvailableQuestionsForDifficulty($competency, $difficulty, $userId)
+    {
+        $questionCounts = [
+            'beginner' => 15,
+            'intermediate' => 20,
+            'advanced' => 25
+        ];
+        
+        $required = $questionCounts[$difficulty];
+        
+        // Get all questions for this difficulty
+        $allQuestions = DB::table('questions')
+            ->where('competency', $competency)
+            ->where('difficulty_level', $difficulty)
+            ->where('is_active', 1)
+            ->get();
+        
+        // Filter out questions in cooldown
+        $availableQuestions = $this->filterQuestionsInCooldown($allQuestions, $userId);
+        
+        return [
+            'available' => $availableQuestions->count(),
+            'required' => $required,
+            'can_generate' => $availableQuestions->count() >= $required,
+            'in_cooldown' => $allQuestions->count() - $availableQuestions->count()
+        ];
+    }
+
+    /**
+     * Get cooldown time for correct answers (in minutes)
+     * Can be easily modified here to change cooldown behavior
+     */
+    private function getCorrectAnswerCooldown()
+    {
+        return 30; // 30 minutes for correct answers
+    }
+
+    /**
+     * Get cooldown time for incorrect answers (in minutes)
+     * Can be easily modified here to change cooldown behavior
+     */
+    private function getIncorrectAnswerCooldown()
+    {
+        return 60; // 60 minutes for incorrect answers
+    }
+
+    /**
+     * Get time limit based on difficulty
+     */
+    private function getTimeLimitForDifficulty($difficulty)
+    {
+        $timeLimits = [
+            'beginner' => 25,      // 25 minutes for 15 questions
+            'intermediate' => 35,   // 35 minutes for 20 questions  
+            'advanced' => 45        // 45 minutes for 25 questions
+        ];
+        
+        return $timeLimits[$difficulty] ?? 30;
+    }
+
+    /**
+     * Get topics covered for a competency and difficulty
+     */
+    private function getTopicsForCompetency($competency, $difficulty)
+    {
+        // Get unique topics for this competency and difficulty
+        $topics = DB::table('questions')
+            ->where('competency', $competency)
+            ->where('difficulty_level', $difficulty)
+            ->where('is_active', 1)
+            ->distinct()
+            ->pluck('topic_tag')
+            ->filter()
+            ->take(3) // Show max 3 topics
+            ->toArray();
+            
+        return $topics ?: ['General Mathematics'];
+    }
+
+    /**
      * Show assessment review page
      */
     public function showReview($category)
@@ -520,22 +833,38 @@ class AssessmentController extends Controller
         // Convert to database format
         $dbCompetency = strtolower(str_replace('_', '_', $category));
         
-        // Get the most recent diagnostic session for this user and competency
-        $diagnosticSession = DB::table('diagnostic_sessions')
+        // Get the most recent completed assessment for this user and competency
+        $latestAssessment = DB::table('assessments')
             ->where('user_id', $user->id)
             ->where('competency', $dbCompetency)
-            ->orderBy('started_at', 'desc')
+            ->where('status', 'completed')
+            ->orderBy('completed_at', 'desc')
             ->first();
         
-        if (!$diagnosticSession) {
-            return redirect()->route('student.assessments.category', $category)
-                ->with('error', 'No assessment found to review.');
+        // If no regular assessment found, check for diagnostic session
+        if (!$latestAssessment) {
+            $diagnosticSession = DB::table('diagnostic_sessions')
+                ->where('user_id', $user->id)
+                ->where('competency', $dbCompetency)
+                ->orderBy('started_at', 'desc')
+                ->first();
+            
+            if ($diagnosticSession) {
+                $assessmentId = $diagnosticSession->session_id;
+                $assessmentType = 'diagnostic';
+            } else {
+                return redirect()->route('student.assessments.category', $category)
+                    ->with('error', 'No assessment found to review.');
+            }
+        } else {
+            $assessmentId = $latestAssessment->assessment_id;
+            $assessmentType = $latestAssessment->assessment_type ?? 'regular';
         }
         
         // Get detailed question responses with question data
         $questionResponses = DB::table('question_responses')
             ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
-            ->where('question_responses.assessment_id', $diagnosticSession->session_id)
+            ->where('question_responses.assessment_id', $assessmentId)
             ->select([
                 'question_responses.*',
                 'questions.question_text',
@@ -566,7 +895,9 @@ class AssessmentController extends Controller
             'totalQuestions' => $totalQuestions,
             'correctAnswers' => $correctAnswers,
             'scorePercentage' => $scorePercentage,
-            'questionsByDifficulty' => $questionsByDifficulty
+            'questionsByDifficulty' => $questionsByDifficulty,
+            'assessmentType' => $assessmentType,
+            'assessmentData' => $latestAssessment
         ]);
     }
     
