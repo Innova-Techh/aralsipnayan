@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Student\AssessmentGenerationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 class AssessmentController extends Controller
 {
+    protected $assessmentGenerator;
+
+    public function __construct()
+    {
+        $this->assessmentGenerator = new AssessmentGenerationController();
+    }
+
     /**
      * Show assessments page
      */
@@ -119,7 +127,7 @@ class AssessmentController extends Controller
         
         // Generate dynamic assessments based on current mastery level
         $currentDifficulty = $mastery->current_difficulty;
-        $assessmentData = $this->generateAssessments($dbCompetency, $currentDifficulty, $user->id);
+        $assessmentData = $this->assessmentGenerator->generateAssessments($dbCompetency, $currentDifficulty, $user->id);
         
         return view('student.assessment-list', [
             'student' => $student,
@@ -726,7 +734,7 @@ class AssessmentController extends Controller
         }
         
         // Generate fresh assessments
-        $assessmentData = $this->generateAssessments($dbSubject, $mastery->current_difficulty, $userId);
+        $assessmentData = $this->assessmentGenerator->generateAssessments($dbSubject, $mastery->current_difficulty, $userId);
         
         return response()->json([
             'success' => true,

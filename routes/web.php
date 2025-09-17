@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\OnboardingController;
 use App\Http\Controllers\Student\AssessmentController;
 use App\Http\Controllers\Student\QuizController as StudentQuizController;
+use App\Http\Controllers\Student\RegularAssessmentController;
 use App\Http\Controllers\AdminAuthController;
 
 // Homepage
@@ -89,6 +90,9 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     
     // Quiz routes
     Route::prefix('quiz')->name('quiz.')->group(function () {
+        // Start regular assessment
+        Route::post('/start-assessment', [RegularAssessmentController::class, 'startAssessment'])->name('start-assessment');
+        
         // Start diagnostic for a category
         Route::get('/diagnostic/{category}', [AssessmentController::class, 'startDiagnostic'])->name('diagnostic');
         

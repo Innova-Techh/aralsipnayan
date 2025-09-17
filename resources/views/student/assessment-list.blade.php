@@ -364,14 +364,43 @@ function closeAssessmentModal() {
     selectedAssessmentIndex = null;
 }
 
+// Start assessment function
 function startAssessment(assessmentId) {
     // Show loading state
     const startBtn = document.getElementById('modal-start-btn');
+    const originalText = startBtn.textContent;
     startBtn.disabled = true;
     startBtn.textContent = 'Starting...';
     
-    // Redirect to quiz
-    window.location.href = `{{ route('student.quiz.show', $category) }}?assessment_id=${assessmentId}`;
+    // Create the assessment when user clicks start (not during page load)
+    fetch('{{ route("student.quiz.start-assessment") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            assessment_id: assessmentId,
+            category: '{{ $category }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to quiz interface
+            window.location.href = data.redirect;
+        } else {
+            alert(data.message || 'Failed to start assessment. Please try again.');
+            startBtn.disabled = false;
+            startBtn.textContent = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error starting assessment:', error);
+        alert('Failed to start assessment. Please try again.');
+        startBtn.disabled = false;
+        startBtn.textContent = originalText;
+    });
 }
 
 // Close modal when clicking outside

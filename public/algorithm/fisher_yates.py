@@ -61,6 +61,7 @@ class EnhancedFisherYatesShuffle:
     def get_questions_in_cooldown(self, user_id, competency):
         """
         Get list of question IDs that are currently in cooldown for the user
+        FIXED: Properly check question_cooldowns table first
         """
         conn = self.connect_db()
         if not conn:
@@ -69,23 +70,29 @@ class EnhancedFisherYatesShuffle:
         try:
             cursor = conn.cursor()
             
-            # Check question_cooldowns table first (primary source)
+            # PRIMARY: Check question_cooldowns table first (most accurate)
             cursor.execute("""
-                SELECT DISTINCT question_id
+                SELECT DISTINCT question_id, cooldown_until, was_correct
                 FROM question_cooldowns 
                 WHERE user_id = %s 
                 AND competency = %s
                 AND is_active = TRUE
                 AND cooldown_until > NOW()
+                ORDER BY cooldown_until DESC
             """, (user_id, competency))
             
-            cooldown_questions = [row[0] for row in cursor.fetchall()]
+            cooldown_data = cursor.fetchall()
+            cooldown_questions = [row[0] for row in cooldown_data]
             
-            # If no cooldown table entries, fall back to question_responses
+            print(f"DEBUG: Found {len(cooldown_questions)} questions in cooldown table for user {user_id}, competency {competency}", file=sys.stderr)
+            
+            # SECONDARY: If no cooldown table entries, fall back to question_responses analysis
             if not cooldown_questions:
+                print(f"DEBUG: No cooldown table entries found, checking question_responses fallback", file=sys.stderr)
+                
                 # Get questions answered correctly within 30 minutes (excluding diagnostic)
                 cursor.execute("""
-                    SELECT DISTINCT question_id
+                    SELECT DISTINCT qr.question_id
                     FROM question_responses qr
                     JOIN assessments a ON qr.assessment_id = a.assessment_id
                     WHERE qr.user_id = %s 
@@ -99,7 +106,7 @@ class EnhancedFisherYatesShuffle:
                 
                 # Get questions answered incorrectly within 60 minutes (excluding diagnostic)
                 cursor.execute("""
-                    SELECT DISTINCT question_id
+                    SELECT DISTINCT qr.question_id
                     FROM question_responses qr
                     JOIN assessments a ON qr.assessment_id = a.assessment_id
                     WHERE qr.user_id = %s 
@@ -112,12 +119,94 @@ class EnhancedFisherYatesShuffle:
                 incorrect_cooldowns = [row[0] for row in cursor.fetchall()]
                 
                 cooldown_questions = list(set(correct_cooldowns + incorrect_cooldowns))
+                print(f"DEBUG: Fallback found {len(correct_cooldowns)} correct + {len(incorrect_cooldowns)} incorrect = {len(cooldown_questions)} total cooldown questions", file=sys.stderr)
             
             return cooldown_questions
             
         except mysql.connector.Error as e:
             print(f"ERROR: Failed to get cooldown questions: {e}", file=sys.stderr)
             return []
+        finally:
+            conn.close()
+
+    def create_cooldown_entry(self, user_id, question_id, competency, was_correct, response_time):
+        """
+        Create a cooldown entry when a question is answered
+        """
+        conn = self.connect_db()
+        if not conn:
+            return False
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Calculate cooldown duration and end time
+            cooldown_minutes = self.cooldown_rules['correct'] if was_correct else self.cooldown_rules['incorrect']
+            cooldown_until = datetime.now() + timedelta(minutes=cooldown_minutes)
+            
+            # Generate unique cooldown_id
+            import hashlib
+            timestamp = int(datetime.now().timestamp())
+            combined = f"{user_id}_{question_id}_{timestamp}"
+            cooldown_id = f"CD_{hashlib.md5(combined.encode()).hexdigest()[:12]}"
+            
+            # Deactivate any existing cooldowns for this user-question pair
+            cursor.execute("""
+                UPDATE question_cooldowns 
+                SET is_active = FALSE 
+                WHERE user_id = %s AND question_id = %s AND is_active = TRUE
+            """, (user_id, question_id))
+            
+            # Insert new cooldown entry
+            cursor.execute("""
+                INSERT INTO question_cooldowns 
+                (cooldown_id, user_id, question_id, competency, was_correct, 
+                 answered_at, response_time, cooldown_duration, cooldown_until, is_active)
+                VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, TRUE)
+            """, (
+                cooldown_id, user_id, question_id, competency, was_correct,
+                response_time, cooldown_minutes, cooldown_until
+            ))
+            
+            conn.commit()
+            print(f"DEBUG: Created cooldown entry for question {question_id}, user {user_id}, expires at {cooldown_until}", file=sys.stderr)
+            return True
+            
+        except mysql.connector.Error as e:
+            conn.rollback()
+            print(f"ERROR: Failed to create cooldown entry: {e}", file=sys.stderr)
+            return False
+        finally:
+            conn.close()
+
+    def cleanup_expired_cooldowns(self):
+        """
+        Clean up expired cooldown entries
+        """
+        conn = self.connect_db()
+        if not conn:
+            return False
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Deactivate expired cooldowns
+            cursor.execute("""
+                UPDATE question_cooldowns 
+                SET is_active = FALSE 
+                WHERE cooldown_until <= NOW() AND is_active = TRUE
+            """)
+            
+            affected_rows = cursor.rowcount
+            conn.commit()
+            
+            print(f"DEBUG: Cleaned up {affected_rows} expired cooldown entries", file=sys.stderr)
+            return True
+            
+        except mysql.connector.Error as e:
+            conn.rollback()
+            print(f"ERROR: Failed to cleanup expired cooldowns: {e}", file=sys.stderr)
+            return False
         finally:
             conn.close()
 
@@ -132,7 +221,7 @@ class EnhancedFisherYatesShuffle:
         try:
             cursor = conn.cursor()
             
-            # Get questions used in recent assessments (last 7 days)
+            # Get questions used in recent assessments (last 7 days, excluding diagnostic)
             cursor.execute("""
                 SELECT DISTINCT qr.question_id
                 FROM question_responses qr
@@ -144,7 +233,9 @@ class EnhancedFisherYatesShuffle:
                 ORDER BY qr.answered_at DESC
             """, (user_id, competency, days))
             
-            return [row[0] for row in cursor.fetchall()]
+            recently_used = [row[0] for row in cursor.fetchall()]
+            print(f"DEBUG: Found {len(recently_used)} recently used questions in last {days} days", file=sys.stderr)
+            return recently_used
             
         except mysql.connector.Error as e:
             print(f"ERROR: Failed to get recently used questions: {e}", file=sys.stderr)
@@ -155,11 +246,7 @@ class EnhancedFisherYatesShuffle:
     def get_available_questions(self, user_id, competency, difficulty_level, requested_count=15):
         """
         Get questions available for assessment (not in cooldown, unique per user)
-        IMPLEMENTS RULE-BASED ALGORITHM (CogniSeq System) as documented:
-        1. BKT FILTERING: Filter questions matching current difficulty level
-        2. RULE-BASED FILTERING: Remove cooldown questions 
-        3. ASSESSMENT COMPOSITION: Create 15-question assessment
-        4. FISHER-YATES SHUFFLING: Randomize question order
+        FIXED: Enhanced cooldown checking and better filtering
         """
         conn = self.connect_db()
         if not conn:
@@ -168,12 +255,17 @@ class EnhancedFisherYatesShuffle:
         try:
             cursor = conn.cursor(dictionary=True)
             
-            # Get questions in cooldown
+            # First cleanup expired cooldowns
+            self.cleanup_expired_cooldowns()
+            
+            # Get questions in cooldown (FIXED: properly check cooldown table)
             cooldown_questions = self.get_questions_in_cooldown(user_id, competency)
             recently_used = self.get_recently_used_questions(user_id, competency, days=3)
             
-            # Combine all excluded questions
+            # Combine all excluded questions (remove duplicates)
             excluded_questions = list(set(cooldown_questions + recently_used))
+            
+            print(f"DEBUG: Excluding {len(cooldown_questions)} cooldown + {len(recently_used)} recent = {len(excluded_questions)} total questions", file=sys.stderr)
             
             # Build exclusion clause
             exclusion_clause = ""
@@ -185,7 +277,6 @@ class EnhancedFisherYatesShuffle:
                 params.extend(excluded_questions)
             
             # Get available questions with higher limit to ensure we have enough
-            # after filtering and shuffling
             query = f"""
                 SELECT q.question_id, q.question_text, q.question_type, 
                        q.choice_a, q.choice_b, q.choice_c, q.choice_d,
@@ -201,11 +292,13 @@ class EnhancedFisherYatesShuffle:
             """
             
             # Request more questions than needed to account for potential filtering
-            limit = min(requested_count * 2, 100)  # Cap at 100 for performance
+            limit = min(requested_count * 3, 200)  # Increased multiplier and cap
             params.append(limit)
             
             cursor.execute(query, params)
             available_questions = cursor.fetchall()
+            
+            print(f"DEBUG: Found {len(available_questions)} available questions out of requested {requested_count}", file=sys.stderr)
             
             # Convert datetime objects to strings for JSON serialization
             for question in available_questions:
@@ -219,6 +312,7 @@ class EnhancedFisherYatesShuffle:
                 'total_found': len(available_questions),
                 'excluded_cooldown': len(cooldown_questions),
                 'excluded_recent': len(recently_used),
+                'excluded_total': len(excluded_questions),
                 'requested_count': requested_count
             }
             
@@ -233,7 +327,8 @@ class EnhancedFisherYatesShuffle:
 
     def create_assessment_pool(self, assessment_id, user_id=None, competency=None, difficulty_level=None, question_count=15):
         """
-        Create shuffled assessment pool with cooldown checking
+        Create shuffled assessment pool with enhanced cooldown checking
+        FIXED: Prevent duplicate assessments and ensure unique question pools
         """
         conn = self.connect_db()
         if not conn:
@@ -242,25 +337,35 @@ class EnhancedFisherYatesShuffle:
         try:
             cursor = conn.cursor()
             
-            # Extract parameters from assessment_id if not provided (backward compatibility)
+            # Check if assessment already exists
+            cursor.execute("SELECT assessment_id FROM assessments WHERE assessment_id = %s", (assessment_id,))
+            existing_assessment = cursor.fetchone()
+            
+            if existing_assessment:
+                print(f"DEBUG: Assessment {assessment_id} already exists, skipping creation", file=sys.stderr)
+                return {'success': False, 'message': 'Assessment already exists'}
+            
+            # Extract parameters from assessment_id if not provided
             if user_id is None or competency is None or difficulty_level is None:
                 parts = assessment_id.split('_')
                 if len(parts) >= 5:
                     user_id = int(parts[1])
                     
                     # Handle competency that might contain underscores
-                    if len(parts) >= 7:  # Has multiple parts including underscore in competency
-                        competency = f"{parts[2]}_{parts[3]}"  # "number_algebra"
-                        difficulty_level = parts[4]  # "beginner"
+                    if len(parts) >= 7:
+                        competency = f"{parts[2]}_{parts[3]}"
+                        difficulty_level = parts[4]
                     else:
                         competency = parts[2]
                         difficulty_level = parts[3]
                 else:
                     return {'success': False, 'message': 'Invalid assessment_id format or missing parameters'}
             
-            # Get available questions (not in cooldown)
+            print(f"DEBUG: Creating assessment pool for user {user_id}, competency {competency}, difficulty {difficulty_level}", file=sys.stderr)
+            
+            # Get available questions (FIXED: enhanced cooldown checking)
             available_result = self.get_available_questions(
-                user_id, competency, difficulty_level, question_count
+                user_id, competency, difficulty_level, question_count * 2  # Get more than needed
             )
             
             if not available_result['success']:
@@ -269,43 +374,34 @@ class EnhancedFisherYatesShuffle:
             available_questions = available_result['available_questions']
             
             if len(available_questions) < question_count:
-                # Try to get more questions by reducing recent usage filter
-                backup_result = self.get_available_questions(
-                    user_id, competency, difficulty_level, question_count * 2
-                )
-                if backup_result['success']:
-                    available_questions = backup_result['available_questions']
-            
-            if len(available_questions) == 0:
                 return {
                     'success': False,
-                    'message': f'No available questions found for {competency} {difficulty_level}',
+                    'message': f'Insufficient questions available. Found {len(available_questions)}, need {question_count}',
                     'cooldown_count': available_result.get('excluded_cooldown', 0),
-                    'recent_count': available_result.get('excluded_recent', 0)
+                    'recent_count': available_result.get('excluded_recent', 0),
+                    'available_count': len(available_questions)
                 }
             
             # Take only the requested number of questions
             questions_to_use = available_questions[:question_count]
             
-            # Ensure assessment record exists
+            # Create assessment record (FIXED: prevent duplicates)
             try:
-                cursor.execute("SELECT assessment_id FROM assessments WHERE assessment_id = %s", (assessment_id,))
-                if not cursor.fetchone():
-                    # Create assessment record
-                    cursor.execute("""
-                        INSERT INTO assessments 
-                        (assessment_id, user_id, competency, assessment_type, difficulty_level, 
-                         total_questions, status, is_diagnostic_phase, correct_answers, 
-                         incorrect_answers, questions_answered, total_time_spent, 
-                         cumulative_time_score)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (
-                        assessment_id, user_id, competency, 'regular', difficulty_level,
-                        len(questions_to_use), 'in_progress', 0, 0, 0, 0, 0, 0.0000
-                    ))
-            except mysql.connector.IntegrityError:
-                # Assessment already exists, continue
-                pass
+                cursor.execute("""
+                    INSERT INTO assessments 
+                    (assessment_id, user_id, competency, assessment_type, difficulty_level, 
+                     total_questions, status, is_diagnostic_phase, correct_answers, 
+                     incorrect_answers, questions_answered, total_time_spent, 
+                     cumulative_time_score)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    assessment_id, user_id, competency, 'regular', difficulty_level,
+                    len(questions_to_use), 'in_progress', 0, 0, 0, 0, 0, 0.0000
+                ))
+                print(f"DEBUG: Created new assessment record {assessment_id}", file=sys.stderr)
+            except mysql.connector.IntegrityError as e:
+                print(f"DEBUG: Assessment {assessment_id} already exists (integrity error), returning existing", file=sys.stderr)
+                return {'success': False, 'message': 'Assessment already exists'}
             
             # Shuffle questions using Fisher-Yates
             shuffled_questions = self.fisher_yates_shuffle(questions_to_use)
@@ -314,7 +410,7 @@ class EnhancedFisherYatesShuffle:
             for index, question in enumerate(shuffled_questions):
                 question['question_order'] = index + 1
             
-            # Clean up any existing questions for this assessment
+            # Clean up any existing questions for this assessment (shouldn't happen with duplicate check)
             cursor.execute("DELETE FROM assessment_questions WHERE assessment_id = %s", (assessment_id,))
             
             # Insert shuffled questions into assessment_questions table
@@ -336,6 +432,7 @@ class EnhancedFisherYatesShuffle:
                 ))
             
             conn.commit()
+            print(f"DEBUG: Successfully created assessment pool with {len(shuffled_questions)} questions", file=sys.stderr)
             
             return {
                 'success': True,
@@ -343,7 +440,8 @@ class EnhancedFisherYatesShuffle:
                 'total_questions': len(shuffled_questions),
                 'excluded_cooldown': available_result.get('excluded_cooldown', 0),
                 'excluded_recent': available_result.get('excluded_recent', 0),
-                'available_pool_size': available_result.get('total_found', 0)
+                'available_pool_size': available_result.get('total_found', 0),
+                'assessment_id': assessment_id
             }
             
         except mysql.connector.Error as e:
@@ -360,49 +458,6 @@ class EnhancedFisherYatesShuffle:
                 'success': False, 
                 'message': f'Unexpected error: {str(e)}'
             }
-        finally:
-            conn.close()
-
-    def validate_assessment_uniqueness(self, user_id, competency, questions):
-        """
-        Validate that assessment questions are unique for the user
-        """
-        conn = self.connect_db()
-        if not conn:
-            return {'success': False, 'message': 'Database connection failed'}
-        
-        try:
-            cursor = conn.cursor()
-            question_ids = [q['question_id'] for q in questions]
-            
-            if not question_ids:
-                return {'success': True, 'duplicates': []}
-            
-            # Check for duplicates in recent assessments
-            placeholders = ','.join(['%s'] * len(question_ids))
-            cursor.execute(f"""
-                SELECT DISTINCT qr.question_id, COUNT(*) as usage_count
-                FROM question_responses qr
-                JOIN assessments a ON qr.assessment_id = a.assessment_id
-                WHERE qr.user_id = %s 
-                AND a.competency = %s
-                AND a.assessment_type = 'regular'
-                AND qr.question_id IN ({placeholders})
-                AND qr.answered_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)
-                GROUP BY qr.question_id
-            """, [user_id, competency] + question_ids)
-            
-            duplicates = cursor.fetchall()
-            
-            return {
-                'success': True,
-                'duplicates': [{'question_id': d[0], 'usage_count': d[1]} for d in duplicates],
-                'has_duplicates': len(duplicates) > 0
-            }
-            
-        except mysql.connector.Error as e:
-            print(f"ERROR: Failed to validate uniqueness: {e}", file=sys.stderr)
-            return {'success': False, 'message': 'Failed to validate uniqueness'}
         finally:
             conn.close()
 
@@ -485,6 +540,7 @@ class EnhancedFisherYatesShuffle:
             """, (assessment_id, question_id))
             
             conn.commit()
+            print(f"DEBUG: Marked question {question_id} as answered for assessment {assessment_id}", file=sys.stderr)
             
             return {'success': True}
             
@@ -559,7 +615,7 @@ def main():
                 )
                 
         elif action == 'create_pool_file':
-            # Backward compatibility with existing Laravel code
+            # Enhanced backward compatibility with existing Laravel code
             if len(sys.argv) < 4:
                 result = {'success': False, 'message': 'Missing parameters: assessment_id and file_path'}
             else:
@@ -567,45 +623,53 @@ def main():
                 file_path = sys.argv[3]
                 try:
                     # Extract user_id, competency, and difficulty from assessment_id
-                    # Format: ASSESS_{userId}_{competency}_{difficulty}_{i}_{timestamp}
                     parts = assessment_id.split('_')
                     if len(parts) >= 5:
                         user_id = int(parts[1])
-                        if len(parts) >= 7:  # Has multiple parts including underscore in competency
-                            competency = f"{parts[2]}_{parts[3]}"  # "number_algebra"
-                            difficulty_level = parts[4]  # "beginner"
+                        if len(parts) >= 7:
+                            competency = f"{parts[2]}_{parts[3]}"
+                            difficulty_level = parts[4]
                         else:
                             competency = parts[2]
                             difficulty_level = parts[3]
                         
-                        # Read questions from file (legacy support)
+                        # Determine question count from file or use default
+                        question_count = 15
                         try:
                             with open(file_path, 'r', encoding='utf-8') as f:
                                 questions = json.load(f)
-                        except UnicodeDecodeError:
-                            with open(file_path, 'r', encoding='utf-16') as f:
-                                questions = json.load(f)
+                                question_count = len(questions)
+                        except:
+                            pass  # Use default count if file can't be read
                         
-                        # Instead of using file questions, get available questions with cooldown filtering
+                        # Use enhanced assessment pool creation with proper cooldown checking
                         result = shuffle.create_assessment_pool(
-                            assessment_id, user_id, competency, difficulty_level, len(questions)
+                            assessment_id, user_id, competency, difficulty_level, question_count
                         )
                     else:
                         result = {'success': False, 'message': 'Invalid assessment_id format'}
-                except FileNotFoundError:
-                    result = {'success': False, 'message': 'Questions file not found'}
-                except json.JSONDecodeError as e:
-                    result = {'success': False, 'message': f'Invalid JSON in file: {str(e)}'}
                 except Exception as e:
-                    result = {'success': False, 'message': f'Error processing questions file: {str(e)}'}
+                    result = {'success': False, 'message': f'Error processing assessment: {str(e)}'}
                     
-        elif action == 'create_pool_simple':
-            # Simple backward compatibility - just need assessment_id
-            if len(sys.argv) < 3:
-                result = {'success': False, 'message': 'Missing assessment_id parameter'}
+        elif action == 'create_cooldown':
+            if len(sys.argv) < 7:
+                result = {
+                    'success': False, 
+                    'message': 'Missing parameters: user_id, question_id, competency, was_correct, response_time'
+                }
             else:
-                assessment_id = sys.argv[2]
-                result = shuffle.create_assessment_pool(assessment_id)
+                user_id = int(sys.argv[2])
+                question_id = sys.argv[3]
+                competency = sys.argv[4]
+                was_correct = sys.argv[5].lower() == 'true'
+                response_time = float(sys.argv[6])
+                
+                success = shuffle.create_cooldown_entry(user_id, question_id, competency, was_correct, response_time)
+                result = {'success': success}
+                
+        elif action == 'cleanup_cooldowns':
+            success = shuffle.cleanup_expired_cooldowns()
+            result = {'success': success}
                 
         elif action == 'get_available':
             if len(sys.argv) < 5:
@@ -621,23 +685,6 @@ def main():
                 
                 result = shuffle.get_available_questions(user_id, competency, difficulty_level, count)
                 
-        elif action == 'validate_uniqueness':
-            if len(sys.argv) < 5:
-                result = {
-                    'success': False, 
-                    'message': 'Missing parameters: user_id, competency, questions_json'
-                }
-            else:
-                user_id = int(sys.argv[2])
-                competency = sys.argv[3]
-                questions_json = sys.argv[4]
-                
-                try:
-                    questions = json.loads(questions_json)
-                    result = shuffle.validate_assessment_uniqueness(user_id, competency, questions)
-                except json.JSONDecodeError:
-                    result = {'success': False, 'message': 'Invalid JSON format for questions'}
-                    
         elif action == 'next_question':
             if len(sys.argv) < 3:
                 result = {'success': False, 'message': 'Missing assessment_id parameter'}
