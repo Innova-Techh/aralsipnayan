@@ -9,6 +9,11 @@
 </head>
 
 @include('loaders.loader')
+
+@php
+    $captchaHtml = captcha_img('default');
+@endphp
+
 <script>
 function refreshCaptcha() {
     const captchaImages = document.querySelectorAll('img[src*="captcha"]');
@@ -18,7 +23,6 @@ function refreshCaptcha() {
 }
 </script>
 <body class="min-h-screen bg-gray-100 font-sans">
-    <!-- Your existing mobile and desktop layouts stay the same -->
     <!-- Mobile layout -->
     <div class="md:hidden h-screen flex flex-col justify-center items-center px-5 py-4 overflow-hidden">
         <!-- Logo and Brand -->
@@ -50,19 +54,20 @@ function refreshCaptcha() {
                         name="password" id="password" placeholder="••••••••" required>
                 </div>
                 <div class="mb-8">
-                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security Code</label>
-                         <div class="flex gap-3 items-center">
+                         <label for="captcha" class="block text-white text-base font-medium mb-2">Security Code</label>
+                         <div class="flex flex-col gap-3">
                              <input type="text" 
-                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue" 
-                                    name="captcha" 
-                                    id="captcha_desktop" 
+                                    class="w-full px-4 py-3 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30" 
+                                    name="captcha"  
                                     placeholder="Enter security code"
-                                    >
-                             <div class="border border-gray-300 rounded-xl p-2 bg-gray-50">
-                                 {!! captcha_img('default') !!}
+                                    required>
+                             <div class="border border-gray-300 rounded-xl p-3 bg-white w-full flex items-center justify-center">
+                                 <div class="w-full max-w-[140px] min-h-[40px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[40px] sm:max-w-[120px] sm:[&>img]:!min-h-[35px]">
+                                     {!! $captchaHtml !!}
+                                 </div>
                              </div>
                          </div>
-                         <button type="button" onclick="refreshCaptcha()" class="text-primary-blue text-sm mt-2 underline hover:no-underline">
+                         <button type="button" onclick="refreshCaptcha()" class="text-white text-sm mt-2 underline hover:no-underline">
                              Refresh Code
                          </button>
                 </div>
@@ -115,12 +120,11 @@ function refreshCaptcha() {
                          <div class="flex gap-3 items-center">
                              <input type="text" 
                                     class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue" 
-                                    name="captcha" 
-                                    id="captcha_desktop" 
+                                    name="captcha"  
                                     placeholder="Enter security code"
                                     >
                              <div class="border border-gray-300 rounded-xl p-2 bg-gray-50">
-                                 {!! captcha_img('default') !!}
+                                 {!! $captchaHtml !!}
                              </div>
                          </div>
                          <button type="button" onclick="refreshCaptcha()" class="text-primary-blue text-sm mt-2 underline hover:no-underline">
@@ -169,11 +173,9 @@ function refreshCaptcha() {
             if (errorModal && loaderWrapper) {
                 loaderWrapper.style.display = "none";
 
-                // Show the forms again
+                // Show the appropriate form based on screen size
                 const mobileLayout = document.querySelector('.md\\:hidden');
                 const desktopLayout = document.querySelector('.hidden.md\\:flex');
-                if (mobileLayout) mobileLayout.style.display = 'flex';
-                if (desktopLayout) desktopLayout.style.display = 'flex';
 
                 // Re-enable submit buttons
                 const submitBtns = document.querySelectorAll('button[type="submit"]');
