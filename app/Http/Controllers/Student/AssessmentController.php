@@ -500,13 +500,19 @@ class AssessmentController extends Controller
         // Clear the diagnostic results from session
         session()->forget('diagnostic_final_results');
         
+        // Create assessment object for the view
+        $assessment = (object) [
+            'total_points_earned' => round($pointsEarned),
+            'correct_answers' => $correctAnswers,
+            'total_questions' => $totalQuestions,
+            'accuracy' => $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0
+        ];
+        
         return view('student.assessment-complete', [
             'category' => $category,
-            'pointsEarned' => round($pointsEarned),
-            'score' => round($score),
-            'correctAnswers' => $correctAnswers,
-            'totalQuestions' => $totalQuestions,
-            'assessmentId' => 1 // You can modify this based on your needs
+            'assessment' => $assessment,
+            'assessment_id' => $diagnosticSession->session_id ?? 'diagnostic_' . time(),
+            'from_regular_quiz' => false // This is a diagnostic, not regular quiz
         ]);
     }
 
