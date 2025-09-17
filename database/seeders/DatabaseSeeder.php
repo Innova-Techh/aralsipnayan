@@ -96,11 +96,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-        MasteryThresholdsSeeder::class,
-        BktParametersSeeder::class,
-        LevelConfigSeeder::class,
-        RankConfigSeeder::class,
-        BadgeConfigSeeder::class,
         TrophiesSeeder::class,
         QuestionsTableSeeder::class,
         // add any other seeders you created

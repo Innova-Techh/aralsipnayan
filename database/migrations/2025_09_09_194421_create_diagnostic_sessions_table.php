@@ -28,15 +28,21 @@ return new class extends Migration
             // Phase Results
             $table->decimal('phase_1_score', 5, 4)->nullable();
             $table->integer('phase_1_questions')->default(15);
+            $table->decimal('phase_1_time_factor', 5, 4)->nullable();
+
 
             $table->decimal('phase_2_score', 5, 4)->nullable();
             $table->integer('phase_2_questions')->default(15);
+            $table->decimal('phase_2_time_factor', 5, 4)->nullable();
 
             $table->decimal('phase_3_score', 5, 4)->nullable();
             $table->integer('phase_3_questions')->default(10);
+            $table->decimal('phase_3_time_factor', 5, 4)->nullable();
 
             // Final Diagnostic Results
             $table->decimal('final_master_score', 5, 2)->nullable();
+            $table->decimal('accuracy_component', 5, 4)->nullable();
+            $table->decimal('bkt_component', 5, 4)->nullable();
             $table->enum('recommended_difficulty', ['beginner', 'intermediate', 'advanced'])->nullable();
 
             // Session Status & Tracking
