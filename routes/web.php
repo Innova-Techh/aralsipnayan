@@ -90,8 +90,17 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     
     // Quiz routes
     Route::prefix('quiz')->name('quiz.')->group(function () {
+        // Check for active assessments
+        Route::post('/check-active', [RegularAssessmentController::class, 'checkActiveAssessments'])->name('check-active');
+        
+        // Resume assessment from list
+        Route::post('/resume-assessment', [RegularAssessmentController::class, 'resumeAssessmentFromList'])->name('resume-assessment');
+        
         // Start regular assessment
         Route::post('/start-assessment', [RegularAssessmentController::class, 'startAssessment'])->name('start-assessment');
+        
+        // Submit regular assessment answer
+        Route::post('/submit-regular', [RegularAssessmentController::class, 'submitAnswer'])->name('submit-regular');
         
         // Start diagnostic for a category
         Route::get('/diagnostic/{category}', [AssessmentController::class, 'startDiagnostic'])->name('diagnostic');
@@ -125,6 +134,15 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         
         // Assessment progress saving
         Route::post('/assessment/save-progress', [StudentQuizController::class, 'saveAssessmentProgress'])->name('assessment.save-progress');
+        
+        // Regular quiz results routes (separate from diagnostic assessment routes)
+        Route::get('/results/complete/{category}', [RegularAssessmentController::class, 'showQuizComplete'])->name('results.complete');
+        
+        // Regular quiz review page
+        Route::get('/results/review/{category}', [RegularAssessmentController::class, 'showQuizReview'])->name('results.review');
+        
+        // Get regular quiz results data
+        Route::get('/results/data/{assessmentId}', [RegularAssessmentController::class, 'getQuizResultsData'])->name('results.data');
     });
 });
 

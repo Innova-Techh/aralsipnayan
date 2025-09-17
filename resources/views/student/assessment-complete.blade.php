@@ -17,11 +17,11 @@
         <!-- Points and Score -->
         <div class="flex justify-around mb-6">
             <div class="bg-green-100 text-green-800 px-6 py-4 rounded-xl font-semibold">
-                {{ $pointsEarned ?? 0 }}<br>
+                {{ $assessment->total_points_earned ?? 0 }}<br>
                 <span class="text-sm font-normal">Points Earned</span>
             </div>
             <div class="bg-gray-100 text-blue-800 px-6 py-4 rounded-xl font-semibold">
-                {{ $correctAnswers ?? 0 }}/{{ $totalQuestions ?? 15 }}<br>
+                {{ $assessment->correct_answers ?? 0 }}/{{ $assessment->total_questions ?? 15 }}<br>
                 <span class="text-sm font-normal">Score</span>
             </div>
         </div>
@@ -29,10 +29,17 @@
         <!-- Buttons -->
         <div class="space-y-3">
             <!-- Review Assessment -->
-            <a href="{{ route('student.assessments.review', $category) }}"
-               class="w-full inline-block bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
-                Review Assessment
-            </a>
+            @if(isset($from_regular_quiz) && $from_regular_quiz)
+                <a href="{{ route('student.quiz.results.review', $category) }}?assessment_id={{ $assessment_id }}"
+                   class="w-full inline-block bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
+                    Review Assessment
+                </a>
+            @else
+                <a href="{{ route('student.assessments.review', $category) }}"
+                   class="w-full inline-block bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
+                    Review Assessment
+                </a>
+            @endif
 
             <!-- Back to Assessments -->
             <a href="{{ route('student.assessments.category', $category) }}"

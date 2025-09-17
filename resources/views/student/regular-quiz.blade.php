@@ -381,8 +381,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize quiz
     initializeQuiz();
     
-    // Check for resumable quiz session on page load
-    checkForResumableSession();
+    // Resume functionality is now handled at the assessment list level
+    // checkForResumableSession();
     
     function checkForResumableSession() {
         // Check if there's an incomplete assessment session for this user and category
@@ -602,6 +602,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Restore answer if available
                     if (saved.currentAnswer) {
                         restoreAnswer(saved.currentAnswer);
+                    }
+                    
+                    // Restore question counter state
+                    if (saved.questionIndex !== undefined) {
+                        quizState.questionIndex = saved.questionIndex;
+                        console.log('Restored question index:', saved.questionIndex);
+                    }
+                    
+                    // Restore total questions count
+                    if (saved.totalQuestions !== undefined) {
+                        quizState.totalQuestions = saved.totalQuestions;
                     }
                     
                     // Adjust quiz timer based on elapsed time
@@ -873,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function submitAnswerWithRetry(requestData, attempt = 1) {
-        const url = '{{ route("student.quiz.submit") }}';
+        const url = '{{ route("student.quiz.submit-regular") }}';
         
         return fetch(url, {
             method: 'POST',
@@ -1107,11 +1118,8 @@ document.addEventListener('DOMContentLoaded', function() {
         submitAnswerWithRetry(requestData)
         .then(data => {
             if (data.success) {
-                // Update question counter for the next question
-                if (!data.assessment_complete) {
-                    quizState.questionIndex++;
-                    updateQuestionCounterDisplay();
-                }
+                // Note: Question counter will be updated when user clicks "Next"
+                // Don't increment here to avoid double-counting
                 
                 // Clear progress from localStorage on successful submission
                 const storageKey = `quiz_progress_${quizState.sessionId}`;
@@ -1267,6 +1275,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             nextBtn.textContent = 'Next Question';
             nextBtn.onclick = function() {
+                // Update question counter before reloading
+                quizState.questionIndex++;
+                updateQuestionCounterDisplay();
+                
+                // Save the updated state to localStorage before reload
+                saveProgressToLocalStorage();
+                
                 // The page will reload to show the next question
                 // The quiz timer will continue because it's based on the stored start time
                 window.location.reload();

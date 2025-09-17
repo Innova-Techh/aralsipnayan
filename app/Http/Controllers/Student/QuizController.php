@@ -674,11 +674,11 @@ class QuizController extends Controller
      */
     private function checkDifficultyProgression($masteryScore, $currentDifficulty)
     {
-        if ($masteryScore >= 75 && $currentDifficulty !== 'advanced') {
+        if ($masteryScore >= 85 && $currentDifficulty !== 'advanced') {
             return 'advanced';
-        } elseif ($masteryScore >= 50 && $masteryScore < 75 && $currentDifficulty !== 'intermediate') {
+        } elseif ($masteryScore >= 76 && $masteryScore <= 84 && $currentDifficulty !== 'intermediate') {
             return 'intermediate';
-        } elseif ($masteryScore < 50 && $currentDifficulty !== 'beginner') {
+        } elseif ($masteryScore <= 75 && $currentDifficulty !== 'beginner') {
             return 'beginner';
         }
         

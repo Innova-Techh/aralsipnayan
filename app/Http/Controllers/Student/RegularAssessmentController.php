@@ -62,12 +62,20 @@ class RegularAssessmentController extends Controller
             );
             
             if ($result['success']) {
-                $redirectUrl = route('student.quiz.show', $category) . '?assessment_id=' . $assessmentId;
+                // Use the actual assessment ID from the result (which may be different from the passed ID)
+                $actualAssessmentId = $result['assessment']->assessment_id ?? $assessmentId;
+                $sessionId = $result['session_id'] ?? null;
+                
+                $redirectUrl = route('student.quiz.show', $category) . '?assessment_id=' . $actualAssessmentId;
+                if ($sessionId) {
+                    $redirectUrl .= '&session_id=' . $sessionId;
+                }
                 
                 return response()->json([
                     'success' => true,
                     'assessment_exists' => $result['exists'],
-                    'assessment_id' => $assessmentId,
+                    'assessment_id' => $actualAssessmentId,
+                    'session_id' => $sessionId,
                     'question_count' => $result['question_count'] ?? $result['assessment']->total_questions,
                     'time_limit' => $result['time_limit'] ?? $result['assessment']->time_limit,
                     'redirect' => $redirectUrl
@@ -125,6 +133,14 @@ class RegularAssessmentController extends Controller
                 // Create assessment record in Laravel
                 $timeLimit = $this->getTimeLimitForDifficulty($difficulty);
                 
+                // Get initial BKT score from student_mastery
+                $mastery = DB::table('student_mastery')
+                    ->where('user_id', $userId)
+                    ->where('competency', $competency)
+                    ->first();
+                
+                $initialBktScore = $mastery ? $mastery->bkt_score : 0.5;
+                
                 DB::table('assessments')->insert([
                     'assessment_id' => $assessmentId,
                     'user_id' => $userId,
@@ -140,7 +156,9 @@ class RegularAssessmentController extends Controller
                     'incorrect_answers' => 0,
                     'questions_answered' => 0,
                     'total_time_spent' => 0,
-                    'cumulative_time_score' => 0.0000
+                    'cumulative_time_score' => 0.0000,
+                    'bkt_score_before' => $initialBktScore,
+                    'initial_bkt_probability' => $initialBktScore
                 ]);
                 
                 Log::info("Assessment created successfully", [
@@ -300,7 +318,26 @@ class RegularAssessmentController extends Controller
             $bonusPoints = $isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0;
             $totalPoints = $basePoints + $bonusPoints;
             
-            // Record response
+            // Get BKT score before answering
+            $mastery = DB::table('student_mastery')
+                ->where('user_id', $user->id)
+                ->where('competency', $assessment->competency)
+                ->first();
+            
+            $bktBefore = $mastery ? $mastery->bkt_score : 0.5;
+            
+            // Update BKT and mastery first to get new BKT score
+            $this->updateMasteryRecord($user->id, $assessment->competency, $isCorrect, $timeScore, $assessment->difficulty_level);
+            
+            // Get BKT score after update
+            $masteryAfter = DB::table('student_mastery')
+                ->where('user_id', $user->id)
+                ->where('competency', $assessment->competency)
+                ->first();
+            
+            $bktAfter = $masteryAfter ? $masteryAfter->bkt_score : $bktBefore;
+            
+            // Record response with BKT tracking
             $responseId = $this->generateResponseId($assessmentId, $questionId);
             
             DB::table('question_responses')->insert([
@@ -314,6 +351,10 @@ class RegularAssessmentController extends Controller
                 'max_allowed_time' => $question->max_allowed_time,
                 'normalized_time' => $normalizedTime,
                 'time_score' => $timeScore,
+                'bkt_before' => $bktBefore,
+                'bkt_after' => $bktAfter,
+                'difficulty_factor' => $this->getDifficultyFactor($assessment->difficulty_level),
+                'time_factor' => $timeScore,
                 'base_points' => $basePoints,
                 'time_bonus_points' => $bonusPoints,
                 'total_points' => $totalPoints,
@@ -329,18 +370,11 @@ class RegularAssessmentController extends Controller
             // Update assessment statistics
             $this->updateAssessmentStats($assessmentId, $isCorrect, $timeTaken, $timeScore);
             
-            // Update BKT and mastery
-            $this->updateMasteryRecord($user->id, $assessment->competency, $isCorrect, $timeScore, $assessment->difficulty_level);
-            
             // Check if assessment is complete
             $progress = $this->getAssessmentProgress($assessmentId);
-            $isComplete = $progress['answered_questions'] >= $progress['total_questions'];
+            $isComplete = (int)$progress['answered_questions'] >= (int)$progress['total_questions'];
             
-            if ($isComplete) {
-                $this->completeAssessment($assessmentId);
-            }
-            
-            return response()->json([
+            $responseData = [
                 'success' => true,
                 'is_correct' => $isCorrect,
                 'correct_answer' => $question->correct_answer,
@@ -348,7 +382,17 @@ class RegularAssessmentController extends Controller
                 'points_earned' => $totalPoints,
                 'assessment_complete' => $isComplete,
                 'progress' => $progress
-            ]);
+            ];
+            
+            if ($isComplete) {
+                $this->completeAssessment($assessmentId);
+                
+                // Add redirect URL for completed assessment
+                $categoryForUrl = $assessment->competency;
+                $responseData['redirect_url'] = route('student.quiz.results.complete', $categoryForUrl) . '?assessment_id=' . $assessmentId;
+            }
+            
+            return response()->json($responseData);
             
         } catch (\Exception $e) {
             Log::error('Failed to submit answer: ' . $e->getMessage(), [
@@ -749,50 +793,76 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Update BKT score
+     * Update BKT score with smoother transitions
      */
     private function updateBKT($priorBkt, $isCorrect, $timeScore, $difficulty, $params)
     {
+        // Use more conservative parameters to prevent large jumps
+        $adjustedParams = [
+            'learn_rate' => min($params['learn_rate'], 0.15), // Cap learning rate
+            'slip_rate' => $params['slip_rate'],
+            'guess_rate' => $params['guess_rate']
+        ];
+        
+        // Reduce the impact of difficulty factor to prevent jumps
         $difficultyFactor = $this->getDifficultyFactor($difficulty);
+        $moderatedDifficultyFactor = 1.0 + (($difficultyFactor - 1.0) * 0.3); // Reduce impact by 70%
+        
+        // Apply time score more conservatively
+        $moderatedTimeScore = 0.7 + ($timeScore * 0.3); // Time score between 0.7-1.0
         
         if ($isCorrect) {
-            $numerator = $priorBkt * (1 - $params['slip_rate']) * $timeScore * $difficultyFactor;
-            $denominator = $priorBkt * (1 - $params['slip_rate']) + (1 - $priorBkt) * $params['guess_rate'];
+            // For correct answers
+            $numerator = $priorBkt * (1 - $adjustedParams['slip_rate']);
+            $denominator = $priorBkt * (1 - $adjustedParams['slip_rate']) + (1 - $priorBkt) * $adjustedParams['guess_rate'];
         } else {
-            $numerator = $priorBkt * $params['slip_rate'];
-            $denominator = $priorBkt * $params['slip_rate'] + (1 - $priorBkt) * (1 - $params['guess_rate']) * $timeScore * $difficultyFactor;
+            // For incorrect answers
+            $numerator = $priorBkt * $adjustedParams['slip_rate'];
+            $denominator = $priorBkt * $adjustedParams['slip_rate'] + (1 - $priorBkt) * (1 - $adjustedParams['guess_rate']);
         }
         
         if ($denominator == 0) return $priorBkt;
         
-        $newBkt = $numerator / $denominator;
+        $posteriorBkt = $numerator / $denominator;
         
-        // Apply learning transition
-        $newBkt = $newBkt + (1 - $newBkt) * $params['learn_rate'];
+        // Apply learning transition more gradually
+        $learningRate = $adjustedParams['learn_rate'] * $moderatedTimeScore * $moderatedDifficultyFactor;
+        $newBkt = $posteriorBkt + (1 - $posteriorBkt) * $learningRate;
         
-        return max(0, min(1, $newBkt));
+        // Prevent dramatic changes - limit change to 0.1 per question
+        $maxChange = 0.1;
+        $change = $newBkt - $priorBkt;
+        if (abs($change) > $maxChange) {
+            $newBkt = $priorBkt + ($change > 0 ? $maxChange : -$maxChange);
+        }
+        
+        return max(0.01, min(0.99, $newBkt)); // Keep BKT between 1% and 99%
     }
     
     /**
-     * Get difficulty factor
+     * Get difficulty factor (reduced impact to prevent jumps)
      */
     private function getDifficultyFactor($difficulty)
     {
         $factors = [
-            'beginner' => 0.8,
+            'beginner' => 0.95,    // Reduced from 0.8
             'intermediate' => 1.0,
-            'advanced' => 1.2
+            'advanced' => 1.05     // Reduced from 1.2
         ];
         
         return $factors[$difficulty] ?? 1.0;
     }
     
     /**
-     * Calculate mastery score
+     * Calculate mastery score with smoother transitions
      */
     private function calculateMasteryScore($accuracy, $bktScore)
     {
-        return (0.55 * $accuracy + 0.45 * $bktScore) * 100;
+        // Use a more balanced approach with smoother transitions
+        $weightedScore = (0.6 * $accuracy + 0.4 * $bktScore) * 100;
+        
+        // Apply smoothing to prevent dramatic changes
+        return min(100, max(0, $weightedScore));
     }
     
     /**
@@ -802,9 +872,9 @@ class RegularAssessmentController extends Controller
     {
         if ($masteryScore >= 85 && $currentDifficulty !== 'advanced') {
             return 'advanced';
-        } elseif ($masteryScore >= 75 && $masteryScore < 85 && $currentDifficulty !== 'intermediate') {
+        } elseif ($masteryScore >= 76 && $masteryScore <= 84 && $currentDifficulty !== 'intermediate') {
             return 'intermediate';
-        } elseif ($masteryScore < 50 && $currentDifficulty !== 'beginner') {
+        } elseif ($masteryScore <= 75 && $currentDifficulty !== 'beginner') {
             return 'beginner';
         }
         
@@ -812,11 +882,21 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Complete assessment
+     * Complete assessment with final BKT calculations
      */
     private function completeAssessment($assessmentId)
     {
         try {
+            // Get assessment info
+            $assessment = DB::table('assessments')
+                ->where('assessment_id', $assessmentId)
+                ->first();
+                
+            if (!$assessment) {
+                Log::error('Assessment not found for completion', ['assessment_id' => $assessmentId]);
+                return;
+            }
+            
             // Get final assessment statistics
             $responses = DB::table('question_responses')
                 ->where('assessment_id', $assessmentId)
@@ -833,6 +913,34 @@ class RegularAssessmentController extends Controller
                 $accuracy = $responses->total_answered > 0 ? 
                     ($responses->correct_answers / $responses->total_answered) * 100 : 0;
                 
+                // Get current BKT scores from student_mastery
+                $mastery = DB::table('student_mastery')
+                    ->where('user_id', $assessment->user_id)
+                    ->where('competency', $assessment->competency)
+                    ->first();
+                
+                $initialBktScore = $mastery ? $mastery->bkt_score : 0.5;
+                
+                // Apply final BKT consolidation based on overall performance
+                $this->applyFinalBKTConsolidation(
+                    $assessment->user_id, 
+                    $assessment->competency, 
+                    $accuracy / 100, // Convert to decimal
+                    $responses->avg_time_score ?? 0.5,
+                    $assessment->difficulty_level,
+                    $responses->total_answered
+                );
+                
+                // Get final BKT scores after consolidation
+                $finalMastery = DB::table('student_mastery')
+                    ->where('user_id', $assessment->user_id)
+                    ->where('competency', $assessment->competency)
+                    ->first();
+                
+                $finalBktScore = $finalMastery ? $finalMastery->bkt_score : $initialBktScore;
+                $finalMasteryScore = $finalMastery ? $finalMastery->final_mastery_score : 0;
+                
+                // Update assessment record with complete BKT tracking
                 DB::table('assessments')
                     ->where('assessment_id', $assessmentId)
                     ->update([
@@ -842,15 +950,67 @@ class RegularAssessmentController extends Controller
                         'correct_answers' => $responses->correct_answers,
                         'incorrect_answers' => $responses->total_answered - $responses->correct_answers,
                         'accuracy_percentage' => $accuracy,
+                        'accuracy_component' => $accuracy / 100,
+                        'bkt_score_before' => $assessment->bkt_score_before ?? $initialBktScore,
+                        'bkt_score_after' => $finalBktScore,
+                        'bkt_final_score' => $finalBktScore,
+                        'bkt_component' => $finalBktScore,
+                        'final_mastery_score' => $finalMasteryScore,
                         'average_response_time' => $responses->avg_response_time,
                         'time_performance_score' => $responses->avg_time_score,
+                        'cumulative_time_score' => $responses->avg_time_score * $responses->total_answered,
+                        'average_time_factor' => $responses->avg_time_score,
+                        'total_time_spent' => $responses->avg_response_time * $responses->total_answered,
                         'total_points_earned' => $responses->total_points_earned
+                    ]);
+                
+                // Get suggested difficulty level based on final mastery score
+                $suggestedDifficulty = $this->getSuggestedDifficultyLevel($finalMasteryScore);
+                
+                // Also update assessment_sessions table if it exists for this assessment
+                $sessionExists = DB::table('assessment_sessions')
+                    ->where('assessment_id', $assessmentId)
+                    ->where('user_id', $assessment->user_id)
+                    ->exists();
+                
+                if ($sessionExists) {
+                    DB::table('assessment_sessions')
+                        ->where('assessment_id', $assessmentId)
+                        ->where('user_id', $assessment->user_id)
+                        ->update([
+                            'status' => 'completed',
+                            'completed_at' => now(),
+                            'questions_answered' => $responses->total_answered,
+                            'correct_answers' => $responses->correct_answers,
+                            'incorrect_answers' => $responses->total_answered - $responses->correct_answers,
+                            'total_points_earned' => $responses->total_points_earned,
+                            'accuracy_percentage' => $accuracy,
+                            'accuracy_component' => $accuracy / 100,
+                            'average_response_time' => $responses->avg_response_time,
+                            'time_performance_score' => $responses->avg_time_score,
+                            'cumulative_time_score' => $responses->avg_time_score * $responses->total_answered,
+                            'initial_bkt_probability' => $assessment->bkt_score_before ?? $initialBktScore,
+                            'final_bkt_probability' => $finalBktScore,
+                            'bkt_component' => $finalBktScore,
+                            'final_mastery_score' => $finalMasteryScore,
+                            'suggested_difficulty_level' => $suggestedDifficulty
+                        ]);
+                }
+                
+                // Update assessments table with suggested difficulty as well
+                DB::table('assessments')
+                    ->where('assessment_id', $assessmentId)
+                    ->update([
+                        'suggested_difficulty_level' => $suggestedDifficulty
                     ]);
                     
                 Log::info("Assessment completed successfully", [
                     'assessment_id' => $assessmentId,
                     'accuracy' => $accuracy,
-                    'total_points' => $responses->total_points_earned
+                    'total_points' => $responses->total_points_earned,
+                    'bkt_before' => $assessment->bkt_score_before ?? $initialBktScore,
+                    'bkt_after' => $finalBktScore,
+                    'final_mastery' => $finalMasteryScore
                 ]);
             }
             
@@ -858,6 +1018,58 @@ class RegularAssessmentController extends Controller
             Log::error('Failed to complete assessment: ' . $e->getMessage(), [
                 'assessment_id' => $assessmentId
             ]);
+        }
+    }
+    
+    /**
+     * Apply final BKT consolidation after assessment completion
+     */
+    private function applyFinalBKTConsolidation($userId, $competency, $overallAccuracy, $avgTimeScore, $difficulty, $questionCount)
+    {
+        try {
+            $mastery = DB::table('student_mastery')
+                ->where('user_id', $userId)
+                ->where('competency', $competency)
+                ->first();
+                
+            if (!$mastery) return;
+            
+            // Apply a consolidation factor based on assessment performance
+            $consolidationFactor = min(0.05, $questionCount * 0.003); // Max 5% adjustment
+            
+            if ($overallAccuracy >= 0.7) {
+                // Good performance - slight positive consolidation
+                $bktAdjustment = $consolidationFactor * $avgTimeScore;
+            } else {
+                // Poor performance - slight negative consolidation
+                $bktAdjustment = -$consolidationFactor * (1 - $avgTimeScore);
+            }
+            
+            $newBktScore = max(0.01, min(0.99, $mastery->bkt_score + $bktAdjustment));
+            $newMasteryScore = $this->calculateMasteryScore($mastery->accuracy_score, $newBktScore);
+            
+            // Check for difficulty progression
+            $newDifficulty = $this->checkDifficultyProgression($newMasteryScore, $mastery->current_difficulty);
+            
+            DB::table('student_mastery')
+                ->where('user_id', $userId)
+                ->where('competency', $competency)
+                ->update([
+                    'bkt_score' => $newBktScore,
+                    'final_mastery_score' => $newMasteryScore,
+                    'current_difficulty' => $newDifficulty,
+                    'updated_at' => now()
+                ]);
+                
+            Log::info("Final BKT consolidation applied", [
+                'user_id' => $userId,
+                'competency' => $competency,
+                'bkt_adjustment' => $bktAdjustment,
+                'new_mastery_score' => $newMasteryScore
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to apply final BKT consolidation: ' . $e->getMessage());
         }
     }
     
@@ -1355,15 +1567,40 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Generate unique assessment ID
+     * Generate unique assessment ID (max 50 chars for DB)
      */
     private function generateUniqueAssessmentId($userId, $competency, $difficulty, $index)
     {
-        $timestamp = time();
-        $microtime = microtime(true);
-        $randomSuffix = substr(md5($microtime), 0, 6);
+        // Use current time with microseconds for better uniqueness
+        $timestamp = time() . substr(microtime(), 2, 6); // Unix timestamp + microseconds
+        $randomBytes = bin2hex(random_bytes(6)); // 12 char random string
         
-        return "ASSESS_{$userId}_{$competency}_{$difficulty}_{$index}_{$timestamp}_{$randomSuffix}";
+        // Format: ASS_[userId]_[timestamp]_[random] (keeps it under 50 chars)
+        $assessmentId = "ASS_{$userId}_{$timestamp}_{$randomBytes}";
+        
+        // Double-check for existing assessment with same ID
+        $existingAssessment = DB::table('assessments')
+            ->where('assessment_id', $assessmentId)
+            ->first();
+        
+        // If duplicate found, add extra randomness
+        if ($existingAssessment) {
+            $extraRandom = bin2hex(random_bytes(4)); // 8 more chars
+            $assessmentId = "ASS_{$userId}_{$timestamp}{$extraRandom}";
+            
+            // Final check - if still duplicate, use completely random approach
+            $retryCount = 0;
+            while ($existingAssessment && $retryCount < 5) {
+                $fullRandom = bin2hex(random_bytes(10)); // 20 char random
+                $assessmentId = "ASS_{$userId}_{$fullRandom}";
+                $existingAssessment = DB::table('assessments')
+                    ->where('assessment_id', $assessmentId)
+                    ->first();
+                $retryCount++;
+            }
+        }
+        
+        return $assessmentId;
     }
     
     /**
@@ -1419,5 +1656,411 @@ class RegularAssessmentController extends Controller
             ->toArray();
             
         return $topics ?: ['General Mathematics'];
+    }
+    
+    /**
+     * Check for active assessment sessions for a user
+     */
+    public function checkActiveAssessments(Request $request)
+    {
+        $request->validate([
+            'category' => 'required|string'
+        ]);
+        
+        $user = Auth::user();
+        $category = $request->category;
+        $dbCompetency = strtolower($category);
+        
+        try {
+            // Check for active assessments in assessments table that have been STARTED (have sessions)
+            $activeAssessments = DB::table('assessments as a')
+                ->join('assessment_sessions as s', 'a.assessment_id', '=', 's.assessment_id')
+                ->where('a.user_id', $user->id)
+                ->where('a.competency', $dbCompetency)
+                ->where('a.status', 'in_progress')
+                ->where('s.status', 'in_progress')
+                ->where('a.started_at', '>=', now()->subHours(2)) // Only check recent assessments
+                ->select('a.*', 's.session_id', 's.questions_answered as session_progress')
+                ->get();
+            
+            // Check for active sessions in assessment_sessions table (standalone sessions)
+            $activeSessions = DB::table('assessment_sessions')
+                ->where('user_id', $user->id)
+                ->where('competency', $dbCompetency)
+                ->where('status', 'in_progress')
+                ->where('started_at', '>=', now()->subHours(2)) // Only check recent sessions
+                ->whereNull('assessment_id') // Sessions without assessments
+                ->get();
+            
+            $activeAssessmentData = [];
+            
+            // Process active assessments
+            foreach ($activeAssessments as $assessment) {
+                // Check if assessment has questions and progress
+                $questionCount = DB::table('assessment_questions')
+                    ->where('assessment_id', $assessment->assessment_id)
+                    ->count();
+                    
+                if ($questionCount > 0) {
+                    $activeAssessmentData[] = [
+                        'assessment_id' => $assessment->assessment_id,
+                        'type' => 'assessment',
+                        'progress' => $assessment->questions_answered,
+                        'total_questions' => $assessment->total_questions,
+                        'started_at' => $assessment->started_at,
+                        'difficulty' => $assessment->difficulty_level,
+                        'time_limit' => $assessment->time_limit ?? 30
+                    ];
+                }
+            }
+            
+            // Process active sessions
+            foreach ($activeSessions as $session) {
+                $activeAssessmentData[] = [
+                    'session_id' => $session->session_id,
+                    'assessment_id' => $session->assessment_id,
+                    'type' => 'session',
+                    'progress' => $session->questions_answered,
+                    'total_questions' => $session->total_questions,
+                    'started_at' => $session->started_at,
+                    'difficulty' => $session->difficulty_level,
+                    'time_limit' => $session->time_limit_minutes ?? 30
+                ];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'has_active_assessments' => !empty($activeAssessmentData),
+                'active_assessments' => $activeAssessmentData
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking active assessments: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'category' => $category,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking active assessments',
+                'has_active_assessments' => false,
+                'active_assessments' => []
+            ]);
+        }
+    }
+    
+    /**
+     * Resume an active assessment from assessment list
+     */
+    public function resumeAssessmentFromList(Request $request)
+    {
+        $request->validate([
+            'assessment_id' => 'required|string',
+            'category' => 'required|string'
+        ]);
+        
+        $user = Auth::user();
+        $assessmentId = $request->assessment_id;
+        $category = $request->category;
+        
+        try {
+            // Verify the assessment belongs to the user and is active
+            $assessment = DB::table('assessments')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->where('status', 'in_progress')
+                ->first();
+            
+            if (!$assessment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Assessment not found or not active'
+                ]);
+            }
+            
+            // Check if assessment has questions
+            $questionCount = DB::table('assessment_questions')
+                ->where('assessment_id', $assessmentId)
+                ->count();
+                
+            if ($questionCount === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Assessment has no questions'
+                ]);
+            }
+            
+            // Get the next question to continue from
+            $nextQuestion = DB::table('assessment_questions as aq')
+                ->join('questions as q', 'aq.question_id', '=', 'q.question_id')
+                ->where('aq.assessment_id', $assessmentId)
+                ->where('aq.is_answered', false)
+                ->orderBy('aq.question_order')
+                ->first();
+            
+            if (!$nextQuestion) {
+                // All questions answered, redirect to results page
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('student.quiz.results.complete', $category) . '?assessment_id=' . $assessmentId
+                ]);
+            }
+            
+            // Calculate current progress
+            $currentQuestionNumber = $assessment->questions_answered + 1;
+            
+            return response()->json([
+                'success' => true,
+                'redirect' => route('student.quiz.show', [
+                    'category' => $category
+                ]) . '?assessment_id=' . $assessmentId . '&question=' . $currentQuestionNumber
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error resuming assessment: ' . $e->getMessage(), [
+                'assessment_id' => $assessmentId,
+                'user_id' => $user->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to resume assessment: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Show quiz completion page
+     */
+    public function showQuizComplete($category, Request $request)
+    {
+        $user = Auth::user();
+        $assessmentId = $request->query('assessment_id');
+        
+        if (!$assessmentId) {
+            return redirect()->route('student.assessments.category', $category)
+                ->with('error', 'Assessment ID is required to view results.');
+        }
+        
+        try {
+            // Get assessment details
+            $assessment = DB::table('assessments')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->first();
+                
+            if (!$assessment) {
+                return redirect()->route('student.assessments.category', $category)
+                    ->with('error', 'Assessment not found.');
+            }
+            
+            // Get user's mastery data
+            $mastery = DB::table('student_mastery')
+                ->where('user_id', $user->id)
+                ->where('competency', strtolower($category))
+                ->first();
+            
+            // Format category data
+            $categoryData = $this->getCategoryData($category);
+            
+            return view('student.assessment-complete', [
+                'category' => $category,
+                'data' => $categoryData,
+                'mastery' => $mastery,
+                'assessment' => $assessment,
+                'assessment_id' => $assessmentId,
+                'from_regular_quiz' => true
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to show quiz completion page: ' . $e->getMessage());
+            return redirect()->route('student.assessments.category', $category)
+                ->with('error', 'Unable to load results page.');
+        }
+    }
+    
+    /**
+     * Show quiz review page
+     */
+    public function showQuizReview($category, Request $request)
+    {
+        $user = Auth::user();
+        $assessmentId = $request->query('assessment_id');
+        
+        if (!$assessmentId) {
+            return redirect()->route('student.assessments.category', $category)
+                ->with('error', 'Assessment ID is required to view review.');
+        }
+        
+        try {
+            // Get assessment details
+            $assessment = DB::table('assessments')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->first();
+                
+            if (!$assessment) {
+                return redirect()->route('student.assessments.category', $category)
+                    ->with('error', 'Assessment not found.');
+            }
+            
+            // Get question responses for review
+            $responses = DB::table('question_responses as qr')
+                ->join('questions as q', 'qr.question_id', '=', 'q.question_id')
+                ->where('qr.assessment_id', $assessmentId)
+                ->select([
+                    'q.question_text',
+                    'q.question_type',
+                    'q.choice_a',
+                    'q.choice_b', 
+                    'q.choice_c',
+                    'q.choice_d',
+                    'q.correct_answer',
+                    'q.explanation',
+                    'q.difficulty_level',
+                    'q.topic_tag as topic',
+                    'qr.user_answer',
+                    'qr.is_correct',
+                    'qr.response_time',
+                    'qr.answered_at'
+                ])
+                ->orderBy('qr.answered_at')
+                ->get();
+            
+            // Get user's mastery data
+            $mastery = DB::table('student_mastery')
+                ->where('user_id', $user->id)
+                ->where('competency', strtolower($category))
+                ->first();
+            
+            // Calculate statistics for the view
+            $correctAnswers = $responses->where('is_correct', true)->count();
+            $totalQuestions = $responses->count();
+            $scorePercentage = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 1) : 0;
+            
+            // Group responses by difficulty level for breakdown
+            $questionsByDifficulty = $responses->groupBy('difficulty_level');
+            
+            // Format category data
+            $categoryData = $this->getCategoryData($category);
+            
+            return view('student.assessment-review', [
+                'category' => $category,
+                'data' => $categoryData,
+                'mastery' => $mastery,
+                'assessment' => $assessment,
+                'responses' => $responses,
+                'questionResponses' => $responses, // For compatibility with view
+                'correctAnswers' => $correctAnswers,
+                'totalQuestions' => $totalQuestions,
+                'scorePercentage' => $scorePercentage,
+                'questionsByDifficulty' => $questionsByDifficulty,
+                'assessment_id' => $assessmentId,
+                'from_regular_quiz' => true
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to show quiz review page: ' . $e->getMessage());
+            return redirect()->route('student.assessments.category', $category)
+                ->with('error', 'Unable to load review page.');
+        }
+    }
+    
+    /**
+     * Get quiz results data (API endpoint)
+     */
+    public function getQuizResultsData($assessmentId)
+    {
+        $user = Auth::user();
+        
+        try {
+            // Get assessment details
+            $assessment = DB::table('assessments')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->first();
+                
+            if (!$assessment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Assessment not found.'
+                ]);
+            }
+            
+            // Get detailed response statistics
+            $responses = DB::table('question_responses')
+                ->where('assessment_id', $assessmentId)
+                ->selectRaw('
+                    COUNT(*) as total_questions,
+                    SUM(is_correct) as correct_answers,
+                    AVG(response_time) as avg_response_time,
+                    SUM(total_points) as total_points,
+                    AVG(time_score) as avg_time_score
+                ')
+                ->first();
+            
+            return response()->json([
+                'success' => true,
+                'assessment' => $assessment,
+                'responses' => $responses,
+                'accuracy' => $responses->total_questions > 0 ? 
+                    round(($responses->correct_answers / $responses->total_questions) * 100, 1) : 0
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to get quiz results data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get results data'
+            ]);
+        }
+    }
+    
+    
+    /**
+     * Get category data for display
+     */
+    private function getCategoryData($category)
+    {
+        $categoryMap = [
+            'number_algebra' => [
+                'title' => 'Number and Algebra',
+                'icon' => '🔢',
+                'description' => 'Master mathematical expressions, equations, and number relationships'
+            ],
+            'measurement_geometry' => [
+                'title' => 'Measurement and Geometry', 
+                'icon' => '📐',
+                'description' => 'Explore shapes, measurements, and spatial relationships'
+            ],
+            'data_probability' => [
+                'title' => 'Data and Probability',
+                'icon' => '📊', 
+                'description' => 'Analyze data patterns and understand probability concepts'
+            ]
+        ];
+        
+        return $categoryMap[$category] ?? [
+            'title' => ucfirst(str_replace('_', ' ', $category)),
+            'icon' => '📚',
+            'description' => 'Mathematical concepts and problem solving'
+        ];
+    }
+    
+    /**
+     * Get suggested difficulty level based on mastery score
+     * Uses the same thresholds as diagnostic: beginner (≤75), intermediate (76-84), advanced (≥85)
+     */
+    private function getSuggestedDifficultyLevel($masteryScore)
+    {
+        if ($masteryScore >= 85) {
+            return 'advanced';
+        } elseif ($masteryScore >= 76 && $masteryScore <= 84) {
+            return 'intermediate';
+        } else {
+            return 'beginner';
+        }
     }
 }

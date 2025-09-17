@@ -32,7 +32,8 @@ class AssessmentGenerationController extends Controller
             $sessionKey = "assessments_{$userId}_{$competency}_{$currentDifficulty}";
             $cachedAssessments = session($sessionKey);
             
-            // Temporarily disable caching for testing - remove this later
+            // Clear session cache to force fresh generation with unique IDs
+            session()->forget($sessionKey);
             $cachedAssessments = null;
             
             if ($cachedAssessments && isset($cachedAssessments['generated_at']) && 
@@ -67,7 +68,13 @@ class AssessmentGenerationController extends Controller
             // Check for existing valid assessments first
             $existingAssessments = $this->getExistingValidAssessments($userId, $competency, $currentDifficulty);
             
-            if (!empty($existingAssessments)) {
+            // Calculate how many assessments we should have
+            $maxAssessments = 8; // Increased limit to allow more assessments
+            $possibleAssessments = floor($availabilityCheck['availableCount'] / $questionsPerAssessment);
+            $targetAssessmentCount = min($maxAssessments, $possibleAssessments);
+            
+            // Only use existing assessments if we have enough, otherwise generate new ones
+            if (!empty($existingAssessments) && count($existingAssessments) >= $targetAssessmentCount) {
                 Log::info("Using existing valid assessments", [
                     'user_id' => $userId,
                     'competency' => $competency,
@@ -87,18 +94,25 @@ class AssessmentGenerationController extends Controller
                 ]]);
                 
                 return $result;
+            } else {
+                // Clear any insufficient existing assessments and generate fresh ones
+                if (!empty($existingAssessments)) {
+                    Log::info("Insufficient existing assessments, generating fresh ones", [
+                        'existing_count' => count($existingAssessments),
+                        'target_count' => $targetAssessmentCount
+                    ]);
+                }
             }
             
-            // Generate new assessments only if none exist
-            $maxAssessments = 8; // Increased limit to allow more assessments
-            $possibleAssessments = floor($availabilityCheck['availableCount'] / $questionsPerAssessment);
-            $assessmentCount = min($maxAssessments, $possibleAssessments);
+            // Generate new assessments only if none exist or insufficient existing ones
+            $assessmentCount = $targetAssessmentCount;
             
             Log::info("Assessment generation calculation", [
                 'available_questions' => $availabilityCheck['availableCount'],
                 'questions_per_assessment' => $questionsPerAssessment,
                 'possible_assessments' => $possibleAssessments,
                 'max_assessments' => $maxAssessments,
+                'target_assessment_count' => $targetAssessmentCount,
                 'final_assessment_count' => $assessmentCount
             ]);
             
@@ -181,22 +195,34 @@ class AssessmentGenerationController extends Controller
     public function createActualAssessment($assessmentId, $userId, $competency, $difficulty)
     {
         try {
-            // Check if assessment already exists in database
-            $existingAssessment = DB::table('assessments')
-                ->where('assessment_id', $assessmentId)
-                ->first();
+            // ALWAYS generate a new unique ID instead of using the passed one
+            // This prevents duplicate key violations from cached/reused IDs
+            $newAssessmentId = $this->generateUniqueAssessmentId($userId, $competency, $difficulty, rand(1, 999));
             
-            if ($existingAssessment) {
-                Log::info("Assessment already exists in database", [
-                    'assessment_id' => $assessmentId,
-                    'status' => $existingAssessment->status
+            // Double-check that the new ID is truly unique
+            $retryCount = 0;
+            while (DB::table('assessments')->where('assessment_id', $newAssessmentId)->exists() && $retryCount < 10) {
+                $newAssessmentId = $this->generateUniqueAssessmentId($userId, $competency, $difficulty, rand(1000, 9999));
+                $retryCount++;
+            }
+            
+            if ($retryCount >= 10) {
+                Log::error("Failed to generate unique assessment ID after 10 attempts", [
+                    'user_id' => $userId,
+                    'competency' => $competency,
+                    'difficulty' => $difficulty
                 ]);
                 return [
-                    'success' => true,
-                    'exists' => true,
-                    'assessment' => $existingAssessment
+                    'success' => false,
+                    'message' => 'Unable to generate unique assessment ID. Please try again.'
                 ];
             }
+            
+            Log::info("Generated new unique assessment ID", [
+                'original_id' => $assessmentId,
+                'new_id' => $newAssessmentId,
+                'user_id' => $userId
+            ]);
             
             // Define question counts
             $questionCounts = [
@@ -206,30 +232,16 @@ class AssessmentGenerationController extends Controller
             ];
             
             $questionCount = $questionCounts[$difficulty] ?? 15;
-            
-            // Create assessment pool using Fisher-Yates algorithm
-            $poolResult = $this->createAssessmentPoolWithFisherYates(
-                $assessmentId, 
-                $userId, 
-                $competency, 
-                $difficulty, 
-                $questionCount
-            );
-            
-            if (!$poolResult['success']) {
-                return $poolResult;
-            }
-            
-            // Create assessment record in database
             $timeLimit = $this->getTimeLimitForDifficulty($difficulty);
             
+            // Create assessment record FIRST before any other database operations
             $assessmentData = [
-                'assessment_id' => $assessmentId,
+                'assessment_id' => $newAssessmentId,
                 'user_id' => $userId,
                 'competency' => $competency,
                 'assessment_type' => 'regular',
                 'difficulty_level' => $difficulty,
-                'total_questions' => $poolResult['total_questions'],
+                'total_questions' => $questionCount,
                 'time_limit' => $timeLimit,
                 'status' => 'in_progress',
                 'started_at' => now(),
@@ -241,10 +253,47 @@ class AssessmentGenerationController extends Controller
                 'cumulative_time_score' => 0.0000
             ];
             
+            // Insert assessment record first
             DB::table('assessments')->insert($assessmentData);
             
+            Log::info("Assessment record created successfully", [
+                'assessment_id' => $newAssessmentId,
+                'user_id' => $userId
+            ]);
+            
+            // Now create assessment pool using Fisher-Yates algorithm with existing assessment ID
+            $poolResult = $this->createAssessmentPoolWithFisherYates(
+                $newAssessmentId, 
+                $userId, 
+                $competency, 
+                $difficulty, 
+                $questionCount
+            );
+            
+            if (!$poolResult['success']) {
+                // Clean up assessment record if pool creation fails
+                DB::table('assessments')->where('assessment_id', $newAssessmentId)->delete();
+                return $poolResult;
+            }
+            
+            // Create assessment session after pool creation
+            $questionsArray = $poolResult['shuffled_questions'] ?? ($poolResult['questions'] ?? ($poolResult['available_questions'] ?? []));
+            $sessionResult = $this->createAssessmentSession($newAssessmentId, $userId, $competency, $difficulty, $questionCount, $questionsArray);
+            
+            if (!$sessionResult['success']) {
+                // Clean up if session creation fails
+                DB::table('assessments')->where('assessment_id', $newAssessmentId)->delete();
+                Log::error("Failed to create assessment session", [
+                    'assessment_id' => $newAssessmentId,
+                    'error' => $sessionResult['message']
+                ]);
+                return $sessionResult;
+            }
+            
+            
             Log::info("Assessment created successfully", [
-                'assessment_id' => $assessmentId,
+                'assessment_id' => $newAssessmentId,
+                'assessment_id_length' => strlen($newAssessmentId),
                 'question_count' => $poolResult['total_questions']
             ]);
             
@@ -252,6 +301,7 @@ class AssessmentGenerationController extends Controller
                 'success' => true,
                 'exists' => false,
                 'assessment' => (object) $assessmentData,
+                'session_id' => $sessionResult['session_id'],
                 'question_count' => $poolResult['total_questions'],
                 'time_limit' => $timeLimit
             ];
@@ -266,6 +316,98 @@ class AssessmentGenerationController extends Controller
             return [
                 'success' => false,
                 'message' => 'Failed to create assessment: ' . $e->getMessage()
+            ];
+        }
+    }
+    
+    /**
+     * Create assessment session record
+     */
+    private function createAssessmentSession($assessmentId, $userId, $competency, $difficulty, $questionCount, $questions)
+    {
+        try {
+            // Generate unique session ID
+            $sessionId = 'SESS_' . $userId . '_' . time() . '_' . bin2hex(random_bytes(4));
+            
+            // Ensure session ID is unique
+            while (DB::table('assessment_sessions')->where('session_id', $sessionId)->exists()) {
+                $sessionId = 'SESS_' . $userId . '_' . time() . '_' . bin2hex(random_bytes(4));
+            }
+            
+            $timeLimit = $this->getTimeLimitForDifficulty($difficulty);
+            $now = now();
+            
+            // Ensure questions is an array and properly formatted
+            if (!is_array($questions)) {
+                $questions = [];
+            }
+            
+            // Extract just the question IDs if questions have full data
+            $questionIds = [];
+            foreach ($questions as $question) {
+                if (is_array($question) && isset($question['question_id'])) {
+                    $questionIds[] = $question['question_id'];
+                } elseif (is_string($question) || is_numeric($question)) {
+                    $questionIds[] = $question;
+                }
+            }
+            
+            $sessionData = [
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'assessment_id' => $assessmentId,
+                'session_type' => 'adaptive',
+                'competency' => $competency,
+                'difficulty_level' => $difficulty,
+                'total_questions' => $questionCount,
+                'questions_json' => json_encode($questionIds),
+                'current_question_index' => 0,
+                'time_limit_minutes' => $timeLimit,
+                'total_time_allowed_seconds' => $timeLimit * 60,
+                'countdown_started_at' => $now,
+                'countdown_expires_at' => $now->copy()->addMinutes($timeLimit),
+                'time_remaining_seconds' => $timeLimit * 60,
+                'auto_submit_on_timeout' => true,
+                'beginner_question_time_limit' => 30,
+                'intermediate_question_time_limit' => 45,
+                'advanced_question_time_limit' => 60,
+                'current_question_time_limit' => $difficulty === 'beginner' ? 30 : ($difficulty === 'intermediate' ? 45 : 60),
+                'is_paused' => false,
+                'questions_answered' => 0,
+                'correct_answers' => 0,
+                'incorrect_answers' => 0,
+                'total_points_earned' => 0,
+                'is_adaptive' => true,
+                'status' => 'in_progress',
+                'started_at' => $now,
+                'last_activity_at' => $now
+            ];
+            
+            DB::table('assessment_sessions')->insert($sessionData);
+            
+            Log::info("Assessment session created successfully", [
+                'session_id' => $sessionId,
+                'assessment_id' => $assessmentId,
+                'user_id' => $userId,
+                'question_count' => count($questionIds)
+            ]);
+            
+            return [
+                'success' => true,
+                'session_id' => $sessionId,
+                'session_data' => $sessionData
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error('Assessment session creation failed: ' . $e->getMessage(), [
+                'assessment_id' => $assessmentId,
+                'user_id' => $userId,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => 'Failed to create assessment session: ' . $e->getMessage()
             ];
         }
     }
@@ -350,15 +492,40 @@ class AssessmentGenerationController extends Controller
     }
     
     /**
-     * Generate unique assessment ID with better randomization
+     * Generate unique assessment ID with better randomization (max 50 chars for DB)
      */
     private function generateUniqueAssessmentId($userId, $competency, $difficulty, $index)
     {
-        $timestamp = time();
-        $microtime = microtime(true);
-        $randomBytes = bin2hex(random_bytes(4)); // More random than md5
+        // Use current time with microseconds for better uniqueness
+        $timestamp = time() . substr(microtime(), 2, 6); // Unix timestamp + microseconds
+        $randomBytes = bin2hex(random_bytes(6)); // 12 char random string
         
-        return "ASSESS_{$userId}_{$competency}_{$difficulty}_{$index}_{$timestamp}_{$randomBytes}";
+        // Format: ASS_[userId]_[timestamp]_[random] (keeps it under 50 chars)
+        $assessmentId = "ASS_{$userId}_{$timestamp}_{$randomBytes}";
+        
+        // Double-check for existing assessment with same ID
+        $existingAssessment = DB::table('assessments')
+            ->where('assessment_id', $assessmentId)
+            ->first();
+        
+        // If duplicate found, add extra randomness
+        if ($existingAssessment) {
+            $extraRandom = bin2hex(random_bytes(4)); // 8 more chars
+            $assessmentId = "ASS_{$userId}_{$timestamp}{$extraRandom}";
+            
+            // Final check - if still duplicate, use completely random approach
+            $retryCount = 0;
+            while ($existingAssessment && $retryCount < 5) {
+                $fullRandom = bin2hex(random_bytes(10)); // 20 char random
+                $assessmentId = "ASS_{$userId}_{$fullRandom}";
+                $existingAssessment = DB::table('assessments')
+                    ->where('assessment_id', $assessmentId)
+                    ->first();
+                $retryCount++;
+            }
+        }
+        
+        return $assessmentId;
     }
     
     // ... rest of the existing methods remain the same ...

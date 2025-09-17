@@ -339,21 +339,91 @@
 <script>
 let assessmentOptions = @json($assessmentOptions ?? []);
 let selectedAssessmentIndex = null;
+let activeAssessments = []; // Initialize as empty array
+
+// Check for active assessments when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    checkForActiveAssessments();
+});
+
+function checkForActiveAssessments() {
+    fetch('{{ route("student.quiz.check-active") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            category: '{{ $category }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.has_active_assessments) {
+            activeAssessments = data.active_assessments || []; // Ensure it's an array
+            updateAssessmentButtons();
+        } else {
+            activeAssessments = []; // Reset to empty array if no active assessments
+        }
+    })
+    .catch(error => {
+        console.error('Error checking active assessments:', error);
+        activeAssessments = []; // Reset to empty array on error
+    });
+}
+
+function updateAssessmentButtons() {
+    // Update all assessment cards to show Resume if there's an active assessment
+    if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
+        const buttons = document.querySelectorAll('button[onclick*="openAssessmentModal"]');
+        buttons.forEach((button, index) => {
+            // Check if this specific assessment has an active session
+            const hasActiveAssessment = activeAssessments.some(active => 
+                active.assessment_id === assessmentOptions[index].assessment_id
+            );
+            
+            if (hasActiveAssessment) {
+                button.innerHTML = 'Resume Assessment';
+                // Keep the same styling as Start Assessment - orange gradient
+                button.className = 'w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200';
+            }
+        });
+    }
+}
 
 function openAssessmentModal(index) {
     selectedAssessmentIndex = index;
     const assessment = assessmentOptions[index];
+    
+    // Check if there's an active session for this specific assessment
+    let activeAssessment = null;
+    if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
+        activeAssessment = activeAssessments.find(active => 
+            active.assessment_id === assessment.assessment_id
+        );
+    }
     
     // Populate modal content
     document.getElementById('modal-title').textContent = assessment.title;
     document.getElementById('modal-time').textContent = assessment.time_limit + ' minutes';
     document.getElementById('modal-questions').textContent = assessment.question_count + ' Questions';
     
-    // Update start button
+    // Update start button based on whether there's an active assessment
     const startBtn = document.getElementById('modal-start-btn');
-    startBtn.onclick = function() {
-        startAssessment(assessment.assessment_id);
-    };
+    if (activeAssessment) {
+        startBtn.textContent = 'Resume Assessment';
+        // Keep the same styling as Start Assessment - orange gradient with updated classes
+        startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
+        startBtn.onclick = function() {
+            resumeAssessment(activeAssessment.assessment_id);
+        };
+    } else {
+        startBtn.textContent = 'Start Assessment';
+        startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
+        startBtn.onclick = function() {
+            startAssessment(assessment.assessment_id);
+        };
+    }
     
     // Show modal
     document.getElementById('assessmentModal').classList.remove('hidden');
@@ -362,6 +432,12 @@ function openAssessmentModal(index) {
 function closeAssessmentModal() {
     document.getElementById('assessmentModal').classList.add('hidden');
     selectedAssessmentIndex = null;
+    
+    // Reset button state in case it was changed
+    const startBtn = document.getElementById('modal-start-btn');
+    startBtn.disabled = false;
+    startBtn.textContent = 'Start Assessment';
+    startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
 }
 
 // Start assessment function
@@ -398,6 +474,45 @@ function startAssessment(assessmentId) {
     .catch(error => {
         console.error('Error starting assessment:', error);
         alert('Failed to start assessment. Please try again.');
+        startBtn.disabled = false;
+        startBtn.textContent = originalText;
+    });
+}
+
+// Resume assessment function
+function resumeAssessment(assessmentId) {
+    // Show loading state
+    const startBtn = document.getElementById('modal-start-btn');
+    const originalText = startBtn.textContent;
+    startBtn.disabled = true;
+    startBtn.textContent = 'Resuming...';
+    
+    // Resume the existing assessment
+    fetch('{{ route("student.quiz.resume-assessment") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            assessment_id: assessmentId,
+            category: '{{ $category }}'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to quiz interface or results
+            window.location.href = data.redirect;
+        } else {
+            alert(data.message || 'Failed to resume assessment. Please try again.');
+            startBtn.disabled = false;
+            startBtn.textContent = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error resuming assessment:', error);
+        alert('Failed to resume assessment. Please try again.');
         startBtn.disabled = false;
         startBtn.textContent = originalText;
     });

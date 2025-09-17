@@ -337,13 +337,20 @@ class EnhancedFisherYatesShuffle:
         try:
             cursor = conn.cursor()
             
-            # Check if assessment already exists
+            # Check if assessment already has questions (assessment_questions table)
+            cursor.execute("SELECT COUNT(*) FROM assessment_questions WHERE assessment_id = %s", (assessment_id,))
+            existing_questions = cursor.fetchone()[0]
+            
+            if existing_questions > 0:
+                print(f"DEBUG: Assessment {assessment_id} already has questions, skipping pool creation", file=sys.stderr)
+                return {'success': False, 'message': 'Assessment questions already exist'}
+            
+            # Check if assessment record exists in assessments table
             cursor.execute("SELECT assessment_id FROM assessments WHERE assessment_id = %s", (assessment_id,))
             existing_assessment = cursor.fetchone()
             
-            if existing_assessment:
-                print(f"DEBUG: Assessment {assessment_id} already exists, skipping creation", file=sys.stderr)
-                return {'success': False, 'message': 'Assessment already exists'}
+            assessment_exists = existing_assessment is not None
+            print(f"DEBUG: Assessment {assessment_id} exists in assessments table: {assessment_exists}", file=sys.stderr)
             
             # Extract parameters from assessment_id if not provided
             if user_id is None or competency is None or difficulty_level is None:
@@ -385,23 +392,26 @@ class EnhancedFisherYatesShuffle:
             # Take only the requested number of questions
             questions_to_use = available_questions[:question_count]
             
-            # Create assessment record (FIXED: prevent duplicates)
-            try:
-                cursor.execute("""
-                    INSERT INTO assessments 
-                    (assessment_id, user_id, competency, assessment_type, difficulty_level, 
-                     total_questions, status, is_diagnostic_phase, correct_answers, 
-                     incorrect_answers, questions_answered, total_time_spent, 
-                     cumulative_time_score)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    assessment_id, user_id, competency, 'regular', difficulty_level,
-                    len(questions_to_use), 'in_progress', 0, 0, 0, 0, 0, 0.0000
-                ))
-                print(f"DEBUG: Created new assessment record {assessment_id}", file=sys.stderr)
-            except mysql.connector.IntegrityError as e:
-                print(f"DEBUG: Assessment {assessment_id} already exists (integrity error), returning existing", file=sys.stderr)
-                return {'success': False, 'message': 'Assessment already exists'}
+            # Create assessment record only if it doesn't exist (PHP may have already created it)
+            if not assessment_exists:
+                try:
+                    cursor.execute("""
+                        INSERT INTO assessments 
+                        (assessment_id, user_id, competency, assessment_type, difficulty_level, 
+                         total_questions, status, is_diagnostic_phase, correct_answers, 
+                         incorrect_answers, questions_answered, total_time_spent, 
+                         cumulative_time_score)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        assessment_id, user_id, competency, 'regular', difficulty_level,
+                        len(questions_to_use), 'in_progress', 0, 0, 0, 0, 0, 0.0000
+                    ))
+                    print(f"DEBUG: Created new assessment record {assessment_id}", file=sys.stderr)
+                except mysql.connector.IntegrityError as e:
+                    print(f"DEBUG: Assessment {assessment_id} race condition, already exists", file=sys.stderr)
+                    # Continue with pool creation even if assessment creation failed due to race condition
+            else:
+                print(f"DEBUG: Assessment {assessment_id} already exists, proceeding with pool creation", file=sys.stderr)
             
             # Shuffle questions using Fisher-Yates
             shuffled_questions = self.fisher_yates_shuffle(questions_to_use)
