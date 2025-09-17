@@ -638,25 +638,26 @@ class BKTAlgorithm:
             
             # Get all responses for this diagnostic session to calculate proper metrics
             cursor.execute("""
-                SELECT is_correct, time_score, bkt_after, response_time, max_allowed_time
+                SELECT is_correct, time_score, bkt_after, bkt_before, response_time, max_allowed_time
                 FROM question_responses 
                 WHERE assessment_id = %s 
                 ORDER BY answered_at
             """, (session_id,))
-            
+
             responses = cursor.fetchall()
-            
+
             if not responses:
                 return {'success': False, 'message': 'No responses found for diagnostic'}
-            
+
             # Calculate accuracy score
             total_questions = len(responses)
             correct_answers = sum(1 for r in responses if r['is_correct'])
-            accuracy_score = correct_answers / total_questions if total_questions > 0 else 0
-            
-            # Calculate time scores (handle null values from old data)
+            incorrect_answers = total_questions - correct_answers
+            accuracy_score = correct_answers / total_questions if total_questions > 0 else 0            # Calculate time scores (handle null values from old data)
             time_scores = []
+            total_response_time = 0.0
             for r in responses:
+                total_response_time += float(r['response_time'])
                 if r['time_score'] is not None:
                     time_scores.append(float(r['time_score']))
                 else:
@@ -666,11 +667,17 @@ class BKTAlgorithm:
                     is_correct = bool(r['is_correct'])
                     time_score = self.calculate_time_score(response_time, max_time, is_correct)
                     time_scores.append(time_score)
-            
+
             # Calculate average time factor (ftime)
             average_time_factor = sum(time_scores) / len(time_scores) if time_scores else 1.0
             
-            # Get final BKT score (last BKT value after all responses)
+            # Calculate time-related metrics for assessments table
+            average_response_time = total_response_time / total_questions if total_questions > 0 else 0.0
+            cumulative_time_score = sum(time_scores)
+            time_performance_score = average_time_factor  # Using average time factor as time performance score
+
+            # Get BKT scores (first and last)
+            bkt_score_before = float(responses[0]['bkt_before']) if responses and responses[0]['bkt_before'] is not None else self.default_params['prior_knowledge']
             final_bkt_score = float(responses[-1]['bkt_after']) if responses else 0.5
             
             # Calculate mastery score using the weighted formula
@@ -828,23 +835,34 @@ class BKTAlgorithm:
                     UPDATE assessments 
                     SET status = 'completed',
                         completed_at = NOW(),
-                        final_mastery_score = %s,
-                        difficulty_level = %s,
+                        correct_answers = %s,
+                        incorrect_answers = %s,
+                        questions_answered = %s,
                         accuracy_percentage = %s,
-                        bkt_final_score = %s,
                         accuracy_component = %s,
+                        bkt_score_before = %s,
+                        bkt_score_after = %s,
+                        bkt_final_score = %s,
                         bkt_component = %s,
-                        average_time_factor = %s
+                        final_mastery_score = %s,
+                        total_time_spent = %s,
+                        average_response_time = %s,
+                        time_performance_score = %s,
+                        cumulative_time_score = %s,
+                        average_time_factor = %s,
+                        difficulty_level = %s
                     WHERE assessment_id = %s
-                """, (final_master_score, recommended_difficulty, accuracy_score * 100,
-                      final_bkt_score, accuracy_component, bkt_component, 
-                      average_time_factor, session_id))
-                
+                """, (correct_answers, incorrect_answers, total_questions, accuracy_score * 100,
+                      accuracy_component, bkt_score_before, final_bkt_score, final_bkt_score,
+                      bkt_component, final_master_score, int(total_response_time), 
+                      average_response_time, time_performance_score, cumulative_time_score,
+                      average_time_factor, recommended_difficulty, session_id))
+
                 self.log_error(f"Assessments update - rows affected: {cursor.rowcount}")
-                
+
                 # Commit the assessments update
                 conn.commit()
-                
+
             except mysql.connector.Error as e:
                 if e.errno == 1205:  # Lock timeout on assessments
                     self.log_error(f"Lock timeout on assessments table - non-critical")
@@ -879,11 +897,18 @@ class BKTAlgorithm:
                     'accuracy_score': accuracy_score,
                     'accuracy_percentage': accuracy_score * 100,
                     'bkt_score': final_bkt_score,
+                    'bkt_score_before': bkt_score_before,
+                    'bkt_score_after': final_bkt_score,
                     'accuracy_component': accuracy_component,
                     'bkt_component': bkt_component,
                     'average_time_factor': average_time_factor,
                     'total_questions': total_questions,
-                    'correct_answers': correct_answers
+                    'correct_answers': correct_answers,
+                    'incorrect_answers': incorrect_answers,
+                    'total_time_spent': int(total_response_time),
+                    'average_response_time': average_response_time,
+                    'time_performance_score': time_performance_score,
+                    'cumulative_time_score': cumulative_time_score
                 },
                 'phase_scores': {
                     'beginner': ms1,
