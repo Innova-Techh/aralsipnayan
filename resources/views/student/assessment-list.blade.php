@@ -1,26 +1,30 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Assessment List}}')
+@section('title', 'Assessment List')
 
 @section('content')
 
-<div class="space-y-8">
+    <div class="space-y-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
     <!-- My Assessments Header -->
     <div class="relative overflow-hidden mt-4 lg:mt-8">
-        <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" 
-             style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
-                    background-size: 95% clamp(120px, 10vw + 60px, 200px);
-                    min-height: clamp(120px, 10vw + 60px, 200px);
-                    padding-left: clamp(2rem, 8vw, 18rem);">
-            <div class="relative z-10 pr-6">
-                <h1 class="text-3xl sm:text-3xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
-                    {{ $data['title'] }} Assessments
-                </h1>
-                <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
-                    {{ $data['description'] }}
-                </p>
-            </div>
-        </div>
+<div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" 
+     style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
+            background-size: 95% clamp(120px, 10vw + 60px, 200px);
+            min-height: clamp(120px, 10vw + 60px, 200px);
+            padding-left: clamp(2rem, 8vw, 18rem);">
+    <div class="relative z-10 pr-6">
+        <!-- Title -->
+        <h1 class="text-lg sm:text-xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
+            {{ $data['title'] }} Assessments
+        </h1>
+
+        <!-- Description -->
+        <p class="text-[10px] sm:text-xs md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
+            {{ $data['description'] }}
+        </p>
+    </div>
+</div>
+
     </div>
 
     {{-- Return to Assessments --}}
@@ -147,99 +151,116 @@
     </div>
 
     <!-- Assessment List Content -->
-    <div class="mx-auto max-w-10xl">
-        @if($availableQuestions > 0)
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Available Assessments</h2>
-                <p class="text-gray-600">Based on your current level: {{ ucfirst($mastery->current_difficulty ?? 'Beginner') }}</p>
-                <p class="text-sm text-gray-500 mt-1">{{ $availableQuestions }} questions available ({{ $questionsInCooldown }} in cooldown)</p>
-            </div>
+<div class="mx-auto max-w-[1600px] px-2 sm:px-4 md:px-6 lg:px-8 pb-24">
+    @if($availableQuestions > 0)
+        <div class="grid 
+                    grid-cols-1          <!-- all mobile: 1 column -->
+                    md:grid-cols-2       <!-- tablet: 2 columns -->
+                    lg:grid-cols-2       <!-- laptop: 3 columns -->
+                    xl:grid-cols-3       <!-- desktop: 3 columns -->
+                    2xl:grid-cols-4      <!-- large desktop: 5 columns -->
+                    gap-4 sm:gap-5 lg:gap-6 font-baloo">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-baloo">
-                @foreach($assessmentOptions as $index => $assessment)
-                <div class="w-full bg-gradient-to-br from-[#2077AF] to-[#4720AF] rounded-xl border-b-4 border-[#0b1d30] shadow-lg transition-all p-4 flex flex-col justify-between h-auto">
-                    <!-- Title + Time Row -->
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-lg font-bold text-white">{{ $assessment['title'] }}</h3>
-                        <div class="flex items-center gap-1 text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#FF6B6B]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 8a1 1 0 0 1 1 1v3.28l2.72 1.64a1 1 0 1 1-1.04 1.72l-3.2-1.92A1 1 0 0 1 11 13V9a1 1 0 0 1 1-1zm0-6a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">{{ $assessment['time_limit'] }} mins</span>
-                        </div>
+            @foreach($assessmentOptions as $index => $assessment)
+            <div class="w-full 
+                        bg-gradient-to-br from-[#2077AF] to-[#4720AF] 
+                        rounded-xl border-b-4 border-[#0b1d30] 
+                        shadow-lg transition-all 
+                        p-3 sm:p-4 md:p-5 
+                        flex flex-col justify-between 
+                        h-auto">
+
+                <!-- Title + Time -->
+                <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+                    <h3 class="text-base sm:text-lg md:text-xl font-bold text-white">
+                        {{ $assessment['title'] }}
+                    </h3>
+                    <div class="flex items-center gap-1 text-white text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B6B]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 8a1 1 0 0 1 1 1v3.28l2.72 1.64a1 1 0 1 1-1.04 1.72l-3.2-1.92A1 1 0 0 1 11 13V9a1 1 0 0 1 1-1zm0-6a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+                        </svg>
+                        <span class="font-semibold">{{ $assessment['time_limit'] }} mins</span>
+                    </div>
+                </div>
+
+                <!-- Attributes -->
+                <div class="space-y-3 mb-4">
+                    <!-- Number of Questions -->
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 sm:w-7 sm:h-7 text-[#4ADE80]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 5h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2z"/>
+                        </svg>
+                        <span class="text-sm sm:text-lg text-white font-bold">{{ $assessment['question_count'] }} Questions</span>
                     </div>
 
-                    <!-- Attributes Section -->
-                    <div class="space-y-3 mb-4">
-                        <!-- Number of Questions -->
-                        <div class="flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#4ADE80]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M3 5h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2zm0 6h18a1 1 0 0 1 0 2H3a1 1 0 1 1 0-2z"/>
-                            </svg>
-                            <span class="text-lg text-white font-bold font-baloo">{{ $assessment['question_count'] }} Questions</span>
-                        </div>
-
-                        <!-- Difficulty Tag -->
-                        <div class="flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#FFD93D]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 .587l3.668 7.571 8.332 1.151-6.064 5.879 1.524 8.229L12 18.897l-7.46 4.52 1.524-8.229L0 9.309l8.332-1.151z"/>
-                            </svg>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-200 text-yellow-900 shadow-md">
-                                {{ ucfirst($assessment['difficulty']) }}
-                            </span>
-                        </div>
-
-                        <!-- Topics Covered -->
-                        <div class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-[#8B5CF6] mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12a1 1 0 002 0V7a1 1 0 00-2 0v5zM9 15a1 1 0 112 0 1 1 0 01-2 0z"/>
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/>
-                            </svg>
-                            <div class="text-white text-sm">
-                                <div class="font-semibold mb-1">Topics:</div>
-                                <div class="text-xs text-gray-200">{{ implode(', ', $assessment['topics']) }}</div>
-                            </div>
-                        </div>
+                    <!-- Difficulty -->
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 sm:w-7 sm:h-7 text-[#FFD93D]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 .587l3.668 7.571 8.332 1.151-6.064 5.879 1.524 8.229L12 18.897l-7.46 4.52 1.524-8.229L0 9.309l8.332-1.151z"/>
+                        </svg>
+                        <span class="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-bold bg-yellow-200 text-yellow-900 shadow-md">
+                            {{ ucfirst($assessment['difficulty']) }}
+                        </span>
                     </div>
 
-                    <!-- Assessment Details -->
-                    <div class="bg-white/10 rounded-lg p-3 mb-4">
-                        <div class="text-xs text-white/80 space-y-1">
-                            <div>Estimated Points: {{ $assessment['estimated_points'] }}</div>
-                            <div>Best Time: {{ $assessment['best_completion_time'] ?? 'Not attempted' }}</div>
+                    <!-- Topics -->
+                    <div class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 sm:w-7 sm:h-7 text-[#8B5CF6] mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 12a1 1 0 002 0V7a1 1 0 00-2 0v5zM9 15a1 1 0 112 0 1 1 0 01-2 0z"/>
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="text-white text-xs sm:text-sm">
+                            <div class="font-semibold mb-1">Topics:</div>
+                            <div class="text-[10px] sm:text-xs text-gray-200">{{ implode(', ', $assessment['topics']) }}</div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Trigger Button -->
-                    <button onclick="openAssessmentModal({{ $index }})" 
-                        class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200">
-                        Start Assessment
-                    </button>
+                <!-- Assessment Details -->
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 mb-4">
+                    <div class="text-[10px] sm:text-xs text-white/80 space-y-1">
+                        <div>Estimated Points: {{ $assessment['estimated_points'] }}</div>
+                        <div>Best Time: {{ $assessment['best_completion_time'] ?? 'Not attempted' }}</div>
+                    </div>
                 </div>
-                @endforeach
+
+                <!-- Button -->
+                <button onclick="openAssessmentModal({{ $index }})" 
+                    class="w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200">
+                    Start Assessment
+                </button>
             </div>
-        @else
-            <!-- No Questions Available -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-                <div class="text-yellow-600 mb-4">
-                    <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-yellow-800 mb-2">No Assessments Available</h3>
-                <p class="text-yellow-700 mb-4">All questions for your current level are in cooldown period. Please wait or try a different competency.</p>
-                <div class="text-sm text-yellow-600">
-                    <p>Questions return to availability after:</p>
-                    <p class="font-semibold">• 30 minutes (if answered correctly)</p>
-                    <p class="font-semibold">• 60 minutes (if answered incorrectly)</p>
-                </div>
-                <a href="{{ route('student.assessments') }}" class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
-                    Try Other Competencies
-                </a>
-            </div>
-        @endif
+            @endforeach
+        </div>
     </div>
-</div>
+    @else
+
+                <!-- No Questions Available -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                    <div class="text-yellow-600 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-2">No Assessments Available</h3>
+                    <p class="text-yellow-700 mb-4">All questions for your current level are in cooldown period. Please wait or try a different competency.</p>
+                    <div class="text-sm text-yellow-600 mb-4">
+                        <p>Questions return to availability after:</p>
+                        <p class="font-semibold">• 30 minutes (if answered correctly)</p>
+                        <p class="font-semibold">• 60 minutes (if answered incorrectly)</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button onclick="refreshAssessments()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            🔄 Check for Available Questions
+                        </button>
+                        <a href="{{ route('student.assessments') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+                            Try Other Competencies
+                        </a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
 
 <!-- Assessment Modal -->
 <div id="assessmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4 sm:px-0">
@@ -359,6 +380,43 @@ document.getElementById('assessmentModal').addEventListener('click', function(e)
         closeAssessmentModal();
     }
 });
+
+// Refresh assessments function
+function refreshAssessments() {
+    // Show loading state
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '⏳ Checking...';
+    
+    // Make AJAX request to refresh assessments
+    fetch(`{{ route('student.assessments.refresh', $category) }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data.assessmentOptions.length > 0) {
+            // Refresh the page to show new assessments
+            window.location.reload();
+        } else {
+            // Show message that no assessments are available yet
+            alert('No assessments available yet. Questions are still in cooldown period.');
+        }
+    })
+    .catch(error => {
+        console.error('Error refreshing assessments:', error);
+        alert('Error checking for available assessments. Please try again.');
+    })
+    .finally(() => {
+        // Restore button state
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = originalText;
+    });
+}
 </script>
 
 @endsection

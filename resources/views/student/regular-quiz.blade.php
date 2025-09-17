@@ -5,84 +5,43 @@
 @section('content')
 
 <div class="space-y-8 font-baloo mt-8">
-<!-- Header Section -->
-<!-- Header Section -->
-<div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
-    
-    <!-- Question Counter -->
-    <div class="bg-purple-700 backdrop-blur-sm rounded-full
-                px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                border-b-6 border-[#4a1377]"
-         style="box-shadow: 0 6px 0 #4a1377;">
-        <span class="text-white font-semibold
-                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
-            @if(isset($diagnosticMode) && $diagnosticMode)
-                Phase {{ $diagnosticPhase ?? 1 }} - Question {{ $currentQuestion }} of {{ $totalQuestions }}
-            @else
-                Question {{ $currentQuestion }} of {{ $totalQuestions }}
-            @endif
-        </span>
-    </div>
-
-    <!-- Timer (only show for non-diagnostic quizzes) -->
-    @if(!isset($diagnosticMode) || !$diagnosticMode)
-    <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full
-                px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                flex items-center gap-2 sm:gap-3 md:gap-4
-                border-b-6 border-[#cc4713]"
-         style="box-shadow: 0 6px 0 #cc4713;">
-        <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-white"
-             fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clip-rule="evenodd"/>
-        </svg>
-        <span class="text-white font-bold
-                     text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
-              id="timer-display">30:00</span>
-    </div>
-    @endif
-</div>
-
-
-
-    <!-- Diagnostic Mode Banner (if applicable) -->
-    @if(isset($diagnosticMode) && $diagnosticMode)
-    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl 
-                p-2 sm:p-3 md:p-4 lg:p-4 
-                text-white text-center shadow-lg">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
         
-        <h3 class="font-bold 
-                text-sm sm:text-base md:text-md lg:text-md xl:text-xl mb-1 sm:mb-2">
-            @if(session('resumed_session'))
-                � Diagnostic Assessment Resumed
-            @else
-                �🔬 Diagnostic Assessment
-            @endif
-        </h3>
-        
-        @if(session('resumed_session'))
-            <p class="text-xs sm:text-sm md:text-base lg:text-lg">
-                Welcome back! You can continue from where you left off.
-            </p>
-        @endif
-        
-        <!-- Optional description -->
-        <!--
-        <p class="text-xs sm:text-sm md:text-base lg:text-lg">
-            This diagnostic test helps us understand your current skill level. 
-            Take your time and do your best!
-        </p>
-        -->
-    </div>
-    @endif
+        <!-- Question Counter -->
+        <div class="bg-purple-700 backdrop-blur-sm rounded-full
+                    px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
+                    border-b-6 border-[#4a1377]"
+             style="box-shadow: 0 6px 0 #4a1377;">
+            <span class="text-white font-semibold
+                         text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
+                  id="question-counter">
+                Question <span id="current-question-number">{{ $currentQuestion }}</span> of <span id="total-questions-number">{{ $totalQuestions }}</span>
+            </span>
+        </div>
 
+        <!-- Timer -->
+        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full
+                    px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
+                    flex items-center gap-2 sm:gap-3 md:gap-4
+                    border-b-6 border-[#cc4713]"
+             style="box-shadow: 0 6px 0 #cc4713;">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-white"
+                 fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                      clip-rule="evenodd"/>
+            </svg>
+            <span class="text-white font-bold
+                         text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
+                  id="timer-display">30:00</span>
+        </div>
+    </div>
 
     <!-- Quiz Card -->
     <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
         
-        <!-- Hint Button (if not diagnostic) -->
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
+        <!-- Controls Row -->
         <div class="flex justify-between items-center mb-6">
             <button id="hint-btn" class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#cc4713] shadow-lg">
                 💡 HINT
@@ -93,14 +52,6 @@
                 🔊 AUDIO ON
             </button>
         </div>
-        @else
-        <div class="flex justify-end mb-6">
-            <!-- Audio Toggle Button for Diagnostic -->
-            <button id="audio-toggle" class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
-                🔊 AUDIO ON
-            </button>
-        </div>
-        @endif
 
         <!-- Question -->
         <div class="mb-8 md:mb-10">
@@ -179,14 +130,11 @@
             </button>
         </div>
 
-
         <!-- Feedback Section (initially hidden) -->
         <div id="feedback-section" class="hidden mt-6 p-4 rounded-lg">
             <div id="feedback-message" class="font-extrabold mb-2 font-baloo text-lg sm:text-xl md:text-2xl"></div>
             <div id="explanation-text" class="text-base sm:text-lg md:text-xl text-gray-700 font-baloo leading-relaxed"></div>
         </div>
-
-        
     </div>
 </div>
 
@@ -383,29 +331,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let startTime = Date.now();
+    // Quiz-wide timer settings (get time limit from database, default 30 minutes)
+    const quizTimeLimit = {{ $timeLimit ?? 30 }} * 60; // Convert minutes to seconds
     
-    // Quiz-wide timer settings (30 minutes = 1800 seconds for regular quiz, no timer for diagnostic)
-    const isDiagnostic = {{ isset($diagnosticMode) && $diagnosticMode ? 'true' : 'false' }};
-    const quizTimeLimit = 30 * 60; // 30 minutes in seconds
+    // Get quiz start time from controller (JavaScript timestamp in milliseconds)
+    const quizStartTime = {{ $quizStartTime ?? 'Date.now()' }};
+    const elapsedQuizTime = Math.floor((Date.now() - quizStartTime) / 1000);
+    let quizTimeRemaining = Math.max(0, quizTimeLimit - elapsedQuizTime);
     
-    // For regular quiz, get the start time from server, for diagnostic no timer
-    let quizTimeRemaining;
-    if (isDiagnostic) {
-        quizTimeRemaining = null;
-    } else {
-        const quizStartTime = {{ isset($quizStartTime) ? $quizStartTime : 'Date.now()' }};
-        const elapsedQuizTime = Math.floor((Date.now() - quizStartTime) / 1000);
-        quizTimeRemaining = Math.max(0, quizTimeLimit - elapsedQuizTime);
+    // Validate quiz time remaining - if negative or zero, end quiz
+    if (quizTimeRemaining <= 0) {
+        setTimeout(() => {
+            endQuizDueToTimeout();
+        }, 100);
+        return;
     }
     
-    // Per-question timing (for BKT calculation and timeout)
+    // Per-question timing (for BKT calculation only)
     let questionMaxTime = {{ $question->max_time ?? 30 }};
-    let questionTimeRemaining = questionMaxTime;
     let questionStartTime = Date.now();
     
     let timerInterval;
-    let questionTimerInterval;
     let questionSubmitted = false;
     let autoSaveInterval;
     let retryAttempts = 0;
@@ -414,22 +360,168 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Quiz progress state
     const quizState = {
-        sessionId: '{{ session("diagnostic_session_id") ?? session("quiz_session_id") ?? "quiz_" . time() }}',
+        sessionId: '{{ session("quiz_session_id") ?? "quiz_" . time() }}',
         questionId: '{{ $question->question_id }}',
-        competency: '{{ session("diagnostic_competency") ?? $category ?? "" }}',
-        isDiagnostic: isDiagnostic,
-        startTime: startTime,
+        competency: '{{ $category ?? "" }}',
+        quizStartTime: quizStartTime,
         questionMaxTime: questionMaxTime,
         currentAnswer: '',
         questionTimeTaken: 0,
-        questionIndex: {{ session('current_question_index', 0) }},
+        questionIndex: {{ $currentQuestion ?? 1 }} - 1, // Convert to 0-based index
         totalQuestions: {{ $totalQuestions ?? 15 }},
         quizTimeRemaining: quizTimeRemaining,
-        audioEnabled: true // Audio enabled by default
+        audioEnabled: true
     };
+    
+    // Debug log quiz state
+    console.log('Quiz state initialized:', quizState);
+    console.log('Current question from PHP:', {{ $currentQuestion ?? 1 }});
+    console.log('Total questions from PHP:', {{ $totalQuestions ?? 15 }});
     
     // Initialize quiz
     initializeQuiz();
+    
+    // Check for resumable quiz session on page load
+    checkForResumableSession();
+    
+    function checkForResumableSession() {
+        // Check if there's an incomplete assessment session for this user and category
+        const assessmentId = '{{ $assessmentId ?? "" }}';
+        const category = '{{ $category ?? "" }}';
+        
+        if (assessmentId && category) {
+            // Check session storage for resume data
+            const resumeKey = `quiz_resume_${assessmentId}`;
+            const resumeData = sessionStorage.getItem(resumeKey);
+            
+            if (resumeData) {
+                try {
+                    const data = JSON.parse(resumeData);
+                    
+                    // Check if resume is still valid (within time limit)
+                    const timeElapsed = Math.floor((Date.now() - data.quizStartTime) / 1000);
+                    if (timeElapsed < quizTimeLimit) {
+                        showResumeDialog(data);
+                        return;
+                    } else {
+                        // Session expired, clear it
+                        sessionStorage.removeItem(resumeKey);
+                    }
+                } catch (error) {
+                    console.error('Error parsing resume data:', error);
+                    sessionStorage.removeItem(resumeKey);
+                }
+            }
+        }
+    }
+    
+    function showResumeDialog(resumeData) {
+        const dialog = document.createElement('div');
+        dialog.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+        dialog.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+                <div class="mb-6">
+                    <div class="text-6xl mb-4">⏰</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Resume Quiz Session?</h3>
+                    <p class="text-gray-600">
+                        You have an incomplete quiz session. Would you like to continue where you left off?
+                    </p>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>Time remaining: <span class="font-semibold">${formatTime(resumeData.timeRemaining)}</span></p>
+                        <p>Progress: <span class="font-semibold">${resumeData.currentQuestion} of ${resumeData.totalQuestions} questions</span></p>
+                    </div>
+                </div>
+                <div class="flex gap-4 justify-center">
+                    <button id="resume-btn" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-200">
+                        📚 Resume Quiz
+                    </button>
+                    <button id="restart-btn" 
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-200">
+                        🔄 Start Over
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+        
+        // Handle resume
+        document.getElementById('resume-btn').addEventListener('click', function() {
+            resumeQuizSession(resumeData);
+            document.body.removeChild(dialog);
+        });
+        
+        // Handle restart
+        document.getElementById('restart-btn').addEventListener('click', function() {
+            clearQuizSession();
+            document.body.removeChild(dialog);
+        });
+    }
+    
+    function resumeQuizSession(resumeData) {
+        try {
+            // Update quiz state with resume data
+            quizState.quizStartTime = resumeData.quizStartTime;
+            quizState.questionIndex = resumeData.currentQuestion - 1; // Convert to 0-based
+            quizState.totalQuestions = resumeData.totalQuestions;
+            quizTimeRemaining = resumeData.timeRemaining;
+            
+            // Update UI
+            updateQuestionCounterDisplay();
+            updateQuizTimerDisplay();
+            
+            // Restore any saved answer for current question
+            if (resumeData.currentAnswer) {
+                restoreAnswer(resumeData.currentAnswer);
+            }
+            
+            console.log('Quiz session resumed successfully');
+            showConnectionStatus('Quiz session resumed!', 'success');
+            
+        } catch (error) {
+            console.error('Error resuming quiz session:', error);
+            showConnectionStatus('Error resuming session, starting fresh', 'error');
+        }
+    }
+    
+    function clearQuizSession() {
+        const assessmentId = '{{ $assessmentId ?? "" }}';
+        if (assessmentId) {
+            const resumeKey = `quiz_resume_${assessmentId}`;
+            sessionStorage.removeItem(resumeKey);
+            localStorage.removeItem(`quiz_progress_${quizState.sessionId}`);
+        }
+        console.log('Quiz session cleared, starting fresh');
+    }
+    
+    function saveQuizSession() {
+        const assessmentId = '{{ $assessmentId ?? "" }}';
+        if (assessmentId) {
+            const resumeKey = `quiz_resume_${assessmentId}`;
+            const resumeData = {
+                quizStartTime: quizState.quizStartTime,
+                currentQuestion: quizState.questionIndex + 1,
+                totalQuestions: quizState.totalQuestions,
+                timeRemaining: quizTimeRemaining,
+                currentAnswer: quizState.currentAnswer,
+                lastSaved: Date.now()
+            };
+            
+            try {
+                sessionStorage.setItem(resumeKey, JSON.stringify(resumeData));
+                console.log('Quiz session saved for resume');
+            } catch (error) {
+                console.error('Failed to save quiz session:', error);
+            }
+        }
+    }
+    
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
     
     function initializeQuiz() {
         // Restore progress from localStorage if available
@@ -438,13 +530,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Restore audio preference
         restoreAudioPreference();
         
-        // Initialize quiz-wide timer (only for non-diagnostic)
-        if (!isDiagnostic) {
-            startQuizTimer();
-        }
-        
-        // Initialize per-question timer (hidden, for tracking only)
-        startQuestionTimer();
+        // Initialize quiz-wide timer (30 minutes for entire quiz)
+        startQuizTimer();
         
         // Initialize answer selection
         initializeAnswerSelection();
@@ -464,26 +551,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Audio toggle handler
         document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
         
-        // Hint button handler (only for non-diagnostic mode)
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
+        // Hint button handler
         const hintBtn = document.getElementById('hint-btn');
         if (hintBtn) {
             hintBtn.addEventListener('click', getHint);
         }
-        @endif
         
         // Save progress when user selects answer
         addProgressSaveListeners();
         
-        // Handle page navigation/close for diagnostic sessions
-        if (isDiagnostic) {
-            addDiagnosticCleanupHandlers();
-        }
+        // Update question counter display
+        updateQuestionCounterDisplay();
     }
     
     function saveProgressToLocalStorage() {
         try {
-            quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
+            quizState.questionTimeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
             quizState.lastSaved = Date.now();
             
             const storageKey = `quiz_progress_${quizState.sessionId}`;
@@ -503,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (serverProgress && serverProgress.current_answer) {
                     restoreAnswer(serverProgress.current_answer);
                     console.log('Progress restored from server:', serverProgress);
-                    return; // Don't check localStorage if server has progress
+                    return;
                 }
             @endif
             
@@ -521,15 +604,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         restoreAnswer(saved.currentAnswer);
                     }
                     
-                    // Adjust question timer if needed (don't let users get extra time)
+                    // Adjust quiz timer based on elapsed time
                     const timeSinceLastSave = Date.now() - saved.lastSaved;
                     if (timeSinceLastSave < 60000) { // If less than 1 minute ago
-                        questionTimeRemaining = Math.max(0, questionMaxTime - saved.questionTimeTaken - Math.floor(timeSinceLastSave / 1000));
-                    }
-                    
-                    // Restore quiz timer for non-diagnostic
-                    if (!isDiagnostic && saved.quizTimeRemaining !== undefined) {
-                        quizTimeRemaining = Math.max(0, saved.quizTimeRemaining - Math.floor(timeSinceLastSave / 1000));
+                        const elapsedQuizTime = Math.floor((Date.now() - quizState.quizStartTime) / 1000);
+                        quizTimeRemaining = Math.max(0, quizTimeLimit - elapsedQuizTime);
+                        quizState.quizTimeRemaining = quizTimeRemaining;
                     }
                     
                     console.log('Progress restored from localStorage:', saved);
@@ -576,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.checked = true;
                 const label = option.closest('.option-label');
                 if (label) {
-                    label.click(); // Trigger the visual selection
+                    label.click();
                 }
                 quizState.currentAnswer = answer;
             }
@@ -606,80 +686,12 @@ document.addEventListener('DOMContentLoaded', function() {
         @endif
     }
     
-    function addDiagnosticCleanupHandlers() {
-        // Handle page unload/navigation for diagnostic sessions
-        window.addEventListener('beforeunload', function(event) {
-            // Clear diagnostic session when user tries to leave
-            if (isDiagnostic && !questionSubmitted) {
-                cleanupDiagnosticSession();
-                
-                // Show warning to user
-                event.preventDefault();
-                event.returnValue = 'Your diagnostic progress will be lost if you leave this page. Are you sure?';
-                return event.returnValue;
-            }
-        });
-        
-        // Handle actual navigation away
-        window.addEventListener('unload', function() {
-            if (isDiagnostic) {
-                cleanupDiagnosticSession();
-            }
-        });
-        
-        // Handle tab visibility changes (when user switches tabs)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden && isDiagnostic && !questionSubmitted) {
-                // User switched away from tab, save current state
-                saveProgressToLocalStorage();
-                
-                // Start a timeout to cleanup if they don't return
-                setTimeout(function() {
-                    if (document.hidden && isDiagnostic && !questionSubmitted) {
-                        cleanupDiagnosticSession();
-                    }
-                }, 300000); // 5 minutes timeout
-            }
-        });
-    }
-    
-    function cleanupDiagnosticSession() {
-        try {
-            // Use sendBeacon for reliable cleanup even during page unload
-            const cleanupData = JSON.stringify({
-                _token: '{{ csrf_token() }}',
-                session_id: quizState.sessionId,
-                competency: quizState.competency
-            });
-            
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon('{{ route("student.quiz.clear-diagnostic") }}', cleanupData);
-            } else {
-                // Fallback for browsers without sendBeacon
-                fetch('{{ route("student.quiz.clear-diagnostic") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: cleanupData,
-                    keepalive: true
-                }).catch(error => {
-                    console.warn('Failed to cleanup diagnostic session:', error);
-                });
-            }
-            
-            console.log('Diagnostic session cleanup initiated');
-        } catch (error) {
-            console.error('Error during diagnostic cleanup:', error);
-        }
-    }
-    
     function startAutoSave() {
         // Auto-save progress every 10 seconds
         autoSaveInterval = setInterval(function() {
             if (!questionSubmitted) {
                 saveProgressToLocalStorage();
+                saveQuizSession(); // Save session for resume functionality
                 syncProgressToServer();
             }
         }, 10000);
@@ -702,6 +714,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify(syncData)
         })
@@ -713,7 +726,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Failed to sync progress to server:', error);
-            // Keep in localStorage for later sync
         });
     }
     
@@ -731,16 +743,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function initializeAudio() {
-        // Preload audio files for better performance
         try {
             window.correctAudio = new Audio('{{ asset("audio/correct.mp3") }}');
             window.incorrectAudio = new Audio('{{ asset("audio/incorrect.mp3") }}');
             
-            // Set volume
             window.correctAudio.volume = 0.7;
             window.incorrectAudio.volume = 0.7;
-            
-            // Preload the audio files
             window.correctAudio.preload = 'auto';
             window.incorrectAudio.preload = 'auto';
             
@@ -749,10 +757,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error initializing audio system:', error);
         }
         
-        // Add user interaction listener to enable audio (required by many browsers)
         function enableAudioOnFirstInteraction() {
             try {
-                // Try to play and immediately pause to "unlock" audio
                 if (window.correctAudio) {
                     window.correctAudio.play().then(() => {
                         window.correctAudio.pause();
@@ -766,7 +772,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }).catch(() => {});
                 }
                 
-                // Remove the event listener after first interaction
                 document.removeEventListener('click', enableAudioOnFirstInteraction);
                 document.removeEventListener('touchstart', enableAudioOnFirstInteraction);
                 console.log('Audio enabled after user interaction');
@@ -775,7 +780,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Listen for first user interaction
         document.addEventListener('click', enableAudioOnFirstInteraction);
         document.addEventListener('touchstart', enableAudioOnFirstInteraction);
     }
@@ -784,13 +788,11 @@ document.addEventListener('DOMContentLoaded', function() {
         quizState.audioEnabled = !quizState.audioEnabled;
         updateAudioButtonDisplay();
         
-        // Play a test sound to confirm audio is working when enabled
         if (quizState.audioEnabled && window.correctAudio) {
             window.correctAudio.currentTime = 0;
             window.correctAudio.play().catch(() => {});
         }
         
-        // Save audio preference to localStorage
         try {
             localStorage.setItem('quiz_audio_enabled', quizState.audioEnabled);
         } catch (error) {
@@ -802,11 +804,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const hintBtn = document.getElementById('hint-btn');
         const originalText = hintBtn.innerHTML;
         
-        // Show loading state
         hintBtn.disabled = true;
         hintBtn.innerHTML = '⏳ Loading...';
         
-        // Make request for hint
         fetch('{{ route("student.quiz.hint") }}', {
             method: 'POST',
             headers: {
@@ -820,7 +820,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show hint inline
                 showHintInline(data.hint);
             } else {
                 alert('Sorry, no hint is available for this question.');
@@ -831,33 +830,27 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to get hint. Please try again.');
         })
         .finally(() => {
-            // Restore button state
             hintBtn.disabled = false;
             hintBtn.innerHTML = originalText;
         });
     }
     
     function showHintInline(hint) {
-        // Get hint elements
         const hintSection = document.getElementById('hint-section');
         const hintText = document.getElementById('hint-text');
         const hintBtn = document.getElementById('hint-btn');
         
-        // Update hint text and show the section
         hintText.textContent = hint;
         hintSection.classList.remove('hidden');
         
-        // Update button to show it's been used
         hintBtn.innerHTML = '✅ HINT SHOWN';
         hintBtn.disabled = true;
         hintBtn.className = 'bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base cursor-not-allowed border-b-4 border-[#5d5d5d] shadow-lg';
         
-        // Scroll to hint if needed
         hintSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     
     function showConnectionStatus(message, type) {
-        // Create or update connection status indicator
         let statusDiv = document.getElementById('connection-status');
         if (!statusDiv) {
             statusDiv = document.createElement('div');
@@ -872,7 +865,6 @@ document.addEventListener('DOMContentLoaded', function() {
             type === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
         }`;
         
-        // Auto-hide after 3 seconds for success messages
         if (type === 'success') {
             setTimeout(() => {
                 statusDiv.style.display = 'none';
@@ -881,9 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function submitAnswerWithRetry(requestData, attempt = 1) {
-        const url = quizState.isDiagnostic ? 
-            '{{ route("student.quiz.diagnostic.submit") }}' : 
-            '{{ route("student.quiz.submit") }}';
+        const url = '{{ route("student.quiz.submit") }}';
         
         return fetch(url, {
             method: 'POST',
@@ -903,7 +893,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(`Submit attempt ${attempt} failed:`, error);
             
             if (attempt < maxRetryAttempts) {
-                // Exponential backoff: wait 2^attempt seconds
                 const delay = Math.pow(2, attempt) * 1000;
                 
                 return new Promise((resolve, reject) => {
@@ -921,14 +910,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Timer functions
     function startQuizTimer() {
-        if (isDiagnostic) return; // No timer for diagnostic
+        // Update timer display immediately
+        updateQuizTimerDisplay();
         
         timerInterval = setInterval(function() {
             if (quizTimeRemaining > 0) {
                 quizTimeRemaining--;
                 updateQuizTimerDisplay();
                 
-                // Save quiz time remaining to state
                 quizState.quizTimeRemaining = quizTimeRemaining;
                 
                 if (quizTimeRemaining <= 0) {
@@ -942,19 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    function startQuestionTimer() {
-        // This timer tracks per-question time but doesn't display anything
-        questionTimerInterval = setInterval(function() {
-            if (questionTimeRemaining > 0 && !questionSubmitted) {
-                questionTimeRemaining--;
-                quizState.questionTimeTaken = questionMaxTime - questionTimeRemaining;
-            }
-        }, 1000);
-    }
-    
     function updateQuizTimerDisplay() {
-        if (isDiagnostic) return; // No display for diagnostic
-        
         const displayTime = Math.max(0, quizTimeRemaining);
         const minutes = Math.floor(displayTime / 60);
         const seconds = displayTime % 60;
@@ -975,14 +952,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function updateQuestionCounterDisplay() {
+        const currentQuestion = quizState.questionIndex + 1;
+        const totalQuestions = quizState.totalQuestions;
+        
+        // Update the counter display using the new IDs
+        const currentQuestionElement = document.getElementById('current-question-number');
+        const totalQuestionsElement = document.getElementById('total-questions-number');
+        
+        if (currentQuestionElement) {
+            currentQuestionElement.textContent = currentQuestion;
+            console.log(`Updated current question number to: ${currentQuestion}`);
+        } else {
+            console.error('Could not find current-question-number element');
+        }
+        
+        if (totalQuestionsElement) {
+            totalQuestionsElement.textContent = totalQuestions;
+            console.log(`Updated total questions number to: ${totalQuestions}`);
+        } else {
+            console.error('Could not find total-questions-number element');
+        }
+        
+        console.log(`Question counter updated: ${currentQuestion} of ${totalQuestions}`);
+        console.log(`Quiz timer remaining: ${Math.floor(quizTimeRemaining / 60)}:${(quizTimeRemaining % 60).toString().padStart(2, '0')}`);
+        console.log(`Elapsed quiz time: ${Math.floor((Date.now() - quizState.quizStartTime) / 1000)} seconds`);
+    }
+    
     function endQuizDueToTimeout() {
         questionSubmitted = true;
-        clearInterval(questionTimerInterval);
+        clearInterval(timerInterval);
         clearInterval(autoSaveInterval);
         
         alert('Quiz time has ended! Your current progress will be submitted.');
         
-        // Show loader for quiz timeout processing
         showAssessmentLoader('Quiz Time Ended', 'Processing your final answers...');
         
         // Force submit current answer or empty answer
@@ -999,22 +1002,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         @endif
         
-        const actualTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-        const timeoutTimeTaken = Math.max(1, actualTimeElapsed);
-        
         const requestData = {
             question_id: '{{ $question->question_id }}',
             answer: answerValue,
-            time_taken: timeoutTimeTaken,
+            time_taken: Math.max(1, Math.floor((Date.now() - questionStartTime) / 1000)),
             quiz_timeout: true,
+            assessment_id: '{{ $assessmentId ?? "" }}',
             _token: '{{ csrf_token() }}'
         };
         
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
-            requestData.assessment_id = '{{ $assessmentId ?? "" }}';
-        @endif
-        
-        // Submit and end quiz
         submitAnswerWithRetry(requestData)
         .then(data => {
             setTimeout(() => {
@@ -1081,8 +1077,8 @@ document.addEventListener('DOMContentLoaded', function() {
         @endif
         
         questionSubmitted = true;
-        clearInterval(timerInterval);
-        clearInterval(questionTimerInterval);
+        // Don't clear the quiz timer - it should continue running for the entire quiz
+        // Only clear the auto-save interval
         clearInterval(autoSaveInterval);
         
         // Calculate actual time taken (ensure it's at least 1 second)
@@ -1098,12 +1094,9 @@ document.addEventListener('DOMContentLoaded', function() {
             question_id: '{{ $question->question_id }}',
             answer: answerValue,
             time_taken: questionTimeTaken,
+            assessment_id: '{{ $assessmentId ?? "" }}',
             _token: '{{ csrf_token() }}'
         };
-        
-        @if(!isset($diagnosticMode) || !$diagnosticMode)
-            requestData.assessment_id = '{{ $assessmentId ?? "" }}';
-        @endif
         
         // Update quiz state
         quizState.currentAnswer = answerValue;
@@ -1114,6 +1107,12 @@ document.addEventListener('DOMContentLoaded', function() {
         submitAnswerWithRetry(requestData)
         .then(data => {
             if (data.success) {
+                // Update question counter for the next question
+                if (!data.assessment_complete) {
+                    quizState.questionIndex++;
+                    updateQuestionCounterDisplay();
+                }
+                
                 // Clear progress from localStorage on successful submission
                 const storageKey = `quiz_progress_${quizState.sessionId}`;
                 localStorage.removeItem(storageKey);
@@ -1135,6 +1134,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'SUBMIT ANSWER';
                 questionSubmitted = false;
+                // Restart auto-save since we cleared it earlier
+                startAutoSave();
                 submitAnswer();
             };
             
@@ -1144,64 +1145,8 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = false;
             submitBtn.textContent = 'SUBMIT ANSWER';
             questionSubmitted = false;
-        });
-    }
-    
-    function timeoutSubmission() {
-        questionSubmitted = true;
-        
-        // Show loader for timeout processing
-        showAssessmentLoader('Question Timeout', 'Processing your response...');
-        
-        // Auto-submit with no answer (timeout)
-        const actualTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-        const timeoutTimeTaken = Math.max(1, actualTimeElapsed);
-        
-        const requestData = {
-            question_id: '{{ $question->question_id }}',
-            answer: '',
-            time_taken: timeoutTimeTaken,
-            _token: '{{ csrf_token() }}'
-        };
-        
-        @if(isset($diagnosticMode) && $diagnosticMode)
-            requestData._method = 'POST';
-            fetch('{{ route("student.quiz.diagnostic.submit") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(requestData)
-            })
-        @else
-            requestData.assessment_id = '{{ $assessmentId ?? "" }}';
-            fetch('{{ route("student.quiz.submit") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(requestData)
-            })
-        @endif
-        .then(response => response.json())
-        .then(data => {
-            setTimeout(() => {
-                hideAssessmentLoader();
-                if (data.success) {
-                    showFeedback(data, true);
-                } else {
-                    alert('Session timeout. Redirecting...');
-                    window.location.href = '{{ route("student.assessments") }}';
-                }
-            }, 1500);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            hideAssessmentLoader();
-            alert('Session timeout. Redirecting...');
-            window.location.href = '{{ route("student.assessments") }}';
+            // Restart auto-save since we cleared it earlier
+            startAutoSave();
         });
     }
     
@@ -1210,15 +1155,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const loaderTitle = loader.querySelector('h3');
         const loaderStatus = document.getElementById('loader-status');
         
-        // Update loader text
         loaderTitle.textContent = title;
         loaderStatus.textContent = status;
         
-        // Show loader with flex display
         loader.classList.remove('hidden');
         loader.style.display = 'flex';
         
-        // Add different status messages over time for diagnostic assessments
         if (title === 'Processing Assessment Results') {
             setTimeout(() => {
                 loaderStatus.textContent = 'Running BKT algorithm...';
@@ -1241,7 +1183,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function playAudioFeedback(isCorrect, isTimeout = false) {
-        // Don't play audio if disabled, timeout, or not available
         if (!quizState.audioEnabled || isTimeout) return;
         
         try {
@@ -1253,16 +1194,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (audio) {
-                // Reset audio to beginning
                 audio.currentTime = 0;
-                
-                // Play audio with error handling
                 audio.play().catch(error => {
                     console.log('Audio playback failed:', error);
                 });
             } else {
                 console.log('Audio not available - creating new instance');
-                // Fallback: create new audio instance
                 const audioPath = isCorrect ? 
                     '{{ asset("audio/correct.mp3") }}' : 
                     '{{ asset("audio/incorrect.mp3") }}';
@@ -1314,65 +1251,35 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackSection.classList.remove('hidden');
         
         // Handle next question or completion
-        console.log('Quiz response data:', data); // DEBUG
-        console.log('diagnostic_complete:', data.diagnostic_complete); // DEBUG
-        console.log('redirect_url:', data.redirect_url); // DEBUG
-        
-        if (data.assessment_complete || data.diagnostic_complete) {
-            console.log('Setting View Results button'); // DEBUG
+        if (data.assessment_complete) {
             nextBtn.textContent = 'View Results';
             nextBtn.onclick = function() {
-                console.log('View Results button clicked, showing assessment loader'); // DEBUG
                 showAssessmentLoader();
                 
-                // Simulate BKT calculation time and redirect
                 setTimeout(() => {
-                    console.log('Redirecting to:', data.redirect_url); // DEBUG
                     if (data.redirect_url) {
                         window.location.href = data.redirect_url;
                     } else {
-                        console.log('No redirect_url, going to assessments page'); // DEBUG
                         window.location.href = '{{ route("student.assessments") }}';
                     }
-                }, 3000); // Show loader for 3 seconds to simulate processing
-            };
-        } else if (data.phase_complete && !data.diagnostic_complete) {
-            console.log('Phase complete but not diagnostic complete, continuing to next phase'); // DEBUG
-            nextBtn.textContent = `Continue to ${data.next_phase || 'Next Phase'}`;
-            nextBtn.onclick = function() {
-                showAssessmentLoader('Preparing next phase...', 'Loading questions for the next difficulty level...');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                }, 3000);
             };
         } else {
-            console.log('Regular next question'); // DEBUG
-            console.log('Current progress:', data.progress); // DEBUG
             nextBtn.textContent = 'Next Question';
             nextBtn.onclick = function() {
-                // Update question counter if progress data is available
-                if (data.progress) {
-                    updateQuestionCounter(data.progress.answered_questions + 1, data.progress.total_questions);
-                }
+                // The page will reload to show the next question
+                // The quiz timer will continue because it's based on the stored start time
                 window.location.reload();
             };
         }
     }
     
     function updateQuestionCounter(currentQuestion, totalQuestions) {
-        // Update the progress display immediately
         const progressElement = document.querySelector('.text-center h2');
         if (progressElement) {
-            const isDiagnostic = {{ isset($diagnosticMode) && $diagnosticMode ? 'true' : 'false' }};
-            if (isDiagnostic) {
-                const phase = {{ $diagnosticPhase ?? 1 }};
-                progressElement.textContent = `Phase ${phase} - Question ${currentQuestion} of ${totalQuestions}`;
-            } else {
-                progressElement.textContent = `Question ${currentQuestion} of ${totalQuestions}`;
-            }
+            progressElement.textContent = `Question ${currentQuestion} of ${totalQuestions}`;
         }
         
-        // Also update the global state
         window.quizState = window.quizState || {};
         window.quizState.currentQuestion = currentQuestion;
         window.quizState.totalQuestions = totalQuestions;

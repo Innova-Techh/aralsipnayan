@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\AchievementController;
@@ -14,13 +13,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\OnboardingController;
 use App\Http\Controllers\Student\AssessmentController;
 use App\Http\Controllers\Student\QuizController as StudentQuizController;
+use App\Http\Controllers\AdminAuthController;
 
 // Homepage
 Route::get('/', function () {
     return view('homepage');
 });
 
-// Student Auth Routes
+// Auth Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -29,7 +29,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/adminlogin', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/adminlogin', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-
 
 // General dashboard redirect (based on role)
 Route::get('/dashboard', function() {
@@ -79,6 +78,9 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     // Assessment category routes
     Route::get('/assessments/{category}', [AssessmentController::class, 'showCategory'])->name('assessments.category');
     
+    // Assessment refresh route
+    Route::post('/assessments/{category}/refresh', [AssessmentController::class, 'refreshAssessments'])->name('assessments.refresh');
+    
     // Assessment complete page
     Route::get('/assessments/complete/{category}', [AssessmentController::class, 'showComplete'])->name('assessments.complete');
     
@@ -98,18 +100,40 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
         
         // Submit regular assessment answer
         Route::post('/submit', [StudentQuizController::class, 'submitAnswer'])->name('submit');
+        
+        // Get hint for current question
+        Route::post('/hint', [StudentQuizController::class, 'getHint'])->name('hint');
+        
+        // Save quiz progress
+        Route::post('/save-progress', [AssessmentController::class, 'saveProgress'])->name('save-progress');
+        
+        // Get saved progress
+        Route::get('/get-progress/{sessionId}/{questionId}', [AssessmentController::class, 'getProgress'])->name('get-progress');
+        
+        // Clear progress
+        Route::delete('/clear-progress/{sessionId}', [AssessmentController::class, 'clearProgress'])->name('clear-progress');
+        
+        // Clear diagnostic session
+        Route::post('/clear-diagnostic', [AssessmentController::class, 'clearDiagnosticSession'])->name('clear-diagnostic');
+        
+        // Assessment session cleanup
+        Route::post('/assessment/cleanup', [StudentQuizController::class, 'cleanupAssessment'])->name('assessment.cleanup');
+        
+        // Assessment progress saving
+        Route::post('/assessment/save-progress', [StudentQuizController::class, 'saveAssessmentProgress'])->name('assessment.save-progress');
     });
 });
 
-// Teacher Dashboard (placeholder view)
+// Teacher Dashboard (placeholder)
 Route::get('/teacher/dashboard', function () {
     return view('admin.teacher.index');
 })->middleware(['auth', 'role:Teacher'])->name('teacher.dashboard');
 
-// Admin Dashboard (placeholder view)
+// Admin Dashboard (placeholder)
 Route::get('/admin/dashboard', function () {
     return view('admin.admin.index');
 })->middleware(['auth', 'role:Admin'])->name('admin.dashboard');
+
 
 // Backward compatibility routes for old assessment references (redirects to student routes)
 Route::middleware(['auth'])->group(function () {

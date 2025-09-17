@@ -97,6 +97,7 @@
                         $naLevel = $naMastery ? $naMastery->current_difficulty_level : 'Beginner';
                         $naProgress = $naMastery ? round($naMastery->mastery_probability * 100) : 30;
                         $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
+                        $naIncompleteSession = $incompleteSessionData['Number_Algebra'] ?? null;
                     @endphp
                     <span class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-100 
                                                             text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-700 
@@ -167,13 +168,20 @@
 
                 <!-- Button -->
                 @if(!$naHasDiagnostic)
-                    <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                        Take Diagnostic Test
-                    </a>
+                    @if($naIncompleteSession)
+                        <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                            Resume Diagnostic Test
+                        </a>
+                    @else
+                        <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                            Take Diagnostic Test
+                        </a>
+                    @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Number_Algebra') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
                         style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
                         View Assessments
                     </a>
@@ -203,6 +211,7 @@
                         $mgLevel = $mgMastery ? $mgMastery->current_difficulty_level : 'Beginner';
                         $mgProgress = $mgMastery ? round($mgMastery->mastery_probability * 100) : 30;
                         $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
+                        $mgIncompleteSession = $incompleteSessionData['Measurement_Geometry'] ?? null;
                     @endphp
                     <span
                         class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full relative z-20">{{ $mgLevel }}</span>
@@ -270,10 +279,17 @@
 
                 <!-- Button -->
                 @if(!$mgHasDiagnostic)
-                    <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                        Take Diagnostic Test
-                    </a>
+                    @if($mgIncompleteSession)
+                        <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                            Resume Diagnostic Test
+                        </a>
+                    @else
+                        <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                            Take Diagnostic Test
+                        </a>
+                    @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}"
                         class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
@@ -306,6 +322,7 @@
                         $dpLevel = $dpMastery ? $dpMastery->current_difficulty_level : 'Beginner';
                         $dpProgress = $dpMastery ? round($dpMastery->mastery_probability * 100) : 30;
                         $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
+                        $dpIncompleteSession = $incompleteSessionData['Data_Probability'] ?? null;
                     @endphp
                     <span
                         class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $dpLevel }}</span>
@@ -373,10 +390,17 @@
 
                 <!-- Button -->
                 @if(!$dpHasDiagnostic)
-                    <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                        Take Diagnostic Test
-                    </a>
+                    @if($dpIncompleteSession)
+                        <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                            Resume Diagnostic Test
+                        </a>
+                    @else
+                        <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                            Take Diagnostic Test
+                        </a>
+                    @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Data_Probability') }}"
                         class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"

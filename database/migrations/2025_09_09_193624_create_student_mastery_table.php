@@ -24,7 +24,9 @@ return new class extends Migration
 
             // Mastery Score Components (0.0 to 1.0 scale)
             $table->decimal('accuracy_score', 5, 4)->default(0.0000); // 55% weight
+            $table->decimal('accuracy_component', 5, 4)->nullable();
             $table->decimal('bkt_score', 5, 4)->default(0.5000);      // 45% weight
+            $table->decimal('bkt_component', 5, 4)->nullable();
 
             // Final Mastery Score (0-100 scale)
             $table->decimal('final_mastery_score', 5, 2)->default(22.50);
@@ -49,6 +51,7 @@ return new class extends Migration
             
             // Current F-Time Factor (for BKT calculations)
             $table->decimal('current_ftime_factor', 5, 4)->default(1.0000);
+            $table->decimal('average_time_factor', 5, 4)->default(1.0000);
 
             // Timestamps
             $table->timestamps();
