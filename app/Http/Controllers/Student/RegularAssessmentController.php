@@ -28,7 +28,7 @@ class RegularAssessmentController extends Controller
             'category' => 'required|string',
         ]);
 
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $assessmentId = $request->assessment_id;
         $category = $request->category;
         
@@ -208,7 +208,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -277,7 +277,7 @@ class RegularAssessmentController extends Controller
             'time_taken' => 'required|integer|min:1'
         ]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $assessmentId = $request->assessment_id;
         $questionId = $request->question_id;
         $userAnswer = $request->answer;
@@ -418,7 +418,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -463,7 +463,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Check if assessment exists and belongs to user
         $assessment = DB::table('assessments')
@@ -1083,7 +1083,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -1196,7 +1196,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -1260,7 +1260,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -1338,7 +1338,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -1412,7 +1412,7 @@ class RegularAssessmentController extends Controller
         
         $questionId = $request->question_id;
         $assessmentId = $request->assessment_id;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Verify assessment belongs to user
         $assessment = DB::table('assessments')
@@ -1477,7 +1477,7 @@ class RegularAssessmentController extends Controller
         ]);
         
         $category = $request->category;
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $dbCompetency = strtolower($category);
         
         // Get user's mastery level
@@ -1667,7 +1667,7 @@ class RegularAssessmentController extends Controller
             'category' => 'required|string'
         ]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $category = $request->category;
         $dbCompetency = strtolower($category);
         
@@ -1760,7 +1760,7 @@ class RegularAssessmentController extends Controller
             'category' => 'required|string'
         ]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $assessmentId = $request->assessment_id;
         $category = $request->category;
         
@@ -1836,7 +1836,7 @@ class RegularAssessmentController extends Controller
      */
     public function showQuizComplete($category, Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $assessmentId = $request->query('assessment_id');
         
         if (!$assessmentId) {
@@ -1886,7 +1886,7 @@ class RegularAssessmentController extends Controller
      */
     public function showQuizReview($category, Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $assessmentId = $request->query('assessment_id');
         
         if (!$assessmentId) {
@@ -1973,7 +1973,7 @@ class RegularAssessmentController extends Controller
      */
     public function getQuizResultsData($assessmentId)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         try {
             // Get assessment details
