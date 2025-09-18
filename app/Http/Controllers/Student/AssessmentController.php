@@ -23,7 +23,7 @@ class AssessmentController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if (!$user->isStudent()) {
             return redirect()->route('login');
@@ -93,7 +93,7 @@ class AssessmentController extends Controller
     {
         Log::info("showCategory method called", ['category' => $category]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $student = $user->studentProfile;
         
         // Check if onboarding is completed
@@ -145,7 +145,9 @@ class AssessmentController extends Controller
      */
     public function startDiagnostic($category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
+        
+
         
         // Validate category
         $validCategories = ['Number_Algebra', 'Measurement_Geometry', 'Data_Probability'];
@@ -284,7 +286,7 @@ class AssessmentController extends Controller
             'time_taken' => 'required|integer|min:1',
         ]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $sessionId = session('diagnostic_session_id');
         $questions = session('diagnostic_questions', []);
         $currentIndex = session('current_question_index', 0);
@@ -309,7 +311,7 @@ class AssessmentController extends Controller
             $isCorrect = $request->answer === $currentQuestion['correct_answer'];
             
             // Get user and competency info
-            $userId = Auth::id();
+            $userId = Auth::guard('student')->id();
             $competency = session('diagnostic_competency');
             
             // Record answer via Python script
@@ -403,7 +405,7 @@ class AssessmentController extends Controller
     private function completeDiagnosticPhase($sessionId)
     {
         try {
-            $userId = Auth::id();
+            $userId = Auth::guard('student')->id();
             $competency = session('diagnostic_competency');
             
             if (!$userId || !$competency) {
@@ -467,7 +469,7 @@ class AssessmentController extends Controller
      */
     public function showComplete($category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Get the final results from session or database
         $finalResults = session('diagnostic_final_results');
@@ -720,7 +722,7 @@ class AssessmentController extends Controller
      */
     public function refreshAssessments($category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $userId = $user->id;
         
         // Convert URL format to database format
@@ -836,7 +838,7 @@ class AssessmentController extends Controller
      */
     public function showReview($category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Validate category
         $validCategories = ['Number_Algebra', 'Measurement_Geometry', 'Data_Probability'];
@@ -944,7 +946,7 @@ class AssessmentController extends Controller
                 Log::info("Diagnostic session cleared for abandonment", [
                     'session_id' => $sessionId,
                     'competency' => $competency,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::guard('student')->id(),
                     'cleanup_result' => $result
                 ]);
             }

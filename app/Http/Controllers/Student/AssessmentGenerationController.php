@@ -701,7 +701,7 @@ class AssessmentGenerationController extends Controller
      */
     public function refreshAssessments(Request $request, $category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $userId = $user->id;
         
         // Convert category format
@@ -764,7 +764,7 @@ class AssessmentGenerationController extends Controller
     public function validateAssessment(Request $request)
     {
         $assessmentId = $request->input('assessment_id');
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Check if assessment exists and belongs to user
         $assessment = DB::table('assessments')

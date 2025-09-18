@@ -15,7 +15,7 @@ class QuizController extends Controller
      */
     public function show(Request $request, $category)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Validate category
         $validCategories = ['Number_Algebra', 'Measurement_Geometry', 'Data_Probability'];
@@ -74,7 +74,7 @@ class QuizController extends Controller
      */
     private function showRegularAssessment($category, $assessmentId = null)
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $dbCompetency = strtolower(str_replace('_', '_', $category));
         
         // Get user's current difficulty level
@@ -376,7 +376,7 @@ class QuizController extends Controller
             ], 422);
         }
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Validate quiz time limit
         $assessment = DB::table('assessments')

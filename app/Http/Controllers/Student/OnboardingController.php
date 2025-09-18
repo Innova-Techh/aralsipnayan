@@ -16,7 +16,7 @@ class OnboardingController extends Controller
      */
     public function showWelcome()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if (!$user->isStudent()) {
             return redirect()->route('login');
@@ -37,7 +37,7 @@ class OnboardingController extends Controller
      */
     public function startOnboarding()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if (!$user->isStudent()) {
             return redirect()->route('login');
@@ -51,7 +51,7 @@ class OnboardingController extends Controller
      */
     public function showAvatarSelection()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if (!$user->isStudent()) {
             return redirect()->route('login');
@@ -86,7 +86,7 @@ class OnboardingController extends Controller
             'avatar' => 'required|string'
         ]);
 
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if (!$user || !$user->isStudent()) {
             Log::error('Unauthorized onboarding attempt', ['user' => $user ? $user->toArray() : null]);
