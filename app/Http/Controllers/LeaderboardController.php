@@ -13,7 +13,7 @@ class LeaderboardController extends Controller
      */
     public function getLeaderboardDataForView(): array
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Get user profile with avatar for current user
         $userProfile = $user->studentProfile;
@@ -141,7 +141,7 @@ class LeaderboardController extends Controller
      */
     public function getLeaderboardData()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Sample API response
         return response()->json([

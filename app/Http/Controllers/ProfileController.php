@@ -15,7 +15,7 @@ class ProfileController extends Controller
      */
     public function edit(): View
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $profile = $user->studentProfile;
         
         return view('student.profile.edit', compact('profile'));
@@ -30,7 +30,7 @@ class ProfileController extends Controller
             'avatar' => 'required|string|in:avatar1.png,avatar2.png,avatar3.png,avatar4.png,avatar5.png,avatar6.png'
         ]);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $profile = $user->studentProfile;
         
         if (!$profile) {
@@ -60,7 +60,7 @@ class ProfileController extends Controller
      */
     public function getCurrentAvatar(): JsonResponse
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $profile = $user->studentProfile;
         
         $avatarUrl = $profile && $profile->avatar_url 

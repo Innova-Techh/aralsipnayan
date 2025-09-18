@@ -13,7 +13,7 @@ class SectionController extends Controller
      */
     public function index(): View
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $sections = [
             [
                 'id' => 1,
@@ -53,7 +53,7 @@ class SectionController extends Controller
      */
     public function getSectionsData()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Sample data - replace with actual database queries
         return response()->json([

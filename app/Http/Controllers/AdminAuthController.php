@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Teacher;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,19 +31,19 @@ class AdminAuthController extends Controller
         // Allow login with either username or email
         $loginField = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         
-        if (Auth::attempt([$loginField => $request->username, 'password' => $request->password])) {
+        if (Auth::guard('admin')->attempt([$loginField => $request->username, 'password' => $request->password])) {
             $request->session()->regenerate();
 
             // Only allow Admin and Teacher roles
-            if (in_array(Auth::user()->role, ['Admin', 'Teacher'])) {
-                switch (Auth::user()->role) {
+            if (in_array(Auth::guard('admin')->user()->role, ['Admin', 'Teacher'])) {
+                switch (Auth::guard('admin')->user()->role) {
                     case 'Admin':
                         return redirect()->route('admin.dashboard');
                     case 'Teacher':
                         return redirect()->route('teacher.dashboard');
                 }
             } else {
-                Auth::logout();
+                Auth::guard('admin')->logout();
                 return back()->withErrors([
                     'username' => 'Access denied. Admin/Teacher accounts only.',
                 ])->withInput($request->except('password', 'captcha'));
@@ -60,7 +60,7 @@ class AdminAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

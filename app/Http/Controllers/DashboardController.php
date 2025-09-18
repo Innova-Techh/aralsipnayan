@@ -18,10 +18,10 @@ class DashboardController extends Controller
         // Optional: Add delay to simulate data fetching (remove in production)
         sleep(1);
         
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Get user profile with avatar
-        $userProfile = $user->studentProfile;
+        $userProfile = $user ? $user->studentProfile : null;
         $userAvatarUrl = $userProfile && $userProfile->avatar_url 
             ? asset($userProfile->avatar_url)
             : asset('images/profile/avatar5.png'); // Default avatar
@@ -63,7 +63,13 @@ class DashboardController extends Controller
      */
     public function getStats()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
+        
+        if (!$user) {
+            return response()->json([
+                'error' => 'User not authenticated'
+            ], 401);
+        }
         
         // Replace with actual database queries
         return response()->json([

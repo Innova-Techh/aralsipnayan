@@ -10,7 +10,7 @@ class LoginStreakController extends Controller
 {
     public function checkStreak()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Only process streaks for students
         if ($user->role !== 'Student') {
@@ -46,7 +46,7 @@ class LoginStreakController extends Controller
 
     public function getStreakData()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         if ($user->role !== 'Student') {
             return response()->json([
@@ -79,7 +79,7 @@ class LoginStreakController extends Controller
 
     public function showStreakPage()
     {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         
         // Redirect non-students to dashboard
         if ($user->role !== 'Student') {
