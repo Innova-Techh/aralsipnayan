@@ -1,6 +1,6 @@
 @extends('admin.teacher.layouts.app')
 
-@section('title', 'Assessment Management')
+@section('title', 'Aralsipnayan')
 
 @section('content')
 <div>

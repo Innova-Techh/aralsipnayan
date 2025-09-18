@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Teacher Dashboard')</title>
+    <title>@yield('title', 'Aralsipnayan')</title>
 
     <!-- Tailwind (Vite) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -107,12 +107,16 @@
             <!-- Logo/Brand -->
             <div class="p-6 border-b border-gray-200">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">AS</span>
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
+                        <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
+                        class="w-10 h-10 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-xl">
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-gray-900">AralSip</h1>
-                        <p class="text-sm text-gray-500">Teacher Portal</p>
+                        <h1
+                            class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold text-gray-900 whitespace-nowrap">
+                            Aral<span class="text-red-600">Sipnayan</span>
+                        </h1>
+                        <p class="text-sm text-gray-500">Faculty Dashboard</p>
                     </div>
                 </div>
             </div>
@@ -160,24 +164,9 @@
                                         Assessment Templates
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="#"
-                                       class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                                        <span class="material-symbols-outlined mr-2 text-sm">help</span>
-                                        Question Bank
-                                    </a>
-                                </li>
                             </ul>
                             @endif
                         </div>
-                    </li>
-
-                    <li>
-                        <a href="#"
-                           class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                            <span class="material-symbols-outlined mr-3">help</span>
-                            Question Bank
-                        </a>
                     </li>
 
                     <li>
@@ -229,8 +218,7 @@
             <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
-                        <span class="material-symbols-outlined text-gray-400">menu</span>
-                        <span class="text-gray-600 font-medium">Teacher</span>
+                        <span class="text-white font-medium bg-black p-2 rounded-full">Teacher</span>
                     </div>
                     
                     <div class="flex items-center space-x-4">
@@ -244,7 +232,7 @@
                         <!-- User Profile -->
                         <div class="flex items-center space-x-3">
                             <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">{{ Auth::user()->username ?? 'Maria Santos' }}</p>
+                                <p class="text-sm font-medium text-gray-900">{{ Auth::guard('admin')->user()?->username ?? 'Admin' }}</p>
                                 <p class="text-xs text-gray-500">Grade 7 Teacher</p>
                             </div>
                             <div class="relative">
