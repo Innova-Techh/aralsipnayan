@@ -139,7 +139,7 @@ class AssessmentGenerationController extends Controller
                 // Create assessment metadata only (not the full assessment yet)
                 $assessmentOption = [
                     'assessment_id' => $assessmentId,
-                    'title' => ucfirst($currentDifficulty) . " Assessment #$i",
+                    'title' => ucfirst($currentDifficulty) . " Assessment",
                     'question_count' => $questionsPerAssessment,
                     'time_limit' => $this->getTimeLimitForDifficulty($currentDifficulty),
                     'difficulty' => $currentDifficulty,
@@ -477,7 +477,7 @@ class AssessmentGenerationController extends Controller
                 if ($questionCount > 0) {
                     $assessmentOptions[] = [
                         'assessment_id' => $assessment->assessment_id,
-                        'title' => ucfirst($difficulty) . " Assessment #$index",
+                        'title' => ucfirst($difficulty) . " Assessment",
                         'question_count' => $assessment->total_questions,
                         'time_limit' => $assessment->time_limit,
                         'difficulty' => $difficulty,
