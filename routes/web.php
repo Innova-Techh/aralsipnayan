@@ -33,20 +33,26 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 
 // General dashboard redirect (based on role)
 Route::get('/dashboard', function() {
-    if (!Auth::check()) {
-        return redirect()->route('login');
+    // Check student guard first
+    if (Auth::guard('student')->check()) {
+        return redirect()->route('student.dashboard');
     }
-
-    switch(Auth::user()->role) {
-        case 'Admin':
-            return redirect()->route('admin.dashboard');
-        case 'Teacher':
-            return redirect()->route('teacher.dashboard');
-        case 'Student':
-            return redirect()->route('student.dashboard');
-        default:
-            return redirect('/');
+    
+    // Check admin guard
+    if (Auth::guard('admin')->check()) {
+        $user = Auth::guard('admin')->user();
+        switch($user->role) {
+            case 'Admin':
+                return redirect()->route('admin.dashboard');
+            case 'Teacher':
+                return redirect()->route('teacher.dashboard');
+            default:
+                return redirect('/');
+        }
     }
+    
+    // No one is authenticated, redirect to login
+    return redirect()->route('login');
 })->name('dashboard');
 
 // Student Onboarding Routes (no middleware restrictions)
@@ -58,11 +64,11 @@ Route::prefix('student/onboarding')->name('student.onboarding.')->group(function
 });
 
 // Protected Student Routes (require completed onboarding)
-Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')->group(function () {
+Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->name('student.')->group(function () {
     
     // Dashboard - check onboarding completion
     Route::get('/dashboard', function() {
-        $user = Auth::user();
+        $user = Auth::guard('student')->user();
         $profile = $user->studentProfile;
         
         // If onboarding not completed, redirect to welcome
@@ -146,22 +152,91 @@ Route::middleware(['auth', 'role:Student'])->prefix('student')->name('student.')
     });
 });
 
-// Teacher Dashboard (placeholder)
-Route::get('/teacher/dashboard', function () {
-    return view('admin.teacher.index');
-})->middleware(['auth', 'role:Teacher'])->name('teacher.dashboard');
+// Teacher Routes - Using Admin Auth System
+Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', function () {
+        // Check if user is authenticated and has Teacher role
+        if (!Auth::guard('admin')->check()) {
+            return redirect()->route('admin.login');
+        }
+        
+        if (Auth::guard('admin')->user()->role !== 'Teacher') {
+            Auth::guard('admin')->logout();
+            return redirect()->route('admin.login')->withErrors(['access' => 'Teacher access required.']);
+        }
+        
+        return view('admin.teacher.index');
+    })->name('dashboard');
+    
+    // Assessment Management
+    Route::get('/assessments', function () {
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        return view('admin.teacher.assessments.index');
+    })->name('assessments');
+    
+    Route::get('/assessments/create', function () {
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        return view('admin.teacher.assessments.create');
+    })->name('assessments.create');
+    
+    // Student Management
+    Route::get('/students', function () {
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        return view('admin.teacher.students.index');
+    })->name('students');
+    
+    // Analytics
+    Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
+    Route::get('/analytics/assessment/{assessmentId}', [App\Http\Controllers\Teacher\AnalyticsController::class, 'showAssessmentDetails'])->name('analytics.assessment.details');
+    
+    // Debug route
+    Route::get('/debug-assessments', function() {
+        $assessments = DB::table('assessments')->get();
+        $diagnostics = DB::table('diagnostic_sessions')->get();
+        
+        return response()->json([
+            'assessments_count' => $assessments->count(),
+            'assessments' => $assessments->take(5),
+            'diagnostics_count' => $diagnostics->count(), 
+            'diagnostics' => $diagnostics->take(5)
+        ]);
+    });
+    
+    // Section Management
+    Route::get('/sections', function () {
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        return view('admin.teacher.sections.index');
+    })->name('sections');
+    
+    // Profile
+    Route::get('/profile', function () {
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        return view('admin.teacher.profile.index');
+    })->name('profile');
+});
 
 // Admin Dashboard (placeholder)
 Route::get('/admin/dashboard', function () {
     return view('admin.admin.index');
-})->middleware(['auth', 'role:Admin'])->name('admin.dashboard');
+})->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.dashboard');
 
 
 // Backward compatibility routes for old assessment references (redirects to student routes)
-Route::middleware(['auth'])->group(function () {
+Route::group([], function () {
     // Legacy assessment routes (redirects to student assessments)
     Route::get('/assessments', function() {
-        if (Auth::user()->role === 'Student') {
+        if (Auth::guard('student')->check() && Auth::guard('student')->user()->role === 'Student') {
             return redirect()->route('student.assessments');
         }
         return redirect()->route('dashboard');
@@ -169,7 +244,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Legacy assessment category route
     Route::get('/assessments/{category}', function($category) {
-        if (Auth::user()->role === 'Student') {
+        if (Auth::guard('student')->check() && Auth::guard('student')->user()->role === 'Student') {
             return redirect()->route('student.assessments.category', $category);
         }
         return redirect()->route('dashboard');
@@ -177,7 +252,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Legacy quiz start route
     Route::get('/quiz/{category}', function($category) {
-        if (Auth::user()->role === 'Student') {
+        if (Auth::guard('student')->check() && Auth::guard('student')->user()->role === 'Student') {
             return redirect()->route('student.quiz.show', $category);
         }
         return redirect()->route('dashboard');
@@ -185,7 +260,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Other protected routes (require auth + completed onboarding for students)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['student.auth'])->group(function () {
     
     // Dashboard stats
     Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
@@ -211,7 +286,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Add these routes after your existing auth middleware group
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['student.auth'])->group(function () {
     // Login streak routes
     Route::get('/check-login-streak', [App\Http\Controllers\LoginStreakController::class, 'checkStreak'])->name('login-streak.check');
     Route::get('/streak-data', [App\Http\Controllers\LoginStreakController::class, 'getStreakData'])->name('login-streak.data');
