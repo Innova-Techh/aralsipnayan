@@ -209,3 +209,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
     Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
 });
+
+// Add these routes after your existing auth middleware group
+Route::middleware(['auth'])->group(function () {
+    // Login streak routes
+    Route::get('/check-login-streak', [App\Http\Controllers\LoginStreakController::class, 'checkStreak'])->name('login-streak.check');
+    Route::get('/streak-data', [App\Http\Controllers\LoginStreakController::class, 'getStreakData'])->name('login-streak.data');
+    
+    // Login streak page
+    Route::get('/login-streak', [App\Http\Controllers\LoginStreakController::class, 'showStreakPage'])->name('login-streak.page');
+    
+    // Existing routes...
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+    // ... rest of your existing routes
+});

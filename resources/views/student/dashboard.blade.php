@@ -142,9 +142,70 @@
                 transform: translate(-10px, 10px);
             }
         }
+
+        /* Login Streak Modal Styles */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes flame {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(-1deg);
+            }
+
+            25% {
+                transform: scale(1.05) rotate(1deg);
+            }
+
+            50% {
+                transform: scale(1.02) rotate(-0.5deg);
+            }
+
+            75% {
+                transform: scale(1.03) rotate(0.5deg);
+            }
+        }
+
+        .modal-overlay {
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .flame-icon {
+            animation: flame 3s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3));
+        }
+
+        /* Custom button hover effect */
+        #continueButton:hover {
+            box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
+        }
     </style>
 
-    <!-- Remove the outer div wrapper to eliminate gaps -->
     <!-- Welcome Header (Hero) - Fixed margins and width -->
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
         <div
@@ -152,7 +213,7 @@
             <div class="relative z-10 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-8xl mx-auto">
                 <h1 class="text-lg xs:text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                     style="text-shadow: -1px -1px 0 #18337e, 1px -1px 0 #18337e, -1px 1px 0 #18337e, 1px 1px 0 #18337e, 0 4px 0 #18337e;">
-                    Welcome back, {{ Auth::user()->username }}! 👋
+                    Welcome back, {{ $profile?->firstname ?? Auth::user()->username }}! 👋
                 </h1>
                 <p class="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 mt-2 sm:mt-3 lg:mt-4">Ready to
                     continue your math journey?</p>
@@ -183,8 +244,7 @@
                                 <div>
                                     <h2 class="lg:text-3xl sm:text-2xl font-bold text-gray-900">Your Learning Progress</h2>
                                     <h4 class="text-xs sm:text-sm text-gray-900 mt-1">You're growing into a math master
-                                        every
-                                        day!</h3>
+                                        every day!</h3>
                                 </div>
                             </div>
                         </div>
@@ -228,7 +288,7 @@
                             </div>
                         </div>
 
-                        <!-- Stats Grid -->
+                        <!-- Stats Grid with Live Data -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                             <div class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-cover bg-center"
                                 style="background-image: url('{{ asset('images/dashboard/bookcard.png') }}');">
@@ -246,7 +306,9 @@
                                     <img src="{{ asset('images/dashboard/points.png') }}" alt="Points"
                                         class="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10">
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold relative z-10">1250</div>
+                                <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardPoints">
+                                    {{ $profile?->total_points ?? 0 }}
+                                </div>
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Points</div>
                             </div>
 
@@ -256,7 +318,9 @@
                                     <img src="{{ asset('images/dashboard/streak.png') }}" alt="Streak"
                                         class="w-9 h-9 sm:w-11 sm:h-11 object-contain relative z-10">
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold relative z-10">8</div>
+                                <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardStreak">
+                                    {{ $profile?->current_streak ?? 0 }}
+                                </div>
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Streak</div>
                             </div>
 
@@ -365,11 +429,11 @@
                                 <a href="{{ route('achievements.index') }}"
                                     class="px-4 py-2 transition-colors duration-200 rounded-xl text-white text-sm font-medium"
                                     style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%);  box-shadow: 0 4px 0 #7A4305;  text-shadow:
-                                       -1px -1px 0 #7A4305,
-                                       1px -1px 0 #7A4305,
-                                       -1px 1px 0 #7A4305,
-                                       1px 1px 0 #7A4305,
-                                       0 0 1px #7A4305;">
+                                                               -1px -1px 0 #7A4305,
+                                                               1px -1px 0 #7A4305,
+                                                               -1px 1px 0 #7A4305,
+                                                               1px 1px 0 #7A4305,
+                                                               0 0 1px #7A4305;">
                                     View All
                                 </a>
                             </div>
@@ -401,8 +465,6 @@
                                         </div>
                                     </div>
                                 @endforeach
-
-
                             </div>
                         </div>
                     </div>
@@ -426,13 +488,10 @@
                             </div>
 
                             <!-- Leaderboard content -->
-                            <!--Outer Div -->
                             <div class="relative px-6 lg:px-6 md:px-4 sm:px-4 -mt-8 lg:-mt-8 md:-mt-12 -z-10">
                                 <div class="px-2 pb-4 rounded-xl" style="background-color: #9B2C14;">
-                                    <!--Inner Div -->
                                     <div
                                         class="bg-gradient-to-b from-yellow-100 to-orange-50 rounded-b-xl card-shadow p-6 relative">
-
                                         <div class="space-y-3 relative z-10">
                                             @php
                                                 $rankBadges = [
@@ -451,7 +510,7 @@
                                                         <div
                                                             class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3 border-2 {{ $rank === 1 ? 'bg-yellow-500 border-yellow-600' : ($rank === 2 ? 'bg-gray-400 border-gray-500' : ($rank === 3 ? 'bg-orange-600 border-orange-700' : ($rank === 4 ? 'bg-blue-400 border-blue-500' : 'bg-teal-400 border-teal-500'))) }}">
                                                             <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
-                                                                alt="{{ Auth::user()->username ?? 'Student' }}"
+                                                                alt="{{ $row['name'] ?? 'Student' }}"
                                                                 class="w-full h-full object-cover">
                                                         </div>
                                                         <div>
@@ -460,8 +519,7 @@
                                                                 {{ $row['name'] ?? 'Student' }}
                                                             </div>
                                                             <div class="text-sm sm:text-base text-gray-600">
-                                                                {{ $row['points'] ?? 0 }}
-                                                                pts
+                                                                {{ $row['points'] ?? 0 }} pts
                                                             </div>
                                                         </div>
                                                     </div>
@@ -481,4 +539,84 @@
             </div>
         </div>
     </div>
+
+    <!-- Include Login Streak Modal -->
+    <x-login-streak-modal />
+
+    <!-- Test Button (Remove when done) -->
+    <button onclick="showStreakModal({current_streak: 3, points_earned: 25, message: 'Keep it up!'})"
+        class="fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg z-50 font-medium">
+        Test Modal
+    </button>
+
+    <script>
+        // Modal functions
+        function showStreakModal(data = null) {
+            const modal = document.getElementById('loginStreakModal');
+
+            if (data) {
+                document.getElementById('streakDay').textContent = `Day ${data.current_streak}`;
+                document.getElementById('pointsEarned').textContent = `${data.points_earned} points`;
+                document.getElementById('streakMessage').textContent = data.message || "You're doing great! Keep the streak up!";
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeStreakModal() {
+            const modal = document.getElementById('loginStreakModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+
+            // Update dashboard stats after closing modal
+            updateDashboardStats();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('loginStreakModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeStreakModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeStreakModal();
+            }
+        });
+
+        // Auto-check for login streak on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            checkLoginStreak();
+            updateDashboardStats();
+        });
+
+        function checkLoginStreak() {
+            fetch('{{ route("login-streak.check") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.show_modal) {
+                        showStreakModal(data.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking login streak:', error);
+                });
+        }
+
+        function updateDashboardStats() {
+            fetch('{{ route("login-streak.data") }}')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the stats cards with live data
+                    document.getElementById('dashboardStreak').textContent = data.current_streak;
+                    document.getElementById('dashboardPoints').textContent = data.total_points;
+                })
+                .catch(error => {
+                    console.error('Error updating dashboard stats:', error);
+                });
+        }
+    </script>
 @endsection
