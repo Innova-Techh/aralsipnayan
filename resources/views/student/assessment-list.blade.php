@@ -359,34 +359,60 @@ function checkForActiveAssessments() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Active assessments API response:', data);
         if (data.success && data.has_active_assessments) {
             activeAssessments = data.active_assessments || []; // Ensure it's an array
+            console.log('Setting activeAssessments to:', activeAssessments);
             updateAssessmentButtons();
         } else {
+            console.log('No active assessments found in API response');
             activeAssessments = []; // Reset to empty array if no active assessments
+            updateAssessmentButtons(); // Update to ensure "Start Assessment" is shown
         }
     })
     .catch(error => {
         console.error('Error checking active assessments:', error);
         activeAssessments = []; // Reset to empty array on error
+        updateAssessmentButtons(); // Update to ensure "Start Assessment" is shown
     });
 }
 
 function updateAssessmentButtons() {
+    console.log('updateAssessmentButtons called with:', activeAssessments.length, 'active assessments');
+    
     // Update all assessment cards to show Resume if there's an active assessment
     if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
         const buttons = document.querySelectorAll('button[onclick*="openAssessmentModal"]');
+        
         buttons.forEach((button, index) => {
+            if (!assessmentOptions[index]) {
+                return;
+            }
+            
             // Check if this specific assessment has an active session
-            const hasActiveAssessment = activeAssessments.some(active => 
-                active.assessment_id === assessmentOptions[index].assessment_id
-            );
+            // Convert both IDs to strings to ensure proper comparison
+            const currentAssessmentId = String(assessmentOptions[index].assessment_id);
+            const hasActiveAssessment = activeAssessments.some(active => {
+                const activeAssessmentId = String(active.assessment_id);
+                console.log(`Comparing: "${activeAssessmentId}" with "${currentAssessmentId}"`);
+                return activeAssessmentId === currentAssessmentId;
+            });
             
             if (hasActiveAssessment) {
+                console.log(`Setting button ${index} to "Resume Assessment"`);
                 button.innerHTML = 'Resume Assessment';
                 // Keep the same styling as Start Assessment - orange gradient
                 button.className = 'w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200';
+            } else {
+                // Ensure it shows "Start Assessment" if no active session
+                button.innerHTML = 'Start Assessment';
             }
+        });
+    } else {
+        // Make sure all buttons show "Start Assessment" when no active sessions
+        const buttons = document.querySelectorAll('button[onclick*="openAssessmentModal"]');
+        buttons.forEach((button) => {
+            button.innerHTML = 'Start Assessment';
         });
     }
 }

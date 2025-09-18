@@ -195,6 +195,41 @@ class AssessmentGenerationController extends Controller
     public function createActualAssessment($assessmentId, $userId, $competency, $difficulty)
     {
         try {
+            // First, check if there's already an active assessment for this user and competency
+            $existingAssessment = DB::table('assessments')
+                ->where('user_id', $userId)
+                ->where('competency', $competency)
+                ->where('status', 'in_progress')
+                ->where('started_at', '>=', now()->subHours(2)) // Only check recent assessments
+                ->orderBy('started_at', 'desc')
+                ->first();
+            
+            if ($existingAssessment) {
+                // Check if this assessment has an active session
+                $existingSession = DB::table('assessment_sessions')
+                    ->where('assessment_id', $existingAssessment->assessment_id)
+                    ->where('user_id', $userId)
+                    ->where('status', 'in_progress')
+                    ->first();
+                
+                if ($existingSession) {
+                    Log::info("Returning existing assessment instead of creating new one", [
+                        'existing_assessment_id' => $existingAssessment->assessment_id,
+                        'existing_session_id' => $existingSession->session_id,
+                        'user_id' => $userId
+                    ]);
+                    
+                    return [
+                        'success' => true,
+                        'exists' => true, // Mark as existing
+                        'assessment' => $existingAssessment,
+                        'session_id' => $existingSession->session_id,
+                        'question_count' => $existingAssessment->total_questions,
+                        'time_limit' => $existingAssessment->time_limit
+                    ];
+                }
+            }
+            
             // ALWAYS generate a new unique ID instead of using the passed one
             // This prevents duplicate key violations from cached/reused IDs
             $newAssessmentId = $this->generateUniqueAssessmentId($userId, $competency, $difficulty, rand(1, 999));

@@ -50,6 +50,41 @@ class RegularAssessmentController extends Controller
         }
         
         try {
+            // First, check if there's already an active assessment for this user and category
+            $existingAssessment = DB::table('assessments')
+                ->where('user_id', $user->id)
+                ->where('competency', $dbCompetency)
+                ->where('status', 'in_progress')
+                ->where('started_at', '>=', now()->subHours(2)) // Only check recent assessments
+                ->orderBy('started_at', 'desc')
+                ->first();
+            
+            if ($existingAssessment) {
+                // Check if this assessment has an active session
+                $existingSession = DB::table('assessment_sessions')
+                    ->where('assessment_id', $existingAssessment->assessment_id)
+                    ->where('user_id', $user->id)
+                    ->where('status', 'in_progress')
+                    ->first();
+                
+                if ($existingSession) {
+                    // Return the existing assessment instead of creating a new one
+                    $redirectUrl = route('student.quiz.show', $category) . '?assessment_id=' . $existingAssessment->assessment_id;
+                    $redirectUrl .= '&session_id=' . $existingSession->session_id;
+                    
+                    return response()->json([
+                        'success' => true,
+                        'assessment_exists' => true,
+                        'assessment_id' => $existingAssessment->assessment_id,
+                        'session_id' => $existingSession->session_id,
+                        'question_count' => $existingAssessment->total_questions,
+                        'time_limit' => $existingAssessment->time_limit,
+                        'redirect' => $redirectUrl,
+                        'message' => 'Resuming existing assessment'
+                    ]);
+                }
+            }
+            
             // Extract difficulty from assessment_id
             $difficulty = $mastery->current_difficulty;
             
@@ -1213,6 +1248,17 @@ class RegularAssessmentController extends Controller
         }
         
         try {
+            // Update assessment session to mark as paused
+            $sessionUpdated = DB::table('assessment_sessions')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->where('status', 'in_progress')
+                ->update([
+                    'is_paused' => true,
+                    'paused_at' => now(),
+                    'last_activity_at' => now()
+                ]);
+            
             // Save pause state to database
             DB::table('assessment_pauses')->updateOrInsert(
                 [
@@ -1230,7 +1276,8 @@ class RegularAssessmentController extends Controller
             
             Log::info("Assessment paused successfully", [
                 'assessment_id' => $assessmentId,
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'session_updated' => $sessionUpdated > 0
             ]);
             
             return response()->json([
@@ -1277,6 +1324,16 @@ class RegularAssessmentController extends Controller
         }
         
         try {
+            // Update assessment session to mark as unpaused
+            $sessionUpdated = DB::table('assessment_sessions')
+                ->where('assessment_id', $assessmentId)
+                ->where('user_id', $user->id)
+                ->update([
+                    'is_paused' => false,
+                    'paused_at' => null,
+                    'last_activity_at' => now()
+                ]);
+            
             // Get pause state
             $pauseState = DB::table('assessment_pauses')
                 ->where('assessment_id', $assessmentId)
@@ -1306,7 +1363,8 @@ class RegularAssessmentController extends Controller
             Log::info("Assessment resumed successfully", [
                 'assessment_id' => $assessmentId,
                 'user_id' => $user->id,
-                'had_pause_state' => !empty($pauseState)
+                'had_pause_state' => !empty($pauseState),
+                'session_updated' => $sessionUpdated > 0
             ]);
             
             return response()->json([
@@ -1672,60 +1730,76 @@ class RegularAssessmentController extends Controller
         $dbCompetency = strtolower($category);
         
         try {
-            // Check for active assessments in assessments table that have been STARTED (have sessions)
-            $activeAssessments = DB::table('assessments as a')
-                ->join('assessment_sessions as s', 'a.assessment_id', '=', 's.assessment_id')
-                ->where('a.user_id', $user->id)
-                ->where('a.competency', $dbCompetency)
-                ->where('a.status', 'in_progress')
-                ->where('s.status', 'in_progress')
-                ->where('a.started_at', '>=', now()->subHours(2)) // Only check recent assessments
-                ->select('a.*', 's.session_id', 's.questions_answered as session_progress')
-                ->get();
+            $activeAssessmentData = [];
             
-            // Check for active sessions in assessment_sessions table (standalone sessions)
-            $activeSessions = DB::table('assessment_sessions')
+            // First, check for active assessments in the assessments table
+            $activeAssessments = DB::table('assessments')
                 ->where('user_id', $user->id)
                 ->where('competency', $dbCompetency)
                 ->where('status', 'in_progress')
-                ->where('started_at', '>=', now()->subHours(2)) // Only check recent sessions
-                ->whereNull('assessment_id') // Sessions without assessments
+                ->where('started_at', '>=', now()->subHours(2)) // Only check recent assessments
+                ->orderBy('started_at', 'desc')
                 ->get();
             
-            $activeAssessmentData = [];
-            
-            // Process active assessments
             foreach ($activeAssessments as $assessment) {
-                // Check if assessment has questions and progress
-                $questionCount = DB::table('assessment_questions')
+                // Check if this assessment has an active session
+                $session = DB::table('assessment_sessions')
                     ->where('assessment_id', $assessment->assessment_id)
-                    ->count();
+                    ->where('user_id', $user->id)
+                    ->first();
+                
+                if ($session && $session->status === 'in_progress') {
+                    // Check if assessment has questions in Fisher-Yates pool
+                    $scriptPath = base_path('public/algorithm/fisher_yates.py');
+                    $command = "python \"{$scriptPath}\" check_pool {$assessment->assessment_id}";
                     
-                if ($questionCount > 0) {
-                    $activeAssessmentData[] = [
-                        'assessment_id' => $assessment->assessment_id,
-                        'type' => 'assessment',
-                        'progress' => $assessment->questions_answered,
-                        'total_questions' => $assessment->total_questions,
-                        'started_at' => $assessment->started_at,
-                        'difficulty' => $assessment->difficulty_level,
-                        'time_limit' => $assessment->time_limit ?? 30
-                    ];
+                    $output = shell_exec($command);
+                    $result = json_decode($output, true);
+                    
+                    if ($result && $result['success'] && isset($result['total_questions'])) {
+                        $activeAssessmentData[] = [
+                            'assessment_id' => $assessment->assessment_id,
+                            'session_id' => $session->session_id,
+                            'type' => 'assessment',
+                            'progress' => $assessment->questions_answered,
+                            'total_questions' => $assessment->total_questions,
+                            'started_at' => $assessment->started_at,
+                            'difficulty' => $assessment->difficulty_level,
+                            'time_limit' => $assessment->time_limit ?? 30,
+                            'is_paused' => $session->is_paused ?? false,
+                            'title' => ucfirst($assessment->difficulty_level) . ' Assessment',
+                            'can_resume' => true
+                        ];
+                    }
                 }
             }
             
-            // Process active sessions
-            foreach ($activeSessions as $session) {
-                $activeAssessmentData[] = [
-                    'session_id' => $session->session_id,
-                    'assessment_id' => $session->assessment_id,
-                    'type' => 'session',
-                    'progress' => $session->questions_answered,
-                    'total_questions' => $session->total_questions,
-                    'started_at' => $session->started_at,
-                    'difficulty' => $session->difficulty_level,
-                    'time_limit' => $session->time_limit_minutes ?? 30
-                ];
+            // If no assessments found, also check standalone sessions (shouldn't happen in normal flow)
+            if (empty($activeAssessmentData)) {
+                $activeSessions = DB::table('assessment_sessions')
+                    ->where('user_id', $user->id)
+                    ->where('competency', $dbCompetency)
+                    ->where('status', 'in_progress')
+                    ->where('started_at', '>=', now()->subHours(2))
+                    ->whereNotNull('assessment_id') // Only sessions linked to assessments
+                    ->orderBy('started_at', 'desc')
+                    ->get();
+                
+                foreach ($activeSessions as $session) {
+                    $activeAssessmentData[] = [
+                        'assessment_id' => $session->assessment_id,
+                        'session_id' => $session->session_id,
+                        'type' => 'session',
+                        'progress' => $session->questions_answered,
+                        'total_questions' => $session->total_questions,
+                        'started_at' => $session->started_at,
+                        'difficulty' => $session->difficulty_level,
+                        'time_limit' => $session->time_limit_minutes ?? 30,
+                        'is_paused' => $session->is_paused ?? false,
+                        'title' => ucfirst($session->difficulty_level) . ' Assessment',
+                        'can_resume' => true
+                    ];
+                }
             }
             
             return response()->json([
