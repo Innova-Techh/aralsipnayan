@@ -226,8 +226,9 @@
 
                 <!-- Button -->
                 <button onclick="openAssessmentModal({{ $index }})" 
-                    class="w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200">
-                    Start Assessment
+                    class="w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_8px_rgba(0,0,0,0.3)] border-b-4 border-[#c03f00] hover:scale-[1.03] hover:shadow-[0_6px_12px_rgba(0,0,0,0.4)] active:scale-[0.98] active:shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-all duration-200 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                    <span class="relative z-10">Start Assessment</span>
                 </button>
             </div>
             @endforeach
@@ -263,12 +264,13 @@
     </div>
 
 <!-- Assessment Modal -->
-<div id="assessmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden px-4 sm:px-0">
+<div id="assessmentModal" class="fixed inset-0 bg-black bg-opacity-50 justify-center items-center z-50 hidden px-4 sm:px-0">
     <div class="w-full max-w-lg bg-[#FFF7E6] rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-[#2077AF] to-[#4720AF] p-4 flex items-center gap-2">
-            <span class="text-2xl" id="modal-icon">{{ $data['icon'] }}</span>
-            <h2 class="text-xl font-extrabold text-white" id="modal-title">Assessment Preview</h2>
+        <!-- Header with 3D effects -->
+        <div class="bg-gradient-to-r from-[#2077AF] to-[#4720AF] p-4 flex items-center gap-2 shadow-[0_8px_16px_rgba(0,0,0,0.3)] border-b-4 border-[#1a5a8a] relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+            <span class="text-2xl relative z-10" id="modal-icon">{{ $data['icon'] }}</span>
+            <h2 class="text-xl font-extrabold text-white relative z-10 text-shadow-lg" id="modal-title">Assessment Preview</h2>
         </div>
 
         <!-- Content -->
@@ -321,20 +323,109 @@
                 </p>
             </div>
 
-            <!-- Start Button -->
+            <!-- Start Button with 3D effects -->
             <button id="modal-start-btn" 
-                class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300">
-                Start Assessment
+                class="w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-[0_6px_12px_rgba(0,0,0,0.3)] hover:scale-[1.03] hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.3)] transition-all duration-200 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                <span class="relative z-10">Start Assessment</span>
             </button>
 
-            <!-- Close Button -->
+            <!-- Close Button with subtle 3D effects -->
             <button onclick="closeAssessmentModal()" 
-                class="w-full text-center text-sm text-gray-600 mt-3 hover:underline">
+                class="w-full text-center text-sm text-gray-600 mt-3 hover:underline py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 shadow-sm hover:shadow-md">
                 Cancel
             </button>
         </div>
     </div>
 </div>
+
+<!-- Active Assessment Notification Modal -->
+<div id="activeAssessmentModal" class="fixed inset-0 bg-black bg-opacity-60 justify-center items-center z-[60] hidden px-4 sm:px-0">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] overflow-hidden transform scale-95 transition-all duration-300" id="activeAssessmentModalContent">
+        <!-- Header with 3D effects -->
+        <div class="bg-gradient-to-r from-[#FF6B6B] to-[#FF8E8E] p-6 relative shadow-[0_8px_16px_rgba(0,0,0,0.3)] border-b-4 border-[#e74c3c]">
+            <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
+            <div class="flex items-center justify-center gap-3 relative z-10">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-[0_4px_8px_rgba(0,0,0,0.2)]">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-white drop-shadow-lg">Assessment In Progress</h2>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 text-center">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Cannot Start New Assessment</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    You already have an active assessment in progress. Please complete or abandon your current assessment before starting a new one.
+                </p>
+            </div>
+
+            <!-- Active Assessment Info -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border-l-4 border-blue-400 shadow-inner">
+                <div class="text-sm text-gray-700">
+                    <div class="font-semibold text-blue-800 mb-2">Current Assessment:</div>
+                    <div id="activeAssessmentInfo" class="space-y-1">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons with 3D effects -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <!-- Resume Button -->
+                <button onclick="resumeFromNotification()" 
+                    class="flex-1 bg-gradient-to-b from-[#4CAF50] to-[#45a049] text-white font-semibold py-3 px-4 rounded-xl border-b-4 border-[#3d8b40] shadow-[0_6px_12px_rgba(0,0,0,0.2)] hover:scale-[1.02] hover:shadow-[0_8px_16px_rgba(0,0,0,0.3)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                    <span class="relative z-10"> Resume Assessment</span>
+                </button>
+
+                <!-- Cancel Button -->
+                <button onclick="closeActiveAssessmentModal()" 
+                    class="flex-1 bg-gradient-to-b from-[#6C757D] to-[#5a6268] text-white font-semibold py-3 px-4 rounded-xl border-b-4 border-[#4e555b] shadow-[0_6px_12px_rgba(0,0,0,0.2)] hover:scale-[1.02] hover:shadow-[0_8px_16px_rgba(0,0,0,0.3)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                    <span class="relative z-10">Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.text-shadow-lg {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#assessmentModal:not(.hidden) {
+    display: flex !important;
+}
+
+#activeAssessmentModal {
+    display: none;
+}
+
+#activeAssessmentModal.show {
+    display: flex !important;
+}
+
+#activeAssessmentModal.show #activeAssessmentModalContent {
+    transform: scale(1);
+}
+
+.shadow-3d {
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.shadow-3d-pressed {
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+</style>
 
 <script>
 let assessmentOptions = @json($assessmentOptions ?? []);
@@ -376,54 +467,68 @@ function updateAssessmentButtons() {
     // Update all assessment cards to show Resume if there's an active assessment
     if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
         const buttons = document.querySelectorAll('button[onclick*="openAssessmentModal"]');
-        buttons.forEach((button, index) => {
-            // Check if this specific assessment has an active session
-            const hasActiveAssessment = activeAssessments.some(active => 
-                active.assessment_id === assessmentOptions[index].assessment_id
-            );
+        
+        // If there are active assessments, change the first button to Resume
+        // Since we can only have one active assessment per competency/difficulty
+        if (buttons.length > 0) {
+            const firstButton = buttons[0];
+            firstButton.innerHTML = 'Resume Assessment';
+            // Keep the same styling as Start Assessment - orange gradient
+            firstButton.className = 'w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200';
             
-            if (hasActiveAssessment) {
-                button.innerHTML = 'Resume Assessment';
-                // Keep the same styling as Start Assessment - orange gradient
-                button.className = 'w-full text-xs sm:text-sm md:text-base bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white py-2 rounded-lg sm:rounded-xl font-semibold shadow-[0_4px_0_#c03f00] hover:scale-[1.03] transition-all duration-200';
-            }
-        });
+            // Update the onclick to use the resume function for the first button
+            firstButton.setAttribute('onclick', 'openResumeModal(0)');
+        }
     }
 }
 
 function openAssessmentModal(index) {
+    // Check if there are active assessments first
+    if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
+        showActiveAssessmentNotification();
+        return;
+    }
+    
     selectedAssessmentIndex = index;
     const assessment = assessmentOptions[index];
     
-    // Check if there's an active session for this specific assessment
-    let activeAssessment = null;
-    if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
-        activeAssessment = activeAssessments.find(active => 
-            active.assessment_id === assessment.assessment_id
-        );
-    }
-    
-    // Populate modal content
+    // Populate modal content for new assessment
     document.getElementById('modal-title').textContent = assessment.title;
     document.getElementById('modal-time').textContent = assessment.time_limit + ' minutes';
     document.getElementById('modal-questions').textContent = assessment.question_count + ' Questions';
     
-    // Update start button based on whether there's an active assessment
+    // Set up start button for new assessment
     const startBtn = document.getElementById('modal-start-btn');
-    if (activeAssessment) {
-        startBtn.textContent = 'Resume Assessment';
-        // Keep the same styling as Start Assessment - orange gradient with updated classes
-        startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
-        startBtn.onclick = function() {
-            resumeAssessment(activeAssessment.assessment_id);
-        };
-    } else {
-        startBtn.textContent = 'Start Assessment';
-        startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
-        startBtn.onclick = function() {
-            startAssessment(assessment.assessment_id);
-        };
-    }
+    startBtn.textContent = 'Start Assessment';
+    startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-[0_6px_12px_rgba(0,0,0,0.3)] hover:scale-[1.03] hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.3)] transition-all duration-200 relative overflow-hidden';
+    startBtn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div><span class="relative z-10">Start Assessment</span>';
+    startBtn.onclick = function() {
+        startAssessment(assessment.assessment_id);
+    };
+    
+    // Show modal
+    document.getElementById('assessmentModal').classList.remove('hidden');
+}
+
+function openResumeModal(index) {
+    selectedAssessmentIndex = index;
+    
+    // Get the first active assessment (should only be one per competency/difficulty)
+    const activeAssessment = activeAssessments[0];
+    
+    // Populate modal content for resume
+    document.getElementById('modal-title').textContent = activeAssessment.title || 'Resume Assessment';
+    document.getElementById('modal-time').textContent = activeAssessment.time_limit + ' minutes';
+    document.getElementById('modal-questions').textContent = activeAssessment.total_questions + ' Questions';
+    
+    // Set up resume button
+    const startBtn = document.getElementById('modal-start-btn');
+    startBtn.textContent = 'Resume Assessment';
+    startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-[0_6px_12px_rgba(0,0,0,0.3)] hover:scale-[1.03] hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.3)] transition-all duration-200 relative overflow-hidden';
+    startBtn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div><span class="relative z-10">Resume Assessment</span>';
+    startBtn.onclick = function() {
+        resumeAssessment(activeAssessment.assessment_id);
+    };
     
     // Show modal
     document.getElementById('assessmentModal').classList.remove('hidden');
@@ -436,8 +541,92 @@ function closeAssessmentModal() {
     // Reset button state in case it was changed
     const startBtn = document.getElementById('modal-start-btn');
     startBtn.disabled = false;
-    startBtn.textContent = 'Start Assessment';
-    startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-lg hover:scale-[1.03] transition-all duration-300';
+    startBtn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div><span class="relative z-10">Start Assessment</span>';
+    startBtn.className = 'w-full bg-gradient-to-b from-[#F6510C] to-[#F5D70B] text-white text-lg font-semibold py-3 rounded-2xl border-b-4 border-[#922f26] shadow-[0_6px_12px_rgba(0,0,0,0.3)] hover:scale-[1.03] hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.3)] transition-all duration-200 relative overflow-hidden';
+    startBtn.onclick = null; // Reset onclick handler
+}
+
+// New functions for active assessment notification modal
+let timeUpdateInterval = null;
+
+function showActiveAssessmentNotification() {
+    const modal = document.getElementById('activeAssessmentModal');
+    const activeAssessment = activeAssessments[0]; // Get the first (should be only) active assessment
+    
+    // Function to update the time display
+    function updateTimeDisplay() {
+        const infoDiv = document.getElementById('activeAssessmentInfo');
+        if (activeAssessment && infoDiv) {
+            // Calculate remaining time
+            const startTime = new Date(activeAssessment.started_at);
+            const timeLimitMinutes = activeAssessment.time_limit || 30;
+            const timeLimitMs = timeLimitMinutes * 60 * 1000; // Convert to milliseconds
+            const elapsedMs = Date.now() - startTime.getTime();
+            const remainingMs = Math.max(0, timeLimitMs - elapsedMs);
+            
+            // Convert remaining time to readable format
+            const remainingMinutes = Math.floor(remainingMs / 60000);
+            const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
+            
+            let timeDisplay;
+            if (remainingMs <= 0) {
+                timeDisplay = '<span class="text-red-600 font-bold">⏰ Time Expired</span>';
+            } else if (remainingMinutes > 0) {
+                timeDisplay = `<span class="text-orange-600 font-semibold">⏱️ ${remainingMinutes}m ${remainingSeconds}s remaining</span>`;
+            } else {
+                timeDisplay = `<span class="text-red-500 font-semibold">⏱️ ${remainingSeconds}s remaining</span>`;
+            }
+            
+            infoDiv.innerHTML = `
+                <div class="font-medium text-gray-800">${activeAssessment.title || 'Assessment'}</div>
+                <div class="text-sm mt-2">
+                    ${timeDisplay}
+                </div>
+            `;
+        }
+    }
+    
+    // Initial update
+    updateTimeDisplay();
+    
+    // Show modal with animation
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+    
+    // Update time every second while modal is open
+    timeUpdateInterval = setInterval(updateTimeDisplay, 1000);
+}
+
+function closeActiveAssessmentModal() {
+    const modal = document.getElementById('activeAssessmentModal');
+    modal.classList.remove('show');
+    
+    // Clear the time update interval
+    if (timeUpdateInterval) {
+        clearInterval(timeUpdateInterval);
+        timeUpdateInterval = null;
+    }
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+function resumeFromNotification() {
+    const activeAssessment = activeAssessments[0];
+    if (activeAssessment) {
+        // Clear the time update interval
+        if (timeUpdateInterval) {
+            clearInterval(timeUpdateInterval);
+            timeUpdateInterval = null;
+        }
+        
+        closeActiveAssessmentModal();
+        // Use the existing resume functionality
+        resumeAssessment(activeAssessment.assessment_id);
+    }
 }
 
 // Start assessment function
@@ -522,6 +711,13 @@ function resumeAssessment(assessmentId) {
 document.getElementById('assessmentModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeAssessmentModal();
+    }
+});
+
+// Close active assessment modal when clicking outside
+document.getElementById('activeAssessmentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeActiveAssessmentModal();
     }
 });
 
