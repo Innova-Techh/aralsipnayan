@@ -20,10 +20,9 @@ class AchievementController extends Controller
                 'rarity_color' => 'gray',
                 'is_earned' => true,
                 'earned_date' => '2024-01-15',
-                'front_image' => 'a/firststep.png',
+                'front_image' => 'a/first_step.svg',
                 'reward' => '+50 XP',
-                'background_light' => '#646565',
-                'background_dark' => '#2E343C'
+                'background_light' => '#646565'
             ],
             [
                 'id' => 2,
@@ -36,8 +35,7 @@ class AchievementController extends Controller
                 'earned_date' => '2024-01-20',
                 'front_image' => 'a/quicklearner.png',
                 'reward' => '+50 XP',
-                'background_light' => '#1E8646',
-                'background_dark' => '#163522'
+                'background_light' => '#1E8646'
             ],
             [
                 'id' => 5,
@@ -48,10 +46,9 @@ class AchievementController extends Controller
                 'rarity_color' => 'purple',
                 'is_earned' => false,
                 'earned_date' => null,
-                'front_image' => 'a/mathwhiz.png',
+                'front_image' => 'a/math_whiz.svg',
                 'reward' => '+50 XP',
-                'background_light' => '#2C1B68',
-                'background_dark' => '#100A23'
+                'background_light' => '#2C1B68'
             ],
             [
                 'id' => 7,
@@ -62,10 +59,9 @@ class AchievementController extends Controller
                 'rarity_color' => 'yellow',
                 'is_earned' => false,
                 'earned_date' => null,
-                'front_image' => 'a/gradechampion.png',
+                'front_image' => 'a/grade_champion.svg',
                 'reward' => '+50 XP',
-                'background_light' => '#D17A09',
-                'background_dark' => '#512500'
+                'background_light' => '#D17A09'
             ],
             [
                 'id' => 11,
@@ -76,10 +72,9 @@ class AchievementController extends Controller
                 'rarity_color' => 'red',
                 'is_earned' => true,
                 'earned_date' => '2024-01-20',
-                'front_image' => 'a/onfire.png',
+                'front_image' => 'a/on_fire.svg',
                 'reward' => '+50 XP',
-                'background_light' => '#913311',
-                'background_dark' => '#591E09'
+                'background_light' => '#913311'
             ]
         ];
     }
@@ -89,63 +84,100 @@ class AchievementController extends Controller
         // Get all achievements data
         $allAchievements = $this->getAllAchievements();
         
-        // Achievement card color mapping
+        // Achievement card color mapping and drop shadows
         $achievementColors = [
-            // Blue theme (like your current cards)
+            // Blue theme
             'blue-light' => '#165A9A',
-            'blue-dark' => '#104373',
             // Brown/Orange theme
             'brown-light' => '#913311',
-            'brown-dark' => '#591E09',
             // Gray theme
             'gray-light' => '#646565',
-            'gray-dark' => '#2E343C',
             // Green theme
             'green-light' => '#1E8646',
-            'green-dark' => '#163522',
             // Purple theme
             'purple-light' => '#2C1B68',
-            'purple-dark' => '#100A23',
             // Gold/Yellow theme
             'gold-light' => '#D17A09',
-            'gold-dark' => '#512500',
         ];
         
-        // Function to get background colors based on rarity
-        function getBackgroundColors($rarity) {
+        // Achievement drop shadow colors
+        $achievementDropShadows = [
+            'achievement-common' => '4px 4px 0 #2E343C',
+            'achievement-uncommon' => '4px 4px 0 #163522',
+            'achievement-rare' => '4px 4px 0 #591E09',
+            'achievement-epic' => '4px 4px #100A23',
+            'achievement-legendary' => '4px 4px #512500',
+            'achievement-blue' => '4px 4px #104373',
+        ];
+
+        // Achievement inner shadow colors
+         // Achievement inner shadow colors (combined)
+        $achievementInnerShadows = [
+            'achievement-common' => 'inset 4px 4px 2px #525555, inset -2px 4px 4px #82868B',
+            'achievement-uncommon' => 'inset 4px 4px 2px #166D38, inset -2px 4px 4px #33A15E',
+            'achievement-rare' => 'inset 4px 4px 2px #591E09, inset -2px 4px 4px #591E09',
+            'achievement-epic' => 'inset 4px 4px 2px #21125C, inset -2px 4px 4px #4A368B',
+            'achievement-legendary' => 'inset 4px 4px 2px #804B03, inset -2px 4px 4px #FF9F4E',
+            'achievement-blue' => 'inset 4px 4px 2px #104373, inset -2px 4px 4px #104373',
+        ];
+        
+        // Function to get background color and drop shadow based on rarity
+        function getBackgroundColor($rarity) {
             global $achievementColors;
             
             switch(strtolower($rarity)) {
                 case 'common':
-                    return [
-                        'light' => $achievementColors['gray-light'],
-                        'dark' => $achievementColors['gray-dark']
-                    ];
+                    return $achievementColors['gray-light'];
                 case 'uncommon':
-                    return [
-                        'light' => $achievementColors['green-light'],
-                        'dark' => $achievementColors['green-dark']
-                    ];
+                    return $achievementColors['green-light'];
                 case 'rare':
-                    return [
-                        'light' => $achievementColors['brown-light'],
-                        'dark' => $achievementColors['brown-dark']
-                    ];
+                    return $achievementColors['brown-light'];
                 case 'epic':
-                    return [
-                        'light' => $achievementColors['purple-light'],
-                        'dark' => $achievementColors['purple-dark']
-                    ];
+                    return $achievementColors['purple-light'];
                 case 'legendary':
-                    return [
-                        'light' => $achievementColors['gold-light'],
-                        'dark' => $achievementColors['gold-dark']
-                    ];
+                    return $achievementColors['gold-light'];
                 default:
-                    return [
-                        'light' => $achievementColors['blue-light'],
-                        'dark' => $achievementColors['blue-dark']
-                    ];
+                    return $achievementColors['blue-light'];
+            }
+        };
+        
+        // Function to get drop shadow based on rarity
+        function getDropShadow($rarity) {
+            global $achievementDropShadows;
+            
+            switch(strtolower($rarity)) {
+                case 'common':
+                    return $achievementDropShadows['achievement-common'];
+                case 'uncommon':
+                    return $achievementDropShadows['achievement-uncommon'];
+                case 'rare':
+                    return $achievementDropShadows['achievement-rare'];
+                case 'epic':
+                    return $achievementDropShadows['achievement-epic'];
+                case 'legendary':
+                    return $achievementDropShadows['achievement-legendary'];
+                default:
+                    return $achievementDropShadows['achievement-blue'];
+            }
+        };
+
+        // Function to get inner shadow based on rarity
+        function getInnerShadow($rarity) {
+            global $achievementInnerShadows;
+            
+            switch(strtolower($rarity)) {
+                case 'common':
+                    return $achievementInnerShadows['achievement-common'];
+                case 'uncommon':
+                    return $achievementInnerShadows['achievement-uncommon'];
+                case 'rare':
+                    return $achievementInnerShadows['achievement-rare'];
+                case 'epic':
+                    return $achievementInnerShadows['achievement-epic'];
+                case 'legendary':
+                    return $achievementInnerShadows['achievement-legendary'];
+                default:
+                    return $achievementInnerShadows['achievement-blue'];
             }
         };
 
