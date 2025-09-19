@@ -16,6 +16,12 @@ class QuestionsTableSeeder extends Seeder
             database_path('data/number_algebra/number_algebra_beginner.json'),
             database_path('data/number_algebra/number_algebra_intermediate.json'),
             database_path('data/number_algebra/number_algebra_advanced.json'),
+            database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
+            database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
+            database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
+            database_path('data/data_probability/data_probability_beginner.json'),
+            database_path('data/data_probability/data_probability_intermediate.json'),
+            database_path('data/data_probability/data_probability_advanced.json'),
         ];
 
         foreach ($files as $file) {

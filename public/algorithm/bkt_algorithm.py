@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import math
 import uuid
 import os
+import time
 from decimal import Decimal, ROUND_HALF_UP
 
 class BKTAlgorithm:
@@ -393,8 +394,8 @@ class BKTAlgorithm:
                 bkt_before, is_correct, params, ftime_factor, difficulty_factor
             )
             
-            # Record the response with all calculated values
-            response_id = f"RESP_{session_id}_{question_id}_{int(datetime.now().timestamp())}"
+            # Record the response with all calculated values - use UUID for guaranteed uniqueness
+            response_id = f"RESP_DIAG_{session['user_id']}_{session['competency']}_{int(time.time() * 1000000)}_{question_id.split('-')[-1] if '-' in question_id else question_id[:5]}"
             
             cursor.execute("""
                 INSERT INTO question_responses 
@@ -449,6 +450,8 @@ class BKTAlgorithm:
         try:
             cursor = conn.cursor(dictionary=True)
             
+            self.log_error(f"Starting diagnostic phase completion for session: {session_id}")
+            
             # Get session and calculate phase score
             cursor.execute("""
                 SELECT ds.*, 
@@ -462,11 +465,14 @@ class BKTAlgorithm:
             
             session = cursor.fetchone()
             if not session:
+                self.log_error(f"Session not found: {session_id}")
                 return {'success': False, 'message': 'Session not found'}
             
             current_phase = session['current_phase']
             total_answered = session['total_answered'] or 0
             total_correct = session['total_correct'] or 0
+            
+            self.log_error(f"Phase {current_phase} completion - Total answered: {total_answered}, Total correct: {total_correct}")
             
             # Calculate phase score based on current phase
             # Expected questions per phase: Phase 1 = 5, Phase 2 = 5, Phase 3 = 5
@@ -476,6 +482,7 @@ class BKTAlgorithm:
                 # For phase 1, all responses are for this phase
                 phase_answered = min(total_answered, questions_per_phase)
                 phase_correct = min(total_correct, phase_answered)
+                self.log_error(f"Phase 1: Using all responses - answered: {phase_answered}, correct: {phase_correct}")
             elif current_phase == 2:
                 # For phase 2, subtract phase 1 responses
                 phase_1_questions = questions_per_phase
@@ -484,6 +491,7 @@ class BKTAlgorithm:
                 # Get phase 1 correct answers
                 phase_1_correct = int((session['phase_1_score'] or 0) * phase_1_questions)
                 phase_correct = min(max(0, total_correct - phase_1_correct), phase_answered)
+                self.log_error(f"Phase 2: Subtracting phase 1 ({phase_1_correct} correct) - answered: {phase_answered}, correct: {phase_correct}")
             elif current_phase == 3:
                 # For phase 3, subtract phase 1 and 2 responses
                 phase_1_questions = questions_per_phase
@@ -496,14 +504,19 @@ class BKTAlgorithm:
                 phase_2_correct = int((session['phase_2_score'] or 0) * phase_2_questions)
                 previous_correct = phase_1_correct + phase_2_correct
                 phase_correct = min(max(0, total_correct - previous_correct), phase_answered)
+                self.log_error(f"Phase 3: Subtracting phases 1&2 ({previous_correct} correct) - answered: {phase_answered}, correct: {phase_correct}")
             else:
                 phase_answered = 0
                 phase_correct = 0
+                self.log_error(f"Invalid phase {current_phase} - setting to 0")
             
             # Calculate phase mastery score
-            phase_score = (phase_correct / phase_answered) if phase_answered > 0 else 0
-            
-            self.log_error(f"Phase {current_phase} calculation: {phase_correct}/{phase_answered} = {phase_score}")
+            if phase_answered > 0:
+                phase_score = phase_correct / phase_answered
+                self.log_error(f"Phase {current_phase} calculation: {phase_correct}/{phase_answered} = {phase_score}")
+            else:
+                phase_score = 0
+                self.log_error(f"Phase {current_phase} calculation: No questions answered yet, defaulting score to 0")
             
             # Calculate phase time factor
             # Get time scores for this specific phase
@@ -523,16 +536,22 @@ class BKTAlgorithm:
                 phase_start = 0
                 phase_end = 0
             
-            # Get time scores for this phase
-            cursor.execute("""
-                SELECT time_score, response_time, max_allowed_time, is_correct
-                FROM question_responses 
-                WHERE assessment_id = %s 
-                ORDER BY answered_at
-                LIMIT %s OFFSET %s
-            """, (session_id, phase_end - phase_start, phase_start))
+            # Get time scores for this phase - ensure valid LIMIT and OFFSET values
+            limit_value = max(0, phase_end - phase_start)
+            offset_value = max(0, phase_start)
             
-            phase_responses = cursor.fetchall()
+            if limit_value > 0:
+                cursor.execute("""
+                    SELECT time_score, response_time, max_allowed_time, is_correct
+                    FROM question_responses 
+                    WHERE assessment_id = %s 
+                    ORDER BY answered_at
+                    LIMIT %s OFFSET %s
+                """, (session_id, limit_value, offset_value))
+                
+                phase_responses = cursor.fetchall()
+            else:
+                phase_responses = []
             
             # Calculate time scores for this phase (handle null values)
             phase_time_scores = []

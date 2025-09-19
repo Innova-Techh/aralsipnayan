@@ -99,11 +99,12 @@
                         $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
                         $naIncompleteSession = $incompleteSessionData['Number_Algebra'] ?? null;
                     @endphp
-                    <span class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-100 
-                                                            text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'orange' : 'red') }}-700 
-                                                            text-xs font-medium px-2 py-1 rounded-full">
+                    <span class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                text-xs font-medium px-2 py-1 rounded-full">
                         {{ $naLevel }}
                     </span>
+
                 </div>
 
                 <!-- Progress Bar -->
@@ -213,8 +214,12 @@
                         $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
                         $mgIncompleteSession = $incompleteSessionData['Measurement_Geometry'] ?? null;
                     @endphp
-                    <span
-                        class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full relative z-20">{{ $mgLevel }}</span>
+                    <span class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+              text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+              text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                    {{ $mgLevel }}
+                </span>
+
                 </div>
 
                 <!-- Progress Bar -->
@@ -324,8 +329,12 @@
                         $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
                         $dpIncompleteSession = $incompleteSessionData['Data_Probability'] ?? null;
                     @endphp
-                    <span
-                        class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-100 text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'orange' : 'red') }}-700 text-xs font-medium px-2 py-1 rounded-full">{{ $dpLevel }}</span>
+                   <span class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                            text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                            text-xs font-medium px-2 py-1 rounded-full">
+                    {{ $dpLevel }}
+                </span>
+
                 </div>
 
                 <!-- Progress Bar -->
