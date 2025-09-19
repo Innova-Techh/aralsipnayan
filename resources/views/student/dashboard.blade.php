@@ -708,7 +708,7 @@
 
                                         @foreach(($leaderboardTop5 ?? []) as $index => $row)
                                             @php $rank = $index + 1; @endphp
-                                            <div class="flex items-center justify-between p-3 rounded-lg shadow-sm">
+                                            <div class="flex items-center justify-between p-3  rounded-lg shadow-sm">
                                                 <div class="flex items-center">
                                                     <div
                                                         class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3 border-2 {{ $rank === 1 ? 'bg-yellow-500 border-yellow-600' : ($rank === 2 ? 'bg-gray-400 border-gray-500' : ($rank === 3 ? 'bg-orange-600 border-orange-700' : ($rank === 4 ? 'bg-blue-400 border-blue-500' : 'bg-teal-400 border-teal-500'))) }}">

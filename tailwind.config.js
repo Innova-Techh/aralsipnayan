@@ -206,6 +206,9 @@ export default {
                     "linear-gradient(to bottom, #4F46E5, #06B6D4)",
                 "on-board-learn":
                     "linear-gradient(to bottom, #D62839, #E9742F, #FBBF24)",
+                "gradient-primary":
+                    "linear-gradient(to bottom, #4338CA, #9333EA)",
+                "hover-primary": "linear-gradient(to bottom, #0284C7, #0369A1)",
                 "gradient-secondary":
                     "linear-gradient(to bottom, #F6510C, #F5D70B)",
                 "hover-secondary":
@@ -234,6 +237,8 @@ export default {
                     "linear-gradient(to bottom, #DC2626 0%, #761414 100%)",
             },
             dropShadow: {
+                "gradient-primary": "0 4px 0 #312297",
+                "gradient-secondary": "0 4px 0 #7A4305",
                 "select-avatar": "0 6px 0 #CE8E21",
                 "on-board-earn": "0 4px 0 #C47E06",
                 "on-board-learn": "0 4px 0 #C1321F",
