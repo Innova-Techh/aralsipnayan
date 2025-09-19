@@ -99,6 +99,9 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
         // Check for active assessments
         Route::post('/check-active', [RegularAssessmentController::class, 'checkActiveAssessments'])->name('check-active');
         
+        // Check for active diagnostics
+        Route::post('/check-active-diagnostics', [AssessmentController::class, 'checkActiveDiagnostics'])->name('check-active-diagnostics');
+        
         // Resume assessment from list
         Route::post('/resume-assessment', [RegularAssessmentController::class, 'resumeAssessmentFromList'])->name('resume-assessment');
         

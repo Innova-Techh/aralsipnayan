@@ -170,15 +170,15 @@
                 <!-- Button -->
                 @if(!$naHasDiagnostic)
                     @if($naIncompleteSession)
-                        <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
                             Resume Diagnostic Test
-                        </a>
+                        </button>
                     @else
-                        <a href="{{ route('student.quiz.diagnostic', 'Number_Algebra') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                             Take Diagnostic Test
-                        </a>
+                        </button>
                     @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Number_Algebra') }}"
@@ -285,15 +285,15 @@
                 <!-- Button -->
                 @if(!$mgHasDiagnostic)
                     @if($mgIncompleteSession)
-                        <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
                             Resume Diagnostic Test
-                        </a>
+                        </button>
                     @else
-                        <a href="{{ route('student.quiz.diagnostic', 'Measurement_Geometry') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                             Take Diagnostic Test
-                        </a>
+                        </button>
                     @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}"
@@ -400,15 +400,15 @@
                 <!-- Button -->
                 @if(!$dpHasDiagnostic)
                     @if($dpIncompleteSession)
-                        <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
                             Resume Diagnostic Test
-                        </a>
+                        </button>
                     @else
-                        <a href="{{ route('student.quiz.diagnostic', 'Data_Probability') }}"
+                        <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
                             class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
                             Take Diagnostic Test
-                        </a>
+                        </button>
                     @endif
                 @else
                     <a href="{{ route('student.assessments.category', 'Data_Probability') }}"
@@ -421,8 +421,70 @@
         </div>
     </div>
 
+    <!-- Active Diagnostic Modal -->
+    <div id="activeDiagnosticModal" class="fixed inset-0 bg-black bg-opacity-60 justify-center items-center z-[60] hidden px-4 sm:px-0">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] overflow-hidden transform scale-95 transition-all duration-300" id="activeDiagnosticModalContent">
+            <!-- Header with 3D effects -->
+            <div class="bg-gradient-to-r from-[#FF6B6B] to-[#FF8E8E] p-6 relative shadow-[0_8px_16px_rgba(0,0,0,0.3)] border-b-4 border-[#e74c3c]">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
+                <div class="flex items-center justify-center gap-3 relative z-10">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-[0_4px_8px_rgba(0,0,0,0.2)]">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-white drop-shadow-lg">Diagnostic Test In Progress</h2>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 text-center">
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Cannot Start New Diagnostic</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        You already have an active diagnostic test in progress. Please complete your current diagnostic test before starting a new one.
+                    </p>
+                </div>
+
+                <!-- Active Diagnostic Info -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border-l-4 border-blue-400 shadow-inner">
+                    <div class="text-sm text-gray-700">
+                        <div class="font-semibold text-blue-800 mb-2">Current Diagnostic:</div>
+                        <div id="activeDiagnosticInfo" class="space-y-1">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Action Button with 3D effects -->
+                <div class="flex justify-center">
+                    <!-- OK Button -->
+                    <button onclick="closeActiveDiagnosticModal()" 
+                        class="w-full bg-gradient-to-b from-[#6C757D] to-[#5a6268] text-white font-semibold py-3 px-4 rounded-xl border-b-4 border-[#4e555b] shadow-[0_6px_12px_rgba(0,0,0,0.2)] hover:scale-[1.02] hover:shadow-[0_8px_16px_rgba(0,0,0,0.3)] active:scale-[0.98] active:shadow-[0_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+                        <span class="relative z-10">OK</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<style>
+#activeDiagnosticModal {
+    display: none;
+}
+
+#activeDiagnosticModal.show {
+    display: flex !important;
+}
+
+#activeDiagnosticModal.show #activeDiagnosticModalContent {
+    transform: scale(1);
+}
+</style>
+
 
     <script>
+        let activeDiagnostics = []; // Initialize as empty array
+
         document.addEventListener('DOMContentLoaded', function () {
             // Animate Number & Algebra progress bar
             const progressBarNA = document.getElementById('progress-bar-na');
@@ -444,6 +506,113 @@
             setTimeout(() => {
                 progressBarDP.style.width = progressDP + '%';
             }, 300);
+        });
+
+        // Check for active diagnostics before starting new diagnostic
+        function checkDiagnosticBeforeStart(category) {
+            console.log('Checking for active diagnostics for category:', category);
+            
+            // Show loading state (optional)
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = 'Checking...';
+            
+            // Check if this is a resume button (if text contains "Resume")
+            const isResumeButton = originalText.includes('Resume');
+            
+            if (isResumeButton) {
+                // If it's a resume button, proceed directly to the diagnostic
+                console.log('Resume button clicked, proceeding to diagnostic');
+                window.location.href = `/student/quiz/diagnostic/${category}`;
+                return;
+            }
+            
+            // For "Take Diagnostic" buttons, check for active diagnostics in ANY competency
+            fetch('{{ route("student.quiz.check-active-diagnostics") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    category: category
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Check diagnostics response:', data);
+                
+                if (data.success) {
+                    if (data.has_active_diagnostics && data.active_diagnostics.length > 0) {
+                        console.log('Active diagnostics found:', data.active_diagnostics);
+                        // Show active diagnostic modal to prevent starting new diagnostic
+                        activeDiagnostics = data.active_diagnostics;
+                        showActiveDiagnosticModal();
+                    } else {
+                        console.log('No active diagnostics, proceeding to new diagnostic');
+                        // No active diagnostics, proceed to start new diagnostic
+                        window.location.href = `/student/quiz/diagnostic/${category}`;
+                    }
+                } else {
+                    console.error('Error checking diagnostics:', data.message);
+                    // Error checking diagnostics, proceed anyway
+                    window.location.href = `/student/quiz/diagnostic/${category}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error checking diagnostics:', error);
+                // Error in request, proceed anyway
+                window.location.href = `/student/quiz/diagnostic/${category}`;
+            })
+            .finally(() => {
+                // Reset button state
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+        }
+
+        // Show active diagnostic notification modal
+        function showActiveDiagnosticModal() {
+            const modal = document.getElementById('activeDiagnosticModal');
+            const activeDiagnostic = activeDiagnostics[0]; // Get the first (should be only) active diagnostic
+            
+            // Update the diagnostic info display
+            const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
+            if (activeDiagnostic) {
+                diagnosticInfo.innerHTML = `
+                    <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                    <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                    <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                    <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                `;
+            }
+            
+            // Show modal with animation
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        // Close active diagnostic modal
+        function closeActiveDiagnosticModal() {
+            const modal = document.getElementById('activeDiagnosticModal');
+            modal.classList.remove('show');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('activeDiagnosticModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeActiveDiagnosticModal();
+            }
         });
     </script>
 

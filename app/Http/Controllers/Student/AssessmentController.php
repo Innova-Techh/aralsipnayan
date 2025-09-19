@@ -918,6 +918,88 @@ class AssessmentController extends Controller
     }
     
     /**
+     * Check for active diagnostic sessions for a user
+     */
+    public function checkActiveDiagnostics(Request $request)
+    {
+        $request->validate([
+            'category' => 'required|string'
+        ]);
+        
+        $user = Auth::guard('student')->user();
+        $category = $request->category;
+        $dbCompetency = strtolower($category);
+        
+        try {
+            $activeDiagnosticData = [];
+            
+            // Check for active diagnostic sessions across ALL competencies (not just the requested one)
+            // This prevents starting a new diagnostic when any diagnostic is in progress
+            $activeDiagnostics = DB::table('diagnostic_sessions')
+                ->where('user_id', $user->id)
+                ->where('status', 'in_progress')
+                ->where('started_at', '>=', now()->subDays(1)) // Check diagnostics from last 24 hours
+                ->orderBy('started_at', 'desc')
+                ->get();
+            
+            foreach ($activeDiagnostics as $diagnostic) {
+                // Get phase information
+                $phaseNames = [1 => 'Beginner', 2 => 'Intermediate', 3 => 'Advanced'];
+                $currentPhaseName = $phaseNames[$diagnostic->current_phase] ?? 'Unknown';
+                
+                // Calculate progress (each phase has 5 questions)
+                $questionsPerPhase = 5;
+                $completedPhases = max(0, $diagnostic->current_phase - 1);
+                $estimatedProgress = $completedPhases * $questionsPerPhase;
+                
+                // Get actual response count for current phase
+                $responseCount = DB::table('question_responses')
+                    ->where('assessment_id', $diagnostic->session_id)
+                    ->count();
+                
+                $actualProgress = $responseCount;
+                $totalQuestions = 15; // 3 phases × 5 questions each
+                
+                // Convert competency back to display format
+                $displayCategory = ucfirst(str_replace('_', ' & ', $diagnostic->competency));
+                
+                $activeDiagnosticData[] = [
+                    'session_id' => $diagnostic->session_id,
+                    'type' => 'diagnostic',
+                    'progress' => $actualProgress,
+                    'total_questions' => $totalQuestions,
+                    'started_at' => $diagnostic->started_at,
+                    'current_phase' => $diagnostic->current_phase,
+                    'phase_name' => $currentPhaseName,
+                    'competency' => $diagnostic->competency,
+                    'title' => $displayCategory . ' Diagnostic',
+                    'can_resume' => true
+                ];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'has_active_diagnostics' => !empty($activeDiagnosticData),
+                'active_diagnostics' => $activeDiagnosticData
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking active diagnostics', [
+                'user_id' => $user->id,
+                'category' => $category,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'has_active_diagnostics' => false,
+                'active_diagnostics' => [],
+                'message' => 'Error checking for active diagnostics'
+            ]);
+        }
+    }
+
+    /**
      * Clear diagnostic session when user navigates away
      */
     public function clearDiagnosticSession(Request $request)
