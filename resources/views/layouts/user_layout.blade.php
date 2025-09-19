@@ -1,5 +1,7 @@
+<!-- user_layout.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
+
 
 <head>
     <meta charset="UTF-8">
@@ -7,50 +9,89 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard')</title>
 
+
     <!-- Tailwind (Vite) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 
     <!-- Material Icons -->
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0"
         rel="stylesheet">
 
-    <!-- Custom CSS -->
+
+    <!-- Add this updated CSS section to your user_layout.blade.php -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 
         body {
             font-family: 'Inter', sans-serif;
         }
+
 
         .material-symbols-outlined {
             transition: all 0.25s ease;
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        /* Hover effect (all devices) */
+
+        /* Desktop Navigation Effects */
         .nav-link:hover .material-symbols-outlined {
             font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 28;
             transform: scale(1.2);
             color: #2563eb;
         }
 
-        /* Active effect (all devices) */
+
         .nav-link.active .material-symbols-outlined {
             font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
             transform: scale(1.2);
             color: #2563eb;
         }
 
+
         /* Remove active background (desktop + mobile) */
         .nav-link.active {
             background-color: transparent !important;
         }
 
-        /* Baloo 2 Regular */
+
+        /* Mobile/Tablet Navigation Effects - Apply to all screen sizes below xl */
+        @media (max-width: 1279px) {
+
+
+            /* Default state: outlined & gray */
+            .nav-link .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                /* gray-500 */
+            }
+
+
+            /* Active: filled & blue */
+            .nav-link.active .material-symbols-outlined {
+                font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
+                color: #2563eb !important;
+                /* blue-600 */
+            }
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+        /* Baloo 2 Font Faces */
         @font-face {
             font-family: 'Baloo 2';
             src: url('{{ asset("fonts/baloo2/Baloo2-Regular.ttf") }}') format('truetype');
@@ -59,7 +100,7 @@
             font-display: swap;
         }
 
-        /* Baloo 2 Bold */
+
         @font-face {
             font-family: 'Baloo 2';
             src: url('{{ asset("fonts/baloo2/Baloo2-Bold.ttf") }}') format('truetype');
@@ -68,7 +109,7 @@
             font-display: swap;
         }
 
-        /* Baloo 2 ExtraBold */
+
         @font-face {
             font-family: 'Baloo 2';
             src: url('{{ asset("fonts/baloo2/Baloo2-ExtraBold.ttf") }}') format('truetype');
@@ -77,6 +118,7 @@
             font-display: swap;
         }
 
+
         /* Show global background image only on large screens and up */
         @media (min-width: 1024px) {
             body.page-bg {
@@ -84,17 +126,12 @@
             }
         }
 
-        @media (max-width: 1279px) {
-            .nav-link.active span:last-child {
-                font-weight: 600;
-                color: #2563eb;
-            }
-        }
 
         /* Custom scrollbar for mobile navigation */
         .mobile-nav-scroll::-webkit-scrollbar {
             display: none;
         }
+
 
         .mobile-nav-scroll {
             -ms-overflow-style: none;
@@ -102,11 +139,14 @@
         }
     </style>
 
+
     @stack('styles')
 </head>
 
+
 <body
     class="min-h-screen {{ request()->routeIs('profile.edit') || request()->routeIs('leaderboard.*') || request()->routeIs('sections.*') || request()->routeIs('achievements.*') ? '' : 'bg-no-repeat bg-center sm:bg-contain lg:bg-cover page-bg' }}">
+
 
     <!-- Top Navigation Bar -->
     <nav class="bg-white border-b-0 sticky top-0 z-50 shadow-sm">
@@ -126,6 +166,7 @@
                     </div>
                 </div>
 
+
                 <!-- Center: Desktop Navigation Links -->
                 <div class="hidden xl:flex xl:items-center xl:space-x-1">
                     <a href="{{ route('dashboard') }}"
@@ -134,11 +175,13 @@
                         Dashboard
                     </a>
 
+
                     <a href="{{ route('assessments.index') }}"
                         class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('assessments.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
                         <span class="material-symbols-outlined mr-2 text-xl">assignment</span>
                         Assessments
                     </a>
+
 
                     <a href="{{ route('achievements.index') }}"
                         class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('achievements.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
@@ -146,11 +189,13 @@
                         Badges
                     </a>
 
+
                     <a href="{{ route('sections.index') }}"
                         class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('sections.index') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
                         <span class="material-symbols-outlined mr-2 text-xl">groups</span>
                         Section
                     </a>
+
 
                     <a href="{{ route('leaderboard.index') }}"
                         class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('leaderboard.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
@@ -158,6 +203,7 @@
                         Leaderboard
                     </a>
                 </div>
+
 
                 <!-- Right: User Profile Section -->
                 <div class="flex items-center relative">
@@ -173,6 +219,7 @@
                             </span>
                         </div>
 
+
                         <!-- Profile Avatar Button -->
                         <button
                             class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center border-2 border-gray-200 hover:border-blue-500 transition-all duration-200 flex-shrink-0"
@@ -182,11 +229,14 @@
                         </button>
                     </div>
 
+
                     <!-- User Dropdown Menu -->
                     <div id="userDropdown"
                         class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200 transform transition-all duration-200">
                         <div class="px-4 py-2 border-b border-gray-100 xs:hidden">
-                            <p class="text-sm font-medium text-gray-900">{{ Auth::guard('student')->user()?->studentProfile?->firstname }}</p>
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
+                            </p>
                             <p class="text-xs text-gray-500">Streak: 4</p>
                         </div>
                         <a href="{{ route('profile.edit') }}"
@@ -206,10 +256,12 @@
         </div>
     </nav>
 
+
     <!-- Main Content with proper padding -->
     <main>
         @yield('content')
     </main>
+
 
     <!-- Bottom Navigation (Mobile & Tablet) -->
     <nav
@@ -223,11 +275,13 @@
                     <span class="text-xs sm:text-sm font-medium mt-0.5">Dashboard</span>
                 </a>
 
+
                 <a href="{{ route('assessments.index') }}"
                     class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('assessments.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
                     <span class="material-symbols-outlined text-xl sm:text-2xl">assignment</span>
                     <span class="text-xs sm:text-sm font-medium mt-0.5">Assessment</span>
                 </a>
+
 
                 <a href="{{ route('achievements.index') }}"
                     class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('achievements.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
@@ -235,11 +289,13 @@
                     <span class="text-xs sm:text-sm font-medium mt-0.5">Badges</span>
                 </a>
 
+
                 <a href="{{ route('sections.index') }}"
                     class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('sections.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
                     <span class="material-symbols-outlined text-xl sm:text-2xl">groups</span>
                     <span class="text-xs sm:text-sm font-medium mt-0.5">Section</span>
                 </a>
+
 
                 <a href="{{ route('leaderboard.index') }}"
                     class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('leaderboard.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
@@ -250,11 +306,13 @@
         </div>
     </nav>
 
+
     <!-- JavaScript for dropdown functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const userMenuButton = document.getElementById('user-menu-button');
             const dropdown = document.getElementById('userDropdown');
+
 
             if (userMenuButton && dropdown) {
                 // Toggle dropdown on button click
@@ -266,6 +324,7 @@
                     userMenuButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
                 });
 
+
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function (event) {
                     if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
@@ -273,6 +332,7 @@
                         userMenuButton.setAttribute('aria-expanded', 'false');
                     }
                 });
+
 
                 // Close dropdown on escape key
                 document.addEventListener('keydown', function (event) {
@@ -284,11 +344,13 @@
                 });
             }
 
+
             // Handle safe area for devices with notches
             if (window.CSS && window.CSS.supports && window.CSS.supports('padding-bottom', 'env(safe-area-inset-bottom)')) {
                 document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom)');
             }
         });
+
 
         // Global function for inline onclick (backup)
         function toggleDropdown() {
@@ -302,7 +364,9 @@
         }
     </script>
 
+
     @stack('scripts')
 </body>
+
 
 </html>

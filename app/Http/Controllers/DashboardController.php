@@ -38,8 +38,9 @@ class DashboardController extends Controller
                 return [
                     'title' => $achievement['title'],
                     'front_image' => $achievement['front_image'],
-                    'background_dark' => $achievement['background_dark'],
-                    'background_light' => $achievement['background_light']
+                    'background_light' => $achievement['background_light'],
+                    'rarity' => $achievement['rarity'], // Added rarity for drop shadow determination
+                    'id' => $achievement['id'] // Added id for reference if needed
                 ];
             })
             ->values()

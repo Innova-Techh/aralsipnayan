@@ -116,17 +116,11 @@ export default {
                 },
                 achievement: {
                     "blue-light": "#165A9A",
-                    "blue-dark": "#104373",
                     "brown-light": "#913311",
-                    "brown-dark": "#591E09",
                     "gray-light": "#646565",
-                    "gray-dark": "#2E343C",
                     "green-light": "#1E8646",
-                    "green-dark": "#163522",
                     "purple-light": "#2C1B68",
-                    "purple-dark": "#100A23",
                     "gold-light": "#D17A09",
-                    "gold-dark": "#512500",
                 },
             },
             borderRadius: {
@@ -254,11 +248,61 @@ export default {
                 "stats-blue": "0 6px 0 #15294D",
                 "stats-yellow": "0 6px 0 #4A2E03",
                 "stats-red": "0 6px 0 #3B0A0A",
+                "drop-custom": "4px 4px 0 black",
+                // Achievement card custom drop shadows
+                "achievement-common": "4px 4px 0 #2E343C",
+                "achievement-uncommon": "4px 4px 0 #163522",
+                "achievement-rare": "4px 4px 0 #591E09",
+                "achievement-epic": "4px 4px 0 #100A23",
+                "achievement-legendary": "4px 4px 0 #512500",
+                "achievement-blue": "4px 4px 0 #104373",
             },
         },
     },
 
     plugins: [
+        plugin(function ({ matchUtilities, theme }) {
+            // Inner shadow plugin
+            matchUtilities(
+                {
+                    "shadow-inner-y-4": (value) => ({
+                        boxShadow: `inset 0 4px 4px ${value}`,
+                    }),
+                },
+                { values: theme("colors"), type: "color" }
+            );
+        }),
+
+        plugin(function ({ addUtilities }) {
+            // Achievement custom inner shadows
+            addUtilities({
+                ".shadow-inner-achievement-common": {
+                    boxShadow:
+                        "inset 4px 4px 2px #525555, inset -2px 4px 4px #82868B",
+                },
+                ".shadow-inner-achievement-uncommon": {
+                    boxShadow:
+                        "inset 4px 4px 2px #166D38, inset -2px 4px 4px #33A15E",
+                },
+                ".shadow-inner-achievement-rare": {
+                    boxShadow:
+                        "inset 4px 4px 2px #591E09, inset -2px 4px 4px #591E09",
+                },
+                ".shadow-inner-achievement-epic": {
+                    boxShadow:
+                        "inset 4px 4px 2px #21125C, inset -2px 4px 4px #4A368B",
+                },
+                ".shadow-inner-achievement-legendary": {
+                    boxShadow:
+                        "inset 4px 4px 2px #804B03, inset -2px 4px 4px #FF9F4E",
+                },
+                ".shadow-inner-achievement-blue": {
+                    boxShadow:
+                        "inset 4px 4px 2px #104373, inset -2px 4px 4px #104373",
+                },
+            });
+        }),
+
         plugin(function ({ matchUtilities, theme }) {
             // Text outline with variable thickness
             matchUtilities(
