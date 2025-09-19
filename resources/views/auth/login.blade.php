@@ -60,7 +60,7 @@ function refreshCaptcha() {
                                     class="w-full px-4 py-3 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-30" 
                                     name="captcha"  
                                     placeholder="Enter security code"
-                                    required>
+                                    >
                              <div class="border border-gray-300 rounded-xl p-3 bg-white w-full flex items-center justify-center">
                                  <div class="w-full max-w-[140px] min-h-[40px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[40px] sm:max-w-[120px] sm:[&>img]:!min-h-[35px]">
                                      {!! $captchaHtml !!}
