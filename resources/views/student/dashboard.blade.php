@@ -204,6 +204,203 @@
         #continueButton:hover {
             box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
         }
+
+        /* Completed Card - 12 Book icons scattered */
+        .stats-green::before {
+            content: '📖 📚 📄 📝 📗 📘 📙 📕 📋 📜 📰 📑';
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            right: -5px;
+            bottom: -10px;
+            font-size: 8px;
+            opacity: 0.1;
+            z-index: 1;
+            word-spacing: 15px;
+            line-height: 20px;
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .stats-green .bg-pattern::before {
+            content: '📖';
+            position: absolute;
+            top: 5px;
+            left: 8px;
+            font-size: 9px;
+            opacity: 0.12;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite 1s;
+        }
+
+        .stats-green .bg-pattern::after {
+            content: '📚';
+            position: absolute;
+            top: 20px;
+            right: 12px;
+            font-size: 7px;
+            opacity: 0.08;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite 3s;
+        }
+
+        /* Points Card - 12 Trophy and achievement icons */
+        .bg-stats-yellow::before {
+            content: '🏆 🥇 🏅 ⭐ 🌟 ✨ 🎖️ 🏵️ 👑 💎 🔥 💫';
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            right: -5px;
+            bottom: -10px;
+            font-size: 8px;
+            opacity: 0.1;
+            z-index: 1;
+            word-spacing: 12px;
+            line-height: 18px;
+            animation: float 9s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .bg-stats-yellow .bg-pattern::before {
+            content: '🏆';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 10px;
+            opacity: 0.15;
+            z-index: 1;
+            animation: float 7s ease-in-out infinite 2s;
+        }
+
+        .bg-stats-yellow .bg-pattern::after {
+            content: '🥇';
+            position: absolute;
+            bottom: 12px;
+            left: 10px;
+            font-size: 8px;
+            opacity: 0.12;
+            z-index: 1;
+            animation: float 7s ease-in-out infinite 4s;
+        }
+
+        /* Streak Card - 12 Fire and energy icons */
+        .bg-stats-red::before {
+            content: '🔥 💥 ⚡ 💢 💨 🌟 ✨ 💫 ⭐ 🎯 🚀 💪';
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            right: -5px;
+            bottom: -10px;
+            font-size: 8px;
+            opacity: 0.12;
+            z-index: 1;
+            word-spacing: 10px;
+            line-height: 16px;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .bg-stats-red .bg-pattern::before {
+            content: '🔥';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 11px;
+            opacity: 0.18;
+            z-index: 1;
+            animation: float 5s ease-in-out infinite 1.5s;
+        }
+
+        .bg-stats-red .bg-pattern::after {
+            content: '⚡';
+            position: absolute;
+            top: 25px;
+            right: 10px;
+            font-size: 9px;
+            opacity: 0.14;
+            z-index: 1;
+            animation: float 5s ease-in-out infinite 3.5s;
+        }
+
+        /* Level Card - 12 Star icons scattered */
+        .bg-stats-blue::before {
+            content: '⭐ ✨ 🌟 💫 ⚡ 🎆 🎇 ✴️ 💥 🔆 ⭐ 🌠';
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            right: -5px;
+            bottom: -10px;
+            font-size: 8px;
+            opacity: 0.1;
+            z-index: 1;
+            word-spacing: 13px;
+            line-height: 19px;
+            animation: float 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .bg-stats-blue .bg-pattern::before {
+            content: '⭐';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 12px;
+            opacity: 0.16;
+            z-index: 1;
+            animation: float 8s ease-in-out infinite 2.5s;
+        }
+
+        .bg-stats-blue .bg-pattern::after {
+            content: '✨';
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            font-size: 10px;
+            opacity: 0.13;
+            z-index: 1;
+            animation: float 8s ease-in-out infinite 5s;
+        }
+
+        /* Enhanced floating animation for more dynamic movement */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) translateX(0px) rotate(0deg);
+                opacity: 0.1;
+            }
+
+            16% {
+                transform: translateY(-2px) translateX(1px) rotate(2deg);
+                opacity: 0.15;
+            }
+
+            33% {
+                transform: translateY(-4px) translateX(-1px) rotate(-1deg);
+                opacity: 0.08;
+            }
+
+            50% {
+                transform: translateY(-6px) translateX(2px) rotate(3deg);
+                opacity: 0.12;
+            }
+
+            66% {
+                transform: translateY(-4px) translateX(-2px) rotate(-2deg);
+                opacity: 0.18;
+            }
+
+            83% {
+                transform: translateY(-2px) translateX(1px) rotate(1deg);
+                opacity: 0.06;
+            }
+        }
+
+        /* Content should be above background */
+        .stats-content {
+            position: relative;
+            z-index: 10;
+        }
     </style>
 
     <!-- Welcome Header (Hero) - Fixed margins and width -->
@@ -227,11 +424,11 @@
 
         <!-- Main content with proper top margin -->
         <div class="mt-6 sm:mt-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-12 xl:gap-24">
                 <!-- Left Column - Progress and Continue Learning -->
-                <div class="lg:col-span-2 space-y-8">
+                <div class="lg:col-span-2 space-y-8 space-x-8">
                     <!-- Learning Progress -->
-                    <div class="rounded-xl p-4 sm:p-6">
+                    <div class="rounded-xl p-4 mx-6 sm:p-6">
                         <div class="flex items-center justify-between mb-4 sm:mb-6">
                             <div class="flex items-center">
                                 <div
@@ -253,7 +450,7 @@
                         <div class="mb-5 sm:mb-6">
                             <div class=" text-white rounded-xl p-4 sm:p-5 shadow-inner"
                                 style="background: linear-gradient(to right, #101093, #931093); box-shadow: inset 0 -4px 4px #42045C, inset 0 2px 2px #CC39F6; box-shadow: 0 6px 0 #0A0A62;">
-                                <div class="flex items-center gap-4 -mx-4 ">
+                                <div class="flex items-center gap-4 -mx-4">
                                     <!-- Rank image - fixed size for consistency -->
                                     <div class="flex-shrink-0">
                                         <img src="{{ asset('images/dashboard/rank.png') }}" alt="rank"
@@ -269,12 +466,12 @@
                                         </div>
 
                                         <!-- Group 2: XP Text (standalone) -->
-                                        <div class="mb-2 text-right">
+                                        <div class="mb-2  mr-4  text-right">
                                             <p class="text-xs sm:text-sm text-blue-200">460 XP / 1000 XP</p>
                                         </div>
 
                                         <!-- Group 3: Progress bar and XP remaining -->
-                                        <div>
+                                        <div class="mr-4">
                                             <div class="mb-1">
                                                 <div class="relative h-2 sm:h-2.5 bg-white/20 rounded-full overflow-hidden">
                                                     <div class="absolute left-0 top-0 h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-300 rounded-full"
@@ -290,8 +487,8 @@
 
                         <!-- Stats Grid with Live Data -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                            <div class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-cover bg-center"
-                                style="background-image: url('{{ asset('images/dashboard/bookcard.png') }}');">
+                            <div
+                                class="stats-green relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-green drop-shadow-stats-green">
                                 <div class="flex items-center justify-center mb-2">
                                     <img src="{{ asset('images/dashboard/book.png') }}" alt="Completed"
                                         class="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10">
@@ -300,8 +497,8 @@
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Completed</div>
                             </div>
 
-                            <div class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-cover bg-center"
-                                style="background-image: url('{{ asset('images/dashboard/pointscard.png') }}');">
+                            <div
+                                class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-yellow drop-shadow-stats-yellow">
                                 <div class="flex items-center justify-center mb-2">
                                     <img src="{{ asset('images/dashboard/points.png') }}" alt="Points"
                                         class="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10">
@@ -312,8 +509,8 @@
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Points</div>
                             </div>
 
-                            <div class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-cover bg-center"
-                                style="background-image: url('{{ asset('images/dashboard/streakcard.png') }}');">
+                            <div
+                                class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-red drop-shadow-stats-red">
                                 <div class="flex items-center justify-center mb-2">
                                     <img src="{{ asset('images/dashboard/streak.png') }}" alt="Streak"
                                         class="w-9 h-9 sm:w-11 sm:h-11 object-contain relative z-10">
@@ -324,8 +521,8 @@
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Streak</div>
                             </div>
 
-                            <div class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-cover bg-center"
-                                style="background-image: url('{{ asset('images/dashboard/starcard.png') }}');">
+                            <div
+                                class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-blue drop-shadow-stats-blue">
                                 <div class="flex items-center justify-center mb-2">
                                     <img src="{{ asset('images/dashboard/star.png') }}" alt="Level"
                                         class="w-12 h-8 sm:w-14 sm:h-10 object-contain relative z-10">
@@ -334,206 +531,213 @@
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Level</div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Assigned Assessments -->
-                    <div class="rounded-xl overflow-hidden mt-8">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between px-6 py-4 text-white"
-                            style="background-color: #B91E2A;">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                                    <span class="text-red-600 text-xl">🎯</span>
+                        <!-- Assigned Assessments -->
+                        <div class="rounded-xl overflow-hidden mt-8">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between px-6 py-4  text-white"
+                                style="background-color: #B91E2A;">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                                        <span class="text-red-600 text-xl">🎯</span>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-lg font-baloo font-bold">Assigned Assessments</h2>
+                                        <p class="text-sm opacity-90">Complete your assigned tasks</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 class="text-lg font-baloo font-bold">Assigned Assessments</h2>
-                                    <p class="text-sm opacity-90">Complete your assigned tasks</p>
+                                <div class="text-right">
+                                    <div class="text-2xl text-center font-extrabold">2</div>
+                                    <div class="text-sm opacity-90">Pending</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-2xl text-center font-extrabold">2</div>
-                                <div class="text-sm opacity-90">Pending</div>
-                            </div>
-                        </div>
 
-                        <!-- Body -->
-                        <div class="p-6 space-y-4" style="background-color: #FFEAEA;">
-                            <!-- Assessment Item -->
-                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between rounded-lg p-4 shadow">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
-                                        <span
-                                            class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Individual</span>
+                            <!-- Body -->
+                            <div class="p-6 space-y-4" style="background-color: #FFEAEA;">
+                                <!-- Assessment Item -->
+                                <div
+                                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between rounded-lg p-4 shadow">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Individual</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Learn how to calculate and evaluate expressions with exponents
+                                        </p>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
+                                                120 points
+                                            </span>
+                                            <span
+                                                class="text-xs px-2 py-1 text-pink-700 font-medium flex items-center gap-1">
+                                                <span class="text-pink-500 font-bold">ⓘ</span> Hard
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p class="text-sm text-gray-600 mb-3">
-                                        Learn how to calculate and evaluate expressions with exponents
-                                    </p>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
-                                            120 points
-                                        </span>
-                                        <span class="text-xs px-2 py-1 text-pink-700 font-medium flex items-center gap-1">
-                                            <span class="text-pink-500 font-bold">ⓘ</span> Hard
-                                        </span>
-                                    </div>
+                                    <button
+                                        class="mt-4 sm:mt-0 sm:ml-4 px-6 py-2 rounded-xl text-white font-semibold shadow transition-all hover:shadow-md"
+                                        style="background: linear-gradient(180deg, #4338CA 0%, #9333EA 100%);  box-shadow: 0 6px 0 #0F172A;">
+                                        Start Assessment
+                                    </button>
                                 </div>
-                                <button
-                                    class="mt-4 sm:mt-0 sm:ml-4 px-6 py-2 rounded-xl text-white font-semibold shadow transition-all hover:shadow-md"
-                                    style="background: linear-gradient(180deg, #4338CA 0%, #9333EA 100%);  box-shadow: 0 6px 0 #0F172A;">
-                                    Start Assessment
-                                </button>
-                            </div>
 
-                            <!-- Assessment Item 2 -->
-                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between rounded-lg p-4 shadow">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
-                                        <span
-                                            class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">Class</span>
+                                <!-- Assessment Item 2 -->
+                                <div
+                                    class="flex flex-col sm:flex-row sm:items-start sm:justify-between rounded-lg p-4 shadow">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">Class</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-3">
+                                            Learn how to calculate and evaluate expressions with exponents
+                                        </p>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
+                                                120 points
+                                            </span>
+                                            <span
+                                                class="text-xs px-2 py-1 text-green-700 font-medium flex items-center gap-1">
+                                                <span class="text-green-500 font-bold">ⓘ</span> Easy
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p class="text-sm text-gray-600 mb-3">
-                                        Learn how to calculate and evaluate expressions with exponents
-                                    </p>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
-                                            120 points
-                                        </span>
-                                        <span class="text-xs px-2 py-1 text-green-700 font-medium flex items-center gap-1">
-                                            <span class="text-green-500 font-bold">ⓘ</span> Easy
-                                        </span>
-                                    </div>
+                                    <button
+                                        class="mt-4 sm:mt-0 sm:ml-4 px-6 py-2 rounded-xl text-white font-semibold shadow transition-all hover:shadow-md"
+                                        style="background: linear-gradient(180deg, #4338CA 0%, #9333EA 100%); box-shadow: 0 6px 0 #0F172A; ">
+                                        Start Assessment
+                                    </button>
                                 </div>
-                                <button
-                                    class="mt-4 sm:mt-0 sm:ml-4 px-6 py-2 rounded-xl text-white font-semibold shadow transition-all hover:shadow-md"
-                                    style="background: linear-gradient(180deg, #4338CA 0%, #9333EA 100%); box-shadow: 0 6px 0 #0F172A; ">
-                                    Start Assessment
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Column -->
-                <div class="space-y-8 lg:space-y-6 lg:pt-[6.5rem]">
-                    <!-- Achievements Section -->
-                    <div class="rounded-xl overflow-hidden shadow-md">
-                        <!-- Header -->
-                        <div class="px-6 py-4" style="background: linear-gradient(to right, #3B82F6, #2563EB, #1D4ED8);">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h2 class="text-xl sm:text-xl font-baloo font-bold text-white">Recent Achievements</h2>
-                                    <p class="text-sm text-blue-100 opacity-90">Recent acquired achievements</p>
+                <div class="space-y-8 space-x-8 lg:space-y-6 lg:pt-[6.5rem]">
+                    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <!-- Achievements Section -->
+                        <div class="rounded-xl overflow-hidden shadow-md w-full">
+                            <!-- Header -->
+                            <div class="px-6 py-4"
+                                style="background: linear-gradient(to right, #3B82F6, #2563EB, #1D4ED8);">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h2 class="text-4xl sm:text-xl font-poppins font-bold text-white">Recent
+                                            Achievements
+                                        </h2>
+                                        <p class="text-sm text-blue-100 opacity-90">Recent acquired achievements</p>
+                                    </div>
+                                    <a href="{{ route('achievements.index') }}"
+                                        class="px-4 py-2 transition-colors duration-200 rounded-xl text-white text-sm font-medium"
+                                        style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%);  box-shadow: 0 4px 0 #7A4305;  text-shadow:
+                                                -1px -1px 0 #7A4305,
+                                                1px -1px 0 #7A4305,
+                                                -1px 1px 0 #7A4305,
+                                                1px 1px 0 #7A4305,
+                                                0 0 1px #7A4305;">
+                                        View All
+                                    </a>
                                 </div>
-                                <a href="{{ route('achievements.index') }}"
-                                    class="px-4 py-2 transition-colors duration-200 rounded-xl text-white text-sm font-medium"
-                                    style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%);  box-shadow: 0 4px 0 #7A4305;  text-shadow:
-                                                               -1px -1px 0 #7A4305,
-                                                               1px -1px 0 #7A4305,
-                                                               -1px 1px 0 #7A4305,
-                                                               1px 1px 0 #7A4305,
-                                                               0 0 1px #7A4305;">
-                                    View All
-                                </a>
                             </div>
-                        </div>
 
-                        <!-- Achievements Body -->
-                        <div class="p-6"
-                            style="background: linear-gradient(135deg, #312E81 0%, #701FB7 50%, #1E1B4B 100%);">
-                            <div class="grid grid-cols-3 gap-6">
-                                @foreach($recentAchievements as $achievement)
-                                    <div
-                                        class="text-center p-2 group cursor-pointer transition-transform duration-300 hover:-translate-y-2">
-                                        <!-- Container for overlapping circles -->
-                                        <div class="relative w-16 h-16 sm:w-18 sm:h-18 mx-auto mb-3">
-                                            <!-- Dark background circle (larger, positioned behind) -->
-                                            <div class="absolute inset-1 w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-lg"
-                                                style="background-color: {{ $achievement['background_dark'] }};"></div>
-                                            <!-- Light foreground circle (smaller, positioned in front) -->
-                                            <div class="absolute inset-0 w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center shadow-md"
-                                                style="background-color: {{ $achievement['background_light'] }};">
-                                                <img src="{{ asset('images/achievements/' . $achievement['front_image']) }}"
-                                                    alt="{{ $achievement['title'] }}"
-                                                    class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-sm">
+                            <!-- Achievements Body -->
+                            <div class="p-6"
+                                style="background: linear-gradient(135deg, #312E81 0%, #701FB7 50%, #1E1B4B 100%);">
+                                <div class="grid grid-cols-3 gap-6">
+                                    @foreach($recentAchievements as $achievement)
+                                        <div
+                                            class="text-center p-2 group cursor-pointer transition-transform duration-300 hover:-translate-y-2">
+                                            <!-- Container for overlapping circles -->
+                                            <div class="relative w-16 h-16 sm:w-18 sm:h-18 mx-auto mb-3">
+                                                <!-- Dark background circle (larger, positioned behind) -->
+                                                <div class="absolute inset-1 w-16 h-16 sm:w-18 sm:h-18 rounded-full shadow-lg"
+                                                    style="background-color: {{ $achievement['background_dark'] }};"></div>
+                                                <!-- Light foreground circle (smaller, positioned in front) -->
+                                                <div class="absolute inset-0 w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center shadow-md"
+                                                    style="background-color: {{ $achievement['background_light'] }};">
+                                                    <img src="{{ asset('images/achievements/' . $achievement['front_image']) }}"
+                                                        alt="{{ $achievement['title'] }}"
+                                                        class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-sm">
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="font-semibold text-white text-xs sm:text-sm md:text-base drop-shadow-sm leading-tight">
+                                                {{ $achievement['title'] }}
                                             </div>
                                         </div>
-                                        <div
-                                            class="font-semibold text-white text-xs sm:text-sm md:text-base drop-shadow-sm leading-tight">
-                                            {{ $achievement['title'] }}
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Leaderboard Section -->
-                    <div class="mt-8">
-                        <div class="px-4">
-                            <div class="relative -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-hidden min-h-[120px] max-h-[150px] flex items-center justify-center z-40"
-                                style="background-image: url('{{ asset('images/dashboard/leaderboard.png') }}'); background-size: contain; background-repeat: no-repeat; background-position: center top;">
-                                <!-- Main header -->
-                                <div
-                                    class="gradient-bg rounded-t-xl px-6 -mt-4 card-shadow relative w-full flex items-center justify-center text-center">
-                                    <h1
-                                        class="text-white text-2xl sm:-mt-4 sm:text-3xl md:text-4xl lg:text-5xl font-baloo font-bold tracking-wide">
-                                        Leaderboards</h1>
-                                    <svg class="w-6 h-6 text-yellow-300 ml-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
+                                    @endforeach
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Leaderboard content -->
-                            <div class="relative px-6 lg:px-6 md:px-4 sm:px-4 -mt-8 lg:-mt-8 md:-mt-12 -z-10">
-                                <div class="px-2 pb-4 rounded-xl" style="background-color: #9B2C14;">
-                                    <div
-                                        class="bg-gradient-to-b from-yellow-100 to-orange-50 rounded-b-xl card-shadow p-6 relative">
-                                        <div class="space-y-3 relative z-10">
-                                            @php
-                                                $rankBadges = [
-                                                    1 => 'bg-gradient-to-b from-yellow-400 to-yellow-600 text-white',
-                                                    2 => 'bg-gradient-to-b from-gray-300 to-gray-500 text-white',
-                                                    3 => 'bg-gradient-to-b from-orange-500 to-orange-700 text-white',
-                                                    4 => 'bg-gradient-to-b from-blue-400 to-blue-600 text-white',
-                                                    5 => 'bg-gradient-to-b from-teal-400 to-teal-600 text-white',
-                                                ];
-                                                $rankLabels = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
-                                            @endphp
-                                            @foreach(($leaderboardTop5 ?? []) as $index => $row)
-                                                @php $rank = $index + 1; @endphp
-                                                <div class="flex items-center justify-between p-3 rounded-lg shadow-sm ">
-                                                    <div class="flex items-center">
-                                                        <div
-                                                            class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3 border-2 {{ $rank === 1 ? 'bg-yellow-500 border-yellow-600' : ($rank === 2 ? 'bg-gray-400 border-gray-500' : ($rank === 3 ? 'bg-orange-600 border-orange-700' : ($rank === 4 ? 'bg-blue-400 border-blue-500' : 'bg-teal-400 border-teal-500'))) }}">
-                                                            <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
-                                                                alt="{{ $row['name'] ?? 'Student' }}"
-                                                                class="w-full h-full object-cover">
-                                                        </div>
-                                                        <div>
-                                                            <div
-                                                                class="font-baloo font-bold text-gray-900 text-base sm:text-lg md:text-xl">
-                                                                {{ $row['name'] ?? 'Student' }}
-                                                            </div>
-                                                            <div class="text-sm sm:text-base text-gray-600">
-                                                                {{ $row['points'] ?? 0 }} pts
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                        <!-- Leaderboard Section -->
+                        <div class="mt-8 px-4">
+                            <div class="max-w-3xl mx-auto rounded-xl overflow-hidden card-shadow">
+                                <!-- Header -->
+                                <div
+                                    class="bg-gradient-to-r from-orange-500 to-orange-700 flex items-center justify-center px-6 py-4">
+                                    <h1
+                                        class="text-white text-2xl sm:text-3xl md:text-4xl font-poppins font-bold tracking-wide flex items-center">
+                                        Leaderboards
+                                        <svg class="w-6 h-6 text-yellow-300 ml-2" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    </h1>
+                                </div>
+
+                                <!-- Body -->
+                                <div class="bg-gradient-to-b from-yellow-100 to-orange-50 p-6">
+                                    <div class="space-y-3">
+                                        @php
+                                            $rankBadges = [
+                                                1 => 'bg-gradient-to-b from-yellow-400 to-yellow-600 text-white',
+                                                2 => 'bg-gradient-to-b from-gray-300 to-gray-500 text-white',
+                                                3 => 'bg-gradient-to-b from-orange-500 to-orange-700 text-white',
+                                                4 => 'bg-gradient-to-b from-blue-400 to-blue-600 text-white',
+                                                5 => 'bg-gradient-to-b from-teal-400 to-teal-600 text-white',
+                                            ];
+                                            $rankLabels = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
+                                        @endphp
+
+                                        @foreach(($leaderboardTop5 ?? []) as $index => $row)
+                                            @php $rank = $index + 1; @endphp
+                                            <div class="flex items-center justify-between p-3 rounded-lg shadow-sm">
+                                                <div class="flex items-center">
                                                     <div
-                                                        class="px-3 py-1 rounded-full text-sm font-bold shadow-sm {{ $rankBadges[$rank] ?? 'bg-gray-200 text-gray-800' }}">
-                                                        {{ $rankLabels[$rank] ?? $rank . 'th' }}
+                                                        class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center mr-3 border-2 {{ $rank === 1 ? 'bg-yellow-500 border-yellow-600' : ($rank === 2 ? 'bg-gray-400 border-gray-500' : ($rank === 3 ? 'bg-orange-600 border-orange-700' : ($rank === 4 ? 'bg-blue-400 border-blue-500' : 'bg-teal-400 border-teal-500'))) }}">
+                                                        <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
+                                                            alt="{{ $row['name'] ?? 'Student' }}"
+                                                            class="w-full h-full object-cover">
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="font-baloo font-bold text-gray-900 text-base sm:text-lg md:text-xl">
+                                                            {{ $row['name'] ?? 'Student' }}
+                                                        </div>
+                                                        <div class="text-sm sm:text-base text-gray-600">
+                                                            {{ $row['points'] ?? 0 }} pts
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            @endforeach
-                                        </div>
+                                                <div
+                                                    class="px-3 py-1 rounded-full text-sm font-bold shadow-sm {{ $rankBadges[$rank] ?? 'bg-gray-200 text-gray-800' }}">
+                                                    {{ $rankLabels[$rank] ?? $rank . 'th' }}
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
+
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

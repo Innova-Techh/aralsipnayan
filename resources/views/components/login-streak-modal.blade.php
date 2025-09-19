@@ -4,7 +4,7 @@
         <div class="bg-white rounded-3xl p-8 w-96 text-center shadow-xl">
 
             <!-- Header -->
-            <h2 class="text-2xl font-bold text-orange-500 mb-8"
+            <h2 class="text-3xl font-bold text-orange-500 mb-8"
                 style="text-shadow: 2px 2px 0px rgba(251, 146, 60, 0.2);">
                 Daily Login Streak
             </h2>
@@ -36,7 +36,7 @@
 
             <!-- Continue Button -->
             <button id="continueButton"
-                class="w-full bg-select-avatar text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
+                class="w-full bg-select-avatar drop-shadow-select-avatar text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
                 onclick="closeStreakModal()">
                 Continue
             </button>

@@ -224,6 +224,14 @@ export default {
                     "linear-gradient(to bottom, #1C8582 0%, #43FFFA 100%)",
                 "avatar-6":
                     "linear-gradient(to bottom, #EF7436 0%, #FFA273 100%)",
+                "stats-green":
+                    "linear-gradient(to bottom, #10B981 0%, #07533A 100%)",
+                "stats-blue":
+                    "linear-gradient(to bottom, #3B82F6 0%, #234C90 100%)",
+                "stats-yellow":
+                    "linear-gradient(to bottom, #F59E0B 0%, #8F5C06 100%)",
+                "stats-red":
+                    "linear-gradient(to bottom, #DC2626 0%, #761414 100%)",
             },
             dropShadow: {
                 "select-avatar": "0 6px 0 #CE8E21",
@@ -237,6 +245,10 @@ export default {
                 "avatar-4": "6px 4px 0 #928F8F",
                 "avatar-5": "6px 4px 0 #20908C",
                 "avatar-6": "6px 4px 0 #F07639",
+                "stats-green": "0 6px 0 #043024",
+                "stats-blue": "0 6px 0 #15294D",
+                "stats-yellow": "0 6px 0 #4A2E03",
+                "stats-red": "0 6px 0 #3B0A0A",
             },
         },
     },
