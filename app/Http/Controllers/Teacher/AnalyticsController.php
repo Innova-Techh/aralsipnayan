@@ -216,7 +216,11 @@ class AnalyticsController extends Controller
                     DB::raw('COUNT(*) as total_attempts'),
                     DB::raw('SUM(question_responses.is_correct) as correct_answers'),
                     DB::raw('AVG(question_responses.response_time) as avg_response_time'),
-                    DB::raw('COUNT(DISTINCT question_responses.user_id) as unique_students')
+                    DB::raw('COUNT(DISTINCT question_responses.user_id) as unique_students'),
+                    DB::raw('AVG(question_responses.bkt_before) as avg_bkt_before'),
+                    DB::raw('AVG(question_responses.bkt_after) as avg_bkt_after'),
+                    DB::raw('AVG(question_responses.time_score) as avg_time_score'),
+                    DB::raw('AVG(question_responses.difficulty_factor) as avg_difficulty_factor')
                 ])
                 ->groupBy([
                     'questions.question_id',
@@ -245,7 +249,12 @@ class AnalyticsController extends Controller
                     'accuracy_rate' => $stat->total_attempts > 0 ? 
                         round(($stat->correct_answers / $stat->total_attempts) * 100, 1) : 0,
                     'avg_response_time' => round($stat->avg_response_time, 2),
-                    'unique_students' => $stat->unique_students
+                    'unique_students' => $stat->unique_students,
+                    'avg_bkt_before' => round($stat->avg_bkt_before ?? 0, 4),
+                    'avg_bkt_after' => round($stat->avg_bkt_after ?? 0, 4),
+                    'bkt_improvement' => round(($stat->avg_bkt_after ?? 0) - ($stat->avg_bkt_before ?? 0), 4),
+                    'avg_time_score' => round($stat->avg_time_score ?? 0, 2),
+                    'avg_difficulty_factor' => round($stat->avg_difficulty_factor ?? 0, 2)
                 ];
             }
 

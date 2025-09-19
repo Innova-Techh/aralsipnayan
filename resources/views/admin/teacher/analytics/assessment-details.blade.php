@@ -1,6 +1,6 @@
 @extends('admin.teacher.layouts.app')
 
-@section('title', 'Assessment Details')
+@section('title', 'Aralsipnayan')
 
 @section('content')
 <div>
@@ -77,6 +77,66 @@
             </div>
         </div>
     </div>
+
+    <!-- BKT Overview -->
+    @php
+        $totalBktBefore = 0;
+        $totalBktAfter = 0;
+        $bktQuestionCount = 0;
+        foreach ($questionDetails as $details) {
+            if (isset($details['avg_bkt_before']) && isset($details['avg_bkt_after'])) {
+                $totalBktBefore += $details['avg_bkt_before'];
+                $totalBktAfter += $details['avg_bkt_after'];
+                $bktQuestionCount++;
+            }
+        }
+        $avgBktBefore = $bktQuestionCount > 0 ? $totalBktBefore / $bktQuestionCount : 0;
+        $avgBktAfter = $bktQuestionCount > 0 ? $totalBktAfter / $bktQuestionCount : 0;
+        $overallBktImprovement = $avgBktAfter - $avgBktBefore;
+    @endphp
+    
+    @if($bktQuestionCount > 0)
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow p-6 mb-8 border border-blue-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="material-symbols-outlined text-blue-600 mr-2">psychology</span>
+            BKT Knowledge Tracing Overview
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600">{{ number_format($avgBktBefore, 4) }}</div>
+                <div class="text-sm font-medium text-gray-700">Average BKT Before</div>
+                <div class="text-xs text-gray-500">Initial knowledge level</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600">{{ number_format($avgBktAfter, 4) }}</div>
+                <div class="text-sm font-medium text-gray-700">Average BKT After</div>
+                <div class="text-xs text-gray-500">Final knowledge level</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold {{ $overallBktImprovement > 0 ? 'text-green-600' : ($overallBktImprovement < 0 ? 'text-red-600' : 'text-gray-600') }}">
+                    {{ $overallBktImprovement > 0 ? '+' : '' }}{{ number_format($overallBktImprovement, 4) }}
+                </div>
+                <div class="text-sm font-medium text-gray-700">Overall Improvement</div>
+                <div class="text-xs text-gray-500">
+                    {{ $overallBktImprovement > 0 ? 'Knowledge gained' : ($overallBktImprovement < 0 ? 'Knowledge lost' : 'No change') }}
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Overall Knowledge Progress</span>
+                <span>{{ number_format($avgBktAfter * 100, 1) }}% mastery</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full" 
+                     style="width: {{ min(max($avgBktAfter * 100, 0), 100) }}%"></div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">
+                BKT scores range from 0.0 (no mastery) to 1.0 (complete mastery). This assessment covered {{ $bktQuestionCount }} questions with BKT tracking.
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Difficulty Breakdown -->
     @if($assessmentStats['difficulty_breakdown']->count() > 0)
@@ -209,8 +269,56 @@
                             <span class="text-gray-600">Unique Students:</span>
                             <span class="font-medium">{{ $details['unique_students'] }}</span>
                         </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Avg. Time Score:</span>
+                            <span class="font-medium">{{ $details['avg_time_score'] ?? 'N/A' }}</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- BKT Analysis Section -->
+                @if(isset($details['avg_bkt_before']) && isset($details['avg_bkt_after']))
+                <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
+                    <h5 class="font-medium text-gray-900 mb-3 flex items-center">
+                        <span class="material-symbols-outlined text-blue-600 mr-2">psychology</span>
+                        BKT (Bayesian Knowledge Tracing) Analysis
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-600">{{ number_format($details['avg_bkt_before'], 4) }}</div>
+                            <div class="text-sm text-gray-600">Avg. BKT Before</div>
+                            <div class="text-xs text-gray-500">Knowledge before question</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-600">{{ number_format($details['avg_bkt_after'], 4) }}</div>
+                            <div class="text-sm text-gray-600">Avg. BKT After</div>
+                            <div class="text-xs text-gray-500">Knowledge after question</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold {{ $details['bkt_improvement'] > 0 ? 'text-green-600' : ($details['bkt_improvement'] < 0 ? 'text-red-600' : 'text-gray-600') }}">
+                                {{ $details['bkt_improvement'] > 0 ? '+' : '' }}{{ number_format($details['bkt_improvement'], 4) }}
+                            </div>
+                            <div class="text-sm text-gray-600">BKT Improvement</div>
+                            <div class="text-xs text-gray-500">
+                                {{ $details['bkt_improvement'] > 0 ? 'Knowledge increased' : ($details['bkt_improvement'] < 0 ? 'Knowledge decreased' : 'No change') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>Knowledge Progress</span>
+                            <span>{{ $details['bkt_improvement'] > 0 ? '+' : '' }}{{ number_format($details['bkt_improvement'] * 100, 2) }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" 
+                                 style="width: {{ min(max(($details['avg_bkt_after'] * 100), 0), 100) }}%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            BKT Score represents the probability (0-1) that a student has mastered this concept
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Explanation -->
                 @if($details['question']->explanation)
