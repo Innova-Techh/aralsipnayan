@@ -213,7 +213,7 @@
             <div class="relative z-10 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-8xl mx-auto">
                 <h1 class="text-lg xs:text-lg sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                     style="text-shadow: -1px -1px 0 #18337e, 1px -1px 0 #18337e, -1px 1px 0 #18337e, 1px 1px 0 #18337e, 0 4px 0 #18337e;">
-                    Welcome back, {{ $profile?->firstname ?? Auth::guard('student')->user()?->username ?? 'Guest' }}! 👋
+                    Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                 </h1>
                 <p class="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 mt-2 sm:mt-3 lg:mt-4">Ready to
                     continue your math journey?</p>

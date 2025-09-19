@@ -165,7 +165,7 @@
                         <!-- User Info - Hidden on very small screens -->
                         <div class="hidden xs:flex flex-col items-end">
                             <span class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-20 sm:max-w-none">
-                                {{ Auth::guard('student')->user()->username }}
+                                {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
                             </span>
                             <span
                                 class="streak w-8 h-5 sm:w-10 sm:h-6 flex items-center justify-center text-xs text-white bg-orange-500 px-2 sm:px-1.5 py-0.5 rounded-xl ">
@@ -178,7 +178,7 @@
                             class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center border-2 border-gray-200 hover:border-blue-500 transition-all duration-200 flex-shrink-0"
                             id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                             <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
-                                alt="{{ Auth::guard('student')->user()->username }}" class="w-full h-full object-cover">
+                                alt="{{ Auth::guard('student')->user()?->studentProfile?->firstname }}" class="w-full h-full object-cover">
                         </button>
                     </div>
 
@@ -186,7 +186,7 @@
                     <div id="userDropdown"
                         class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-200 transform transition-all duration-200">
                         <div class="px-4 py-2 border-b border-gray-100 xs:hidden">
-                            <p class="text-sm font-medium text-gray-900">{{ Auth::guard('student')->user()->username }}</p>
+                            <p class="text-sm font-medium text-gray-900">{{ Auth::guard('student')->user()?->studentProfile?->firstname }}</p>
                             <p class="text-xs text-gray-500">Streak: 4</p>
                         </div>
                         <a href="{{ route('profile.edit') }}"
