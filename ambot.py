@@ -803,6 +803,30 @@ def _run_diagnostic_for_user(username, password, competency, accuracy, speed, ba
         }
 
 
+def _run_quiz_for_user(username, password, competency, accuracy, speed, base_url):
+    """Helper to run a quiz for a single user in its own session."""
+    try:
+        bot = SimpleQuestionBot(base_url=base_url)
+        if not bot.login_student(username, password):
+            return {
+                'username': username,
+                'success': False,
+                'message': 'login_failed'
+            }
+        ok = bot.auto_answer_quiz(competency, accuracy, speed)
+        return {
+            'username': username,
+            'success': bool(ok),
+            'message': 'completed' if ok else 'failed'
+        }
+    except Exception as e:
+        return {
+            'username': username,
+            'success': False,
+            'message': f'error: {e}'
+        }
+
+
 def run_multi_diagnostics(usernames, password, competency, accuracy=0.7, speed=0.5, workers=3, base_url="http://127.0.0.1:8000"):
     """Run diagnostics concurrently for multiple users.
 
@@ -833,6 +857,37 @@ def run_multi_diagnostics(usernames, password, competency, accuracy=0.7, speed=0
     print(f"\nSummary: {passed}/{total} successful ({passed/total*100 if total else 0:.1f}%)")
     return passed == total
 
+
+def run_multi_quiz(usernames, password, competency, accuracy=0.7, speed=0.5, workers=3, base_url="http://127.0.0.1:8000"):
+    """Run regular quizzes concurrently for multiple users.
+
+    usernames: list[str] of usernames
+    password: shared password for all users
+    competency: e.g. 'number_algebra'
+    accuracy, speed: behavior knobs
+    workers: thread pool size
+    base_url: target site base
+    """
+    print(f"Running multi-quiz for {len(usernames)} users | workers: {workers}")
+    results = []
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [
+            executor.submit(_run_quiz_for_user, u, password, competency, accuracy, speed, base_url)
+            for u in usernames
+        ]
+        for fut in as_completed(futures):
+            res = fut.result()
+            results.append(res)
+            status = '✓' if res.get('success') else '✗'
+            print(f" {status} {res.get('username')}: {res.get('message')}")
+
+    # Summarize
+    total = len(results)
+    passed = sum(1 for r in results if r.get('success'))
+    print(f"\nSummary: {passed}/{total} successful ({passed/total*100 if total else 0:.1f}%)")
+    return passed == total
+
 def main():
     """Command line interface"""
     import sys
@@ -841,17 +896,20 @@ def main():
         print("Simple Question Bot - AralSipnayan Automation Tool")
         print("\nUsage:")
         print("  python simple_question_bot.py diagnostic USERNAME PASSWORD COMPETENCY [ACCURACY] [SPEED]")
-        print("  python simple_question_bot.py quiz USERNAME PASSWORD ASSESSMENT_ID [ACCURACY] [SPEED]")
+        print("  python simple_question_bot.py quiz USERNAME PASSWORD COMPETENCY [ACCURACY] [SPEED]")
         print("  python simple_question_bot.py performance USERNAME PASSWORD [NUM_TESTS]")
-        print("  python simple_question_bot.py multi USERNAMES PASSWORD COMPETENCY [NUM_RUNS] [ACCURACY] [SPEED] [WORKERS]")
+        print("  python simple_question_bot.py multi USERNAMES PASSWORD COMPETENCY [ACCURACY] [SPEED] [WORKERS]")
+        print("  python simple_question_bot.py multiquiz USERNAMES PASSWORD COMPETENCY [ACCURACY] [SPEED] [WORKERS]")
         print("\nExamples:")
         print("  python simple_question_bot.py diagnostic student001 password123 number_algebra 0.8 0.4")
-        print("  python simple_question_bot.py quiz student001 password123 ASSESS_001 0.7 0.6")
+        print("  python simple_question_bot.py quiz student001 password123 number_algebra 0.7 0.6")
         print("  python simple_question_bot.py performance student001 password123 3")
         print("  python simple_question_bot.py multi studenta1,studentb1,studentc1 123 number_algebra 0.7 0.5 3")
+        print("  python simple_question_bot.py multiquiz studenta1,studentb1,studentc1 123 number_algebra 0.7 0.5 3")
         print("\nParameters:")
         print("  ACCURACY: 0.0-1.0 (0.7 = 70% correct answers)")
         print("  SPEED: 0.0-1.0 (0.5 = use 50% of allowed time)")
+        print("  WORKERS: Number of concurrent threads (default: 3)")
         return
     
     bot = SimpleQuestionBot()
@@ -873,17 +931,17 @@ def main():
     
     elif command == 'quiz':
         if len(sys.argv) < 5:
-            print("Usage: quiz USERNAME PASSWORD ASSESSMENT_ID [ACCURACY] [SPEED]")
+            print("Usage: quiz USERNAME PASSWORD COMPETENCY [ACCURACY] [SPEED]")
             return
         
         username = sys.argv[2]
         password = sys.argv[3]
-        assessment_id = sys.argv[4]
+        competency = sys.argv[4]
         accuracy = float(sys.argv[5]) if len(sys.argv) > 5 else 0.7
         speed = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
         
         if bot.login_student(username, password):
-            bot.auto_answer_quiz(assessment_id, accuracy, speed)
+            bot.auto_answer_quiz(competency, accuracy, speed)
     
     elif command == 'performance':
         if len(sys.argv) < 4:
@@ -907,6 +965,18 @@ def main():
         speed = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
         workers = int(sys.argv[7]) if len(sys.argv) > 7 else min(3, len(usernames))
         run_multi_diagnostics(usernames, password, competency, accuracy, speed, workers)
+    
+    elif command == 'multiquiz':
+        if len(sys.argv) < 5:
+            print("Usage: multiquiz USERNAMES PASSWORD COMPETENCY [ACCURACY] [SPEED] [WORKERS]")
+            return
+        usernames = [u.strip() for u in sys.argv[2].split(',') if u.strip()]
+        password = sys.argv[3]
+        competency = sys.argv[4]
+        accuracy = float(sys.argv[5]) if len(sys.argv) > 5 else 0.7
+        speed = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
+        workers = int(sys.argv[7]) if len(sys.argv) > 7 else min(3, len(usernames))
+        run_multi_quiz(usernames, password, competency, accuracy, speed, workers)
     
     else:
         print(f"Unknown command: {command}")

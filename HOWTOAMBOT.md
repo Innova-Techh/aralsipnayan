@@ -1,5 +1,5 @@
 This guide shows how to run the Python bot to automatically answer DIAGNOSTIC and ASSESSMENTS for one or many student accounts concurrently.
-
+#REFRESH DB IF THERE IS A PROBLEM!
 ### 1) Prerequisites
 - Python 3.10+ installed
 - Install deps:
@@ -20,10 +20,10 @@ Use the Python script in the repo ambot.py
 By default the bot uses `http://127.0.0.1:8000`. just change it if it is different, edit the script’s `base_url` default or pass it where supported.
 
 ### 4) Commands
-- Single student regular quiz (not multi-user like diagnostic)
+- Single student regular quiz 
   - Prerequisites:
     - Student must have completed the diagnostic
-    - Log in with the target student
+    - Log in with the target student/s
     - Finish onboarding (if not yet finished)
     - Go to the assessments page
   - Run:
@@ -35,23 +35,32 @@ python ambot.py quiz STUDENT_USERNAME 123 number_algebra [ACCURACY] [SPEED]
 python ambot.py quiz studenta1 123 number_algebra 0.8 0.4
 python ambot.py quiz studenta2 123 measurement_geometry 0.7 0.5
 ```
+-Multiple students concurrentlu (quiz only):
+```bash
+python ambot.py multiquiz studenta1,studentb1,studentc1 123 number_algebra [ACCURACY] [SPEED] [WORKERS]
+```
+Examples:
+```bash
+python ambot.py multiquiz studenta1,studentb1,studentc1 123 number_algebra
+python ambot.py multiquiz studenta1,studentb1,studentc1 123 number_algebra 0.7 0.5 3
+```
 
 - Single student diagnostic:
-```
+```bash
 python ambot.py diagnostic STUDENT_USERNAME 123 number_algebra [ACCURACY] [SPEED]
 ```
 Examples:
-```
+```bash
 python ambot.py diagnostic studenta1 123 number_algebra 0.8 0.4
 python ambot.py diagnostic studenta2 123 measurement_geometry 0.7 0.5
 ```
 
 - Multiple students concurrently (diagnostic only):
-```
+```bash
 python ambot.py multi studenta1,studentb1,studentc1 123 number_algebra [ACCURACY] [SPEED] [WORKERS]
 ```
 Examples:
-```
+```bash
 python ambot.py multi studenta1,studentb1,studentc1 123 number_algebra
 python ambot.py multi studenta1,studentb1,studentc1 123 number_algebra 0.7 0.5 3
 ```
@@ -59,8 +68,6 @@ Notes:
 - ACCURACY: 0.0–1.0 (probability the bot answers correctly). Default 0.7
 - SPEED: 0.0–1.0 (fraction of max allowed time used). Default 0.5
 - WORKERS: number of parallel sessions. Default min(3, users)
-
-
 
 
 ### 6) Troubleshooting
