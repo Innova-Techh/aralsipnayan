@@ -468,10 +468,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                           1px -1px 0 #18337e,
-                                                                                                                                                                                           -1px 1px 0 #18337e,
-                                                                                                                                                                                           1px 1px 0 #18337e,
-                                                                                                                                                                                           0 4px 0 #18337e;">
+                                                                                                                                                                                                                                           1px -1px 0 #18337e,
+                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                           1px 1px 0 #18337e,
+                                                                                                                                                                                                                                           0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -635,11 +635,10 @@
 
                             <!-- Body -->
                             <div class="p-6 space-y-4" style="background-color: #FFEAEA;">
-                                <!-- Assessment Item -->
-                                <!-- Replace your Assessment Items with this updated version -->
                                 <!-- Assessment Item 1 -->
-                                <div class="flex flex-col rounded-lg p-4 shadow relative">
-                                    <div>
+                                <div
+                                    class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
+                                    <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-2">
                                             <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
                                             <span
@@ -660,18 +659,19 @@
                                         </div>
                                     </div>
 
-                                    <!-- Full width on mobile/tablet, centered on desktop -->
-                                    <div class="mt-4 lg:mt-6">
+                                    <!-- Button container with responsive positioning -->
+                                    <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
                                         <button
-                                            class="w-full lg:w-auto lg:mx-auto lg:block px-8 lg:px-12 py-3 lg:py-4 rounded-xl text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
+                                            class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
                                             Start Assessment
                                         </button>
                                     </div>
                                 </div>
 
                                 <!-- Assessment Item 2 -->
-                                <div class="flex flex-col rounded-lg p-4 shadow relative">
-                                    <div>
+                                <div
+                                    class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
+                                    <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-2">
                                             <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
                                             <span
@@ -692,20 +692,19 @@
                                         </div>
                                     </div>
 
-                                    <!-- Full width on mobile/tablet, centered on desktop -->
-                                    <div class="mt-4 lg:mt-6">
+                                    <!-- Button container with responsive positioning -->
+                                    <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
                                         <button
-                                            class="w-full lg:w-auto lg:mx-auto lg:block px-8 lg:px-12 py-3 lg:py-4 rounded-xl text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
+                                            class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
                                             Start Assessment
                                         </button>
                                     </div>
                                 </div>
 
-
-
-                                <!-- Assessment Item 2 -->
-                                <div class="flex flex-col rounded-lg p-4 shadow relative">
-                                    <div>
+                                <!-- Assessment Item 3 -->
+                                <div
+                                    class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
+                                    <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-2">
                                             <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents</h3>
                                             <span
@@ -726,14 +725,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- Responsive button -->
-                                    <button class="mt-4 lg:mt-6 px-8 lg:px-12 py-3 lg:py-4 mx-auto
-                                                   rounded-xl text-white font-semibold 
-                                                   bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF]
-                                                   transition-all hover:shadow-md 
-                                                   w-full lg:w-auto lg:mx-auto">
-                                        Start Assessment
-                                    </button>
+                                    <!-- Button container with responsive positioning -->
+                                    <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
+                                        <button
+                                            class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
+                                            Start Assessment
+                                        </button>
+                                    </div>
                                 </div>
 
                             </div>

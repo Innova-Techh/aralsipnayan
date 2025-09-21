@@ -53,12 +53,12 @@
                             </div>
 
                             <!-- Quest Cards Container - Responsive -->
-                            <div class="shadow-lg px-2 xs:px-4 sm:px-3 lg:px-8 pb-2 rounded-xl space-y-3 sm:space-y-4">
+                            <div class="shadow-lg px-2 xs:px-4 sm:px-3 lg:px-12 pb-2 rounded-xl space-y-3 sm:space-y-4">
 
                                 <!-- Geometry Fundamentals Card -->
                                 <div
-                                    class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Geometry
+                                    class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2 ">Geometry
                                         Fundamentals</h3>
                                     <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Assessment covering basic
                                         geometric shapes and properties</p>
@@ -84,21 +84,23 @@
                                     </div>
 
                                     <!-- Start Assessment Button - Responsive -->
-                                    <button class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                    " style="text-shadow:
-                                                                                            -1px -1px 0 #7A4305,
-                                                                                            1px -1px 0 #7A4305,
-                                                                                            -1px 1px 0 #7A4305,
-                                                                                            1px 1px 0 #7A4305,
-                                                                                            0 0 1px #7A4305;">
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                            "
+                                        style="text-shadow:
+                                                                                                                                    -1px -1px 0 #7A4305,
+                                                                                                                                    1px -1px 0 #7A4305,
+                                                                                                                                    -1px 1px 0 #7A4305,
+                                                                                                                                    1px 1px 0 #7A4305,
+                                                                                                                                    0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>
 
                                 <!-- Fractions and Decimals Card -->
                                 <div
-                                    class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4
-                                                                                sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                    class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4 lg:px-8 
+                                                                                                                        sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
                                     <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Fractions and
                                         Decimals</h3>
                                     <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Practice assessment on
@@ -126,20 +128,22 @@
                                     </div>
 
                                     <!-- Start Assessment Button - Responsive -->
-                                    <button class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                    " style="text-shadow:
-                                                                                            -1px -1px 0 #7A4305,
-                                                                                            1px -1px 0 #7A4305,
-                                                                                            -1px 1px 0 #7A4305,
-                                                                                            1px 1px 0 #7A4305,
-                                                                                            0 0 1px #7A4305;">
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                            "
+                                        style="text-shadow:
+                                                                                                                                    -1px -1px 0 #7A4305,
+                                                                                                                                    1px -1px 0 #7A4305,
+                                                                                                                                    -1px 1px 0 #7A4305,
+                                                                                                                                    1px 1px 0 #7A4305,
+                                                                                                                                    0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>
 
                                 <!-- Number Operations Quiz Card -->
                                 <div
-                                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8  lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
                                     <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Number Operations
                                         Quiz</h3>
                                     <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Quick assessment on basic
@@ -165,13 +169,15 @@
                                     </div>
 
                                     <!-- Start Assessment Button - Responsive -->
-                                    <button class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                    " style="text-shadow:
-                                                                                            -1px -1px 0 #7A4305,
-                                                                                            1px -1px 0 #7A4305,
-                                                                                            -1px 1px 0 #7A4305,
-                                                                                            1px 1px 0 #7A4305,
-                                                                                            0 0 1px #7A4305;">
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                            "
+                                        style="text-shadow:
+                                                                                                                                    -1px -1px 0 #7A4305,
+                                                                                                                                    1px -1px 0 #7A4305,
+                                                                                                                                    -1px 1px 0 #7A4305,
+                                                                                                                                    1px 1px 0 #7A4305,
+                                                                                                                                    0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>

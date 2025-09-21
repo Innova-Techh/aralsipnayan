@@ -101,17 +101,17 @@
                                 title="{{ $achievement['is_earned'] ? 'Click to flip' : 'Achievement locked' }}">
                                 <!-- Front of card -->
                                 <div class="flip-card-front absolute w-full h-full rounded-xl overflow-hidden shadow-lg {{ !$achievement['is_earned'] ? 'opacity-60' : '' }}"
-                                    style="background-color: <?= $achievement['background_light'] ?>; backface-visibility: hidden;">
+                                    style="background-color: {{ $achievement['background_light'] }}; backface-visibility: hidden;">
                                     <!-- Rarity Badge - Top Right -->
                                     <div class="absolute top-2 right-2 z-20">
                                         <span class="inline-block px-2 py-1 text-xs rounded-full border-2 shadow-sm text-white"
-                                            style="background-color: <?= $achievement['background_light'] ?>;border-color: <?= $achievement['background_dark'] ?>;">
+                                            style="background-color: {{ $achievement['background_light'] }}; border-color: rgba(0, 0, 0, 0.2);">
                                             {{ $achievement['rarity'] }}
                                         </span>
                                     </div>
                                     <!-- Card Header -->
                                     <div class="relative h-2/3 flex items-center justify-center mt-6 mx-4 rounded-xl"
-                                        style="background-color: <?= $achievement['background_dark'] ?>;">
+                                        style="background: linear-gradient(135deg, {{ $achievement['background_light'] }}, rgba(0, 0, 0, 0.1));">
                                         <!-- Character Image -->
                                         <img src="{{ asset('images/achievements/' . $achievement['front_image']) }}"
                                             alt="{{ $achievement['title'] }}"
@@ -150,7 +150,7 @@
                                     <div class="flip-card-back absolute w-full h-full rounded-xl overflow-hidden shadow-lg"
                                         style="backface-visibility: hidden; transform: rotateY(180deg);">
                                         <div class="p-2 sm:p-4 h-full flex flex-col items-center justify-center text-white text-center border-8 rounded-2xl"
-                                            style="background-color: <?= $achievement['background_dark'] ?>; border-color: <?= $achievement['background_light'] ?>; ">
+                                            style="background: linear-gradient(135deg, {{ $achievement['background_light'] }}, rgba(0, 0, 0, 0.2)); border-color: {{ $achievement['background_light'] }};">
 
                                             <h3 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{{ $achievement['title'] }}</h3>
                                             <p class="text-sm sm:text-sm opacity-90 mb-6">{{ $achievement['description'] }}</p>
@@ -160,13 +160,14 @@
                                                 <!-- Rarity Section -->
                                                 <div class="flex-2 flex-col items-center">
                                                     <span class="text-xs sm:text-sm font-medium">Rarity</span>
-                                                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                                                                                                    @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
-                                                                                                    @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
-                                                                                                    @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
-                                                                                                    @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
-                                                                                                    @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
-                                                                                                    @endif">
+                                                    <span
+                                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                                                                                                            @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
+                                                                                                                            @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
+                                                                                                                            @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
+                                                                                                                            @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
+                                                                                                                            @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
+                                                                                                                            @endif">
                                                         {{ $achievement['rarity'] }}
                                                     </span>
                                                 </div>
