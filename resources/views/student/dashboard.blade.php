@@ -2,10 +2,22 @@
 @extends('layouts.user_layout')
 
 
+
 @section('title', 'AralSipnayan')
 
 
 @section('content')
+
+    @php
+        use App\Http\Controllers\RankController;
+
+        // Initialize the RankController
+        $rankController = new RankController();
+
+        // Get user's current XP (replace with your actual user XP logic)
+        $userXP = auth()->guard('student')->user()->xp ?? 460; // Example: 460 XP
+        $progressInfo = $rankController->getProgressInfo($userXP);
+    @endphp
     <style>
         .welcome-header {
             background: linear-gradient(135deg, #4338CA, #1E40AF, #3B82F6);
@@ -468,10 +480,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                           1px -1px 0 #18337e,
-                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                           1px 1px 0 #18337e,
-                                                                                                                                                                                                                                           0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -518,48 +530,74 @@
                         </div>
 
 
-                        <!-- Level Card -->
+                        <!-- Dynamic Level Card -->
                         <div class="mb-5 sm:mb-6">
-                            <div class=" text-white rounded-xl p-4 sm:p-5 shadow-inner"
+                            <div class="text-white rounded-xl p-4 sm:p-5 shadow-inner"
                                 style="background: linear-gradient(to right, #101093, #931093); box-shadow: inset 0 -4px 4px #42045C, inset 0 2px 2px #CC39F6; box-shadow: 0 6px 0 #0A0A62;">
                                 <div class="flex items-center gap-4 -mx-4">
-                                    <!-- Rank image - fixed size for consistency -->
+                                    <!-- Dynamic Rank image -->
                                     <div class="flex-shrink-0">
-                                        <img src="{{ asset('images/dashboard/rank.png') }}" alt="rank"
+                                        <img src="{{ asset('images/rank_insignia/' . $progressInfo['rank_info']['image']) }}"
+                                            alt="{{ $progressInfo['rank_info']['title'] }}"
                                             class="w-32 h-32 sm:w-18 sm:h-18 rounded-xl object-contain">
                                     </div>
-
 
                                     <!-- Content area -->
                                     <div class="flex-1 min-w-0 -mx-4 mr-2">
                                         <!-- Group 1: Title and Level -->
                                         <div class="mb-2">
-                                            <h3 class="text-xl sm:text-xl font-bold">Problem Solver</h3>
-                                            <p class="text-sm text-blue-200">Level 3</p>
+                                            <h3 class="text-xl sm:text-xl font-bold">
+                                                {{ $progressInfo['rank_info']['title'] }}
+                                            </h3>
+                                            <p class="text-sm text-blue-200">Level {{ $progressInfo['current_level'] }}</p>
                                         </div>
-
 
                                         <!-- Group 2: XP Text (standalone) -->
-                                        <div class="mb-2  mr-4  text-right">
-                                            <p class="text-xs sm:text-sm text-blue-200">460 XP / 1000 XP</p>
+                                        <div class="mb-2 mr-4 text-right">
+                                            @if($progressInfo['is_max_level'])
+                                                <p class="text-xs sm:text-sm text-yellow-300 font-bold">MAX LEVEL ACHIEVED!</p>
+                                            @else
+                                                <p class="text-xs sm:text-sm text-blue-200">
+                                                    {{ number_format($progressInfo['current_xp']) }} XP /
+                                                    {{ number_format($progressInfo['rank_info']['xp_required']) }} XP
+                                                </p>
+                                            @endif
                                         </div>
-
 
                                         <!-- Group 3: Progress bar and XP remaining -->
                                         <div class="mr-4">
                                             <div class="mb-1">
                                                 <div class="relative h-2 sm:h-2.5 bg-white/20 rounded-full overflow-hidden">
                                                     <div class="absolute left-0 top-0 h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-300 rounded-full"
-                                                        style="width: 46%"></div>
+                                                        style="width: {{ $progressInfo['progress_percentage'] }}%"></div>
                                                 </div>
                                             </div>
-                                            <p class="text-xs sm:text-sm text-blue-200">540 XP remaining</p>
+                                            @if($progressInfo['is_max_level'])
+                                                <p class="text-xs sm:text-sm text-yellow-300">🏆 Grandmaster Status</p>
+                                            @else
+                                                <p class="text-xs sm:text-sm text-blue-200">
+                                                    {{ number_format($progressInfo['xp_remaining']) }} XP remaining
+                                                </p>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+
+                        {{-- Optional: Next rank preview --}}
+                        @if(!$progressInfo['is_max_level'])
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-500 text-center">
+                                    <span class="font-medium">Next Rank:</span>
+                                    @php
+                                        $nextRankInfo = $rankController->getRankInfo($progressInfo['current_level'] + 1);
+                                    @endphp
+                                    {{ $nextRankInfo['title'] }} - {{ $nextRankInfo['description'] }}
+                                </p>
+                            </div>
+                        @endif
 
                         <!-- Stats Grid with Live Data -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -972,4 +1010,5 @@
                 });
         }
     </script>
+
 @endsection

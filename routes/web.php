@@ -15,6 +15,7 @@ use App\Http\Controllers\Student\AssessmentController;
 use App\Http\Controllers\Student\QuizController as StudentQuizController;
 use App\Http\Controllers\Student\RegularAssessmentController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\RankController;
 
 // Homepage
 Route::get('/', function () {
@@ -55,6 +56,14 @@ Route::get('/dashboard', function() {
     return redirect()->route('login');
 })->name('dashboard');
 
+
+
+// Rank Controller Routes
+Route::middleware('auth:student')->group(function () {
+    Route::get('/api/user-rank', [RankController::class, 'getUserRankData'])->name('rank.user-data');
+    Route::post('/api/award-xp', [RankController::class, 'awardXP'])->name('rank.award-xp');
+});
+
 // Student Onboarding Routes (no middleware restrictions)
 Route::prefix('student/onboarding')->name('student.onboarding.')->group(function () {
     Route::get('/welcome', [OnboardingController::class, 'showWelcome'])->name('welcome');
@@ -78,6 +87,7 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
         
         return app(DashboardController::class)->index();
     })->name('dashboard');
+    
     
     // Assessments - main page
     Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments');
