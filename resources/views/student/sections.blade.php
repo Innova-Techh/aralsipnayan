@@ -86,13 +86,13 @@
                                     <!-- Start Assessment Button - Responsive -->
                                     <button
                                         class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                            "
+                                                                                                                                    "
                                         style="text-shadow:
-                                                                                                                                    -1px -1px 0 #7A4305,
-                                                                                                                                    1px -1px 0 #7A4305,
-                                                                                                                                    -1px 1px 0 #7A4305,
-                                                                                                                                    1px 1px 0 #7A4305,
-                                                                                                                                    0 0 1px #7A4305;">
+                                                                                                                                            -1px -1px 0 #7A4305,
+                                                                                                                                            1px -1px 0 #7A4305,
+                                                                                                                                            -1px 1px 0 #7A4305,
+                                                                                                                                            1px 1px 0 #7A4305,
+                                                                                                                                            0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>
@@ -100,7 +100,7 @@
                                 <!-- Fractions and Decimals Card -->
                                 <div
                                     class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4 lg:px-8 
-                                                                                                                        sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                                                                                                                sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
                                     <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Fractions and
                                         Decimals</h3>
                                     <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Practice assessment on
@@ -130,13 +130,13 @@
                                     <!-- Start Assessment Button - Responsive -->
                                     <button
                                         class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                            "
+                                                                                                                                    "
                                         style="text-shadow:
-                                                                                                                                    -1px -1px 0 #7A4305,
-                                                                                                                                    1px -1px 0 #7A4305,
-                                                                                                                                    -1px 1px 0 #7A4305,
-                                                                                                                                    1px 1px 0 #7A4305,
-                                                                                                                                    0 0 1px #7A4305;">
+                                                                                                                                            -1px -1px 0 #7A4305,
+                                                                                                                                            1px -1px 0 #7A4305,
+                                                                                                                                            -1px 1px 0 #7A4305,
+                                                                                                                                            1px 1px 0 #7A4305,
+                                                                                                                                            0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>
@@ -171,13 +171,13 @@
                                     <!-- Start Assessment Button - Responsive -->
                                     <button
                                         class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                            "
+                                                                                                                                    "
                                         style="text-shadow:
-                                                                                                                                    -1px -1px 0 #7A4305,
-                                                                                                                                    1px -1px 0 #7A4305,
-                                                                                                                                    -1px 1px 0 #7A4305,
-                                                                                                                                    1px 1px 0 #7A4305,
-                                                                                                                                    0 0 1px #7A4305;">
+                                                                                                                                            -1px -1px 0 #7A4305,
+                                                                                                                                            1px -1px 0 #7A4305,
+                                                                                                                                            -1px 1px 0 #7A4305,
+                                                                                                                                            1px 1px 0 #7A4305,
+                                                                                                                                            0 0 1px #7A4305;">
                                         Start Assessment
                                     </button>
                                 </div>
@@ -187,7 +187,7 @@
                 </div>
 
                 <!-- Right Column - Teacher's Board -->
-                <div x-data="{ activeIndex: 0, total: 3 }" class="lg:col-span-1 lg:order-2 space-y-4">
+                <div x-data="{ activeIndex: 0, total: 3 }" class="lg:col-span-1 lg:order-2 space-y-4 px-8">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
                         <!-- Teacher's Board Header - Responsive -->

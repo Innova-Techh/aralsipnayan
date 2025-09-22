@@ -252,223 +252,6 @@
         #continueButton:hover {
             box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
         }
-
-
-        /* Completed Card - 12 Book icons scattered */
-        .stats-green::before {
-            content: '📖 📚 📄 📝 📗 📘 📙 📕 📋 📜 📰 📑';
-            position: absolute;
-            top: -10px;
-            left: -5px;
-            right: -5px;
-            bottom: -10px;
-            font-size: 8px;
-            opacity: 0.1;
-            z-index: 1;
-            word-spacing: 15px;
-            line-height: 20px;
-            animation: float 8s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-
-        .stats-green .bg-pattern::before {
-            content: '📖';
-            position: absolute;
-            top: 5px;
-            left: 8px;
-            font-size: 9px;
-            opacity: 0.12;
-            z-index: 1;
-            animation: float 6s ease-in-out infinite 1s;
-        }
-
-
-        .stats-green .bg-pattern::after {
-            content: '📚';
-            position: absolute;
-            top: 20px;
-            right: 12px;
-            font-size: 7px;
-            opacity: 0.08;
-            z-index: 1;
-            animation: float 6s ease-in-out infinite 3s;
-        }
-
-
-        /* Points Card - 12 Trophy and achievement icons */
-        .bg-stats-yellow::before {
-            content: '🏆 🥇 🏅 ⭐ 🌟 ✨ 🎖️ 🏵️ 👑 💎 🔥 💫';
-            position: absolute;
-            top: -10px;
-            left: -5px;
-            right: -5px;
-            bottom: -10px;
-            font-size: 8px;
-            opacity: 0.1;
-            z-index: 1;
-            word-spacing: 12px;
-            line-height: 18px;
-            animation: float 9s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-
-        .bg-stats-yellow .bg-pattern::before {
-            content: '🏆';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 10px;
-            opacity: 0.15;
-            z-index: 1;
-            animation: float 7s ease-in-out infinite 2s;
-        }
-
-
-        .bg-stats-yellow .bg-pattern::after {
-            content: '🥇';
-            position: absolute;
-            bottom: 12px;
-            left: 10px;
-            font-size: 8px;
-            opacity: 0.12;
-            z-index: 1;
-            animation: float 7s ease-in-out infinite 4s;
-        }
-
-
-        /* Streak Card - 12 Fire and energy icons */
-        .bg-stats-red::before {
-            content: '🔥 💥 ⚡ 💢 💨 🌟 ✨ 💫 ⭐ 🎯 🚀 💪';
-            position: absolute;
-            top: -10px;
-            left: -5px;
-            right: -5px;
-            bottom: -10px;
-            font-size: 8px;
-            opacity: 0.12;
-            z-index: 1;
-            word-spacing: 10px;
-            line-height: 16px;
-            animation: float 6s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-
-        .bg-stats-red .bg-pattern::before {
-            content: '🔥';
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            font-size: 11px;
-            opacity: 0.18;
-            z-index: 1;
-            animation: float 5s ease-in-out infinite 1.5s;
-        }
-
-
-        .bg-stats-red .bg-pattern::after {
-            content: '⚡';
-            position: absolute;
-            top: 25px;
-            right: 10px;
-            font-size: 9px;
-            opacity: 0.14;
-            z-index: 1;
-            animation: float 5s ease-in-out infinite 3.5s;
-        }
-
-
-        /* Level Card - 12 Star icons scattered */
-        .bg-stats-blue::before {
-            content: '⭐ ✨ 🌟 💫 ⚡ 🎆 🎇 ✴️ 💥 🔆 ⭐ 🌠';
-            position: absolute;
-            top: -10px;
-            left: -5px;
-            right: -5px;
-            bottom: -10px;
-            font-size: 8px;
-            opacity: 0.1;
-            z-index: 1;
-            word-spacing: 13px;
-            line-height: 19px;
-            animation: float 10s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-
-        .bg-stats-blue .bg-pattern::before {
-            content: '⭐';
-            position: absolute;
-            top: 4px;
-            right: 6px;
-            font-size: 12px;
-            opacity: 0.16;
-            z-index: 1;
-            animation: float 8s ease-in-out infinite 2.5s;
-        }
-
-
-        .bg-stats-blue .bg-pattern::after {
-            content: '✨';
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            font-size: 10px;
-            opacity: 0.13;
-            z-index: 1;
-            animation: float 8s ease-in-out infinite 5s;
-        }
-
-
-        /* Enhanced floating animation for more dynamic movement */
-        @keyframes float {
-
-
-            0%,
-            100% {
-                transform: translateY(0px) translateX(0px) rotate(0deg);
-                opacity: 0.1;
-            }
-
-
-            16% {
-                transform: translateY(-2px) translateX(1px) rotate(2deg);
-                opacity: 0.15;
-            }
-
-
-            33% {
-                transform: translateY(-4px) translateX(-1px) rotate(-1deg);
-                opacity: 0.08;
-            }
-
-
-            50% {
-                transform: translateY(-6px) translateX(2px) rotate(3deg);
-                opacity: 0.12;
-            }
-
-
-            66% {
-                transform: translateY(-4px) translateX(-2px) rotate(-2deg);
-                opacity: 0.18;
-            }
-
-
-            83% {
-                transform: translateY(-2px) translateX(1px) rotate(1deg);
-                opacity: 0.06;
-            }
-        }
-
-
-        /* Content should be above background */
-        .stats-content {
-            position: relative;
-            z-index: 10;
-        }
     </style>
 
 
@@ -480,10 +263,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -534,7 +317,7 @@
                         <div class="mb-5 sm:mb-6">
                             <div class="text-white rounded-xl p-4 sm:p-5 shadow-inner"
                                 style="background: linear-gradient(to right, #101093, #931093); box-shadow: inset 0 -4px 4px #42045C, inset 0 2px 2px #CC39F6; box-shadow: 0 6px 0 #0A0A62;">
-                                <div class="flex items-center gap-4 -mx-4">
+                                <div class="flex items-center gap-4">
                                     <!-- Dynamic Rank image -->
                                     <div class="flex-shrink-0">
                                         <img src="{{ asset('images/rank_insignia/' . $progressInfo['rank_info']['image']) }}"
@@ -543,7 +326,7 @@
                                     </div>
 
                                     <!-- Content area -->
-                                    <div class="flex-1 min-w-0 -mx-4 mr-2">
+                                    <div class="flex-1 min-w-0 mr-2">
                                         <!-- Group 1: Title and Level -->
                                         <div class="mb-2">
                                             <h3 class="text-xl sm:text-xl font-bold">
@@ -602,14 +385,62 @@
                         <!-- Stats Grid with Live Data -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                             <div
-                                class="stats-green relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-green drop-shadow-stats-green">
-                                <div class="flex items-center justify-center mb-2">
-                                    <img src="{{ asset('images/dashboard/book.png') }}" alt="Completed"
-                                        class="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10">
+                                class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-green drop-shadow-stats-green">
+
+                                <!-- Books Pattern (scattered icons) -->
+                                <div class="absolute top-0 left-0 w-full h-24 opacity-80 blur-[1px]">
+                                    {{-- <div
+                                        class="absolute top-2 left-4 w-8 h-8 bg-book-icon bg-contain bg-no-repeat rotate-[-15deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-6 left-20 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[25deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-12 left-12 w-4 h-4 bg-book-icon bg-contain bg-no-repeat rotate-[10deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-12 right-12 w-4 h-4 bg-book-icon bg-contain bg-no-repeat rotate-[45deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-5 right-16 w-7 h-7 bg-book-icon bg-contain bg-no-repeat rotate-[35deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 right-2 w-10 h-10 bg-book-icon bg-contain bg-no-repeat rotate-[-20deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-2 left-14 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[-145deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 right-24 w-8 h-8 bg-book-icon bg-contain bg-no-repeat rotate-[-140deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 left-24 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[24deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 left-24 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[24deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 left-24 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[24deg]">
+                                    </div>
+                                    <div
+                                        class="absolute top-1 left-24 w-6 h-6 bg-book-icon bg-contain bg-no-repeat rotate-[24deg]">
+                                    </div> --}}
+
                                 </div>
+
+                                <!-- Icon -->
+                                <div class="flex items-center justify-center mb-2 relative z-10">
+                                    <img src="{{ asset('images/dashboard/book.png') }}" alt="Completed"
+                                        class="w-10 h-10 sm:w-12 sm:h-12 object-contain">
+                                </div>
+
+                                <!-- Number -->
                                 <div class="text-xl sm:text-2xl font-bold relative z-10">2</div>
+
+                                <!-- Label -->
                                 <div class="text-xs sm:text-sm opacity-90 relative z-10">Completed</div>
                             </div>
+
 
 
                             <div
@@ -796,7 +627,8 @@
                                 </div>
                                 <a href="{{ route('achievements.index') }}"
                                     class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
-                                    style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                    style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
+                                    box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                     View All
                                 </a>
                             </div>
@@ -858,7 +690,8 @@
                     <div class="rounded-xl overflow-hidden shadow-md">
                         <!-- Header -->
                         <div
-                            class="bg-gradient-to-r from-orange-500 to-orange-700 flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4">
+                            class="bg-gradient-to-r from-orange-500 to-orange-700 flex flex-col items-start px-4 sm:px-6 py-3 sm:py-4">
+
                             <h1
                                 class="text-white text-xl sm:text-2xl lg:text-3xl font-poppins font-bold tracking-wide flex items-center">
                                 Leaderboards
@@ -868,7 +701,12 @@
                                         d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                 </svg>
                             </h1>
+
+                            <p class="text-xs sm:text-sm text-yellow-100 opacity-90 mt-1">
+                                See the top performing students.
+                            </p>
                         </div>
+
 
 
                         <!-- Body -->

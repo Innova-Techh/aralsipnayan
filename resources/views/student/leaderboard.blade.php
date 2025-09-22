@@ -89,10 +89,10 @@
             </div>
 
             <!-- Bottom Section with Ranked List -->
-            <div class="relative -mx-4 sm:-mx-6 lg:-mx-8  p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10">
-                <div class="bg-white px-6 py-6 space-y-3">
+            <div class="relative -mx-4 sm:-mx-6 lg:-mx-8 p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10">
+                <div class="bg-white px-6 lg:px-24 py-6 space-y-5">
                     <!-- Ranked List Items -->
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">A</span>
                         </div>
@@ -100,12 +100,20 @@
                             <div class="text-white font-semibold">Anderson Silva</div>
                             <div class="text-blue-100 text-sm">VI - Sampaguita</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                                -1px -1px 0 #AE6816, 
+                                                1px -1px 0 #AE6816, 
+                                                -1px 1px 0 #AE6816,
+                                                1px  1px 0 #AE6816,
+                                                -1px  2px 0 #AE6816, 
+                                                1px 2px 0 #AE6816, 
+                                                0 2px 0 #AE6816;">
                             698 pts
                         </div>
                     </div>
 
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">K</span>
                         </div>
@@ -113,12 +121,20 @@
                             <div class="text-white font-semibold">Kate Villamor</div>
                             <div class="text-blue-100 text-sm">VI - Orchid</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                                -1px -1px 0 #AE6816, 
+                                                1px -1px 0 #AE6816, 
+                                                -1px 1px 0 #AE6816,
+                                                1px  1px 0 #AE6816,
+                                                -1px  2px 0 #AE6816, 
+                                                1px 2px 0 #AE6816, 
+                                                0 2px 0 #AE6816;">
                             698 pts
                         </div>
                     </div>
 
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">A</span>
                         </div>
@@ -126,12 +142,20 @@
                             <div class="text-white font-semibold">Angel Lopez</div>
                             <div class="text-blue-100 text-sm">VI - Yellow Bell</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                            -1px -1px 0 #AE6816, 
+                                            1px -1px 0 #AE6816, 
+                                            -1px 1px 0 #AE6816,
+                                            1px  1px 0 #AE6816,
+                                            -1px  2px 0 #AE6816, 
+                                            1px 2px 0 #AE6816, 
+                                            0 2px 0 #AE6816;">
                             698 pts
                         </div>
                     </div>
 
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">J</span>
                         </div>
@@ -139,13 +163,21 @@
                             <div class="text-white font-semibold">Johnson Spear</div>
                             <div class="text-blue-100 text-sm">VI - Jasmin</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                                -1px -1px 0 #AE6816, 
+                                                1px -1px 0 #AE6816, 
+                                                -1px 1px 0 #AE6816,
+                                                1px  1px 0 #AE6816,
+                                                -1px  2px 0 #AE6816, 
+                                                1px 2px 0 #AE6816, 
+                                                0 2px 0 #AE6816;">
                             698 pts
                         </div>
                     </div>
 
                     <!-- Continue with more entries as needed -->
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">S</span>
                         </div>
@@ -153,12 +185,20 @@
                             <div class="text-white font-semibold">Sarah Johnson</div>
                             <div class="text-blue-100 text-sm">VI - Rose</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            650 pts
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                            -1px -1px 0 #AE6816, 
+                                            1px -1px 0 #AE6816, 
+                                            -1px 1px 0 #AE6816,
+                                            1px  1px 0 #AE6816,
+                                            -1px  2px 0 #AE6816, 
+                                            1px 2px 0 #AE6816, 
+                                            0 2px 0 #AE6816;">
+                            698 pts
                         </div>
                     </div>
 
-                    <div class="bg-blue-500 rounded-xl p-4 shadow-md flex items-center">
+                    <div class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
                         <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                             <span class="text-gray-600 font-bold">M</span>
                         </div>
@@ -166,8 +206,16 @@
                             <div class="text-white font-semibold">Michael Chen</div>
                             <div class="text-blue-100 text-sm">VI - Lily</div>
                         </div>
-                        <div class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            620 pts
+                        <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                            style="text-shadow: 
+                                                -1px -1px 0 #AE6816, 
+                                                1px -1px 0 #AE6816, 
+                                                -1px 1px 0 #AE6816,
+                                                1px  1px 0 #AE6816,
+                                                -1px  2px 0 #AE6816, 
+                                                1px 2px 0 #AE6816, 
+                                                0 2px 0 #AE6816;">
+                            698 pts
                         </div>
                     </div>
                 </div>
