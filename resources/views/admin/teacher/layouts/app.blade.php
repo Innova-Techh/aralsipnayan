@@ -232,8 +232,8 @@
                         <!-- User Profile -->
                         <div class="flex items-center space-x-3">
                             <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">{{ Auth::guard('admin')->user()?->username ?? 'Admin' }}</p>
-                                <p class="text-xs text-gray-500">Grade 7 Teacher</p>
+                                <p class="text-sm font-medium text-gray-900">{{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}</p>
+                                <p class="text-xs text-gray-500">Grade 6 Teacher</p>
                             </div>
                             <div class="relative">
                                 <button id="user-menu-button" class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
