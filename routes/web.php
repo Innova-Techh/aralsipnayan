@@ -183,19 +183,12 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('dashboard');
     
     // Assessment Management
-    Route::get('/assessments', function () {
-        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
-        }
-        return view('admin.teacher.assessments.index');
-    })->name('assessments');
+    Route::get('/assessments', [App\Http\Controllers\Teacher\AssessmentController::class, 'index'])->name('assessments');
+    Route::get('/assessments/create', [App\Http\Controllers\Teacher\AssessmentController::class, 'create'])->name('assessments.create');
     
-    Route::get('/assessments/create', function () {
-        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
-        }
-        return view('admin.teacher.assessments.create');
-    })->name('assessments.create');
+    // Assessment Assignment API
+    Route::get('/assessments/students/{section}', [App\Http\Controllers\Teacher\AssessmentController::class, 'getStudentsBySection'])->name('assessments.students');
+    Route::post('/assessments/assign', [App\Http\Controllers\Teacher\AssessmentController::class, 'assignAssessment'])->name('assessments.assign');
     
     // Student Management
     Route::get('/students', function () {
