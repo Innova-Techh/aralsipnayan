@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
             $table->string('firstname', 100);
             $table->string('lastname', 100);
-            $table->string('grade_level_focus', 10)->default('6');
             $table->string('school_name', 150)->default('Pembo Elementary School');
             $table->string('profile_url', 255)->nullable();
             $table->timestamps();
