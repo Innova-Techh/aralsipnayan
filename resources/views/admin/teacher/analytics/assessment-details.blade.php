@@ -30,6 +30,57 @@
         </div>
     </div>
 
+    <!-- Section Filter and Sorting Controls -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Section Filter -->
+                <div class="flex items-center">
+                    <label class="text-sm font-medium text-gray-700 mr-3">Filter by Section:</label>
+                    <form method="GET" class="flex items-center">
+                        <input type="hidden" name="sort" value="{{ $sortBy }}">
+                        <select name="section" onchange="this.form.submit()" 
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="all" {{ $selectedSection === 'all' ? 'selected' : '' }}>All Sections</option>
+                            @foreach($teacherSections as $section)
+                                <option value="{{ $section }}" {{ $selectedSection === $section ? 'selected' : '' }}>
+                                    Section {{ $section }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sorting Options -->
+            <div class="flex items-center">
+                <label class="text-sm font-medium text-gray-700 mr-3">Sort by:</label>
+                <form method="GET" class="flex items-center">
+                    <input type="hidden" name="section" value="{{ $selectedSection }}">
+                    <select name="sort" onchange="this.form.submit()" 
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="accuracy" {{ $sortBy === 'accuracy' ? 'selected' : '' }}>Accuracy</option>
+                        <option value="difficulty" {{ $sortBy === 'difficulty' ? 'selected' : '' }}>Difficulty Level</option>
+                        <option value="time" {{ $sortBy === 'time' ? 'selected' : '' }}>Response Time</option>
+                        <option value="bkt_improvement" {{ $sortBy === 'bkt_improvement' ? 'selected' : '' }}>BKT Improvement</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        
+        @if($selectedSection !== 'all')
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center">
+                <span class="material-symbols-outlined text-blue-600 mr-2">info</span>
+                <p class="text-sm text-blue-800">
+                    Showing data for <strong>Section {{ $selectedSection }}</strong> only. 
+                    <a href="?section=all&sort={{ $sortBy }}" class="text-blue-600 hover:text-blue-800 underline">View all sections</a>
+                </p>
+            </div>
+        </div>
+        @endif
+    </div>
+
     <!-- Assessment Overview -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow p-6">
@@ -171,6 +222,59 @@
     </div>
     @endif
 
+    <!-- Section Performance Breakdown -->
+    @if($selectedSection === 'all' && count($teacherSections) > 1)
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance by Section</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($teacherSections as $section)
+            @php
+                // Get section-specific stats
+                $sectionStats = \DB::table('assessments')
+                    ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                    ->where('assessments.competency', $competency)
+                    ->where('assessments.difficulty_level', $assessmentType)
+                    ->where('assessments.assessment_type', 'regular')
+                    ->where('assessments.status', 'completed')
+                    ->where('student_profile.section', $section)
+                    ->selectRaw('
+                        COUNT(*) as total_assessments,
+                        AVG(assessments.accuracy_percentage) as avg_accuracy,
+                        AVG(assessments.average_response_time) as avg_response_time
+                    ')
+                    ->first();
+            @endphp
+            <div class="border rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-semibold text-gray-900">Section {{ $section }}</h4>
+                    <span class="text-sm text-gray-500">{{ $sectionStats->total_assessments ?? 0 }} attempts</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Avg. Accuracy:</span>
+                        <span class="font-medium 
+                            {{ ($sectionStats->avg_accuracy ?? 0) >= 80 ? 'text-green-600' : 
+                               (($sectionStats->avg_accuracy ?? 0) >= 60 ? 'text-yellow-600' : 'text-red-600') }}">
+                            {{ round($sectionStats->avg_accuracy ?? 0, 1) }}%
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Avg. Time:</span>
+                        <span class="font-medium">{{ round($sectionStats->avg_response_time ?? 0, 1) }}s</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="?section={{ $section }}&sort={{ $sortBy }}" 
+                       class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        View Section Details →
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <!-- Question Details -->
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-6">Question-by-Question Analysis</h3>
@@ -181,7 +285,13 @@
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
                         <div class="flex items-center mb-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            @if($details['accuracy_rate'] < 20)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <span class=" text-xs mr-1">⚠︎</span>
+                                High Difficulty
+                            </span>
+                            @endif
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
                                 {{ $details['accuracy_rate'] >= 70 ? 'bg-green-100 text-green-800' : ($details['accuracy_rate'] >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
                                 {{ $details['accuracy_rate'] }}% Accuracy
                             </span>
@@ -197,6 +307,17 @@
                         <h4 class="text-lg font-medium text-gray-900 mb-2">
                             {{ $details['question']->question_text }}
                         </h4>
+                        @if($details['accuracy_rate'] < 20)
+                        <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="flex items-start">
+                                <span class="material-symbols-outlined text-red-600 mr-2 mt-0.5">info</span>
+                                <div>
+                                    <p class="text-sm font-medium text-red-800">High Difficulty Alert</p>
+                                    <p class="text-sm text-red-700 mt-1">Many students find this question difficult. Consider reviewing the question clarity, explanation, or prerequisite knowledge requirements.</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                     <div class="ml-4 text-right">
                         <div class="text-sm text-gray-500">Avg. Response Time</div>

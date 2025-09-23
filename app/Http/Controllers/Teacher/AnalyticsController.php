@@ -19,22 +19,31 @@ class AnalyticsController extends Controller
             return redirect()->route('admin.login');
         }
 
-        // Get recent assessments with real data
-        $recentAssessments = $this->getRecentAssessments();
+        // Get current teacher's sections
+        $teacherId = Auth::guard('admin')->user()->id;
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacherId)->first();
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        // Get recent assessments with real data (filtered by teacher sections)
+        $recentAssessments = $this->getRecentAssessments($teacherSections);
         
-        // Get overall statistics
-        $statistics = $this->getOverallStatistics();
+        // Get overall statistics (filtered by teacher sections)
+        $statistics = $this->getOverallStatistics($teacherSections);
 
         return view('admin.teacher.analytics.index', [
             'recentAssessments' => $recentAssessments,
-            'statistics' => $statistics
+            'statistics' => $statistics,
+            'teacherSections' => $teacherSections
         ]);
     }
 
     /**
      * Show detailed assessment view
      */
-    public function showAssessmentDetails($assessmentId)
+    public function showAssessmentDetails(Request $request, $assessmentId)
     {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
             return redirect()->route('admin.login');
@@ -49,6 +58,18 @@ class AnalyticsController extends Controller
 
         $competency = $parts[0] . '_' . $parts[1]; // Reconstruct competency (e.g., number_algebra)
         $assessmentType = $parts[2] ?? 'regular'; // Get assessment type
+
+        // Get current teacher's sections
+        $teacherId = Auth::guard('admin')->user()->id;
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacherId)->first();
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        // Get selected section from request (default to all sections)
+        $selectedSection = $request->get('section', 'all');
+        $sortBy = $request->get('sort', 'accuracy'); // accuracy, difficulty, time, bkt_improvement
 
         // Get assessment summary info
         $assessmentSummary = DB::table('assessments')
@@ -72,42 +93,50 @@ class AnalyticsController extends Controller
                 ->with('error', 'Assessment not found.');
         }
 
-        // Get detailed question statistics for this assessment type
-        $questionDetails = $this->getQuestionStatisticsForType($competency, $assessmentType);
+        // Get detailed question statistics for this assessment type with section filtering
+        $questionDetails = $this->getQuestionStatisticsForType($competency, $assessmentType, $selectedSection, $teacherSections);
         
         // Get overall assessment statistics
-        $assessmentStats = $this->getAssessmentStatisticsForType($competency, $assessmentType);
+        $assessmentStats = $this->getAssessmentStatisticsForType($competency, $assessmentType, $selectedSection, $teacherSections);
+
+        // Sort question details
+        $questionDetails = $this->sortQuestionDetails($questionDetails, $sortBy);
 
         return view('admin.teacher.analytics.assessment-details', [
             'assessment' => $assessmentSummary,
             'questionDetails' => $questionDetails,
             'assessmentStats' => $assessmentStats,
             'competency' => $competency,
-            'assessmentType' => $assessmentType
+            'assessmentType' => $assessmentType,
+            'teacherSections' => $teacherSections,
+            'selectedSection' => $selectedSection,
+            'sortBy' => $sortBy
         ]);
     }
 
     /**
      * Get recent assessments with real data
      */
-    private function getRecentAssessments()
+    private function getRecentAssessments($teacherSections = [])
     {
         try {
             // Get unique assessment types (competency + difficulty combinations) with their latest completion date
-            // Only include regular assessments, exclude diagnostics
+            // Only include regular assessments, exclude diagnostics, filtered by teacher sections
             $results = DB::table('assessments')
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
                 ->select([
-                    'competency',
-                    'difficulty_level',
-                    DB::raw('MAX(completed_at) as latest_completed_at'),
+                    'assessments.competency',
+                    'assessments.difficulty_level',
+                    DB::raw('MAX(assessments.completed_at) as latest_completed_at'),
                     DB::raw('COUNT(*) as total_completed'),
-                    DB::raw('SUM(questions_answered) as total_questions_answered')
+                    DB::raw('SUM(assessments.questions_answered) as total_questions_answered')
                 ])
-                ->where('status', 'completed')
-                ->where('assessment_type', 'regular') // Only regular assessments
-                ->whereNotNull('completed_at')
-                ->where('questions_answered', '>', 0)
-                ->groupBy('competency', 'difficulty_level')
+                ->where('assessments.status', 'completed')
+                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->whereNotNull('assessments.completed_at')
+                ->where('assessments.questions_answered', '>', 0)
+                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
+                ->groupBy('assessments.competency', 'assessments.difficulty_level')
                 ->orderBy('latest_completed_at', 'desc')
                 ->limit(10)
                 ->get();
@@ -142,28 +171,34 @@ class AnalyticsController extends Controller
     /**
      * Get overall statistics
      */
-    private function getOverallStatistics()
+    private function getOverallStatistics($teacherSections = [])
     {
         try {
             $totalAssessments = DB::table('assessments')
-                ->where('status', 'completed')
-                ->where('assessment_type', 'regular') // Only regular assessments
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                ->where('assessments.status', 'completed')
+                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
                 ->count();
 
-            $totalStudents = DB::table('users')
-                ->where('role', 'Student')
+            $totalStudents = DB::table('student_profile')
+                ->whereIn('section', $teacherSections) // Only students in teacher's sections
                 ->count();
 
             $avgAccuracy = DB::table('assessments')
-                ->where('status', 'completed')
-                ->where('assessment_type', 'regular') // Only regular assessments
-                ->whereNotNull('accuracy_percentage')
-                ->avg('accuracy_percentage');
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                ->where('assessments.status', 'completed')
+                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
+                ->whereNotNull('assessments.accuracy_percentage')
+                ->avg('assessments.accuracy_percentage');
 
             $completionRate = DB::table('assessments')
-                ->where('assessment_type', 'regular') // Only regular assessments
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
                 ->selectRaw('
-                    COUNT(CASE WHEN status = "completed" THEN 1 END) as completed,
+                    COUNT(CASE WHEN assessments.status = "completed" THEN 1 END) as completed,
                     COUNT(*) as total
                 ')
                 ->first();
@@ -190,17 +225,28 @@ class AnalyticsController extends Controller
     /**
      * Get question-level statistics for a specific assessment type
      */
-    private function getQuestionStatisticsForType($competency, $assessmentType)
+    private function getQuestionStatisticsForType($competency, $assessmentType, $selectedSection = 'all', $teacherSections = [])
     {
         try {
-            // Get all questions that were used in this assessment type
-            $questionStats = DB::table('question_responses')
+            // Build the base query
+            $query = DB::table('question_responses')
                 ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
                 ->join('assessments', 'question_responses.assessment_id', '=', 'assessments.assessment_id')
+                ->join('student_profile', 'question_responses.user_id', '=', 'student_profile.user_id')
                 ->where('assessments.competency', $competency)
                 ->where('assessments.difficulty_level', $assessmentType)
                 ->where('assessments.assessment_type', 'regular') // Only regular assessments
-                ->where('assessments.status', 'completed')
+                ->where('assessments.status', 'completed');
+
+            // Filter by section if not 'all'
+            if ($selectedSection !== 'all' && in_array($selectedSection, $teacherSections)) {
+                $query->where('student_profile.section', $selectedSection);
+            } else {
+                // Only show sections that the teacher handles
+                $query->whereIn('student_profile.section', $teacherSections);
+            }
+
+            $questionStats = $query
                 ->select([
                     'questions.question_id',
                     'questions.question_text',
@@ -333,33 +379,56 @@ class AnalyticsController extends Controller
     /**
      * Get overall assessment statistics for a specific assessment type
      */
-    private function getAssessmentStatisticsForType($competency, $assessmentType)
+    private function getAssessmentStatisticsForType($competency, $assessmentType, $selectedSection = 'all', $teacherSections = [])
     {
         try {
-            // Get overall statistics for this assessment type
-            $overallStats = DB::table('assessments')
-                ->where('competency', $competency)
-                ->where('difficulty_level', $assessmentType)
-                ->where('assessment_type', 'regular') // Only regular assessments
-                ->where('status', 'completed')
-                ->selectRaw('
-                    COUNT(*) as total_assessments,
-                    AVG(questions_answered) as avg_questions,
-                    AVG(correct_answers) as avg_correct,
-                    AVG(accuracy_percentage) as avg_accuracy,
-                    SUM(total_time_spent) as total_time,
-                    AVG(average_response_time) as avg_response_time
-                ')
-                ->first();
-
-            // Get difficulty breakdown
-            $difficultyBreakdown = DB::table('question_responses')
-                ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
-                ->join('assessments', 'question_responses.assessment_id', '=', 'assessments.assessment_id')
+            // Build base query for assessments
+            $assessmentQuery = DB::table('assessments')
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
                 ->where('assessments.competency', $competency)
                 ->where('assessments.difficulty_level', $assessmentType)
                 ->where('assessments.assessment_type', 'regular') // Only regular assessments
-                ->where('assessments.status', 'completed')
+                ->where('assessments.status', 'completed');
+
+            // Filter by section if not 'all'
+            if ($selectedSection !== 'all' && in_array($selectedSection, $teacherSections)) {
+                $assessmentQuery->where('student_profile.section', $selectedSection);
+            } else {
+                // Only show sections that the teacher handles
+                $assessmentQuery->whereIn('student_profile.section', $teacherSections);
+            }
+
+            // Get overall statistics for this assessment type
+            $overallStats = $assessmentQuery
+                ->selectRaw('
+                    COUNT(*) as total_assessments,
+                    AVG(assessments.questions_answered) as avg_questions,
+                    AVG(assessments.correct_answers) as avg_correct,
+                    AVG(assessments.accuracy_percentage) as avg_accuracy,
+                    SUM(assessments.total_time_spent) as total_time,
+                    AVG(assessments.average_response_time) as avg_response_time
+                ')
+                ->first();
+
+            // Get difficulty breakdown with section filtering
+            $difficultyQuery = DB::table('question_responses')
+                ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
+                ->join('assessments', 'question_responses.assessment_id', '=', 'assessments.assessment_id')
+                ->join('student_profile', 'question_responses.user_id', '=', 'student_profile.user_id')
+                ->where('assessments.competency', $competency)
+                ->where('assessments.difficulty_level', $assessmentType)
+                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->where('assessments.status', 'completed');
+
+            // Filter by section if not 'all'
+            if ($selectedSection !== 'all' && in_array($selectedSection, $teacherSections)) {
+                $difficultyQuery->where('student_profile.section', $selectedSection);
+            } else {
+                // Only show sections that the teacher handles
+                $difficultyQuery->whereIn('student_profile.section', $teacherSections);
+            }
+
+            $difficultyBreakdown = $difficultyQuery
                 ->selectRaw('
                     questions.difficulty_level,
                     COUNT(*) as total,
@@ -439,5 +508,46 @@ class AnalyticsController extends Controller
             'competency' => $assessment->competency ?? 'Unknown',
             'difficulty_level' => $assessment->difficulty_level ?? 'Unknown'
         ];
+    }
+
+    /**
+     * Sort question details based on the specified criteria
+     */
+    private function sortQuestionDetails($questionDetails, $sortBy)
+    {
+        switch ($sortBy) {
+            case 'accuracy':
+                uasort($questionDetails, function ($a, $b) {
+                    return $b['accuracy_rate'] <=> $a['accuracy_rate'];
+                });
+                break;
+            case 'difficulty':
+                uasort($questionDetails, function ($a, $b) {
+                    $difficultyOrder = ['beginner' => 1, 'intermediate' => 2, 'advanced' => 3];
+                    $aOrder = $difficultyOrder[$a['question']->difficulty_level] ?? 0;
+                    $bOrder = $difficultyOrder[$b['question']->difficulty_level] ?? 0;
+                    return $aOrder <=> $bOrder;
+                });
+                break;
+            case 'time':
+                uasort($questionDetails, function ($a, $b) {
+                    return $a['avg_response_time'] <=> $b['avg_response_time'];
+                });
+                break;
+            case 'bkt_improvement':
+                uasort($questionDetails, function ($a, $b) {
+                    $aImprovement = $a['bkt_improvement'] ?? 0;
+                    $bImprovement = $b['bkt_improvement'] ?? 0;
+                    return $bImprovement <=> $aImprovement;
+                });
+                break;
+            default:
+                // Default to accuracy sorting
+                uasort($questionDetails, function ($a, $b) {
+                    return $b['accuracy_rate'] <=> $a['accuracy_rate'];
+                });
+        }
+        
+        return $questionDetails;
     }
 }

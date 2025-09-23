@@ -8,6 +8,24 @@
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
         <p class="text-gray-600 mt-1">Track student performance and assessment insights</p>
+        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center">
+                <span class="material-symbols-outlined text-blue-600 mr-2">info</span>
+                <div>
+                    <p class="text-sm font-medium text-blue-800">Your Assigned Sections</p>
+                    <p class="text-sm text-blue-700">
+                        @if(count($teacherSections) > 0)
+                            You handle: 
+                            @foreach($teacherSections as $index => $section)
+                                <strong>Section {{ $section }}</strong>@if($index < count($teacherSections) - 1), @endif
+                            @endforeach
+                        @else
+                            No sections assigned yet.
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Overview Cards -->
@@ -113,7 +131,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students Attempted</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Of Questions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total No. Of Questions Answered</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latest Date</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -128,7 +146,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             <div>
-                                <div class="italic">Sampaguita</div>
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($teacherSections as $section)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            Section {{ $section }}
+                                        </span>
+                                    @endforeach
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -137,7 +161,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ number_format($assessment->total_questions_answered) }} questions
+                            {{ $assessment->total_questions_answered ?? 0 }} questions
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $assessment->formatted_date }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
