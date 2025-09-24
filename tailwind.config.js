@@ -34,6 +34,72 @@ export default {
                 "primary-yellow": "#FBBF24",
                 "custom-purple": "#4F46E5",
                 "custom-cyan": "#06B6D4",
+                // Level Up System Colors
+                "level-bronze": {
+                    "card-from": "#C77C3E",
+                    "card-to": "#5A2E12",
+                    stroke: "#3B1F0C",
+                    "badge-from": "#E69B56",
+                    "badge-to": "#5A2E12",
+                    shadow: "#4D2A12",
+                    title: "#FFFFFF",
+                    xp: "#FFF3E6",
+                    labels: "#FFD9B3",
+                    message: "#E0C3A0",
+                },
+                "level-silver": {
+                    "card-from": "#D9E3F2",
+                    "card-to": "#3C4757",
+                    stroke: "#2A313D",
+                    "badge-from": "#F2F6FA",
+                    "badge-to": "#3C4757",
+                    shadow: "#2E3642",
+                    title: "#FFFFFF",
+                    xp: "#F9FBFF",
+                    labels: "#E2E8F3",
+                    message: "#FFFFFF",
+                },
+                "level-gold-early": {
+                    "card-from": "#D9E3F2",
+                    "card-to": "#3C4757",
+                    stroke: "#2A313D",
+                    "badge-from": "#F2F6FA",
+                    "badge-to": "#3C4757",
+                    shadow: "#2E3642",
+                    title: "#FFFFFF",
+                    "title-stroke": "#5A3A00",
+                    xp: "#F9FBFF",
+                    labels: "#E2E8F3",
+                    message: "#FFFFFF",
+                },
+                "level-gold": {
+                    "card-from": "#FFD55C",
+                    "card-to": "#7A4B0E",
+                    stroke: "#4D3009",
+                    "badge-from": "#FFE58A",
+                    "badge-to": "#7A4B0E",
+                    shadow: "#5C3A0F",
+                    title: "#FFFFFF",
+                    xp: "#FFF7E6",
+                    labels: "#FFECCC",
+                    message: "#FFFFFF",
+                },
+                "level-topaz": {
+                    "card-from": "#F6A43B",
+                    "card-to": "#A64906",
+                    stroke: "#7C3304",
+                    "badge-from": "#FFD59E",
+                    "badge-to": "#B65A0B",
+                    "badge-stroke": "#9C5B0C",
+                    shadow: "#663308",
+                    title: "#FFFFFF",
+                    xp: "#FFF2E2",
+                    labels: "#FFE9D1",
+                    message: "#FFFFFF",
+                    "button-from": "#FFB74A",
+                    "button-to": "#A64906",
+                    "button-stroke": "#5A2503",
+                },
                 border: "#E2E8F0",
                 input: "#E2E8F0",
                 ring: "#E2E8F0",
@@ -163,6 +229,10 @@ export default {
                     "0%": { transform: "rotateY(180deg)" },
                     "100%": { transform: "rotateY(0deg)" },
                 },
+                shimmer: {
+                    "0%": { transform: "translateX(-100%)" },
+                    "100%": { transform: "translateX(100%)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
@@ -172,14 +242,12 @@ export default {
                 "gradient-x": "gradient-x 15s ease infinite",
                 flip: "flip 0.7s ease-in-out",
                 "flip-back": "flip-back 0.7s ease-in-out",
+                shimmer: "shimmer 2s ease-in-out infinite",
             },
             backgroundImage: {
                 "book-icon": `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23006C2B' stroke-width='1' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'><path d='M12 7v14'/><path d='M3 18a1 1 0 0 1-1-1V4h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5v13h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/></svg>")`,
-
                 "flame-icon": `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'><path d='M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4'/></svg>")`,
-
                 "trophy-icon": `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'><path d='M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978'/><path d='M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978'/><path d='M18 9h1.5a1 1 0 0 0 0-5H18'/><path d='M4 22h16'/><path d='M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z'/><path d='M6 9H4.5a1 1 0 0 1 0-5H6'/></svg>")`,
-
                 "star-icon": `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='1' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'><path d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z'/></svg>")`,
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "radial-center":
@@ -198,6 +266,31 @@ radial-gradient(circle at center,
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
                 "mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #F59E0B 0px, transparent 50%), radial-gradient(at 0% 50%, #1E293B 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #F59E0B 0px, transparent 50%), radial-gradient(at 80% 100%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 0%, #1E3A8A 0px, transparent 50%)",
+                // Level Up System Gradients
+                "level-bronze-card":
+                    "linear-gradient(to bottom, #C77C3E, #5A2E12)",
+                "level-bronze-badge":
+                    "linear-gradient(to bottom, #E69B56, #5A2E12)",
+                "level-bronze-button":
+                    "linear-gradient(to bottom, #E69B56, #5A2E12)",
+                "level-silver-card":
+                    "linear-gradient(to bottom, #D9E3F2, #3C4757)",
+                "level-silver-badge":
+                    "linear-gradient(to bottom, #F2F6FA, #3C4757)",
+                "level-silver-button":
+                    "linear-gradient(to bottom, #F2F6FA, #3C4757)",
+                "level-gold-card":
+                    "linear-gradient(to bottom, #FFD55C, #7A4B0E)",
+                "level-gold-badge":
+                    "linear-gradient(to bottom, #FFE58A, #7A4B0E)",
+                "level-gold-button":
+                    "linear-gradient(to bottom, #FFE58A, #7A4B0E)",
+                "level-topaz-card":
+                    "linear-gradient(to bottom, #F6A43B, #A64906)",
+                "level-topaz-badge":
+                    "linear-gradient(to bottom, #FFD59E, #B65A0B)",
+                "level-topaz-button":
+                    "linear-gradient(to bottom, #FFB74A, #A64906)",
                 "blue-mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #1E3A8A 0px, transparent 50%), radial-gradient(at 0% 50%, #06B6D4 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #1E3A8A 0px, transparent 50%), radial-gradient(at 80% 100%, #06B6D4 0px, transparent 50%), radial-gradient(at 0% 0%, #1E293B 0px, transparent 50%)",
                 "avatar-selection":
@@ -268,6 +361,35 @@ radial-gradient(circle at center,
                 "achievement-blue": "4px 4px 0 #104373",
                 "leaderboard-container": "0 8px 0 #2960BB",
                 "leaderboard-points": "0 4px 0 #AE6816",
+                // Level Up System Drop Shadows
+                "level-bronze-badge": "0 4px 0 #4D2A12",
+                "level-bronze-button": "0 4px 0 #4D2A12",
+                "level-bronze-text": "0 3px 0 #4D2A12",
+                "level-silver-badge": "0 4px 0 #2E3642",
+                "level-silver-button": "0 4px 0 #2E3642",
+                "level-silver-text": "0 3px 0 #2E3642",
+                "level-gold-badge": "0 4px 0 #5C3A0F",
+                "level-gold-button": "0 4px 0 #5C3A0F",
+                "level-gold-text": "0 3px 0 #5C3A0F",
+                "level-topaz-badge": "0 4px 0 #663308",
+                "level-topaz-button": "0 4px 0 #5A2503",
+                "level-topaz-text": "0 3px 0 #9C5B0C",
+                // Extended level system shadows for all 10 tiers
+                "level-emerald-badge": "0 4px 0 #064E3B",
+                "level-emerald-button": "0 4px 0 #064E3B",
+                "level-emerald-text": "0 3px 0 #065F46",
+                "level-ruby-badge": "0 4px 0 #7F1D1D",
+                "level-ruby-button": "0 4px 0 #7F1D1D",
+                "level-ruby-text": "0 3px 0 #991B1B",
+                "level-amethyst-badge": "0 4px 0 #581C87",
+                "level-amethyst-button": "0 4px 0 #581C87",
+                "level-amethyst-text": "0 3px 0 #6D28D9",
+                "level-sapphire-badge": "0 4px 0 #1E3A8A",
+                "level-sapphire-button": "0 4px 0 #1E3A8A",
+                "level-sapphire-text": "0 3px 0 #1D4ED8",
+                "level-diamond-badge": "0 4px 0 #475569",
+                "level-diamond-button": "0 4px 0 #475569",
+                "level-diamond-text": "0 3px 0 #64748B",
             },
         },
     },
@@ -312,6 +434,43 @@ radial-gradient(circle at center,
                     boxShadow:
                         "inset 4px 4px 2px #104373, inset -2px 4px 4px #104373",
                 },
+                // Level Up System Inner Shadows
+                ".shadow-inner-level-bronze": {
+                    boxShadow:
+                        "inset 4px 4px 2px #4D2A12, inset -2px 4px 4px #8B4513",
+                },
+                ".shadow-inner-level-silver": {
+                    boxShadow:
+                        "inset 4px 4px 2px #2E3642, inset -2px 4px 4px #607A8B",
+                },
+                ".shadow-inner-level-gold": {
+                    boxShadow:
+                        "inset 4px 4px 2px #5C3A0F, inset -2px 4px 4px #B8860B",
+                },
+                ".shadow-inner-level-topaz": {
+                    boxShadow:
+                        "inset 4px 4px 2px #663308, inset -2px 4px 4px #CD853F",
+                },
+                ".shadow-inner-level-emerald": {
+                    boxShadow:
+                        "inset 4px 4px 2px #064E3B, inset -2px 4px 4px #2E8B57",
+                },
+                ".shadow-inner-level-ruby": {
+                    boxShadow:
+                        "inset 4px 4px 2px #7F1D1D, inset -2px 4px 4px #DC143C",
+                },
+                ".shadow-inner-level-amethyst": {
+                    boxShadow:
+                        "inset 4px 4px 2px #581C87, inset -2px 4px 4px #9932CC",
+                },
+                ".shadow-inner-level-sapphire": {
+                    boxShadow:
+                        "inset 4px 4px 2px #1E3A8A, inset -2px 4px 4px #4169E1",
+                },
+                ".shadow-inner-level-diamond": {
+                    boxShadow:
+                        "inset 4px 4px 2px #475569, inset -2px 4px 4px #B0C4DE",
+                },
             });
         }),
 
@@ -334,6 +493,105 @@ radial-gradient(circle at center,
                 },
                 { values: theme("colors"), type: "color" }
             );
+        }),
+
+        plugin(function ({ matchUtilities, theme }) {
+            // Level-specific gradient utilities
+            matchUtilities(
+                {
+                    "bg-level-gradient": (value) => {
+                        const gradients = {
+                            bronze: "linear-gradient(to bottom, #C77C3E, #5A2E12)",
+                            silver: "linear-gradient(to bottom, #D9E3F2, #3C4757)",
+                            "gold-early":
+                                "linear-gradient(to bottom, #D9E3F2, #3C4757)",
+                            gold: "linear-gradient(to bottom, #FFD55C, #7A4B0E)",
+                            topaz: "linear-gradient(to bottom, #F6A43B, #A64906)",
+                            emerald:
+                                "linear-gradient(to bottom, #10B981, #047857)",
+                            ruby: "linear-gradient(to bottom, #DC2626, #991B1B)",
+                            amethyst:
+                                "linear-gradient(to bottom, #8B5CF6, #6D28D9)",
+                            sapphire:
+                                "linear-gradient(to bottom, #3B82F6, #1E40AF)",
+                            diamond:
+                                "linear-gradient(to bottom, #F8FAFC, #64748B)",
+                        };
+                        return {
+                            backgroundImage:
+                                gradients[value] || gradients.bronze,
+                        };
+                    },
+                },
+                {
+                    values: [
+                        "bronze",
+                        "silver",
+                        "gold-early",
+                        "gold",
+                        "topaz",
+                        "emerald",
+                        "ruby",
+                        "amethyst",
+                        "sapphire",
+                        "diamond",
+                    ],
+                }
+            );
+        }),
+
+        plugin(function ({ addUtilities }) {
+            // Level tier utility classes for easy application
+            addUtilities({
+                ".level-bronze-theme": {
+                    "--level-card-from": "#C77C3E",
+                    "--level-card-to": "#5A2E12",
+                    "--level-stroke": "#3B1F0C",
+                    "--level-badge-from": "#E69B56",
+                    "--level-badge-to": "#5A2E12",
+                    "--level-shadow": "#4D2A12",
+                    "--level-title": "#FFFFFF",
+                    "--level-xp": "#FFF3E6",
+                    "--level-labels": "#FFD9B3",
+                    "--level-message": "#E0C3A0",
+                },
+                ".level-silver-theme": {
+                    "--level-card-from": "#D9E3F2",
+                    "--level-card-to": "#3C4757",
+                    "--level-stroke": "#2A313D",
+                    "--level-badge-from": "#F2F6FA",
+                    "--level-badge-to": "#3C4757",
+                    "--level-shadow": "#2E3642",
+                    "--level-title": "#FFFFFF",
+                    "--level-xp": "#F9FBFF",
+                    "--level-labels": "#E2E8F3",
+                    "--level-message": "#FFFFFF",
+                },
+                ".level-gold-theme": {
+                    "--level-card-from": "#FFD55C",
+                    "--level-card-to": "#7A4B0E",
+                    "--level-stroke": "#4D3009",
+                    "--level-badge-from": "#FFE58A",
+                    "--level-badge-to": "#7A4B0E",
+                    "--level-shadow": "#5C3A0F",
+                    "--level-title": "#FFFFFF",
+                    "--level-xp": "#FFF7E6",
+                    "--level-labels": "#FFECCC",
+                    "--level-message": "#FFFFFF",
+                },
+                ".level-topaz-theme": {
+                    "--level-card-from": "#F6A43B",
+                    "--level-card-to": "#A64906",
+                    "--level-stroke": "#7C3304",
+                    "--level-badge-from": "#FFD59E",
+                    "--level-badge-to": "#B65A0B",
+                    "--level-shadow": "#663308",
+                    "--level-title": "#FFFFFF",
+                    "--level-xp": "#FFF2E2",
+                    "--level-labels": "#FFE9D1",
+                    "--level-message": "#FFFFFF",
+                },
+            });
         }),
     ],
 };

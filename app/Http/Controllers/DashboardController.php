@@ -56,7 +56,16 @@ class DashboardController extends Controller
             array_slice($leaderboardData['ranking_list'] ?? [], 0, 2)
         );
 
-        return view('student.dashboard', compact('recentAchievements', 'leaderboardData', 'leaderboardTop5', 'userAvatarUrl'));
+        // REMOVED: Level-Up System Data (for UI-only version)
+        // This will be added back when we implement the full backend
+        
+        return view('student.dashboard', compact(
+            'recentAchievements', 
+            'leaderboardData', 
+            'leaderboardTop5', 
+            'userAvatarUrl',
+            'userProfile'   // Add user profile for dashboard stats
+        ));
     }
     
     /**
@@ -72,12 +81,16 @@ class DashboardController extends Controller
             ], 401);
         }
         
-        // Replace with actual database queries
+        // Basic stats without level-up system (for now)
         return response()->json([
             'completed_lessons' => 2,
-            'total_points' => 1250,
+            'total_points' => $user->studentProfile?->total_points ?? 0,
+            'current_streak' => $user->studentProfile?->current_streak ?? 0,
             'current_rank' => 4,
             'grade_average' => 'A',
+            // Mock level data for UI
+            'current_level' => 3,
+            'current_xp' => 460,
         ]);
     }
 }

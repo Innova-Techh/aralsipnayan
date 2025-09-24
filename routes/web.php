@@ -16,6 +16,7 @@ use App\Http\Controllers\Student\QuizController as StudentQuizController;
 use App\Http\Controllers\Student\RegularAssessmentController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
+use App\Http\Controllers\LevelUpController;
 
 // Homepage
 Route::get('/', function () {
@@ -56,13 +57,20 @@ Route::get('/dashboard', function() {
     return redirect()->route('login');
 })->name('dashboard');
 
-
-
 // Rank Controller Routes
 Route::middleware('auth:student')->group(function () {
     Route::get('/api/user-rank', [RankController::class, 'getUserRankData'])->name('rank.user-data');
     Route::post('/api/award-xp', [RankController::class, 'awardXP'])->name('rank.award-xp');
 });
+
+// Level Up System Routes
+// Route::middleware(['auth:student'])->group(function () {
+//     // Get current progress
+//     Route::get('/level-up/progress', [LevelUpController::class, 'getCurrentProgress'])->name('level-up.progress');
+    
+//     // Add XP and check for level up
+//     Route::post('/level-up/add-xp', [LevelUpController::class, 'addXP'])->name('level-up.add-xp');
+// });
 
 // Student Onboarding Routes (no middleware restrictions)
 Route::prefix('student/onboarding')->name('student.onboarding.')->group(function () {
@@ -296,18 +304,11 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
     Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
-});
-
-// Add these routes after your existing auth middleware group
-Route::middleware(['student.auth'])->group(function () {
+    
     // Login streak routes
     Route::get('/check-login-streak', [App\Http\Controllers\LoginStreakController::class, 'checkStreak'])->name('login-streak.check');
     Route::get('/streak-data', [App\Http\Controllers\LoginStreakController::class, 'getStreakData'])->name('login-streak.data');
     
     // Login streak page
     Route::get('/login-streak', [App\Http\Controllers\LoginStreakController::class, 'showStreakPage'])->name('login-streak.page');
-    
-    // Existing routes...
-    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
-    // ... rest of your existing routes
 });

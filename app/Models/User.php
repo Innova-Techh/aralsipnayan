@@ -17,6 +17,7 @@ class User extends Authenticatable
         'role',
         'last_login_date',
         'status',
+        'xp', // Add XP field for level-up system
     ];
 
     protected $hidden = [
@@ -27,6 +28,7 @@ class User extends Authenticatable
     protected $casts = [
         'last_login_date' => 'datetime',
         'password' => 'hashed',
+        'xp' => 'integer', // Ensure XP is cast as integer
     ];
 
     /*
@@ -49,7 +51,6 @@ class User extends Authenticatable
         return $this->hasOne(AdminProfile::class);
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Role Helpers
@@ -68,5 +69,46 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'Admin';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Level System Helpers
+    |--------------------------------------------------------------------------
+    */
+    
+    /**
+     * Add XP to the user
+     */
+    public function addXP(int $amount): self
+    {
+        $this->increment('xp', $amount);
+        return $this;
+    }
+
+    /**
+     * Get current level based on XP
+     */
+    public function getCurrentLevel(): int
+    {
+        $levelUpController = new \App\Http\Controllers\LevelUpController();
+        return $levelUpController->calculateLevel($this->xp ?? 0);
+    }
+
+    /**
+     * Get progress information for the user
+     */
+    public function getProgressInfo(): array
+    {
+        $levelUpController = new \App\Http\Controllers\LevelUpController();
+        return $levelUpController->getProgressInfo($this->xp ?? 0);
+    }
+
+    /**
+     * Get XP attribute with default value
+     */
+    public function getXpAttribute($value)
+    {
+        return $value ?? 0;
     }
 }
