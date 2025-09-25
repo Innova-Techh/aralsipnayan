@@ -263,10 +263,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -555,7 +555,7 @@
                                 const tierData = {
                                     bronze: {
                                         tier: 'bronze',
-                                        new_level: 7,
+                                        new_level: 10,
                                         xp_gained: 150,
                                         points_gained: 200,
                                         rank_image: 'rank-1.png',
@@ -564,7 +564,7 @@
                                     },
                                     silver: {
                                         tier: 'silver',
-                                        new_level: 15,
+                                        new_level: 20,
                                         xp_gained: 300,
                                         points_gained: 400,
                                         rank_image: 'rank-2.png',
@@ -573,48 +573,75 @@
                                     },
                                     gold: {
                                         tier: 'gold',
-                                        new_level: 35,
+                                        new_level: 30,
                                         xp_gained: 500,
                                         points_gained: 600,
+                                        rank_image: 'rank-3.png',
+                                        rank_title: 'Math Seeker',
+                                        message: 'You are showing great potential!'
+                                    },
+                                    topaz: {
+                                        tier: 'topaz',
+                                        new_level: 40,
+                                        xp_gained: 750,
+                                        points_gained: 800,
                                         rank_image: 'rank-4.png',
                                         rank_title: 'Math Strategist',
                                         message: 'You are mastering advanced concepts!'
                                     },
-                                    topaz: {
-                                        tier: 'topaz',
-                                        new_level: 45,
-                                        xp_gained: 750,
-                                        points_gained: 800,
+                                    emerald: {
+                                        tier: 'emerald',
+                                        new_level: 50,
+                                        xp_gained: 1000,
+                                        points_gained: 1200,
                                         rank_image: 'rank-5.png',
                                         rank_title: 'Math Innovator',
                                         message: 'You are reaching new mathematical heights!'
                                     },
-                                    emerald: {
-                                        tier: 'emerald',
-                                        new_level: 55,
-                                        xp_gained: 1000,
-                                        points_gained: 1200,
+                                    ruby: {
+                                        tier: 'ruby',
+                                        new_level: 60,
+                                        xp_gained: 1250,
+                                        points_gained: 1500,
                                         rank_image: 'rank-6.png',
                                         rank_title: 'Math Prodigy',
                                         message: 'Your mathematical prowess is extraordinary!'
                                     },
-                                    ruby: {
-                                        tier: 'ruby',
-                                        new_level: 65,
-                                        xp_gained: 1250,
-                                        points_gained: 1500,
+                                    amethyst: {
+                                        tier: 'amethyst',
+                                        new_level: 70,
+                                        xp_gained: 1500,
+                                        points_gained: 1800,
                                         rank_image: 'rank-7.png',
                                         rank_title: 'Math Virtuoso',
                                         message: 'You have achieved mathematical excellence!'
                                     },
+                                    tanzite: {
+                                        tier: 'tanzite',
+                                        new_level: 80,
+                                        xp_gained: 1750,
+                                        points_gained: 2000,
+                                        rank_image: 'rank-8.png',
+                                        rank_title: 'Math Sage',
+                                        message: 'You are becoming a mathematical virtuoso!'
+                                    },
+                                    sapphire: {
+                                        tier: 'sapphire',
+                                        new_level: 90,
+                                        xp_gained: 2000,
+                                        points_gained: 2200,
+                                        rank_image: 'rank-9.png',
+                                        rank_title: 'Math Champion',
+                                        message: 'You have reached the highest levels of mastery!'
+                                    },
                                     prismatic: {
                                         tier: 'prismatic',
-                                        new_level: 95,
-                                        xp_gained: 2000,
-                                        points_gained: 2500,
+                                        new_level: 100,
+                                        xp_gained: 2500,
+                                        points_gained: 3000,
                                         rank_image: 'rank-10.png',
                                         rank_title: 'Math Grandmaster',
-                                        message: 'You have reached the pinnacle of mathematical mastery!'
+                                        message: 'You have achieved the ultimate mathematical pinnacle!'
                                     }
                                 };
 
@@ -626,7 +653,6 @@
                                     showLevelUpModal(tierData[tierName]);
                                 }, 200);
                             }
-
                             // Close panel when clicking outside
                             document.addEventListener('click', function (event) {
                                 const panel = document.getElementById('testPanel');
@@ -905,7 +931,7 @@
                                 <a href="{{ route('achievements.index') }}"
                                     class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
                                     style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
-                                                                                                        box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                                                                                box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                     View All
                                 </a>
                             </div>

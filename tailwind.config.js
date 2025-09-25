@@ -75,7 +75,7 @@ export default {
                     "button-stroke": "#2E3642",
                     "button-shadow": "#2E3642",
                 },
-                // Gold Tier (Levels 21-40)
+                // Gold Tier (Levels 21-30) - CORRECTED RANGE
                 "level-gold": {
                     "card-from": "#FFD55C",
                     "card-to": "#7A4B0E",
@@ -95,7 +95,7 @@ export default {
                     "button-stroke": "#5C3A0F",
                     "button-shadow": "#5C3A0F",
                 },
-                // Topaz Tier (Levels 41-50)
+                // Topaz Tier (Levels 31-40) - CORRECTED RANGE
                 "level-topaz": {
                     "card-from": "#F6A43B",
                     "card-to": "#A64906",
@@ -116,7 +116,7 @@ export default {
                     "button-stroke": "#5A2503",
                     "button-shadow": "#5A2503",
                 },
-                // Emerald Tier (Levels 51-60)
+                // Emerald Tier (Levels 41-50) - CORRECTED RANGE
                 "level-emerald": {
                     "card-from": "#1BA34A",
                     "card-to": "#064A23",
@@ -136,7 +136,7 @@ export default {
                     "button-stroke": "#03361B",
                     "button-shadow": "#03361B",
                 },
-                // Ruby Tier (Levels 61-70)
+                // Ruby Tier (Levels 51-60) - CORRECTED RANGE
                 "level-ruby": {
                     "card-from": "#E63946",
                     "card-to": "#5C0A0A",
@@ -156,7 +156,7 @@ export default {
                     "button-stroke": "#4A0A0A",
                     "button-shadow": "#4A0A0A",
                 },
-                // Amethyst Tier (Levels 71-80)
+                // Amethyst Tier (Levels 61-70) - CORRECTED RANGE
                 "level-amethyst": {
                     "card-from": "#8E44AD",
                     "card-to": "#2E0B3F",
@@ -176,7 +176,7 @@ export default {
                     "button-stroke": "#2A0A3D",
                     "button-shadow": "#2A0A3D",
                 },
-                // Tanzite Tier (Levels 81-90)
+                // Tanzite Tier (Levels 71-80) - CORRECTED RANGE
                 "level-tanzite": {
                     "card-from": "#3A2EA1",
                     "card-to": "#0E163A",
@@ -196,7 +196,7 @@ export default {
                     "button-stroke": "#121637",
                     "button-shadow": "#121637",
                 },
-                // Sapphire Tier (Levels 91-100)
+                // Sapphire Tier (Levels 81-90) - CORRECTED RANGE
                 "level-sapphire": {
                     "card-from": "#4A9BFF",
                     "card-to": "#0D1B3F",
@@ -216,7 +216,7 @@ export default {
                     "button-stroke": "#071B38",
                     "button-shadow": "#071B38",
                 },
-                // Prismatic/Diamond Tier (Levels 91-100)
+                // Prismatic/Diamond Tier (Levels 91-100) - CORRECTED RANGE
                 "level-prismatic": {
                     "card-from": "#C86CFF",
                     "card-to": "#FFD447", // Multi-gradient effect
@@ -547,7 +547,7 @@ radial-gradient(circle at center,
                 "leaderboard-container": "0 8px 0 #2960BB",
                 "leaderboard-points": "0 4px 0 #AE6816",
 
-                // Clean Level Up System Drop Shadows - 10 Tiers
+                // Level Up System Drop Shadows - Matching UI Design Specs
                 "level-bronze-badge": "0 4px 0 #4D2A12",
                 "level-bronze-button": "0 4px 0 #4D2A12",
                 "level-bronze-text": "0 3px 0 #4D2A12",
@@ -671,24 +671,132 @@ radial-gradient(circle at center,
             });
         }),
 
+        // Level-specific text shadow utilities plugin (replacing text-stroke)
+        plugin(function ({ addUtilities, theme }) {
+            const textShadowUtilities = {};
+            const tiers = [
+                "bronze",
+                "silver",
+                "gold",
+                "topaz",
+                "emerald",
+                "ruby",
+                "amethyst",
+                "tanzite",
+                "sapphire",
+                "prismatic",
+            ];
+
+            tiers.forEach((tier) => {
+                const titleStrokeColor =
+                    theme(`colors.level-${tier}["title-stroke"]`) ||
+                    theme(`colors.level-${tier}.stroke`);
+                const xpStrokeColor =
+                    theme(`colors.level-${tier}["xp-stroke"]`) ||
+                    theme(`colors.level-${tier}["button-stroke"]`);
+
+                // Title text shadow (2px stroke effect for Level numbers)
+                textShadowUtilities[`.text-shadow-${tier}-title`] = {
+                    textShadow: `
+                        -2px -2px 0 ${titleStrokeColor},
+                        2px -2px 0 ${titleStrokeColor},
+                        -2px 2px 0 ${titleStrokeColor},
+                        2px 2px 0 ${titleStrokeColor},
+                        0px -2px 0 ${titleStrokeColor},
+                        0px 2px 0 ${titleStrokeColor},
+                        -2px 0px 0 ${titleStrokeColor},
+                        2px 0px 0 ${titleStrokeColor}`,
+                };
+
+                // XP/Points text shadow (1px stroke effect for values)
+                textShadowUtilities[`.text-shadow-${tier}-xp`] = {
+                    textShadow: `
+                        -1px -1px 0 ${xpStrokeColor},
+                        1px -1px 0 ${xpStrokeColor},
+                        -1px 1px 0 ${xpStrokeColor},
+                        1px 1px 0 ${xpStrokeColor},
+                        0px -1px 0 ${xpStrokeColor},
+                        0px 1px 0 ${xpStrokeColor},
+                        -1px 0px 0 ${xpStrokeColor},
+                        1px 0px 0 ${xpStrokeColor}`,
+                };
+
+                // Button text shadow (1px stroke effect)
+                textShadowUtilities[`.text-shadow-${tier}-button`] = {
+                    textShadow: `
+                        -1px -1px 0 ${xpStrokeColor},
+                        1px -1px 0 ${xpStrokeColor},
+                        -1px 1px 0 ${xpStrokeColor},
+                        1px 1px 0 ${xpStrokeColor},
+                        0px -1px 0 ${xpStrokeColor},
+                        0px 1px 0 ${xpStrokeColor},
+                        -1px 0px 0 ${xpStrokeColor},
+                        1px 0px 0 ${xpStrokeColor}`,
+                };
+            });
+
+            addUtilities(textShadowUtilities);
+        }),
+
         plugin(function ({ matchUtilities, theme }) {
-            // Text outline with variable thickness
+            // Enhanced text outline with proper stroke
             matchUtilities(
                 {
-                    "text-outline-custom": (value) => {
+                    "text-outline-level": (value) => {
                         return {
                             textShadow: `
-                -1px -1px 0 ${value},
-                1px -1px 0 ${value},
-                -1px  1px 0 ${value},
-                1px  1px 0 ${value},
-                -1px  4px 0 ${value},   /* left bottom extended */
-                1px  4px 0 ${value},   /* right bottom extended */
-                0px  4px 0 ${value}    /* straight bottom */`,
+                -2px -2px 0 ${value},
+                2px -2px 0 ${value},
+                -2px  2px 0 ${value},
+                2px  2px 0 ${value},
+                0px -2px 0 ${value},
+                0px  2px 0 ${value},
+                -2px  0px 0 ${value},
+                2px  0px 0 ${value}`,
                         };
                     },
                 },
-                { values: theme("colors"), type: "color" }
+                {
+                    values: {
+                        "bronze-title": theme(
+                            "colors.level-bronze.title-stroke"
+                        ),
+                        "bronze-xp": theme("colors.level-bronze.xp-stroke"),
+                        "silver-title": theme(
+                            "colors.level-silver.title-stroke"
+                        ),
+                        "silver-xp": theme("colors.level-silver.xp-stroke"),
+                        "gold-title": theme("colors.level-gold.title-stroke"),
+                        "gold-xp": theme("colors.level-gold.xp-stroke"),
+                        "topaz-title": theme("colors.level-topaz.title-stroke"),
+                        "topaz-xp": theme("colors.level-topaz.xp-stroke"),
+                        "emerald-title": theme(
+                            "colors.level-emerald.title-stroke"
+                        ),
+                        "emerald-xp": theme("colors.level-emerald.xp-stroke"),
+                        "ruby-title": theme("colors.level-ruby.title-stroke"),
+                        "ruby-xp": theme("colors.level-ruby.xp-stroke"),
+                        "amethyst-title": theme(
+                            "colors.level-amethyst.title-stroke"
+                        ),
+                        "amethyst-xp": theme("colors.level-amethyst.xp-stroke"),
+                        "tanzite-title": theme(
+                            "colors.level-tanzite.title-stroke"
+                        ),
+                        "tanzite-xp": theme("colors.level-tanzite.xp-stroke"),
+                        "sapphire-title": theme(
+                            "colors.level-sapphire.title-stroke"
+                        ),
+                        "sapphire-xp": theme("colors.level-sapphire.xp-stroke"),
+                        "prismatic-title": theme(
+                            "colors.level-prismatic.title-stroke"
+                        ),
+                        "prismatic-xp": theme(
+                            "colors.level-prismatic.xp-stroke"
+                        ),
+                    },
+                    type: "color",
+                }
             );
         }),
 
@@ -700,19 +808,19 @@ radial-gradient(circle at center,
                         const gradients = {
                             bronze: "linear-gradient(to bottom, #C77C3E, #5A2E12)",
                             silver: "linear-gradient(to bottom, #D9E3F2, #3C4757)",
-                            "gold-early":
-                                "linear-gradient(to bottom, #D9E3F2, #3C4757)",
                             gold: "linear-gradient(to bottom, #FFD55C, #7A4B0E)",
                             topaz: "linear-gradient(to bottom, #F6A43B, #A64906)",
                             emerald:
-                                "linear-gradient(to bottom, #10B981, #047857)",
-                            ruby: "linear-gradient(to bottom, #DC2626, #991B1B)",
+                                "linear-gradient(to bottom, #1BA34A, #064A23)",
+                            ruby: "linear-gradient(to bottom, #E63946, #5C0A0A)",
                             amethyst:
-                                "linear-gradient(to bottom, #8B5CF6, #6D28D9)",
+                                "linear-gradient(to bottom, #8E44AD, #2E0B3F)",
+                            tanzite:
+                                "linear-gradient(to bottom, #3A2EA1, #0E163A)",
                             sapphire:
-                                "linear-gradient(to bottom, #3B82F6, #1E40AF)",
-                            diamond:
-                                "linear-gradient(to bottom, #F8FAFC, #64748B)",
+                                "linear-gradient(to bottom, #4A9BFF, #0D1B3F)",
+                            prismatic:
+                                "linear-gradient(to bottom, #C86CFF, #3FB6FF, #FFD447)",
                         };
                         return {
                             backgroundImage:
@@ -724,71 +832,17 @@ radial-gradient(circle at center,
                     values: [
                         "bronze",
                         "silver",
-                        "gold-early",
                         "gold",
                         "topaz",
                         "emerald",
                         "ruby",
                         "amethyst",
+                        "tanzite",
                         "sapphire",
-                        "diamond",
+                        "prismatic",
                     ],
                 }
             );
-        }),
-
-        plugin(function ({ addUtilities }) {
-            // Level tier utility classes for easy application
-            addUtilities({
-                ".level-bronze-theme": {
-                    "--level-card-from": "#C77C3E",
-                    "--level-card-to": "#5A2E12",
-                    "--level-stroke": "#3B1F0C",
-                    "--level-badge-from": "#E69B56",
-                    "--level-badge-to": "#5A2E12",
-                    "--level-shadow": "#4D2A12",
-                    "--level-title": "#FFFFFF",
-                    "--level-xp": "#FFF3E6",
-                    "--level-labels": "#FFD9B3",
-                    "--level-message": "#E0C3A0",
-                },
-                ".level-silver-theme": {
-                    "--level-card-from": "#D9E3F2",
-                    "--level-card-to": "#3C4757",
-                    "--level-stroke": "#2A313D",
-                    "--level-badge-from": "#F2F6FA",
-                    "--level-badge-to": "#3C4757",
-                    "--level-shadow": "#2E3642",
-                    "--level-title": "#FFFFFF",
-                    "--level-xp": "#F9FBFF",
-                    "--level-labels": "#E2E8F3",
-                    "--level-message": "#FFFFFF",
-                },
-                ".level-gold-theme": {
-                    "--level-card-from": "#FFD55C",
-                    "--level-card-to": "#7A4B0E",
-                    "--level-stroke": "#4D3009",
-                    "--level-badge-from": "#FFE58A",
-                    "--level-badge-to": "#7A4B0E",
-                    "--level-shadow": "#5C3A0F",
-                    "--level-title": "#FFFFFF",
-                    "--level-xp": "#FFF7E6",
-                    "--level-labels": "#FFECCC",
-                    "--level-message": "#FFFFFF",
-                },
-                ".level-topaz-theme": {
-                    "--level-card-from": "#F6A43B",
-                    "--level-card-to": "#A64906",
-                    "--level-stroke": "#7C3304",
-                    "--level-badge-from": "#FFD59E",
-                    "--level-badge-to": "#B65A0B",
-                    "--level-shadow": "#663308",
-                    "--level-title": "#FFFFFF",
-                    "--level-xp": "#FFF2E2",
-                    "--level-labels": "#FFE9D1",
-                    "--level-message": "#FFFFFF",
-                },
-            });
         }),
     ],
 };
