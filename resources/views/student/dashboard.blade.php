@@ -263,10 +263,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -392,7 +392,7 @@
                                     <button onclick="testTierModal('bronze')"
                                         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-orange-50 transition-colors group">
                                         <div
-                                            class="w-8 h-8 rounded-lg bg-gradient-to-b from-[#E69B56] to-[#5A2E12] border-2 border-[#3B1F0C] flex-shrink-0">
+                                            class="w-8 h-8 rounded-lg bg-level-bronze-badge border-2 border-level-bronze-stroke flex-shrink-0 drop-shadow-level-bronze-badge">
                                         </div>
                                         <div class="text-left">
                                             <div class="font-medium text-gray-800 text-sm">Bronze Tier</div>
@@ -404,7 +404,7 @@
                                     <button onclick="testTierModal('silver')"
                                         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors group">
                                         <div
-                                            class="w-8 h-8 rounded-lg bg-gradient-to-b from-[#F2F6FA] to-[#3C4757] border-2 border-[#2A313D] flex-shrink-0">
+                                            class="w-8 h-8 rounded-lg bg-level-silver-badge border-2 border-level-silver-stroke flex-shrink-0 drop-shadow-level-silver-badge">
                                         </div>
                                         <div class="text-left">
                                             <div class="font-medium text-gray-800 text-sm">Silver Tier</div>
@@ -416,11 +416,11 @@
                                     <button onclick="testTierModal('gold')"
                                         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50 transition-colors group">
                                         <div
-                                            class="w-8 h-8 rounded-lg bg-gradient-to-b from-[#FFE58A] to-[#7A4B0E] border-2 border-[#4D3009] flex-shrink-0">
+                                            class="w-8 h-8 rounded-lg bg-level-gold-badge border-2 border-level-gold-stroke flex-shrink-0 drop-shadow-level-gold-badge">
                                         </div>
                                         <div class="text-left">
                                             <div class="font-medium text-gray-800 text-sm">Gold Tier</div>
-                                            <div class="text-xs text-gray-500">Levels 31-40</div>
+                                            <div class="text-xs text-gray-500">Levels 21-30</div>
                                         </div>
                                     </button>
 
@@ -428,11 +428,83 @@
                                     <button onclick="testTierModal('topaz')"
                                         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-orange-50 transition-colors group">
                                         <div
-                                            class="w-8 h-8 rounded-lg bg-gradient-to-b from-[#FFD59E] to-[#B65A0B] border-2 border-[#9C5B0C] flex-shrink-0">
+                                            class="w-8 h-8 rounded-lg bg-level-topaz-badge border-2 border-level-topaz-badge-stroke flex-shrink-0 drop-shadow-level-topaz-badge">
                                         </div>
                                         <div class="text-left">
                                             <div class="font-medium text-gray-800 text-sm">Topaz Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 31-40</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Emerald Tier -->
+                                    <button onclick="testTierModal('emerald')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-emerald-badge border-2 border-level-emerald-stroke flex-shrink-0 drop-shadow-level-emerald-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Emerald Tier</div>
                                             <div class="text-xs text-gray-500">Levels 41-50</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Ruby Tier -->
+                                    <button onclick="testTierModal('ruby')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-ruby-badge border-2 border-level-ruby-stroke flex-shrink-0 drop-shadow-level-ruby-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Ruby Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 51-60</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Amethyst Tier -->
+                                    <button onclick="testTierModal('amethyst')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-amethyst-badge border-2 border-level-amethyst-stroke flex-shrink-0 drop-shadow-level-amethyst-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Amethyst Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 61-70</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Tanzite Tier -->
+                                    <button onclick="testTierModal('tanzite')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-sapphire-badge border-2 border-level-sapphire-stroke flex-shrink-0 drop-shadow-level-sapphire-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Tanzite Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 71-80</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Sapphire Tier -->
+                                    <button onclick="testTierModal('sapphire')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-blue-sapphire-badge border-2 border-level-blue-sapphire-stroke flex-shrink-0 drop-shadow-level-blue-sapphire-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Sapphire Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 81-90</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Prismatic Tier -->
+                                    <button onclick="testTierModal('prismatic')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-prismatic-badge border-2 border-level-prismatic-stroke flex-shrink-0 drop-shadow-level-prismatic-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Prismatic Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 91-100</div>
                                         </div>
                                     </button>
                                 </div>
@@ -445,7 +517,8 @@
                                     class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors">
                                     <div
                                         class="w-8 h-8 rounded-lg bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                        📊</div>
+                                        📊
+                                    </div>
                                     <div class="text-left">
                                         <div class="font-medium text-gray-800 text-sm">Update Level Card</div>
                                         <div class="text-xs text-gray-500">Test content changes</div>
@@ -515,6 +588,33 @@
                                         rank_image: 'rank-5.png',
                                         rank_title: 'Math Innovator',
                                         message: 'You are reaching new mathematical heights!'
+                                    },
+                                    emerald: {
+                                        tier: 'emerald',
+                                        new_level: 55,
+                                        xp_gained: 1000,
+                                        points_gained: 1200,
+                                        rank_image: 'rank-6.png',
+                                        rank_title: 'Math Prodigy',
+                                        message: 'Your mathematical prowess is extraordinary!'
+                                    },
+                                    ruby: {
+                                        tier: 'ruby',
+                                        new_level: 65,
+                                        xp_gained: 1250,
+                                        points_gained: 1500,
+                                        rank_image: 'rank-7.png',
+                                        rank_title: 'Math Virtuoso',
+                                        message: 'You have achieved mathematical excellence!'
+                                    },
+                                    prismatic: {
+                                        tier: 'prismatic',
+                                        new_level: 95,
+                                        xp_gained: 2000,
+                                        points_gained: 2500,
+                                        rank_image: 'rank-10.png',
+                                        rank_title: 'Math Grandmaster',
+                                        message: 'You have reached the pinnacle of mathematical mastery!'
                                     }
                                 };
 
@@ -805,7 +905,7 @@
                                 <a href="{{ route('achievements.index') }}"
                                     class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
                                     style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
-                                                                                    box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                                                                        box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                     View All
                                 </a>
                             </div>
