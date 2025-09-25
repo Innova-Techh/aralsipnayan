@@ -191,12 +191,17 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('dashboard');
     
     // Assessment Management
-    Route::get('/assessments', [App\Http\Controllers\Teacher\AssessmentController::class, 'index'])->name('assessments');
-    Route::get('/assessments/create', [App\Http\Controllers\Teacher\AssessmentController::class, 'create'])->name('assessments.create');
+    Route::get('/assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'index'])->name('assessments');
+    Route::get('/assessments/create', [App\Http\Controllers\TeacherAssessmentController::class, 'create'])->name('assessments.create');
+    Route::post('/assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'store'])->name('assessments.store');
+    Route::get('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'show'])->name('assessments.show');
+    Route::get('/assessments/{assessment}/edit', [App\Http\Controllers\TeacherAssessmentController::class, 'edit'])->name('assessments.edit');
+    Route::put('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'update'])->name('assessments.update');
+    Route::delete('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'destroy'])->name('assessments.destroy');
     
     // Assessment Assignment API
-    Route::get('/assessments/students/{section}', [App\Http\Controllers\Teacher\AssessmentController::class, 'getStudentsBySection'])->name('assessments.students');
-    Route::post('/assessments/assign', [App\Http\Controllers\Teacher\AssessmentController::class, 'assignAssessment'])->name('assessments.assign');
+    Route::get('/assessments/students/{section}', [App\Http\Controllers\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
+    Route::post('/assessments/assign', [App\Http\Controllers\TeacherAssessmentController::class, 'assign'])->name('assessments.assign');
     
     // Student Management
     Route::get('/students', function () {
@@ -292,6 +297,10 @@ Route::middleware(['student.auth'])->group(function () {
     // Sections
     Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
     Route::get('/sections/data', [SectionController::class, 'getSectionsData'])->name('sections.data');
+    
+    // Teacher-created assessments
+    Route::get('/teacher-assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'studentIndex'])->name('teacher-assessments.index');
+    Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
     
     // Profile routes
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
