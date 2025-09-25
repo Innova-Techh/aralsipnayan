@@ -19,59 +19,104 @@
 
     <!-- Assessment Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Sample Assessment 1 -->
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Algebra Basics Quiz</h3>
-                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
+        @forelse($assessments as $assessment)
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 
+                @if($assessment->status === 'Active') border-green-500
+                @elseif($assessment->status === 'Draft') border-yellow-500
+                @elseif($assessment->status === 'Completed') border-blue-500
+                @else border-gray-500 @endif">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $assessment->title }}</h3>
+                    <span class="
+                        @if($assessment->status === 'Active') bg-green-100 text-green-800
+                        @elseif($assessment->status === 'Draft') bg-yellow-100 text-yellow-800
+                        @elseif($assessment->status === 'Completed') bg-blue-100 text-blue-800
+                        @else bg-gray-100 text-gray-800 @endif
+                        text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        {{ $assessment->status }}
+                    </span>
+                </div>
+                <div class="space-y-2 text-sm text-gray-600 mb-4">
+                    <p><span class="font-medium">Category:</span> {{ $assessment->category }}</p>
+                    <p><span class="font-medium">Questions:</span> {{ $assessment->number_of_questions }}</p>
+                    <p><span class="font-medium">Time Limit:</span> {{ $assessment->time_limit }} mins</p>
+                    <p><span class="font-medium">Difficulty:</span> {{ $assessment->difficulty }}</p>
+                    @if($assessment->is_live_quiz)
+                        <p><span class="font-medium text-blue-600">🔴 Live Quiz</span></p>
+                    @endif
+                    <p><span class="font-medium">Assigned to:</span> 
+                        @if($assessment->assignments->count() > 0)
+                            @php
+                                $specificStudents = $assessment->assignments->where('student_id', '!=', null);
+                                $sectionAssignments = $assessment->assignments->where('student_id', null);
+                            @endphp
+                            @if($specificStudents->count() > 0)
+                                @php
+                                    $names = [];
+                                    foreach($specificStudents as $assignment) {
+                                        if ($assignment->student && $assignment->student->studentProfile) {
+                                            $firstname = $assignment->student->studentProfile->firstname ?? '';
+                                            $lastname = $assignment->student->studentProfile->lastname ?? '';
+                                            $fullName = trim($firstname . ' ' . $lastname);
+                                            $names[] = $fullName ?: 'Student ID: ' . $assignment->student_id;
+                                        } else {
+                                            $names[] = 'Student ID: ' . $assignment->student_id;
+                                        }
+                                    }
+                                @endphp
+                                {{ implode(', ', $names) }}
+                            @elseif($sectionAssignments->count() > 0)
+                                Section {{ $sectionAssignments->pluck('section')->unique()->filter()->implode(', ') }}
+                            @else
+                                Mixed assignments
+                            @endif
+                        @else
+                            Not assigned
+                        @endif
+                    </p>
+                    <p><span class="font-medium">Responses:</span> 
+                        @php
+                            $completedCount = $assessment->assignments->where('status', 'Completed')->count();
+                            $totalStudents = 0;
+                            
+                            // Count students based on assignment type
+                            if ($assessment->assignments->where('student_id', '!=', null)->count() > 0) {
+                                // Specific students assigned
+                                $totalStudents = $assessment->assignments->where('student_id', '!=', null)->count();
+                            } else {
+                                // Section-wide assignment
+                                $sections = $assessment->assignments->pluck('section')->unique()->filter();
+                                foreach ($sections as $section) {
+                                    $totalStudents += collect($studentsData)->where('section', $section)->count();
+                                }
+                            }
+                        @endphp
+                        {{ $completedCount }}/{{ $totalStudents }}
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    @if($assessment->status === 'Active' && $assessment->assignments->count() > 0)
+                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Results</button>
+                    @elseif($assessment->status === 'Draft')
+                        <button onclick="openAssignModal({{ $assessment->id }})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Assign</button>
+                    @endif
+                    <a href="{{ route('teacher.assessments.edit', $assessment) }}" class="text-gray-600 hover:text-gray-800 text-sm font-medium">Edit</a>
+                    @if($assessment->status === 'Completed')
+                        <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">Archive</button>
+                    @endif
+                </div>
             </div>
-            <div class="space-y-2 text-sm text-gray-600 mb-4">
-                <p><span class="font-medium">Category:</span> Number & Algebra</p>
-                <p><span class="font-medium">Questions:</span> 15</p>
-                <p><span class="font-medium">Assigned to:</span> Section A, B</p>
-                <p><span class="font-medium">Responses:</span> 42/50</p>
+        @empty
+            <div class="col-span-full text-center py-12">
+                <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">quiz</span>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No assessments yet</h3>
+                <p class="text-gray-500 mb-4">Create your first assessment to get started</p>
+                <a href="{{ route('teacher.assessments.create') }}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Create Assessment
+                </a>
             </div>
-            <div class="flex space-x-2">
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Results</button>
-                <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">Edit</button>
-            </div>
-        </div>
-
-        <!-- Sample Assessment 2 -->
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Geometry Assessment</h3>
-                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Draft</span>
-            </div>
-            <div class="space-y-2 text-sm text-gray-600 mb-4">
-                <p><span class="font-medium">Category:</span> Measurement & Geometry</p>
-                <p><span class="font-medium">Questions:</span> 20</p>
-                <p><span class="font-medium">Assigned to:</span> Not assigned</p>
-                <p><span class="font-medium">Responses:</span> 0/0</p>
-            </div>
-            <div class="flex space-x-2">
-                <button onclick="openAssignModal('geometry-assessment')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Assign</button>
-                <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">Edit</button>
-            </div>
-        </div>
-
-        <!-- Sample Assessment 3 -->
-        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Statistics Quiz</h3>
-                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Completed</span>
-            </div>
-            <div class="space-y-2 text-sm text-gray-600 mb-4">
-                <p><span class="font-medium">Category:</span> Data & Probability</p>
-                <p><span class="font-medium">Questions:</span> 12</p>
-                <p><span class="font-medium">Assigned to:</span> Section C</p>
-                <p><span class="font-medium">Responses:</span> 25/25</p>
-            </div>
-            <div class="flex space-x-2">
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Results</button>
-                <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">Archive</button>
-            </div>
-        </div>
+        @endforelse
     </div>
 </div>
 
@@ -143,6 +188,7 @@
 <script>
 let selectedClass = null;
 let selectedStudents = [];
+let currentAssessmentId = null;
 
 // Get teacher sections and students data
 const teacherSections = @json($teacherSections ?? []);
@@ -152,6 +198,7 @@ console.log('Teacher sections from server:', teacherSections);
 console.log('Students data from server:', studentsData);
 
 function openAssignModal(assessmentId) {
+    currentAssessmentId = assessmentId;
     document.getElementById('assignModal').classList.remove('hidden');
     loadClasses();
 }
@@ -247,6 +294,9 @@ function toggleStudentSelection() {
     fetch(`/teacher/assessments/students/${selectedClass}`)
         .then(response => {
             console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
@@ -261,19 +311,20 @@ function toggleStudentSelection() {
         })
         .catch(error => {
             console.error('Error fetching students:', error);
-            alert('Error fetching students');
+            alert('Error fetching students: ' + error.message);
         });
 }
 
 function showStudentSelectionModal(students) {
     // Create a simple student selection interface
     const modal = document.createElement('div');
+    modal.id = 'studentSelectionModal';
     modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
     modal.innerHTML = `
         <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
             <div class="flex items-center justify-between p-4 border-b">
                 <h3 class="text-lg font-semibold">Select Students</h3>
-                <button onclick="confirmAssignment()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeStudentModal()" class="text-gray-400 hover:text-gray-600">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -302,14 +353,15 @@ function showStudentSelectionModal(students) {
 }
 
 function closeStudentModal() {
-    const modal = document.querySelector('.fixed.inset-0.bg-gray-600');
+    const modal = document.getElementById('studentSelectionModal');
     if (modal) {
         modal.remove();
     }
 }
 
 function confirmStudentSelection() {
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const modal = document.getElementById('studentSelectionModal');
+    const checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
     const selectedStudentIds = Array.from(checkboxes).map(cb => cb.value);
     
     // Get full student data for selected IDs
@@ -357,7 +409,7 @@ function confirmAssignment() {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
         body: JSON.stringify({
-            assessment_id: 'geometry-assessment', // This would be dynamic in a real implementation
+            assessment_id: currentAssessmentId,
             section: selectedClass,
             student_ids: studentIds,
             accommodations: accommodations
@@ -368,6 +420,7 @@ function confirmAssignment() {
         if (data.success) {
             alert('Assessment assigned successfully!');
             closeAssignModal();
+            location.reload(); // Refresh to show updated assignments
         } else {
             alert('Error: ' + (data.message || 'Failed to assign assessment'));
         }
