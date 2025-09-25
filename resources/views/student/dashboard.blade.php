@@ -263,10 +263,10 @@
                 <div class="flex flex-col justify-center h-full">
                     <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                         style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               0 4px 0 #18337e;">
                         Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                     </h1>
                     <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
@@ -367,6 +367,283 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Single Test Button that opens a panel -->
+                        <div class="fixed bottom-14 right-4 z-50">
+                            <!-- Main Test Button -->
+                            <button onclick="toggleTestPanel()" id="testPanelBtn"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-full shadow-lg font-medium transition-all duration-200">
+                                🧪 Level Tests
+                            </button>
+
+                            <!-- Test Panel (Hidden by default) -->
+                            <div id="testPanel"
+                                class="hidden absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 min-w-[250px] transform transition-all duration-300">
+
+                                <!-- Panel Header -->
+                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                                    <h3 class="font-semibold text-gray-800 text-sm">Level-Up Modal Tests</h3>
+                                    <button onclick="toggleTestPanel()"
+                                        class="text-gray-400 hover:text-gray-600 text-lg">×</button>
+                                </div>
+
+                                <!-- Tier Test Buttons -->
+                                <div class="space-y-2">
+                                    <!-- Bronze Tier -->
+                                    <button onclick="testTierModal('bronze')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-orange-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-bronze-badge border-2 border-level-bronze-stroke flex-shrink-0 drop-shadow-level-bronze-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Bronze Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 1-10</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Silver Tier -->
+                                    <button onclick="testTierModal('silver')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-silver-badge border-2 border-level-silver-stroke flex-shrink-0 drop-shadow-level-silver-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Silver Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 11-20</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Gold Tier -->
+                                    <button onclick="testTierModal('gold')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-gold-badge border-2 border-level-gold-stroke flex-shrink-0 drop-shadow-level-gold-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Gold Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 21-30</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Topaz Tier -->
+                                    <button onclick="testTierModal('topaz')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-orange-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-topaz-badge border-2 border-level-topaz-badge-stroke flex-shrink-0 drop-shadow-level-topaz-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Topaz Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 31-40</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Emerald Tier -->
+                                    <button onclick="testTierModal('emerald')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-emerald-badge border-2 border-level-emerald-stroke flex-shrink-0 drop-shadow-level-emerald-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Emerald Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 41-50</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Ruby Tier -->
+                                    <button onclick="testTierModal('ruby')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-ruby-badge border-2 border-level-ruby-stroke flex-shrink-0 drop-shadow-level-ruby-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Ruby Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 51-60</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Amethyst Tier -->
+                                    <button onclick="testTierModal('amethyst')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-amethyst-badge border-2 border-level-amethyst-stroke flex-shrink-0 drop-shadow-level-amethyst-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Amethyst Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 61-70</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Tanzite Tier -->
+                                    <button onclick="testTierModal('tanzite')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-sapphire-badge border-2 border-level-sapphire-stroke flex-shrink-0 drop-shadow-level-sapphire-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Tanzite Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 71-80</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Sapphire Tier -->
+                                    <button onclick="testTierModal('sapphire')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-blue-sapphire-badge border-2 border-level-blue-sapphire-stroke flex-shrink-0 drop-shadow-level-blue-sapphire-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Sapphire Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 81-90</div>
+                                        </div>
+                                    </button>
+
+                                    <!-- Prismatic Tier -->
+                                    <button onclick="testTierModal('prismatic')"
+                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors group">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-level-prismatic-badge border-2 border-level-prismatic-stroke flex-shrink-0 drop-shadow-level-prismatic-badge">
+                                        </div>
+                                        <div class="text-left">
+                                            <div class="font-medium text-gray-800 text-sm">Prismatic Tier</div>
+                                            <div class="text-xs text-gray-500">Levels 91-100</div>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Separator -->
+                                <hr class="my-3 border-gray-100">
+
+                                <!-- Dashboard Test -->
+                                <button onclick="updateDashboardLevel()"
+                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                        📊
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="font-medium text-gray-800 text-sm">Update Level Card</div>
+                                        <div class="text-xs text-gray-500">Test content changes</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <script>
+                            let testPanelOpen = false;
+
+                            function toggleTestPanel() {
+                                const panel = document.getElementById('testPanel');
+                                const btn = document.getElementById('testPanelBtn');
+
+                                if (testPanelOpen) {
+                                    panel.classList.add('hidden');
+                                    panel.style.transform = 'scale(0.95) translateY(10px)';
+                                    panel.style.opacity = '0';
+                                    btn.style.transform = 'rotate(0deg)';
+                                    testPanelOpen = false;
+                                } else {
+                                    panel.classList.remove('hidden');
+                                    setTimeout(() => {
+                                        panel.style.transform = 'scale(1) translateY(0)';
+                                        panel.style.opacity = '1';
+                                    }, 10);
+                                    btn.style.transform = 'rotate(180deg)';
+                                    testPanelOpen = true;
+                                }
+                            }
+
+                            function testTierModal(tierName) {
+                                const tierData = {
+                                    bronze: {
+                                        tier: 'bronze',
+                                        new_level: 7,
+                                        xp_gained: 150,
+                                        points_gained: 200,
+                                        rank_image: 'rank-1.png',
+                                        rank_title: 'Math Explorer',
+                                        message: 'A great journey begins with small steps!'
+                                    },
+                                    silver: {
+                                        tier: 'silver',
+                                        new_level: 15,
+                                        xp_gained: 300,
+                                        points_gained: 400,
+                                        rank_image: 'rank-2.png',
+                                        rank_title: 'Math Adventurer',
+                                        message: 'Your skills are developing nicely!'
+                                    },
+                                    gold: {
+                                        tier: 'gold',
+                                        new_level: 35,
+                                        xp_gained: 500,
+                                        points_gained: 600,
+                                        rank_image: 'rank-4.png',
+                                        rank_title: 'Math Strategist',
+                                        message: 'You are mastering advanced concepts!'
+                                    },
+                                    topaz: {
+                                        tier: 'topaz',
+                                        new_level: 45,
+                                        xp_gained: 750,
+                                        points_gained: 800,
+                                        rank_image: 'rank-5.png',
+                                        rank_title: 'Math Innovator',
+                                        message: 'You are reaching new mathematical heights!'
+                                    },
+                                    emerald: {
+                                        tier: 'emerald',
+                                        new_level: 55,
+                                        xp_gained: 1000,
+                                        points_gained: 1200,
+                                        rank_image: 'rank-6.png',
+                                        rank_title: 'Math Prodigy',
+                                        message: 'Your mathematical prowess is extraordinary!'
+                                    },
+                                    ruby: {
+                                        tier: 'ruby',
+                                        new_level: 65,
+                                        xp_gained: 1250,
+                                        points_gained: 1500,
+                                        rank_image: 'rank-7.png',
+                                        rank_title: 'Math Virtuoso',
+                                        message: 'You have achieved mathematical excellence!'
+                                    },
+                                    prismatic: {
+                                        tier: 'prismatic',
+                                        new_level: 95,
+                                        xp_gained: 2000,
+                                        points_gained: 2500,
+                                        rank_image: 'rank-10.png',
+                                        rank_title: 'Math Grandmaster',
+                                        message: 'You have reached the pinnacle of mathematical mastery!'
+                                    }
+                                };
+
+                                // Close the panel
+                                toggleTestPanel();
+
+                                // Show the modal after a short delay
+                                setTimeout(() => {
+                                    showLevelUpModal(tierData[tierName]);
+                                }, 200);
+                            }
+
+                            // Close panel when clicking outside
+                            document.addEventListener('click', function (event) {
+                                const panel = document.getElementById('testPanel');
+                                const btn = document.getElementById('testPanelBtn');
+
+                                if (testPanelOpen && !panel.contains(event.target) && !btn.contains(event.target)) {
+                                    toggleTestPanel();
+                                }
+                            });
+
+                            // Close panel with Escape key
+                            document.addEventListener('keydown', function (event) {
+                                if (event.key === 'Escape' && testPanelOpen) {
+                                    toggleTestPanel();
+                                }
+                            });
+                        </script>
 
 
                         {{-- Optional: Next rank preview --}}
@@ -628,7 +905,7 @@
                                 <a href="{{ route('achievements.index') }}"
                                     class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
                                     style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
-                                    box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                                                                        box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                     View All
                                 </a>
                             </div>
@@ -848,5 +1125,6 @@
                 });
         }
     </script>
+    @include('components.level-up-modal')
 
 @endsection
