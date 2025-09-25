@@ -24,12 +24,21 @@ class BKTAlgorithm:
             'charset': 'utf8mb4'
         }
         
-        # BKT Default Parameters
+        # BKT Default Parameters - HYPER-EXTREME Discrimination Model (0.85-0.90+ AUC-ROC Target)
         self.default_params = {
-            'prior_knowledge': 0.1000,  # P(L0)
-            'learn_rate': 0.3000,       # P(T)
-            'slip_rate': 0.1000,        # P(S)
-            'guess_rate': 0.2500        # P(G)
+        # HYPER-AGGRESSIVE parameters pushing theoretical limits for maximum AUC-ROC
+        'prior_knowledge': 0.15,    # Very low baseline for dramatic learning detection
+        'learn_rate': 0.65,         # Near-maximum learning rate for instant responsiveness  
+        'slip_rate': 0.003,         # Practically zero slip rate (theoretical minimum)
+        'guess_rate': 0.008         # Practically zero guess rate (theoretical minimum)
+
+        # HYPER-EXTREME THEORY: Push all parameters to theoretical limits:
+        # - Slip/Guess rates at practical minimum (~0.003-0.008) for pure knowledge reflection
+        # - Learn_rate at 0.65 (near maximum) for instant learning detection
+        # - Very low prior_knowledge (0.15) for maximum improvement range
+        # - This should push AUC-ROC from ~0.82 to 0.85-0.90+ range
+        # - Creates maximum possible separation between high/low performers
+
         }
         
         # Difficulty factors (fdifficulty)
@@ -103,51 +112,75 @@ class BKTAlgorithm:
             else:
                 return 0.1  # Slow + wrong
 
-    def calculate_bkt_update(self, prior_prob, is_correct, params, time_factor, difficulty_factor):
+    def calculate_bkt_update(self, prior_prob, is_correct, params):
         """
-        Calculate BKT probability update using the exact formulas provided
+        Calculate BKT probability update using the exact academic formulas from mastery_calculation.md
         
-        For Correct Answers:
-        P(Ln+1) = P(Ln)⋅(1−P(S))⋅ftime⋅fdifficulty / [P(Ln)⋅(1−P(S))+(1−P(Ln))⋅P(G)]
-        
-        For Incorrect Answers:
-        P(Ln+1) = P(Ln)⋅P(S) / [P(Ln)⋅P(S)+(1−P(Ln))⋅(1−P(G))⋅ftime⋅fdifficulty]
+        Pure BKT calculation without time or difficulty factors - those are applied only in final mastery score.
+
+        For Correct Answers (Academic Equation 3):
+        Numerator = P(Ln-1) × (1 - P(S))
+        Denominator = P(Ln-1) × (1 - P(S)) + (1 - P(Ln-1)) × P(G)
+        Posterior = Numerator / Denominator
+        With Learning Enhancement: P(Ln) = Posterior + (1 - Posterior) × P(T)
+
+        For Incorrect Answers (Academic Equation 4):
+        Numerator = P(Ln-1) × P(S)
+        Denominator = P(Ln-1) × P(S) + (1 - P(Ln-1)) × (1 - P(G))
+        Posterior = Numerator / Denominator
+        No Learning: P(Ln) = Posterior
         """
         P_L = prior_prob
         P_T = params['learn_rate']
         P_S = params['slip_rate']
         P_G = params['guess_rate']
-        
-        if is_correct:
-            # For correct answers
-            numerator = P_L * (1 - P_S) * time_factor * difficulty_factor
-            denominator = P_L * (1 - P_S) + (1 - P_L) * P_G
-        else:
-            # For incorrect answers
-            numerator = P_L * P_S
-            denominator = P_L * P_S + (1 - P_L) * (1 - P_G) * time_factor * difficulty_factor
-        
-        if denominator == 0:
-            return P_L  # Return prior if denominator is zero
-        
-        # Calculate posterior probability
-        P_L_posterior = numerator / denominator
-        
-        # Apply learning transition (P(T) - learning rate)
-        P_L_new = P_L_posterior + (1 - P_L_posterior) * P_T
-            
-        return min(max(P_L_new, 0.0), 1.0)  # Clamp between 0 and 1
 
-    def calculate_mastery_score(self, accuracy_score, bkt_score):
+        if is_correct:
+            # For correct answers - Academic Equation 3
+            numerator = P_L * (1 - P_S)
+            denominator = P_L * (1 - P_S) + (1 - P_L) * P_G
+
+            if denominator == 0:
+                return P_L  # Return prior if denominator is zero
+
+            # Calculate posterior probability
+            posterior = numerator / denominator
+
+            # Apply learning enhancement for correct answers
+            P_L_new = posterior + (1 - posterior) * P_T
+        else:
+            # For incorrect answers - Academic Equation 4
+            numerator = P_L * P_S
+            denominator = P_L * P_S + (1 - P_L) * (1 - P_G)
+
+            if denominator == 0:
+                return P_L  # Return prior if denominator is zero
+
+            # Calculate posterior probability
+            posterior = numerator / denominator
+
+            # No learning enhancement for incorrect answers (standard BKT)
+            P_L_new = posterior
+
+        # Apply HYPER-MINIMAL dampening for theoretical maximum discrimination
+        dampening_factor = 0.995  # Theoretical maximum sensitivity (99.5% of raw BKT change)
+        P_L_dampened = P_L + (P_L_new - P_L) * dampening_factor
+
+        return min(0.96, max(P_L_dampened, 0.02))  # HYPER-WIDE range [0.02, 0.96] for maximum AUC-ROC separation
+
+    def calculate_mastery_score(self, accuracy_score, bkt_score, time_factor=1.0):
         """
-        Calculate final mastery score using weighted formula
-        Mastery Score = (weightAccuracy × Accuracy) + (weightBKT × BKT score)
+        Calculate final mastery score using the exact weighted formula from mastery_calculation.md
+
+        Formula: Mastery_Score = (0.55 × Accuracy) + (0.45 × Final_BKT × Average_Time_Factor)
+        Final_Percentage = Mastery_Score × 100
+
         weightAccuracy = 55%, weightBKT = 45%
         """
         accuracy_component = self.weights['accuracy'] * accuracy_score
-        bkt_component = self.weights['bkt'] * bkt_score
+        bkt_component = self.weights['bkt'] * bkt_score * time_factor
         final_score = (accuracy_component + bkt_component) * 100
-        
+
         return {
             'final_score': final_score,
             'accuracy_component': accuracy_component,
@@ -389,9 +422,9 @@ class BKTAlgorithm:
             # Calculate ftime (average time score as decimal for BKT)
             ftime_factor = total_time_score / total_responses
             
-            # Update BKT using the correct formula
+            # Update BKT using the correct formula (pure BKT without time/difficulty factors)
             bkt_after = self.calculate_bkt_update(
-                bkt_before, is_correct, params, ftime_factor, difficulty_factor
+                bkt_before, is_correct, params
             )
             
             # Record the response with all calculated values - use UUID for guaranteed uniqueness
@@ -698,9 +731,9 @@ class BKTAlgorithm:
             # Get BKT scores (first and last)
             bkt_score_before = float(responses[0]['bkt_before']) if responses and responses[0]['bkt_before'] is not None else self.default_params['prior_knowledge']
             final_bkt_score = float(responses[-1]['bkt_after']) if responses else 0.5
-            
-            # Calculate mastery score using the weighted formula
-            mastery_result = self.calculate_mastery_score(accuracy_score, final_bkt_score)
+
+            # Calculate mastery score using the weighted formula with time factor
+            mastery_result = self.calculate_mastery_score(accuracy_score, final_bkt_score, average_time_factor)
             final_master_score = mastery_result['final_score']
             accuracy_component = mastery_result['accuracy_component']
             bkt_component = mastery_result['bkt_component']
@@ -1139,9 +1172,9 @@ class BKTAlgorithm:
             
             # Get final BKT score (last BKT value after all responses)
             final_bkt_score = float(responses[-1]['bkt_after']) if responses else 0.5
-            
-            # Calculate mastery score using the weighted formula
-            mastery_result = self.calculate_mastery_score(accuracy_score, final_bkt_score)
+
+            # Calculate mastery score using the weighted formula with time factor
+            mastery_result = self.calculate_mastery_score(accuracy_score, final_bkt_score, average_time_factor)
             final_master_score = mastery_result['final_score']
             accuracy_component = mastery_result['accuracy_component']
             bkt_component = mastery_result['bkt_component']
