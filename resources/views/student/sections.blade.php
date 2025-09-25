@@ -53,133 +53,64 @@
                             </div>
 
                             <!-- Quest Cards Container - Responsive -->
-                            <div class="shadow-lg px-2 xs:px-4 sm:px-3 lg:px-12 pb-2 rounded-xl space-y-3 sm:space-y-4">
+                            <div>
 
-                                <!-- Geometry Fundamentals Card -->
-                                <div
-                                    class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2 ">Geometry
-                                        Fundamentals</h3>
-                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Assessment covering basic
-                                        geometric shapes and properties</p>
+                                <div class="shadow-lg px-2 xs:px-4 sm:px-3 lg:px-12 pb-2 rounded-xl space-y-3 sm:space-y-4">
+                                    @forelse($sections as $section)
+                                        <div class="bg-gradient-to-r {{ $section['color'] }} rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                            <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">{{ $section['title'] }}</h3>
+                                            <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">{{ $section['description'] }}</p>
 
-                                    <!-- Stats Row - Mobile Responsive -->
-                                    <div
-                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150</div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward
+                                            <!-- Stats Row - Mobile Responsive -->
+                                            <div class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
+                                                <div class="text-center">
+                                                    <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['xp_reward'] }}</div>
+                                                    <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['time_limit'] }}</div>
+                                                    <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['difficulty'] }}</div>
+                                                    <div class="text-xs lg:text-lg font-medium opacity-90">Difficulty</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">25 mins
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1">Medium
-                                            </div>
-                                            <div class="text-xs lg:text-lg font-medium opacity-90">Difficulty</div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                    "
-                                        style="text-shadow:
-                                                                                                                                            -1px -1px 0 #7A4305,
-                                                                                                                                            1px -1px 0 #7A4305,
-                                                                                                                                            -1px 1px 0 #7A4305,
-                                                                                                                                            1px 1px 0 #7A4305,
-                                                                                                                                            0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
-                                </div>
+                                            <!-- Live Quiz Indicator -->
+                                            @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
+                                                <div class="mb-4 p-2 bg-red-500/20 border border-red-300/30 rounded-lg">
+                                                    <div class="flex items-center justify-center">
+                                                        <span class="text-red-200 text-sm font-medium">🔴 Live Quiz Mode</span>
+                                                    </div>
+                                                </div>
+                                            @endif
 
-                                <!-- Fractions and Decimals Card -->
-                                <div
-                                    class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4 lg:px-8 
-                                                                                                                                sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Fractions and
-                                        Decimals</h3>
-                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Practice assessment on
-                                        converting fractions to decimals</p>
-
-                                    <!-- Stats Row - Mobile Responsive -->
-                                    <div
-                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
+                                            <!-- Start Assessment Button - Responsive -->
+                                            @if(isset($section['assignment_id']))
+                                                <a href="{{ route('teacher-assessments.show', $section['id']) }}"
+                                                class="w-full bg-gradient-secondary drop-shadow-gradient-secondary text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors block text-center"
+                                                style="text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                    @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
+                                                        🔴 Live Quiz
+                                                    @else
+                                                        Start Assessment
+                                                    @endif
+                                                </a>
+                                            @else
+                                                <button class="w-full bg-gradient-secondary drop-shadow-gradient-secondary text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors"
+                                                        style="text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                    Start Assessment
+                                                </button>
+                                            @endif
                                         </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">25
-                                                mins
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
+                                    @empty
+                                        <div class="text-center py-12">
+                                            <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">quiz</span>
+                                            <h3 class="text-lg font-medium text-gray-900 mb-2">No assessments assigned</h3>
+                                            <p class="text-gray-500">Your teacher hasn't assigned any assessments yet</p>
                                         </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Easy
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                    "
-                                        style="text-shadow:
-                                                                                                                                            -1px -1px 0 #7A4305,
-                                                                                                                                            1px -1px 0 #7A4305,
-                                                                                                                                            -1px 1px 0 #7A4305,
-                                                                                                                                            1px 1px 0 #7A4305,
-                                                                                                                                            0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
-                                </div>
-
-                                <!-- Number Operations Quiz Card -->
-                                <div
-                                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8  lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Number Operations
-                                        Quiz</h3>
-                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Quick assessment on basic
-                                        arithmetic operations</p>
-
-                                    <!-- Stats Row - Mobile Responsive -->
-                                    <div
-                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150</div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">25 mins
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Hard
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                    "
-                                        style="text-shadow:
-                                                                                                                                            -1px -1px 0 #7A4305,
-                                                                                                                                            1px -1px 0 #7A4305,
-                                                                                                                                            -1px 1px 0 #7A4305,
-                                                                                                                                            1px 1px 0 #7A4305,
-                                                                                                                                            0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
+                                    @endforelse
                                 </div>
                             </div>
                         </div>
