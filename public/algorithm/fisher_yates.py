@@ -210,38 +210,6 @@ class EnhancedFisherYatesShuffle:
         finally:
             conn.close()
 
-    def get_recently_used_questions(self, user_id, competency, days=7):
-        """
-        Get questions recently used by user to avoid repetition
-        """
-        conn = self.connect_db()
-        if not conn:
-            return []
-        
-        try:
-            cursor = conn.cursor()
-            
-            # Get questions used in recent assessments (last 7 days, excluding diagnostic)
-            cursor.execute("""
-                SELECT DISTINCT qr.question_id
-                FROM question_responses qr
-                JOIN assessments a ON qr.assessment_id = a.assessment_id
-                WHERE qr.user_id = %s 
-                AND a.competency = %s
-                AND a.assessment_type = 'regular'
-                AND qr.answered_at >= DATE_SUB(NOW(), INTERVAL %s DAY)
-                ORDER BY qr.answered_at DESC
-            """, (user_id, competency, days))
-            
-            recently_used = [row[0] for row in cursor.fetchall()]
-            print(f"DEBUG: Found {len(recently_used)} recently used questions in last {days} days", file=sys.stderr)
-            return recently_used
-            
-        except mysql.connector.Error as e:
-            print(f"ERROR: Failed to get recently used questions: {e}", file=sys.stderr)
-            return []
-        finally:
-            conn.close()
 
     def get_available_questions(self, user_id, competency, difficulty_level, requested_count=15):
         """
@@ -258,14 +226,13 @@ class EnhancedFisherYatesShuffle:
             # First cleanup expired cooldowns
             self.cleanup_expired_cooldowns()
             
-            # Get questions in cooldown (FIXED: properly check cooldown table)
+            # Get questions in cooldown (only exclude cooldown questions)
             cooldown_questions = self.get_questions_in_cooldown(user_id, competency)
-            recently_used = self.get_recently_used_questions(user_id, competency, days=3)
-            
-            # Combine all excluded questions (remove duplicates)
-            excluded_questions = list(set(cooldown_questions + recently_used))
-            
-            print(f"DEBUG: Excluding {len(cooldown_questions)} cooldown + {len(recently_used)} recent = {len(excluded_questions)} total questions", file=sys.stderr)
+
+            # Only exclude cooldown questions (removed recent usage filtering)
+            excluded_questions = cooldown_questions
+
+            print(f"DEBUG: Excluding {len(cooldown_questions)} cooldown questions", file=sys.stderr)
             
             # Build exclusion clause
             exclusion_clause = ""
@@ -311,7 +278,7 @@ class EnhancedFisherYatesShuffle:
                 'available_questions': available_questions[:requested_count],
                 'total_found': len(available_questions),
                 'excluded_cooldown': len(cooldown_questions),
-                'excluded_recent': len(recently_used),
+                'excluded_recent': 0,  # No recent usage filtering anymore
                 'excluded_total': len(excluded_questions),
                 'requested_count': requested_count
             }
