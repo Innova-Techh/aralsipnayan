@@ -13,6 +13,13 @@ class RegularAssessmentController extends Controller
 {
     protected $assessmentGenerator;
 
+    // Max allowed time per difficulty (seconds) - matching bkt_algorithm.py
+    private $maxTimesPerDifficulty = [
+        'beginner' => 30,
+        'intermediate' => 45,
+        'advanced' => 60
+    ];
+
     public function __construct()
     {
         $this->assessmentGenerator = new AssessmentGenerationController();
@@ -346,8 +353,9 @@ class RegularAssessmentController extends Controller
                 ]);
             }
             
-            // Calculate scores
-            $normalizedTime = $timeTaken / $question->max_allowed_time;
+            // Calculate scores using difficulty-based max time
+            $maxAllowedTime = $this->getMaxTimeForDifficulty($assessment->difficulty_level);
+            $normalizedTime = $timeTaken / $maxAllowedTime;
             $timeScore = $this->calculateTimeScore($normalizedTime, $isCorrect);
             $basePoints = $this->getBasePoints($assessment->difficulty_level);
             $bonusPoints = $isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0;
@@ -361,8 +369,9 @@ class RegularAssessmentController extends Controller
             
             $bktBefore = $mastery ? $mastery->bkt_score : 0.5;
             
-            // Update BKT and mastery first to get new BKT score
-            $this->updateMasteryRecord($user->id, $assessment->competency, $isCorrect, $timeScore, $assessment->difficulty_level);
+            // Update BKT and mastery first to get new BKT score and ftime_factor
+            $masteryUpdate = $this->updateMasteryRecord($user->id, $assessment->competency, $isCorrect, $timeScore, $assessment->difficulty_level);
+            $ftimeFactor = $masteryUpdate['ftime_factor'] ?? $timeScore;
             
             // Get BKT score after update
             $masteryAfter = DB::table('student_mastery')
@@ -383,13 +392,14 @@ class RegularAssessmentController extends Controller
                 'user_answer' => $userAnswer,
                 'is_correct' => $isCorrect,
                 'response_time' => $timeTaken,
-                'max_allowed_time' => $question->max_allowed_time,
+                'max_allowed_time' => $maxAllowedTime,
                 'normalized_time' => $normalizedTime,
                 'time_score' => $timeScore,
                 'bkt_before' => $bktBefore,
                 'bkt_after' => $bktAfter,
                 'difficulty_factor' => $this->getDifficultyFactor($assessment->difficulty_level),
                 'time_factor' => $timeScore,
+                'ftime_factor' => $ftimeFactor,
                 'base_points' => $basePoints,
                 'time_bonus_points' => $bonusPoints,
                 'total_points' => $totalPoints,
@@ -571,11 +581,19 @@ class RegularAssessmentController extends Controller
         // All assessments have 30-minute time duration as requested
         $timeLimits = [
             'beginner' => 30,      // 30 minutes for 15 questions
-            'intermediate' => 30,   // 30 minutes for 20 questions  
+            'intermediate' => 30,   // 30 minutes for 20 questions
             'advanced' => 30        // 30 minutes for 25 questions
         ];
-        
+
         return $timeLimits[$difficulty] ?? 30;
+    }
+
+    /**
+     * Get max allowed time per question based on difficulty
+     */
+    private function getMaxTimeForDifficulty($difficulty)
+    {
+        return $this->maxTimesPerDifficulty[$difficulty] ?? 30;
     }
     
     /**
@@ -589,14 +607,17 @@ class RegularAssessmentController extends Controller
         if (!empty($question['choice_b'])) $options[1] = $question['choice_b'];
         if (!empty($question['choice_c'])) $options[2] = $question['choice_c'];
         if (!empty($question['choice_d'])) $options[3] = $question['choice_d'];
-        
+
+        $difficulty = $question['difficulty_level'] ?? 'beginner';
+        $maxTime = $this->getMaxTimeForDifficulty($difficulty);
+
         return [
             'question_id' => $question['question_id'],
             'text' => $question['question_text'],
             'type' => $question['question_type'] ?? 'multiple_choice',
             'options' => $options,
-            'max_time' => $question['max_allowed_time'] ?? 30,
-            'difficulty_level' => $question['difficulty_level'] ?? 'beginner',
+            'max_time' => $maxTime,
+            'difficulty_level' => $difficulty,
             'topic' => $question['topic_tag'] ?? '',
             'explanation' => $question['explanation'] ?? '',
             'correct_answer' => $question['correct_answer'] ?? ''
@@ -768,7 +789,7 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Update mastery record with BKT
+     * Update mastery record with BKT and cumulative time tracking
      */
     private function updateMasteryRecord($userId, $competency, $isCorrect, $timeScore, $difficulty)
     {
@@ -777,38 +798,40 @@ class RegularAssessmentController extends Controller
                 ->where('user_id', $userId)
                 ->where('competency', $competency)
                 ->first();
-            
+
             if (!$mastery) {
                 Log::warning('Mastery record not found for BKT update', [
                     'user_id' => $userId,
                     'competency' => $competency
                 ]);
-                return;
+                return ['ftime_factor' => $timeScore];
             }
-            
-            // Calculate new BKT score
+
+            // Calculate cumulative time tracking (like Python implementation)
+            $totalTimeScore = $mastery->cumulative_time_score + $timeScore;
+            $totalResponses = $mastery->total_questions_answered + 1;
+            $ftimeFactor = $totalResponses > 0 ? $totalTimeScore / $totalResponses : $timeScore;
+
+            // Calculate new BKT score using pure BKT calculation
             $newBktScore = $this->updateBKT(
                 $mastery->bkt_score,
                 $isCorrect,
                 $timeScore,
                 $difficulty,
-                [
-                    'prior_knowledge' => $mastery->prior_knowledge,
-                    'learn_rate' => $mastery->learn_rate,
-                    'slip_rate' => $mastery->slip_rate,
-                    'guess_rate' => $mastery->guess_rate
-                ]
+                [] // Parameters are now hardcoded in updateBKT method
             );
-            
+
             // Update counts and accuracy
             $newCorrectCount = $mastery->correct_answers + ($isCorrect ? 1 : 0);
             $newTotalCount = $mastery->total_questions_answered + 1;
             $newAccuracy = $newTotalCount > 0 ? $newCorrectCount / $newTotalCount : 0;
-            $newMasteryScore = $this->calculateMasteryScore($newAccuracy, $newBktScore);
-            
+
+            // Calculate mastery score with cumulative time factor
+            $newMasteryScore = $this->calculateMasteryScore($newAccuracy, $newBktScore, $ftimeFactor);
+
             // Check for difficulty level progression
             $newDifficulty = $this->checkDifficultyProgression($newMasteryScore, $mastery->current_difficulty);
-            
+
             DB::table('student_mastery')
                 ->where('user_id', $userId)
                 ->where('competency', $competency)
@@ -819,85 +842,106 @@ class RegularAssessmentController extends Controller
                     'current_difficulty' => $newDifficulty,
                     'correct_answers' => $newCorrectCount,
                     'total_questions_answered' => $newTotalCount,
+                    'cumulative_time_score' => $totalTimeScore,
+                    'current_ftime_factor' => $ftimeFactor,
+                    'average_time_factor' => $ftimeFactor,
                     'updated_at' => now()
                 ]);
-                
+
+            return ['ftime_factor' => $ftimeFactor];
+
         } catch (\Exception $e) {
             Log::error('Failed to update mastery record: ' . $e->getMessage());
+            return ['ftime_factor' => $timeScore];
         }
     }
     
     /**
-     * Update BKT score with smoother transitions
+     * Update BKT score using exact same calculation as bkt_algorithm.py
+     * Pure BKT calculation without time or difficulty factors - those are applied only in final mastery score.
      */
     private function updateBKT($priorBkt, $isCorrect, $timeScore, $difficulty, $params)
     {
-        // Use more conservative parameters to prevent large jumps
-        $adjustedParams = [
-            'learn_rate' => min($params['learn_rate'], 0.15), // Cap learning rate
-            'slip_rate' => $params['slip_rate'],
-            'guess_rate' => $params['guess_rate']
+        // Use default aggressive parameters to match Python implementation
+        $bktParams = [
+            'prior_knowledge' => 0.15,    // Very low baseline for dramatic learning detection
+            'learn_rate' => 0.65,         // Near-maximum learning rate for instant responsiveness
+            'slip_rate' => 0.003,         // Practically zero slip rate (theoretical minimum)
+            'guess_rate' => 0.008         // Practically zero guess rate (theoretical minimum)
         ];
-        
-        // Reduce the impact of difficulty factor to prevent jumps
-        $difficultyFactor = $this->getDifficultyFactor($difficulty);
-        $moderatedDifficultyFactor = 1.0 + (($difficultyFactor - 1.0) * 0.3); // Reduce impact by 70%
-        
-        // Apply time score more conservatively
-        $moderatedTimeScore = 0.7 + ($timeScore * 0.3); // Time score between 0.7-1.0
-        
+
+        $P_L = $priorBkt;
+        $P_T = $bktParams['learn_rate'];
+        $P_S = $bktParams['slip_rate'];
+        $P_G = $bktParams['guess_rate'];
+
         if ($isCorrect) {
-            // For correct answers
-            $numerator = $priorBkt * (1 - $adjustedParams['slip_rate']);
-            $denominator = $priorBkt * (1 - $adjustedParams['slip_rate']) + (1 - $priorBkt) * $adjustedParams['guess_rate'];
+            // For correct answers - Academic Equation 3
+            $numerator = $P_L * (1 - $P_S);
+            $denominator = $P_L * (1 - $P_S) + (1 - $P_L) * $P_G;
+
+            if ($denominator == 0) {
+                return $P_L;  // Return prior if denominator is zero
+            }
+
+            // Calculate posterior probability
+            $posterior = $numerator / $denominator;
+
+            // Apply learning enhancement for correct answers only
+            $P_L_new = $posterior + (1 - $posterior) * $P_T;
         } else {
-            // For incorrect answers
-            $numerator = $priorBkt * $adjustedParams['slip_rate'];
-            $denominator = $priorBkt * $adjustedParams['slip_rate'] + (1 - $priorBkt) * (1 - $adjustedParams['guess_rate']);
+            // For incorrect answers - Academic Equation 4
+            $numerator = $P_L * $P_S;
+            $denominator = $P_L * $P_S + (1 - $P_L) * (1 - $P_G);
+
+            if ($denominator == 0) {
+                return $P_L;  // Return prior if denominator is zero
+            }
+
+            // Calculate posterior probability
+            $posterior = $numerator / $denominator;
+
+            // No learning enhancement for incorrect answers (standard BKT)
+            $P_L_new = $posterior;
         }
-        
-        if ($denominator == 0) return $priorBkt;
-        
-        $posteriorBkt = $numerator / $denominator;
-        
-        // Apply learning transition more gradually
-        $learningRate = $adjustedParams['learn_rate'] * $moderatedTimeScore * $moderatedDifficultyFactor;
-        $newBkt = $posteriorBkt + (1 - $posteriorBkt) * $learningRate;
-        
-        // Prevent dramatic changes - limit change to 0.1 per question
-        $maxChange = 0.1;
-        $change = $newBkt - $priorBkt;
-        if (abs($change) > $maxChange) {
-            $newBkt = $priorBkt + ($change > 0 ? $maxChange : -$maxChange);
-        }
-        
-        return max(0.01, min(0.99, $newBkt)); // Keep BKT between 1% and 99%
+
+        // Apply HYPER-MINIMAL dampening for theoretical maximum discrimination
+        $dampening_factor = 0.995;  // Theoretical maximum sensitivity (99.5% of raw BKT change)
+        $P_L_dampened = $P_L + ($P_L_new - $P_L) * $dampening_factor;
+
+        return max(0.02, min(0.96, $P_L_dampened));  // HYPER-WIDE range [0.02, 0.96] for maximum AUC-ROC separation
     }
     
     /**
-     * Get difficulty factor (reduced impact to prevent jumps)
+     * Get difficulty factor (now only used for points calculation, not BKT)
      */
     private function getDifficultyFactor($difficulty)
     {
         $factors = [
-            'beginner' => 0.95,    // Reduced from 0.8
+            'beginner' => 0.8,
             'intermediate' => 1.0,
-            'advanced' => 1.05     // Reduced from 1.2
+            'advanced' => 1.2
         ];
-        
+
         return $factors[$difficulty] ?? 1.0;
     }
     
     /**
-     * Calculate mastery score with smoother transitions
+     * Calculate mastery score using exact same formula as bkt_algorithm.py
+     * Formula: Mastery_Score = (0.55 × Accuracy) + (0.45 × Final_BKT × Average_Time_Factor)
+     * Final_Percentage = Mastery_Score × 100
      */
-    private function calculateMasteryScore($accuracy, $bktScore)
+    private function calculateMasteryScore($accuracy, $bktScore, $timeFactor = 1.0)
     {
-        // Use a more balanced approach with smoother transitions
-        $weightedScore = (0.6 * $accuracy + 0.4 * $bktScore) * 100;
-        
-        // Apply smoothing to prevent dramatic changes
-        return min(100, max(0, $weightedScore));
+        // Use exact weights from Python implementation
+        $weightAccuracy = 0.55;  // 55%
+        $weightBKT = 0.45;       // 45%
+
+        $accuracyComponent = $weightAccuracy * $accuracy;
+        $bktComponent = $weightBKT * $bktScore * $timeFactor;
+        $finalScore = ($accuracyComponent + $bktComponent) * 100;
+
+        return min(100, max(0, $finalScore));
     }
     
     /**
@@ -1038,7 +1082,13 @@ class RegularAssessmentController extends Controller
                     ->update([
                         'suggested_difficulty_level' => $suggestedDifficulty
                     ]);
-                    
+
+                // Update student_mastery with total_assessments_taken increment (matching Python implementation)
+                DB::table('student_mastery')
+                    ->where('user_id', $assessment->user_id)
+                    ->where('competency', $assessment->competency)
+                    ->increment('total_assessments_taken');
+
                 Log::info("Assessment completed successfully", [
                     'assessment_id' => $assessmentId,
                     'accuracy' => $accuracy,
@@ -1080,8 +1130,8 @@ class RegularAssessmentController extends Controller
                 $bktAdjustment = -$consolidationFactor * (1 - $avgTimeScore);
             }
             
-            $newBktScore = max(0.01, min(0.99, $mastery->bkt_score + $bktAdjustment));
-            $newMasteryScore = $this->calculateMasteryScore($mastery->accuracy_score, $newBktScore);
+            $newBktScore = max(0.02, min(0.96, $mastery->bkt_score + $bktAdjustment));
+            $newMasteryScore = $this->calculateMasteryScore($mastery->accuracy_score, $newBktScore, $avgTimeScore);
             
             // Check for difficulty progression
             $newDifficulty = $this->checkDifficultyProgression($newMasteryScore, $mastery->current_difficulty);
