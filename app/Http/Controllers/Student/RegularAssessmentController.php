@@ -361,25 +361,19 @@ class RegularAssessmentController extends Controller
             $bonusPoints = $isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0;
             $totalPoints = $basePoints + $bonusPoints;
             
-            // Get BKT score before answering
+            // Get BKT score before answering (for tracking only, not updating)
             $mastery = DB::table('student_mastery')
                 ->where('user_id', $user->id)
                 ->where('competency', $assessment->competency)
                 ->first();
-            
+
             $bktBefore = $mastery ? $mastery->bkt_score : 0.5;
-            
-            // Update BKT and mastery first to get new BKT score and ftime_factor
-            $masteryUpdate = $this->updateMasteryRecord($user->id, $assessment->competency, $isCorrect, $timeScore, $assessment->difficulty_level);
-            $ftimeFactor = $masteryUpdate['ftime_factor'] ?? $timeScore;
-            
-            // Get BKT score after update
-            $masteryAfter = DB::table('student_mastery')
-                ->where('user_id', $user->id)
-                ->where('competency', $assessment->competency)
-                ->first();
-            
-            $bktAfter = $masteryAfter ? $masteryAfter->bkt_score : $bktBefore;
+
+            // Calculate what the BKT score would be after this question (for tracking)
+            $bktAfter = $this->calculateBKTUpdate($bktBefore, $isCorrect, $timeScore, $assessment->difficulty_level);
+
+            // Calculate cumulative time factor for this response
+            $ftimeFactor = $this->calculateCurrentTimeFactor($user->id, $assessment->competency, $timeScore);
             
             // Record response with BKT tracking
             $responseId = $this->generateResponseId($assessmentId, $questionId);
@@ -789,7 +783,46 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Update mastery record with BKT and cumulative time tracking
+     * Calculate BKT update without modifying student_mastery table
+     */
+    private function calculateBKTUpdate($priorBkt, $isCorrect, $timeScore, $difficulty)
+    {
+        return $this->updateBKT($priorBkt, $isCorrect, $timeScore, $difficulty, []);
+    }
+
+    /**
+     * Calculate current time factor based on previous responses
+     */
+    private function calculateCurrentTimeFactor($userId, $competency, $currentTimeScore)
+    {
+        try {
+            // Get cumulative time score from previous responses in this assessment
+            $cumulativeTimeScore = DB::table('question_responses qr')
+                ->join('assessments a', 'qr.assessment_id', '=', 'a.assessment_id')
+                ->where('a.user_id', $userId)
+                ->where('a.competency', $competency)
+                ->where('a.status', 'in_progress')
+                ->sum('qr.time_score');
+
+            // Count total responses including current one
+            $totalResponses = DB::table('question_responses qr')
+                ->join('assessments a', 'qr.assessment_id', '=', 'a.assessment_id')
+                ->where('a.user_id', $userId)
+                ->where('a.competency', $competency)
+                ->where('a.status', 'in_progress')
+                ->count() + 1; // +1 for current response
+
+            $totalTimeScore = $cumulativeTimeScore + $currentTimeScore;
+            return $totalResponses > 0 ? $totalTimeScore / $totalResponses : $currentTimeScore;
+
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate time factor: ' . $e->getMessage());
+            return $currentTimeScore;
+        }
+    }
+
+    /**
+     * Update mastery record with BKT and cumulative time tracking (DEPRECATED - only used for completion)
      */
     private function updateMasteryRecord($userId, $competency, $isCorrect, $timeScore, $difficulty)
     {
@@ -1000,15 +1033,8 @@ class RegularAssessmentController extends Controller
                 
                 $initialBktScore = $mastery ? $mastery->bkt_score : 0.5;
                 
-                // Apply final BKT consolidation based on overall performance
-                $this->applyFinalBKTConsolidation(
-                    $assessment->user_id, 
-                    $assessment->competency, 
-                    $accuracy / 100, // Convert to decimal
-                    $responses->avg_time_score ?? 0.5,
-                    $assessment->difficulty_level,
-                    $responses->total_answered
-                );
+                // Calculate final mastery metrics from all question responses
+                $this->calculateFinalMasteryFromResponses($assessment, $responses);
                 
                 // Get final BKT scores after consolidation
                 $finalMastery = DB::table('student_mastery')
@@ -1107,7 +1133,82 @@ class RegularAssessmentController extends Controller
     }
     
     /**
-     * Apply final BKT consolidation after assessment completion
+     * Calculate final mastery metrics from all question responses
+     */
+    private function calculateFinalMasteryFromResponses($assessment, $responseSummary)
+    {
+        try {
+            // Get all question responses for this assessment
+            $questionResponses = DB::table('question_responses')
+                ->where('assessment_id', $assessment->assessment_id)
+                ->orderBy('answered_at')
+                ->get();
+
+            if ($questionResponses->isEmpty()) {
+                Log::warning('No question responses found for assessment completion');
+                return;
+            }
+
+            // Get current mastery record
+            $mastery = DB::table('student_mastery')
+                ->where('user_id', $assessment->user_id)
+                ->where('competency', $assessment->competency)
+                ->first();
+
+            $initialBktScore = $mastery ? $mastery->bkt_score : 0.5;
+            $currentBktScore = $initialBktScore;
+
+            // Calculate BKT progression through all questions
+            foreach ($questionResponses as $response) {
+                $currentBktScore = $this->updateBKT(
+                    $currentBktScore,
+                    (bool)$response->is_correct,
+                    $response->time_score,
+                    $assessment->difficulty_level,
+                    []
+                );
+            }
+
+            // Calculate final metrics
+            $accuracy = $responseSummary->total_answered > 0 ?
+                $responseSummary->correct_answers / $responseSummary->total_answered : 0;
+
+            $averageTimeFactor = $responseSummary->avg_time_score ?? 0.5;
+            $finalMasteryScore = $this->calculateMasteryScore($accuracy, $currentBktScore, $averageTimeFactor);
+            $newDifficulty = $this->checkDifficultyProgression($finalMasteryScore, $mastery->current_difficulty ?? 'beginner');
+
+            // Update student_mastery with final calculated values
+            DB::table('student_mastery')
+                ->where('user_id', $assessment->user_id)
+                ->where('competency', $assessment->competency)
+                ->update([
+                    'bkt_score' => $currentBktScore,
+                    'accuracy_score' => $accuracy,
+                    'final_mastery_score' => $finalMasteryScore,
+                    'current_difficulty' => $newDifficulty,
+                    'correct_answers' => ($mastery->correct_answers ?? 0) + $responseSummary->correct_answers,
+                    'total_questions_answered' => ($mastery->total_questions_answered ?? 0) + $responseSummary->total_answered,
+                    'cumulative_time_score' => ($mastery->cumulative_time_score ?? 0) + ($responseSummary->avg_time_score * $responseSummary->total_answered),
+                    'current_ftime_factor' => $averageTimeFactor,
+                    'average_time_factor' => $averageTimeFactor,
+                    'updated_at' => now()
+                ]);
+
+            Log::info("Final mastery calculated from responses", [
+                'assessment_id' => $assessment->assessment_id,
+                'initial_bkt' => $initialBktScore,
+                'final_bkt' => $currentBktScore,
+                'final_mastery' => $finalMasteryScore,
+                'new_difficulty' => $newDifficulty
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to calculate final mastery from responses: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Apply final BKT consolidation after assessment completion (DEPRECATED)
      */
     private function applyFinalBKTConsolidation($userId, $competency, $overallAccuracy, $avgTimeScore, $difficulty, $questionCount)
     {
