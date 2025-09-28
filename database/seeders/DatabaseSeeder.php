@@ -47,6 +47,7 @@ class DatabaseSeeder extends Seeder
                         'firstname' => 'John',
                         'lastname' => 'Doe',
                         'middlename' => 'Michael',
+                        'gender' => 'male',
                         'section' => 'A',
                         'grade_level' => '6',
                         'school_name' => 'Pembo Elementary School',

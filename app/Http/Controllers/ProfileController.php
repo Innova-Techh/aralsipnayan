@@ -17,8 +17,22 @@ class ProfileController extends Controller
     {
         $user = Auth::guard('student')->user();
         $profile = $user->studentProfile;
-        
-        return view('student.profile.edit', compact('profile'));
+
+        // Pass student data for gender-based avatar filtering
+        $student = (object) [
+            'id' => $user->id,
+            'gender' => $profile->gender ?? null,
+            'firstname' => $profile->firstname ?? 'Student',
+            'lastname' => $profile->lastname ?? 'User',
+            'avatar_url' => $profile->avatar_url ?? null
+        ];
+
+        // Set avatar URL for the main display
+        $userAvatarUrl = $profile && $profile->avatar_url
+            ? asset($profile->avatar_url)
+            : asset('images/profile/avatar5.png');
+
+        return view('student.profile.edit', compact('profile', 'student', 'userAvatarUrl'));
     }
     
     /**

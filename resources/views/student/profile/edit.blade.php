@@ -279,8 +279,9 @@
             <div class="relative p-5 sm:p-6 min-h-96 bg-white rounded-2xl -mt-4 z-10">
                 <div class="mobile-scroll-content max-w-4xl mx-auto">
                     <div class="grid grid-cols-3 block-ce xl:gap-6 lg:gap-4 xs:gap-6 mb-8">
-                        <!-- Avatar 1 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 1: BOY 1 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'female') hidden @endif"
                             data-avatar="avatar1.png">
                             <div
                                 class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-1 drop-shadow-avatar-1 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -289,8 +290,9 @@
                             </div>
                         </div>
 
-                        <!-- Avatar 2 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 2: GIRL 1 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'male') hidden @endif"
                             data-avatar="avatar2.png">
                             <div
                                 class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-2 drop-shadow-avatar-2 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -299,8 +301,9 @@
                             </div>
                         </div>
 
-                        <!-- Avatar 3 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 3: GIRL 2 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'male') hidden @endif"
                             data-avatar="avatar3.png">
                             <div
                                 class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-3 drop-shadow-avatar-3 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -309,8 +312,9 @@
                             </div>
                         </div>
 
-                        <!-- Avatar 4 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 4: BOY 2 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'female') hidden @endif"
                             data-avatar="avatar4.png">
                             <div
                                 class="avatar-container relative aspect-square  xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-4 drop-shadow-avatar-4 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -319,8 +323,9 @@
                             </div>
                         </div>
 
-                        <!-- Avatar 5 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 5: GIRL 3 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'male') hidden @endif"
                             data-avatar="avatar5.png">
                             <div
                                 class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-5 drop-shadow-avatar-5 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -329,8 +334,9 @@
                             </div>
                         </div>
 
-                        <!-- Avatar 6 -->
-                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8"
+                        <!-- Avatar 6: BOY 3 AVATAR -->
+                        <div class="avatar-option cursor-pointer transform hover:scale-105 transition-transform pt-8
+                            @if(isset($student) && $student->gender === 'female') hidden @endif"
                             data-avatar="avatar6.png">
                             <div
                                 class="avatar-container relative aspect-square xl:w-[12rem] xl:h-[15rem] lg:w-[10rem] lg:h-[12rem] xs:w-[6.9rem] xs:h-[8.5rem] bg-avatar-6 drop-shadow-avatar-6 rounded-2xl shadow-md flex items-end justify-center overflow-visible">
@@ -353,8 +359,15 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // Get all avatar options and filter only visible ones
+                const allAvatarOptions = document.querySelectorAll('.avatar-option');
+                const visibleAvatarOptions = Array.from(allAvatarOptions).filter(option => !option.classList.contains('hidden'));
+
+                // Create arrays based on visible avatars only
+                const avatars = visibleAvatarOptions.map(option => option.getAttribute('data-avatar'));
+
                 // Avatar glow classes corresponding to each avatar
-                const avatarGlowClasses = [
+                const allAvatarGlowClasses = [
                     'avatar-glow-1', // Avatar 1 - Yellow/Gold glow
                     'avatar-glow-2', // Avatar 2 - Pink glow
                     'avatar-glow-3', // Avatar 3 - Red/Coral glow
@@ -363,21 +376,16 @@
                     'avatar-glow-6', // Avatar 6 - Orange glow
                 ];
 
-                const avatars = [
-                    'avatar1.png',
-                    'avatar2.png',
-                    'avatar3.png',
-                    'avatar4.png',
-                    'avatar5.png',
-                    'avatar6.png',
-                    'avatar7.png',
-                    'avatar8.png'
-                ];
+                // Map visible avatars to their corresponding glow classes
+                const avatarGlowClasses = avatars.map(avatar => {
+                    const avatarIndex = parseInt(avatar.replace('avatar', '').replace('.png', '')) - 1;
+                    return allAvatarGlowClasses[avatarIndex];
+                });
 
                 // Detect current avatar from the main avatar image src
                 const mainAvatar = document.getElementById('mainAvatar');
                 const currentAvatarSrc = mainAvatar.src;
-                let currentAvatarIndex = 4; // Default to avatar5 (index 4)
+                let currentAvatarIndex = 0; // Default to first visible avatar
 
                 // Try to detect current avatar from src
                 avatars.forEach((avatar, index) => {
@@ -386,9 +394,14 @@
                     }
                 });
 
+                // If current avatar is not in the visible list, default to first visible avatar
+                if (!avatars.some(avatar => currentAvatarSrc.includes(avatar))) {
+                    currentAvatarIndex = 0;
+                }
+
                 const prevBtn = document.getElementById('prevBtn');
                 const nextBtn = document.getElementById('nextBtn');
-                const avatarOptions = document.querySelectorAll('.avatar-option');
+                const avatarOptions = visibleAvatarOptions; // Use only visible options
                 const selectAvatarBtn = document.getElementById('selectAvatarBtn');
 
                 // Function to update main avatar display
@@ -396,11 +409,11 @@
                     mainAvatar.src = `{{ asset('images/profile/') }}/${avatars[index]}`;
                     currentAvatarIndex = index;
 
-                    // Remove all glow classes from all avatar containers
+                    // Remove all glow classes from all visible avatar containers
                     avatarOptions.forEach((option, i) => {
                         const container = option.querySelector('.avatar-container');
                         // Remove all possible glow classes
-                        avatarGlowClasses.forEach(glowClass => {
+                        allAvatarGlowClasses.forEach(glowClass => {
                             container.classList.remove(glowClass);
                         });
                     });
