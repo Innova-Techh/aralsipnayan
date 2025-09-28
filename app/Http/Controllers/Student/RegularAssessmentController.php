@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Student\AssessmentGenerationController;
+use App\Http\Controllers\Student\GamificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 class RegularAssessmentController extends Controller
 {
     protected $assessmentGenerator;
+    protected $gamificationController;
 
     // Max allowed time per difficulty (seconds) - matching bkt_algorithm.py
     private $maxTimesPerDifficulty = [
@@ -23,6 +25,7 @@ class RegularAssessmentController extends Controller
     public function __construct()
     {
         $this->assessmentGenerator = new AssessmentGenerationController();
+        $this->gamificationController = new GamificationController();
     }
 
     /**
@@ -357,9 +360,23 @@ class RegularAssessmentController extends Controller
             $maxAllowedTime = $this->getMaxTimeForDifficulty($assessment->difficulty_level);
             $normalizedTime = $timeTaken / $maxAllowedTime;
             $timeScore = $this->calculateTimeScore($normalizedTime, $isCorrect);
-            $basePoints = $this->getBasePoints($assessment->difficulty_level);
-            $bonusPoints = $isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0;
-            $totalPoints = $basePoints + $bonusPoints;
+            
+            // Record gamification points using new system
+            $gamificationResult = $this->gamificationController->recordQuestionPoints(
+                $user->id,
+                $assessmentId,
+                $questionId,
+                $isCorrect,
+                $timeTaken,
+                $maxAllowedTime,
+                $assessment->difficulty_level,
+                $assessment->competency
+            );
+            
+            // Use gamification points for consistency
+            $basePoints = $gamificationResult['success'] ? $gamificationResult['base_points'] : $this->getBasePoints($assessment->difficulty_level);
+            $bonusPoints = $gamificationResult['success'] ? $gamificationResult['time_bonus'] : ($isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0);
+            $totalPoints = $gamificationResult['success'] ? $gamificationResult['total_points'] : ($basePoints + $bonusPoints);
             
             // Get BKT score before answering (for tracking only, not updating)
             $mastery = DB::table('student_mastery')
@@ -413,22 +430,50 @@ class RegularAssessmentController extends Controller
             $progress = $this->getAssessmentProgress($assessmentId);
             $isComplete = (int)$progress['answered_questions'] >= (int)$progress['total_questions'];
             
+            // Get updated gamification status
+            $gamificationStatus = $this->gamificationController->getUserGamificationStatus($user->id);
+            
             $responseData = [
                 'success' => true,
                 'is_correct' => $isCorrect,
                 'correct_answer' => $question->correct_answer,
                 'explanation' => $question->explanation,
                 'points_earned' => $totalPoints,
+                'base_points' => $basePoints,
+                'bonus_points' => $bonusPoints,
                 'assessment_complete' => $isComplete,
-                'progress' => $progress
+                'progress' => $progress,
+                'gamification' => [
+                    'level_up' => $gamificationResult['success'] && isset($gamificationResult['level_up']) ? $gamificationResult['level_up'] : false,
+                    'rank_up' => $gamificationResult['success'] && isset($gamificationResult['rank_up']) ? $gamificationResult['rank_up'] : false,
+                    'current_level' => $gamificationStatus['current_level'],
+                    'current_rank' => $gamificationStatus['current_rank'],
+                    'total_points' => $gamificationStatus['total_points'],
+                    'streak' => $gamificationStatus['current_streak']
+                ]
             ];
             
             if ($isComplete) {
-                $this->completeAssessment($assessmentId);
+                $completionResult = $this->completeAssessment($assessmentId);
+                
+                // Record assessment completion bonus
+                if ($completionResult && isset($completionResult['accuracy'])) {
+                    $completionBonus = $this->gamificationController->recordAssessmentCompletionBonus(
+                        $user->id,
+                        $assessmentId,
+                        $assessment->competency,
+                        $completionResult['accuracy'],
+                        $progress['answered_questions']
+                    );
+                    
+                    if ($completionBonus > 0) {
+                        $responseData['completion_bonus'] = $completionBonus;
+                    }
+                }
                 
                 // Add redirect URL for completed assessment
                 $categoryForUrl = $assessment->competency;
-                $responseData['redirect_url'] = route('student.quiz.results.complete', $categoryForUrl) . '?assessment_id=' . $assessmentId;
+                $responseData['redirect_url'] = route('student.results.complete', $categoryForUrl) . '?assessment_id=' . $assessmentId;
             }
             
             return response()->json($responseData);
@@ -797,16 +842,16 @@ class RegularAssessmentController extends Controller
     {
         try {
             // Get cumulative time score from previous responses in this assessment
-            $cumulativeTimeScore = DB::table('question_responses qr')
-                ->join('assessments a', 'qr.assessment_id', '=', 'a.assessment_id')
+            $cumulativeTimeScore = DB::table('question_responses as qr')
+                ->join('assessments as a', 'qr.assessment_id', '=', 'a.assessment_id')
                 ->where('a.user_id', $userId)
                 ->where('a.competency', $competency)
                 ->where('a.status', 'in_progress')
                 ->sum('qr.time_score');
 
             // Count total responses including current one
-            $totalResponses = DB::table('question_responses qr')
-                ->join('assessments a', 'qr.assessment_id', '=', 'a.assessment_id')
+            $totalResponses = DB::table('question_responses as qr')
+                ->join('assessments as a', 'qr.assessment_id', '=', 'a.assessment_id')
                 ->where('a.user_id', $userId)
                 ->where('a.competency', $competency)
                 ->where('a.status', 'in_progress')
@@ -1123,6 +1168,14 @@ class RegularAssessmentController extends Controller
                     'bkt_after' => $finalBktScore,
                     'final_mastery' => $finalMasteryScore
                 ]);
+                
+                return [
+                    'accuracy' => $accuracy / 100, // Return as decimal for gamification
+                    'questions_answered' => $responses->total_answered,
+                    'correct_answers' => $responses->correct_answers,
+                    'total_points' => $responses->total_points_earned,
+                    'final_mastery_score' => $finalMasteryScore
+                ];
             }
             
         } catch (\Exception $e) {
@@ -1130,6 +1183,8 @@ class RegularAssessmentController extends Controller
                 'assessment_id' => $assessmentId
             ]);
         }
+        
+        return null;
     }
     
     /**
@@ -2028,7 +2083,7 @@ class RegularAssessmentController extends Controller
                 // All questions answered, redirect to results page
                 return response()->json([
                     'success' => true,
-                    'redirect' => route('student.quiz.results.complete', $category) . '?assessment_id=' . $assessmentId
+                    'redirect' => route('student.results.complete', $category) . '?assessment_id=' . $assessmentId
                 ]);
             }
             
