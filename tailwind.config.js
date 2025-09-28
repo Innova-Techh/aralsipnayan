@@ -857,5 +857,181 @@ radial-gradient(circle at center,
                 }
             );
         }),
+        plugin(function ({ addUtilities }) {
+            addUtilities({
+                // Progress bar track (main background)
+                ".progress-track": {
+                    position: "relative",
+                    overflow: "visible",
+                    backgroundColor: "#ECECEC",
+                    boxShadow: "inset 0 2px 2px #FCF3FF",
+                },
+
+                // Progress fill (blue gradient with inner shadows)
+                ".progress-fill": {
+                    position: "relative",
+                    overflow: "visible",
+                    background: "linear-gradient(to left, #1E3A8A, #4A9EFF)",
+                    boxShadow:
+                        "inset 0 -2px 2px #0C305E, inset 0 2px 2px #FCF3FF",
+                },
+
+                // Progress handle/circle
+                ".progress-handle": {
+                    position: "absolute",
+                    top: "50%",
+                    left: "100%",
+                    transform: "translate(-50%, -50%)",
+                    width: "32px !important",
+                    height: "32px !important",
+                    background: "linear-gradient(to left, #1E3A8A, #4A9EFF)",
+                    borderRadius: "50%",
+                    border: "none !important",
+                    outline: "none !important",
+                    boxShadow: `
+                inset 0 -2px 4px #0C305E,
+                inset -4px -2px 4px #67A9FD, inset 0 2px 2px #FCF3FF !important `,
+                    transition: "all 0.3s ease",
+                    "@screen sm": {
+                        width: "24px",
+                        height: "24px",
+                    },
+                    "@screen lg": {
+                        width: "38px !important",
+                        height: "38px !important",
+                    },
+                    "&:hover": {
+                        transform: "translate(-50%, -50%) scale(1.05)",
+                    },
+                },
+            });
+        }),
+        // Add this plugin to your existing plugins array in tailwind.config.js
+        plugin(function ({ addUtilities }) {
+            addUtilities({
+                // Achievement Progress bar track (main background)
+                ".progress-track": {
+                    position: "relative",
+                    overflow: "visible",
+                    backgroundColor: "#ECECEC",
+                    boxShadow: "inset 0 2px 2px #FCF3FF",
+                },
+
+                // Achievement Progress fill (blue gradient with inner shadows)
+                ".progress-fill": {
+                    position: "relative",
+                    overflow: "visible",
+                    background: "linear-gradient(to left, #1E3A8A, #4A9EFF)",
+                    boxShadow: "inset 0 -2px 2px #0C305E",
+                },
+
+                // Achievement Progress handle/circle - responsive sizing
+                ".progress-handle": {
+                    position: "absolute",
+                    top: "50%",
+                    left: "100%",
+                    transform: "translate(-50%, -50%)",
+                    width: "28px",
+                    height: "28px",
+                    background: "linear-gradient(to left, #4A9EFF, #1E3A8A)",
+                    borderRadius: "50%",
+                    border: "none",
+                    outline: "none",
+                    boxShadow: `
+                inset 0 -2px 4px #0C305E,
+                inset -4px -2px 2px #67A9FD,
+                0 3px 8px rgba(0, 0, 0, 0.2)
+            `,
+                    transition: "all 0.3s ease",
+                    zIndex: 10,
+                    // Extra small phones (375px)
+                    "@screen xs": {
+                        width: "32px",
+                        height: "32px",
+                    },
+                    // Large phones (425px)
+                    "@screen sm": {
+                        width: "36px",
+                        height: "36px",
+                    },
+                    // Small tablets (640px)
+                    "@screen md": {
+                        width: "40px",
+                        height: "40px",
+                    },
+                    // iPads and larger (768px)
+                    "@screen lg": {
+                        width: "48px",
+                        height: "48px",
+                    },
+                    // Laptops (1024px)
+                    "@screen xl": {
+                        width: "52px",
+                        height: "52px",
+                    },
+                    "&:hover": {
+                        transform: "translate(-50%, -50%) scale(1.05)",
+                        boxShadow: `
+                    inset 0 -2px 4px #0C305E,
+                    inset -4px -2px 2px #67A9FD,
+                    0 5px 15px rgba(74, 158, 255, 0.4)
+                `,
+                    },
+                },
+
+                // Level Progress bar track (yellow/orange theme)
+                ".level-progress-track": {
+                    position: "relative",
+                    overflow: "visible",
+                    backgroundColor: "#ECECEC",
+                    boxShadow: "inset 0 2px 2px #FCF3FF",
+                },
+
+                // Level Progress fill (yellow/orange gradient)
+                ".level-progress-fill": {
+                    position: "relative",
+                    overflow: "visible",
+                    background: "linear-gradient(to left, #F59E0B, #FBBF24)",
+                    boxShadow: "inset 0 -2px 2px #B45309",
+                },
+
+                // Level Progress handle/circle - smaller for level cards
+                ".level-progress-handle": {
+                    position: "absolute",
+                    top: "50%",
+                    left: "100%",
+                    transform: "translate(-50%, -50%)",
+                    width: "16px",
+                    height: "16px",
+                    background: "linear-gradient(to left, #FBBF24, #F59E0B)",
+                    borderRadius: "50%",
+                    border: "none",
+                    outline: "none",
+                    boxShadow: `
+                inset 0 -1px 2px #B45309,
+                inset -2px -1px 1px #FCD34D,
+                0 2px 4px rgba(0, 0, 0, 0.15)
+            `,
+                    transition: "all 0.3s ease",
+                    zIndex: 10,
+                    "@screen sm": {
+                        width: "18px",
+                        height: "18px",
+                    },
+                    "@screen md": {
+                        width: "20px",
+                        height: "20px",
+                    },
+                    "&:hover": {
+                        transform: "translate(-50%, -50%) scale(1.05)",
+                        boxShadow: `
+                    inset 0 -1px 2px #B45309,
+                    inset -2px -1px 1px #FCD34D,
+                    0 3px 8px rgba(251, 191, 36, 0.4)
+                `,
+                    },
+                },
+            });
+        }),
     ],
 };

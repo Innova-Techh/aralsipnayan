@@ -4,11 +4,55 @@
 
 @section('content')
 
+    <style>
+        .progress-container {
+            position: relative;
+        }
+
+        .progress-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 640px) {
+            .progress-handle {
+                width: 24px;
+                height: 24px;
+                border-width: 4px;
+            }
+        }
+
+        .progress-handle:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .progress-track {
+            background: linear-gradient(to right, #e5e7eb 0%, #e5e7eb 100%);
+            position: relative;
+            overflow: visible;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+            position: relative;
+            overflow: visible;
+        }
+    </style>
+
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
         <div class="min-h-screen bg-white">
             <div class="space-y-6 sm:space-y-8">
                 <!-- Header -->
-                <div class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center bg-center bg-"
+                <div class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 mb-16 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center bg-center bg-"
                     {{-- style="background-image: url('{{ asset('images/achievements/achievements-bg-v3.png') }}');"> --}}>
                     <!-- Grid Background -->
                     <div class="absolute inset-0 opacity-30"
@@ -33,28 +77,44 @@
                 @php
                     $progress = $totalCount > 0 ? round(($earnedCount / $totalCount) * 100) : 0;
                 @endphp
-                <div class="bg-achievement-progress shadow-xl border p-6 rounded-2xl mb-6">
-                    <div class="flex items-center mb-2">
-                        <svg class="h-6 w-6 text-blue-100 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-achievement-progress shadow-xl rounded-2xl mb-6 p-3 xs:p-4 sm:p-6 md:p-8 lg:px-12 lg:py-8"
+                    style="box-shadow: 0 6px 0 0 #051C52; ;">
+                    <div class="flex items-center mb-2 xs:mb-3 sm:mb-4 md:mb-5">
+                        <svg class="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-blue-100 mr-2 flex-shrink-0"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z">
                             </path>
                         </svg>
-                        <h2 class="text-2xl text-primary-50 font-semibold font-baloo">Achievement Progress</h2>
+                        <h2
+                            class="text-lg xs:text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl text-primary-50 font-bold font-baloo">
+                            Achievement Progress
+                        </h2>
                     </div>
-                    <p class="text-muted mb-2">Keep learning to unlock more achievements and show off your math skills!
+
+                    <p
+                        class="text-secondary-medium mb-2 xs:mb-3 sm:mb-4 md:mb-5 text-xs xs:text-sm sm:text-base md:text-base lg:text-lg leading-relaxed">
+                        Keep learning to unlock more achievements and show off your math skills!
                     </p>
-                    <div class="bg-gray-200 rounded-full h-4 mb-2">
-                        <div class="h-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 transition-all duration-500"
-                            style="width: {{ $progress }}%"></div>
+
+                    {{-- Custom Progress Bar with Handle --}}
+                    <div class="relative mb-2 xs:mb-3 sm:mb-4 md:mb-5">
+                        <div class="progress-track rounded-full h-3 xs:h-4 sm:h-4 md:h-5 lg:h-5 relative overflow-visible">
+                            <div class="progress-fill h-3 xs:h-4 sm:h-4 md:h-5 lg:h-5 rounded-full transition-all duration-500 ease-out relative overflow-visible"
+                                style="width: {{ $progress }}%">
+                                {{-- Progress Handle/Thumb --}}
+                                <div class="progress-handle"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-sm text-muted  flex justify-between">
-                        <span>{{ $earnedCount }} earned</span>
-                        <span>{{ $progress }}% complete</span>
-                        <span>{{ $totalCount }} total</span>
+
+                    <div
+                        class="text-xs xs:text-xs sm:text-sm md:text-base lg:text-base text-muted flex justify-between items-center gap-1 xs:gap-2 sm:gap-3">
+                        <span class="whitespace-nowrap font-medium">{{ $earnedCount }} earned</span>
+                        <span class="whitespace-nowrap font-bold text-primary-500">{{ $progress }}% complete</span>
+                        <span class="whitespace-nowrap font-medium">{{ $totalCount }} total</span>
                     </div>
                 </div>
-
 
                 <!-- Tabs and Sort -->
                 <div class="flex justify-between items-center gap-3 mb-6">
@@ -170,12 +230,12 @@
                                                     <span class="text-xs sm:text-sm font-medium">Rarity</span>
                                                     <span
                                                         class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @endif">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @endif">
                                                         {{ $achievement['rarity'] }}
                                                     </span>
                                                 </div>

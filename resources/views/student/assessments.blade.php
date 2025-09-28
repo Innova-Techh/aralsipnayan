@@ -12,430 +12,652 @@
                 linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 40px 40px;
         }
+
+        /* Skeleton Loading Animations */
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-dark {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-title {
+            height: 1.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .skeleton-button {
+            height: 2.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .content-loaded {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 
     <div class="space-y-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
-        <!-- My Assessments Header -->
+        <!-- Loading Skeleton (Initially visible) -->
+        <div id="assessmentsSkeleton">
+            <!-- Header Skeleton -->
+            <div
+                class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
+                <!-- Grid Background -->
+                <div class="absolute inset-0 opacity-30"
+                    style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;">
+                </div>
 
-        <div
-            class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
-
-            <!-- Grid Background -->
-            <div class="absolute inset-0 opacity-30"
-                style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;">
+                <!-- Content -->
+                <div class="relative z-10 w-full px-4 sm:px-8 lg:px-8 max-w-8xl mx-auto">
+                    <div class="flex flex-col justify-center h-full">
+                        <div class="skeleton-dark skeleton-title w-64 mb-4"></div>
+                        <div class="skeleton-dark skeleton-text w-3/4"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Content -->
-            <div class="relative z-10 w-full px-4 sm:px-8 lg:px-8 max-w-8xl mx-auto">
-                <div class="flex flex-col justify-center h-full">
-                    <h1
-                        class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight drop-shadow-header">
-                        My Assessments
-                    </h1>
-                    <p
-                        class="text-base sm:text-base md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5 drop-shadow-description">
-                        Test your mathematical knowledge across different competencies and track your learning progress with
-                        adaptive assessments
-                    </p>
+            <!-- Feature Cards Skeleton -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 px-8 pt-8">
+                <div class="rounded-xl md:rounded-2xl p-4 md:p-6 min-h-[120px] md:min-h-[200px] bg-gray-300">
+                    <div class="w-[65%] sm:w-[70%]">
+                        <div class="skeleton skeleton-title w-40 mb-4"></div>
+                        <div class="skeleton skeleton-text w-full mb-2"></div>
+                        <div class="skeleton skeleton-text w-3/4"></div>
+                    </div>
+                </div>
+                <div class="rounded-xl md:rounded-2xl p-4 md:p-6 min-h-[120px] md:min-h-[200px] bg-gray-300">
+                    <div class="w-[65%] sm:w-[70%]">
+                        <div class="skeleton skeleton-title w-40 mb-4"></div>
+                        <div class="skeleton skeleton-text w-full mb-2"></div>
+                        <div class="skeleton skeleton-text w-3/4"></div>
+                    </div>
+                </div>
+                <div class="rounded-xl md:rounded-2xl p-4 md:p-6 min-h-[120px] md:min-h-[200px] bg-gray-300">
+                    <div class="w-[65%] sm:w-[70%]">
+                        <div class="skeleton skeleton-title w-40 mb-4"></div>
+                        <div class="skeleton skeleton-text w-full mb-2"></div>
+                        <div class="skeleton skeleton-text w-3/4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assessment Categories Skeleton -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
+                <!-- Assessment Card Skeleton 1 -->
+                <div
+                    class="rounded-xl shadow-sm p-4 sm:p-6 relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-gray-300 bg-gray-200">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
+                        <div class="relative w-[70%]">
+                            <div class="skeleton skeleton-title w-40 mb-2"></div>
+                            <div class="skeleton skeleton-text w-full"></div>
+                        </div>
+                        <div class="skeleton w-16 h-6 rounded-full"></div>
+                    </div>
+
+                    <!-- Progress Bar Skeleton -->
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <div class="flex justify-between w-full">
+                            <div class="skeleton skeleton-text w-20"></div>
+                            <div class="skeleton skeleton-text w-8"></div>
+                        </div>
+                        <div class="w-full h-8 bg-gray-300 rounded-full"></div>
+                    </div>
+
+                    <!-- Stats Skeleton -->
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                    </div>
+
+                    <!-- Button Skeleton -->
+                    <div class="skeleton skeleton-button w-full"></div>
+                </div>
+
+                <!-- Repeat for 2 more assessment cards -->
+                <div
+                    class="rounded-xl shadow-sm p-4 sm:p-6 relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-gray-300 bg-gray-200">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
+                        <div class="relative w-[70%]">
+                            <div class="skeleton skeleton-title w-48 mb-2"></div>
+                            <div class="skeleton skeleton-text w-full"></div>
+                        </div>
+                        <div class="skeleton w-16 h-6 rounded-full"></div>
+                    </div>
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <div class="flex justify-between w-full">
+                            <div class="skeleton skeleton-text w-20"></div>
+                            <div class="skeleton skeleton-text w-8"></div>
+                        </div>
+                        <div class="w-full h-8 bg-gray-300 rounded-full"></div>
+                    </div>
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton skeleton-button w-full"></div>
+                </div>
+
+                <div
+                    class="rounded-xl shadow-sm p-4 sm:p-6 relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-gray-300 bg-gray-200">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
+                        <div class="relative w-[70%]">
+                            <div class="skeleton skeleton-title w-44 mb-2"></div>
+                            <div class="skeleton skeleton-text w-full"></div>
+                        </div>
+                        <div class="skeleton w-16 h-6 rounded-full"></div>
+                    </div>
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <div class="flex justify-between w-full">
+                            <div class="skeleton skeleton-text w-20"></div>
+                            <div class="skeleton skeleton-text w-8"></div>
+                        </div>
+                        <div class="w-full h-8 bg-gray-300 rounded-full"></div>
+                    </div>
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 skeleton-circle skeleton mr-2"></div>
+                                <div class="skeleton skeleton-text w-6"></div>
+                            </div>
+                            <div class="skeleton skeleton-text w-12 mx-auto"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton skeleton-button w-full"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Feature Cards Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 px-8 pt-8">
-            <!-- Ready for a Challenge Card -->
-            <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#2c014b] shadow-lg"
-                style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
-                <div class="relative z-10 w-[65%] sm:w-[70%]">
-                    <div class="flex items-center mb-2 md:mb-4">
-                        <h3 class="text-base md:text-xl font-bold">🎯 Ready for a Challenge?</h3>
-                    </div>
-                    <p class="text-white mb-2 md:mb-4 text-sm md:text-base">
-                        Test your math skills with fun assessments! Choose from geometry, numbers, or fractions and
-                        start
-                        your learning adventure!
-                    </p>
-                </div>
-            </div>
+        <div id="assessmentsContent" class="hidden">
+            <!-- My Assessments Header -->
 
+            <div
+                class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
 
-            <!-- Level Up Your Skills Card -->
-            <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#922f26] shadow-lg"
-                style="background-image: url('{{ asset('images/assessments/card2.png') }}'); background-size: cover; background-position: center;">
-                <div class="relative z-10 w-[65%] sm:w-[70%]">
-                    <div class="flex items-center mb-2 md:mb-4">
-                        <h3 class="text-base md:text-xl font-bold">🌟 Level Up Your Skills!</h3>
-                    </div>
-                    <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Adaptive learning just for you. Our smart
-                        system
-                        adjusts questions to match your learning pace perfectly!</p>
-                </div>
-            </div>
-
-            <!-- Learning is Fun Card -->
-            <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#396697] shadow-lg"
-                style="background-image: url('{{ asset('images/assessments/card3.png') }}'); background-size: cover; background-position: center;">
-                <div class="relative z-10 w-[65%] sm:w-[70%]">
-                    <div class="flex items-center mb-2 md:mb-4">
-                        <h3 class="text-base md:text-xl font-bold">🎮 Learning is Fun!</h3>
-                    </div>
-                    <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Gamified math assessments. Earn points,
-                        unlock
-                        achievements, and compete with friends while learning!</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Assessment Categories Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
-            <!-- Number and Algebra Card -->
-            <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
-                style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-
-                <!-- Background Vector (kept on top for visual enhancement) -->
-                <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
-                </div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
+                <!-- Grid Background -->
+                <div class="absolute inset-0 opacity-30"
+                    style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;">
                 </div>
 
-                <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
-                    <div class="relative w-[100%]">
-                        <h3 class="text-lg font-bold text-white mb-1 leading-tight">Number and Algebra</h3>
-                        <p class="text-sm text-gray-100">Test your knowledge of numbers, operations, and algebraic
-                            concepts
+                <!-- Content -->
+                <div class="relative z-10 w-full px-4 sm:px-8 lg:px-8 max-w-8xl mx-auto">
+                    <div class="flex flex-col justify-center h-full">
+                        <h1
+                            class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight drop-shadow-header">
+                            My Assessments
+                        </h1>
+                        <p
+                            class="text-base sm:text-base md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5 drop-shadow-description">
+                            Test your mathematical knowledge across different competencies and track your learning progress
+                            with
+                            adaptive assessments
                         </p>
                     </div>
-                    @php
-                        $naMastery = $masteryData['Number_Algebra'] ?? null;
-                        $naLevel = $naMastery ? $naMastery->current_difficulty_level : 'Beginner';
-                        $naProgress = $naMastery ? round($naMastery->mastery_probability * 100) : 30;
-                        $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
-                        $naIncompleteSession = $incompleteSessionData['Number_Algebra'] ?? null;
-                    @endphp
-                    <span
-                        class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
-                        {{ $naLevel }}
-                    </span>
-
                 </div>
-
-                <!-- Progress Bar -->
-                <div class="mb-4 relative z-10 flex flex-col gap-2">
-                    <!-- Label and percentage -->
-                    <div class="flex justify-between w-full text-sm text-gray-100">
-                        <span>Mastery Level</span>
-                        <span id="progress-text-na">{{ $naProgress }}%</span>
-                    </div>
-
-                    <!-- Progress bar container -->
-                    <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
-                        <!-- Gradient progress bar -->
-                        <div id="progress-bar-na"
-                            class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
-                            style="width: 0%;
-                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
-                            <!-- Static shimmer lines -->
-                            <div class="absolute inset-0 flex items-center justify-between px-2">
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="flex justify-between mb-4 relative z-10">
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $naMastery ? $naMastery->correct_answers : 0 }}
-                            </span>
-                        </div>
-                        <span class="text-xs text-gray-100">Correct</span>
-                    </div>
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                                    <path fill-rule="evenodd"
-                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $naMastery ? $naMastery->total_questions_answered : 0 }}
-                            </span>
-                        </div>
-                        <span class="text-xs text-gray-100">Total</span>
-                    </div>
-                </div>
-
-                <!-- Button -->
-                @if(!$naHasDiagnostic)
-                    @if($naIncompleteSession)
-                        <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
-                            Resume Diagnostic Test
-                        </button>
-                    @else
-                        <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                            Take Diagnostic Test
-                        </button>
-                    @endif
-                @else
-                    <a href="{{ route('student.assessments.category', 'Number_Algebra') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
-                        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-                        View Assessments
-                    </a>
-                @endif
             </div>
 
-            <!-- Measurement and Geometry Card -->
-            <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
-                style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
-
-                <!-- Background Vector (kept on top for visual enhancement) -->
-                <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
-                </div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
-                </div>
-                <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-20">
-                    <div class=" relative w-[100%]">
-                        <h3 class="text-lg font-bold text-white mb-1 leading-tight">Measurement and Geometry</h3>
-                        <p class="text-sm text-gray-100 leading-relaxed">Test your knowledge of shapes, angles, and spatial
-                            relationships
+            <!-- Feature Cards Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 px-8 pt-8">
+                <!-- Ready for a Challenge Card -->
+                <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#2c014b] shadow-lg"
+                    style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
+                    <div class="relative z-10 w-[65%] sm:w-[70%]">
+                        <div class="flex items-center mb-2 md:mb-4">
+                            <h3 class="text-base md:text-xl font-bold">🎯 Ready for a Challenge?</h3>
+                        </div>
+                        <p class="text-white mb-2 md:mb-4 text-sm md:text-base">
+                            Test your math skills with fun assessments! Choose from geometry, numbers, or fractions and
+                            start
+                            your learning adventure!
                         </p>
                     </div>
-                    @php
-                        $mgMastery = $masteryData['Measurement_Geometry'] ?? null;
-                        $mgLevel = $mgMastery ? $mgMastery->current_difficulty_level : 'Beginner';
-                        $mgProgress = $mgMastery ? round($mgMastery->mastery_probability * 100) : 30;
-                        $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
-                        $mgIncompleteSession = $incompleteSessionData['Measurement_Geometry'] ?? null;
-                    @endphp
-                    <span
-                        class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
-                        {{ $mgLevel }}
-                    </span>
-
                 </div>
 
-                <!-- Progress Bar -->
-                <div class="mb-4 relative z-10 flex flex-col gap-2">
-                    <!-- Label and percentage -->
-                    <div class="flex justify-between w-full text-sm text-gray-100">
-                        <span>Mastery Level</span>
-                        <span id="progress-text-mg">{{ $mgProgress }}%</span>
-                    </div>
 
-                    <!-- Progress bar container -->
-                    <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
-                        <!-- Gradient progress bar -->
-                        <div id="progress-bar-mg"
-                            class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
-                            style="width: 0%;
-                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
-                            <!-- Static shimmer lines -->
-                            <div class="absolute inset-0 flex items-center justify-between px-2">
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                            </div>
+                <!-- Level Up Your Skills Card -->
+                <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#922f26] shadow-lg"
+                    style="background-image: url('{{ asset('images/assessments/card2.png') }}'); background-size: cover; background-position: center;">
+                    <div class="relative z-10 w-[65%] sm:w-[70%]">
+                        <div class="flex items-center mb-2 md:mb-4">
+                            <h3 class="text-base md:text-xl font-bold">🌟 Level Up Your Skills!</h3>
                         </div>
+                        <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Adaptive learning just for you. Our smart
+                            system
+                            adjusts questions to match your learning pace perfectly!</p>
                     </div>
                 </div>
 
-                <!-- Stats -->
-                <div class="flex justify-between mb-4 relative z-10">
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $mgMastery ? $mgMastery->correct_answers : 0 }}
-                            </span>
+                <!-- Learning is Fun Card -->
+                <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#396697] shadow-lg"
+                    style="background-image: url('{{ asset('images/assessments/card3.png') }}'); background-size: cover; background-position: center;">
+                    <div class="relative z-10 w-[65%] sm:w-[70%]">
+                        <div class="flex items-center mb-2 md:mb-4">
+                            <h3 class="text-base md:text-xl font-bold">🎮 Learning is Fun!</h3>
                         </div>
-                        <span class="text-xs text-gray-100">Correct</span>
-                    </div>
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                                    <path fill-rule="evenodd"
-                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $mgMastery ? $mgMastery->total_questions_answered : 0 }}
-                            </span>
-                        </div>
-                        <span class="text-xs text-gray-100">Total</span>
+                        <p class="text-white mb-2 md:mb-4 text-sm md:text-base">Gamified math assessments. Earn points,
+                            unlock
+                            achievements, and compete with friends while learning!</p>
                     </div>
                 </div>
-
-                <!-- Button -->
-                @if(!$mgHasDiagnostic)
-                    @if($mgIncompleteSession)
-                        <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
-                            Resume Diagnostic Test
-                        </button>
-                    @else
-                        <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                            Take Diagnostic Test
-                        </button>
-                    @endif
-                @else
-                    <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
-                        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-                        View Assessments
-                    </a>
-                @endif
             </div>
 
-            <!-- Data and Probability Card -->
-            <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
-                style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <!-- Assessment Categories Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
+                <!-- Number and Algebra Card -->
+                <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
+                    style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
 
-                <!-- Background Vector (kept on top for visual enhancement) -->
-                <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
-                </div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
-                    <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
-                </div>
-
-                <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
-                    <div class=" relative w-[100%]">
-                        <h3 class="text-lg font-bold text-white mb-1 leading-tight">Data and Probability</h3>
-                        <p class="text-sm text-gray-100 leading-relaxed">Explore data tables, bar graphs, line plots, mean,
-                            and chance
-                            events</p>
+                    <!-- Background Vector (kept on top for visual enhancement) -->
+                    <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
                     </div>
-                    @php
-                        $dpMastery = $masteryData['Data_Probability'] ?? null;
-                        $dpLevel = $dpMastery ? $dpMastery->current_difficulty_level : 'Beginner';
-                        $dpProgress = $dpMastery ? round($dpMastery->mastery_probability * 100) : 30;
-                        $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
-                        $dpIncompleteSession = $incompleteSessionData['Data_Probability'] ?? null;
-                    @endphp
-                    <span
-                        class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
-                        {{ $dpLevel }}
-                    </span>
-
-                </div>
-
-                <!-- Progress Bar -->
-                <div class="mb-4 relative z-10 flex flex-col gap-2">
-                    <!-- Label and percentage -->
-                    <div class="flex justify-between w-full text-sm text-gray-100">
-                        <span>Mastery Level</span>
-                        <span id="progress-text-dp">{{ $dpProgress }}%</span>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
                     </div>
 
-                    <!-- Progress bar container -->
-                    <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
-                        <!-- Gradient progress bar -->
-                        <div id="progress-bar-dp"
-                            class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
-                            style="width: 0%;
-                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
-                            <!-- Static shimmer lines -->
-                            <div class="absolute inset-0 flex items-center justify-between px-2">
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
-                                <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
+                        <div class="relative w-[100%]">
+                            <h3 class="text-lg font-bold text-white mb-1 leading-tight">Number and Algebra</h3>
+                            <p class="text-sm text-gray-100">Test your knowledge of numbers, operations, and algebraic
+                                concepts
+                            </p>
+                        </div>
+                        @php
+                            $naMastery = $masteryData['Number_Algebra'] ?? null;
+                            $naLevel = $naMastery ? $naMastery->current_difficulty_level : 'Beginner';
+                            $naProgress = $naMastery ? round($naMastery->mastery_probability * 100) : 30;
+                            $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
+                            $naIncompleteSession = $incompleteSessionData['Number_Algebra'] ?? null;
+                        @endphp
+                        <span
+                            class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                            {{ $naLevel }}
+                        </span>
+
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <!-- Label and percentage -->
+                        <div class="flex justify-between w-full text-sm text-gray-100">
+                            <span>Mastery Level</span>
+                            <span id="progress-text-na">{{ $naProgress }}%</span>
+                        </div>
+
+                        <!-- Progress bar container -->
+                        <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                            <!-- Gradient progress bar -->
+                            <div id="progress-bar-na"
+                                class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                                style="width: 0%;
+                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                <!-- Static shimmer lines -->
+                                <div class="absolute inset-0 flex items-center justify-between px-2">
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Stats -->
-                <div class="flex justify-between mb-4 relative z-10">
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
+                    <!-- Stats -->
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $naMastery ? $naMastery->correct_answers : 0 }}
+                                </span>
                             </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $dpMastery ? $dpMastery->correct_answers : 0 }}
-                            </span>
+                            <span class="text-xs text-gray-100">Correct</span>
                         </div>
-                        <span class="text-xs text-gray-100">Correct</span>
-                    </div>
-                    <div class="text-center">
-                        <div class="flex items-center justify-center mb-1">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                                    <path fill-rule="evenodd"
-                                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                        <path fill-rule="evenodd"
+                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $naMastery ? $naMastery->total_questions_answered : 0 }}
+                                </span>
                             </div>
-                            <span class="text-xl font-bold text-white">
-                                {{ $dpMastery ? $dpMastery->total_questions_answered : 0 }}
-                            </span>
+                            <span class="text-xs text-gray-100">Total</span>
                         </div>
-                        <span class="text-xs text-gray-100">Total</span>
                     </div>
-                </div>
 
-                <!-- Button -->
-                @if(!$dpHasDiagnostic)
-                    @if($dpIncompleteSession)
-                        <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
-                            Resume Diagnostic Test
-                        </button>
+                    <!-- Button -->
+                    @if(!$naHasDiagnostic)
+                        @if($naIncompleteSession)
+                            <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                                Resume Diagnostic Test
+                            </button>
+                        @else
+                            <button onclick="checkDiagnosticBeforeStart('Number_Algebra')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                                Take Diagnostic Test
+                            </button>
+                        @endif
                     @else
-                        <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
-                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
-                            Take Diagnostic Test
-                        </button>
+                        <a href="{{ route('student.assessments.category', 'Number_Algebra') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
+                            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                            View Assessments
+                        </a>
                     @endif
-                @else
-                    <a href="{{ route('student.assessments.category', 'Data_Probability') }}"
-                        class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
-                        style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
-                        View Assessments
-                    </a>
-                @endif
+                </div>
+
+                <!-- Measurement and Geometry Card -->
+                <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
+                    style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+                    <!-- Background Vector (kept on top for visual enhancement) -->
+                    <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-20">
+                        <div class=" relative w-[100%]">
+                            <h3 class="text-lg font-bold text-white mb-1 leading-tight">Measurement and Geometry</h3>
+                            <p class="text-sm text-gray-100 leading-relaxed">Test your knowledge of shapes, angles, and
+                                spatial
+                                relationships
+                            </p>
+                        </div>
+                        @php
+                            $mgMastery = $masteryData['Measurement_Geometry'] ?? null;
+                            $mgLevel = $mgMastery ? $mgMastery->current_difficulty_level : 'Beginner';
+                            $mgProgress = $mgMastery ? round($mgMastery->mastery_probability * 100) : 30;
+                            $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
+                            $mgIncompleteSession = $incompleteSessionData['Measurement_Geometry'] ?? null;
+                        @endphp
+                        <span
+                            class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                            {{ $mgLevel }}
+                        </span>
+
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <!-- Label and percentage -->
+                        <div class="flex justify-between w-full text-sm text-gray-100">
+                            <span>Mastery Level</span>
+                            <span id="progress-text-mg">{{ $mgProgress }}%</span>
+                        </div>
+
+                        <!-- Progress bar container -->
+                        <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                            <!-- Gradient progress bar -->
+                            <div id="progress-bar-mg"
+                                class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                                style="width: 0%;
+                                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                <!-- Static shimmer lines -->
+                                <div class="absolute inset-0 flex items-center justify-between px-2">
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $mgMastery ? $mgMastery->correct_answers : 0 }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-100">Correct</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                        <path fill-rule="evenodd"
+                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $mgMastery ? $mgMastery->total_questions_answered : 0 }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-100">Total</span>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    @if(!$mgHasDiagnostic)
+                        @if($mgIncompleteSession)
+                            <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                                Resume Diagnostic Test
+                            </button>
+                        @else
+                            <button onclick="checkDiagnosticBeforeStart('Measurement_Geometry')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                                Take Diagnostic Test
+                            </button>
+                        @endif
+                    @else
+                        <a href="{{ route('student.assessments.category', 'Measurement_Geometry') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
+                            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                            View Assessments
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Data and Probability Card -->
+                <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
+                    style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+
+                    <!-- Background Vector (kept on top for visual enhancement) -->
+                    <div class="absolute top-0 right-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector1.png') }}" alt="" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 opacity-80 z-0">
+                        <img src="{{ asset('images/assessments/vector2.png') }}" alt="" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="flex justify-between items-start mb-3 sm:mb-4 relative z-10">
+                        <div class=" relative w-[100%]">
+                            <h3 class="text-lg font-bold text-white mb-1 leading-tight">Data and Probability</h3>
+                            <p class="text-sm text-gray-100 leading-relaxed">Explore data tables, bar graphs, line plots,
+                                mean,
+                                and chance
+                                events</p>
+                        </div>
+                        @php
+                            $dpMastery = $masteryData['Data_Probability'] ?? null;
+                            $dpLevel = $dpMastery ? $dpMastery->current_difficulty_level : 'Beginner';
+                            $dpProgress = $dpMastery ? round($dpMastery->mastery_probability * 100) : 30;
+                            $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
+                            $dpIncompleteSession = $incompleteSessionData['Data_Probability'] ?? null;
+                        @endphp
+                        <span
+                            class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
+                            {{ $dpLevel }}
+                        </span>
+
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4 relative z-10 flex flex-col gap-2">
+                        <!-- Label and percentage -->
+                        <div class="flex justify-between w-full text-sm text-gray-100">
+                            <span>Mastery Level</span>
+                            <span id="progress-text-dp">{{ $dpProgress }}%</span>
+                        </div>
+
+                        <!-- Progress bar container -->
+                        <div class="relative w-full h-8 bg-gray-800 rounded-full overflow-hidden shadow-inner">
+                            <!-- Gradient progress bar -->
+                            <div id="progress-bar-dp"
+                                class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
+                                style="width: 0%;
+                                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                <!-- Static shimmer lines -->
+                                <div class="absolute inset-0 flex items-center justify-between px-2">
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                    <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="flex justify-between mb-4 relative z-10">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $dpMastery ? $dpMastery->correct_answers : 0 }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-100">Correct</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-1">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                        <path fill-rule="evenodd"
+                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xl font-bold text-white">
+                                    {{ $dpMastery ? $dpMastery->total_questions_answered : 0 }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-100">Total</span>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    @if(!$dpHasDiagnostic)
+                        @if($dpIncompleteSession)
+                            <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-center border-b-[6px] border-[#cc4713] shadow-lg">
+                                Resume Diagnostic Test
+                            </button>
+                        @else
+                            <button onclick="checkDiagnosticBeforeStart('Data_Probability')"
+                                class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-center border-b-[6px] border-[#922f26] shadow-lg">
+                                Take Diagnostic Test
+                            </button>
+                        @endif
+                    @else
+                        <a href="{{ route('student.assessments.category', 'Data_Probability') }}"
+                            class="block w-full text-white py-2 px-4 rounded-xl font-medium transition-all duration-300 relative z-20 bg-cover bg-center bg-no-repeat hover:brightness-110 hover:bg-[rgba(139,86,204,0.3)] text-center border-b-[6px] border-[#264566] shadow-lg"
+                            style="background-image: url('{{ asset('images/assessments/btnbg.png') }}');">
+                            View Assessments
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -511,6 +733,113 @@
 
 
     <script>
+        // Assessments Loading Logic
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show skeleton initially, hide actual content
+            const skeleton = document.getElementById('assessmentsSkeleton');
+            const content = document.getElementById('assessmentsContent');
+
+            // Simulate data loading (replace with actual API calls)
+            setTimeout(() => {
+                loadAssessmentsData();
+            }, 1500);
+        });
+
+        async function loadAssessmentsData() {
+            try {
+                // Simulate API calls for different data sections
+                const promises = [
+                    loadMasteryData(),
+                    loadIncompleteSessionData(),
+                    loadUserProgress(),
+                    loadActiveDiagnostics()
+                ];
+
+                // Wait for all data to load
+                await Promise.all(promises);
+
+                // Hide skeleton and show actual content with animation
+                const skeleton = document.getElementById('assessmentsSkeleton');
+                const content = document.getElementById('assessmentsContent');
+
+                skeleton.style.opacity = '0';
+                setTimeout(() => {
+                    skeleton.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    content.classList.add('content-loaded');
+
+                    // Start progress bar animations after content loads
+                    startProgressBarAnimations();
+                }, 300);
+
+            } catch (error) {
+                console.error('Error loading assessments data:', error);
+                showAssessmentsContent();
+            }
+        }
+
+        function showAssessmentsContent() {
+            const skeleton = document.getElementById('assessmentsSkeleton');
+            const content = document.getElementById('assessmentsContent');
+
+            skeleton.classList.add('hidden');
+            content.classList.remove('hidden');
+            content.classList.add('content-loaded');
+
+            // Start progress bar animations
+            startProgressBarAnimations();
+        }
+
+        // Simulate API calls (replace with actual endpoints)
+        async function loadMasteryData() {
+            // Replace with: return fetch('/api/mastery-data').then(r => r.json());
+            return new Promise(resolve => setTimeout(resolve, 400));
+        }
+
+        async function loadIncompleteSessionData() {
+            // Replace with: return fetch('/api/incomplete-sessions').then(r => r.json());
+            return new Promise(resolve => setTimeout(resolve, 300));
+        }
+
+        async function loadUserProgress() {
+            // Replace with: return fetch('/api/user-progress').then(r => r.json());
+            return new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        async function loadActiveDiagnostics() {
+            // Replace with: return fetch('/api/active-diagnostics').then(r => r.json());
+            return new Promise(resolve => setTimeout(resolve, 200));
+        }
+
+        function startProgressBarAnimations() {
+            // Move your existing progress bar animation code here
+            const progressBarNA = document.getElementById('progress-bar-na');
+            const progressNA = {{ $naProgress ?? 0 }};
+            if (progressBarNA) {
+                setTimeout(() => {
+                    progressBarNA.style.width = progressNA + '%';
+                }, 100);
+            }
+
+            const progressBarMG = document.getElementById('progress-bar-mg');
+            const progressMG = {{ $mgProgress ?? 0 }};
+            if (progressBarMG) {
+                setTimeout(() => {
+                    progressBarMG.style.width = progressMG + '%';
+                }, 200);
+            }
+
+            const progressBarDP = document.getElementById('progress-bar-dp');
+            const progressDP = {{ $dpProgress ?? 0 }};
+            if (progressBarDP) {
+                setTimeout(() => {
+                    progressBarDP.style.width = progressDP + '%';
+                }, 300);
+            }
+        }
+
+        // Keep all your existing functions below (checkDiagnosticBeforeStart, etc.)
+
         let activeDiagnostics = []; // Initialize as empty array
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -612,11 +941,11 @@
             const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
             if (activeDiagnostic) {
                 diagnosticInfo.innerHTML = `
-                                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
-                                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
-                                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
-                                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
-                                                                                                                                                    `;
+                                                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                                                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                                                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                                                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                                                                                                                                                                    `;
             }
 
             // Show modal with animation
