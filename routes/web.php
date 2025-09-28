@@ -210,14 +210,18 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     Route::post('/sections', [App\Http\Controllers\TeacherSectionController::class, 'store'])->name('sections.store');
     Route::put('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'update'])->name('sections.update');
     Route::delete('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'destroy'])->name('sections.destroy');
-    
-    // Student Management
+    // Student Overview Page (for assessment management)
     Route::get('/students', function () {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
             return redirect()->route('admin.login');
         }
         return view('admin.teacher.students.index');
     })->name('students');
+    
+    // Section Student Management API (used by section modals)
+    Route::post('/sections/students', [App\Http\Controllers\TeacherStudentController::class, 'store'])->name('sections.students.store');
+    Route::put('/sections/students/{student}', [App\Http\Controllers\TeacherStudentController::class, 'update'])->name('sections.students.update');
+    Route::delete('/sections/students/{student}', [App\Http\Controllers\TeacherStudentController::class, 'destroy'])->name('sections.students.destroy');
     
     // Analytics
     Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
