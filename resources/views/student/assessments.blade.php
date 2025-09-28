@@ -87,7 +87,7 @@
         </div>
 
         <!-- Assessment Categories Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8 max-w-3xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
             <!-- Number and Algebra Card -->
             <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
                 style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -116,8 +116,8 @@
                     @endphp
                     <span
                         class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full">
+                                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
                         {{ $naLevel }}
                     </span>
 
@@ -137,7 +137,7 @@
                         <div id="progress-bar-na"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -232,8 +232,8 @@
                     @endphp
                     <span
                         class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
                         {{ $mgLevel }}
                     </span>
 
@@ -253,7 +253,7 @@
                         <div id="progress-bar-mg"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -349,8 +349,8 @@
                     @endphp
                     <span
                         class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
+                                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
                         {{ $dpLevel }}
                     </span>
 
@@ -370,7 +370,7 @@
                         <div id="progress-bar-dp"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -612,11 +612,11 @@
             const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
             if (activeDiagnostic) {
                 diagnosticInfo.innerHTML = `
-                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
-                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
-                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
-                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
-                                                                                                                                    `;
+                                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                                                                                                                                                    `;
             }
 
             // Show modal with animation

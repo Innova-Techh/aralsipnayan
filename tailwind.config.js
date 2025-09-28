@@ -519,6 +519,8 @@ radial-gradient(circle at center,
                 "leaderboard-container": "#3B82F6",
                 "leaderboard-points":
                     "linear-gradient(to bottom, #F59E0B, #FBBF24)",
+                "achievement-progress":
+                    "linear-gradient(to bottom, #2563EB, #1E3A8A)",
             },
             boxShadow: {
                 // Inner shadow utility
