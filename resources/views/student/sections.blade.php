@@ -91,8 +91,6 @@
                                                     <div class="text-xs lg:text-lg font-medium opacity-90">Difficulty</div>
                                                 </div>
                                             </div>
-
-<<<<<<< Updated upstream
                                             <!-- Live Quiz Indicator -->
                                             @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
                                                 <div class="mb-4 p-2 bg-red-500/20 border border-red-300/30 rounded-lg">
@@ -119,38 +117,6 @@
                                                     Start Assessment
                                                 </button>
                                             @endif
-=======
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                                        "
-                                        style="text-shadow:
-                                                                                                                                                                -1px -1px 0 #7A4305,
-                                                                                                                                                                1px -1px 0 #7A4305,
-                                                                                                                                                                -1px 1px 0 #7A4305,
-                                                                                                                                                                1px 1px 0 #7A4305,
-                                                                                                                                                                0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
-                                </div>
-
-                                <!-- Fractions and Decimals Card -->
-                                <div
-                                    class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4 lg:px-8 
-                                                                                                                                                    sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Fractions and
-                                        Decimals</h3>
-                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Practice assessment on
-                                        converting fractions to decimals</p>
-
-                                    <!-- Stats Row - Mobile Responsive -->
-                                    <div
-                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
->>>>>>> Stashed changes
                                         </div>
                                     @empty
                                         <div class="text-center py-12">
@@ -158,70 +124,7 @@
                                             <h3 class="text-lg font-medium text-gray-900 mb-2">No assessments assigned</h3>
                                             <p class="text-gray-500">Your teacher hasn't assigned any assessments yet</p>
                                         </div>
-<<<<<<< Updated upstream
                                     @endforelse
-=======
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Easy
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                                        "
-                                        style="text-shadow:
-                                                                                                                                                                -1px -1px 0 #7A4305,
-                                                                                                                                                                1px -1px 0 #7A4305,
-                                                                                                                                                                -1px 1px 0 #7A4305,
-                                                                                                                                                                1px 1px 0 #7A4305,
-                                                                                                                                                                0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
-                                </div>
-
-                                <!-- Number Operations Quiz Card -->
-                                <div
-                                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8  lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
-                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Number Operations
-                                        Quiz</h3>
-                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Quick assessment on basic
-                                        arithmetic operations</p>
-
-                                    <!-- Stats Row - Mobile Responsive -->
-                                    <div
-                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150</div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">25 mins
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Hard
-                                            </div>
-                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Start Assessment Button - Responsive -->
-                                    <button
-                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
-                                                                                                                                                        "
-                                        style="text-shadow:
-                                                                                                                                                                -1px -1px 0 #7A4305,
-                                                                                                                                                                1px -1px 0 #7A4305,
-                                                                                                                                                                -1px 1px 0 #7A4305,
-                                                                                                                                                                1px 1px 0 #7A4305,
-                                                                                                                                                                0 0 1px #7A4305;">
-                                        Start Assessment
-                                    </button>
->>>>>>> Stashed changes
                                 </div>
                             </div>
                         </div>
