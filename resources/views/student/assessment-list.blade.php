@@ -218,12 +218,12 @@
                 </div>
 
                 <!-- Assessment Details -->
-                <div class="bg-white/10 rounded-lg p-2 sm:p-3 mb-4">
+                {{-- <div class="bg-white/10 rounded-lg p-2 sm:p-3 mb-4">
                     <div class="text-[10px] sm:text-xs text-white/80 space-y-1">
                         <div>Estimated Points: {{ $assessment['estimated_points'] }}</div>
                         <div>Best Time: {{ $assessment['best_completion_time'] ?? 'Not attempted' }}</div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Button -->
                 <button onclick="openAssessmentModal({{ $index }})" 

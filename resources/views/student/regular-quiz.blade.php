@@ -138,6 +138,109 @@
     </div>
 </div>
 
+<!-- Points Earned Floating Animation -->
+<div id="points-animation-overlay" class="fixed inset-0 pointer-events-none z-[100] hidden">
+    <div class="relative w-full h-full">
+        <!-- Main Points Display -->
+        <div id="points-main-display" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <!-- Points Background Circle -->
+            <div class="relative">
+                <!-- Outer Glow Ring -->
+                <div class="absolute inset-0 rounded-full animate-pulse"
+                     style="background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,165,0,0.3) 50%, transparent 100%);
+                            width: 200px; height: 200px; transform: translate(-50%, -50%); top: 50%; left: 50%;"></div>
+
+                <!-- Main Points Circle -->
+                <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full
+                           bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500
+                           border-4 border-yellow-200 shadow-2xl
+                           flex flex-col items-center justify-center
+                           transform scale-0 animate-bounce"
+                     id="points-circle"
+                     style="animation-duration: 0.6s; animation-fill-mode: forwards;">
+
+                    <!-- Points Text -->
+                    <div class="text-center">
+                        <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white drop-shadow-lg font-baloo"
+                             id="points-earned-text">+0</div>
+                        <div class="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-yellow-100 uppercase tracking-wide"
+                             id="points-label">Points</div>
+                    </div>
+
+                    <!-- Sparkle Elements -->
+                    <div class="absolute inset-0 rounded-full overflow-hidden">
+                        <div class="sparkle sparkle-1">✨</div>
+                        <div class="sparkle sparkle-2">⭐</div>
+                        <div class="sparkle sparkle-3">💫</div>
+                        <div class="sparkle sparkle-4">✨</div>
+                        <div class="sparkle sparkle-5">🌟</div>
+                        <div class="sparkle sparkle-6">✨</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bonus Points Display (Time Bonus) -->
+        <div id="bonus-points-display" class="absolute top-1/3 right-1/4 transform translate-x-1/2 -translate-y-1/2 opacity-0">
+            <div class="bg-gradient-to-r from-green-400 to-blue-500
+                       text-white font-bold py-2 px-4 rounded-full
+                       border-2 border-green-300 shadow-lg
+                       animate-bounce"
+                 style="animation-delay: 0.3s;">
+                <span class="text-sm md:text-base" id="bonus-points-text">+0 Time Bonus!</span>
+            </div>
+        </div>
+
+        <!-- Achievement Notification -->
+        <div id="achievement-notification" class="absolute bottom-1/4 left-1/2 transform -translate-x-1/2 translate-y-1/2 opacity-0">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500
+                       text-white font-bold py-3 px-6 rounded-2xl
+                       border-2 border-purple-300 shadow-xl
+                       animate-pulse"
+                 id="achievement-card">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl" id="achievement-icon">🏆</span>
+                    <div>
+                        <div class="text-sm font-bold" id="achievement-title">Level Up!</div>
+                        <div class="text-xs opacity-90" id="achievement-desc">You've reached a new level!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Numbers Animation -->
+        <div id="floating-numbers" class="absolute inset-0">
+            <!-- Individual floating number elements will be dynamically created -->
+        </div>
+    </div>
+</div>
+
+<!-- Points Breakdown Popup -->
+{{-- <div id="points-breakdown-popup" class="fixed bottom-4 right-4 bg-white rounded-2xl shadow-2xl border-2 border-yellow-300 p-4 transform translate-y-full opacity-0 transition-all duration-500 z-50 max-w-sm">
+    <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-gray-800 text-lg">Points Earned! 🎉</h4>
+        <button onclick="hidePointsBreakdown()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+    </div>
+    <div class="space-y-2 text-sm">
+        <div class="flex justify-between items-center py-1">
+            <span class="text-gray-600">Base Points:</span>
+            <span class="font-bold text-blue-600" id="breakdown-base">+0</span>
+        </div>
+        <div class="flex justify-between items-center py-1" id="breakdown-bonus-row">
+            <span class="text-gray-600">Time Bonus:</span>
+            <span class="font-bold text-green-600" id="breakdown-bonus">+0</span>
+        </div>
+        <hr class="border-gray-200">
+        <div class="flex justify-between items-center py-1 text-lg">
+            <span class="font-bold text-gray-800">Total:</span>
+            <span class="font-bold text-orange-600" id="breakdown-total">+0</span>
+        </div>
+        <div class="text-xs text-gray-500 mt-2" id="breakdown-stats">
+            <!-- Additional stats will be populated here -->
+        </div>
+    </div>
+</div> --}}
+
 <!-- Assessment Loader (initially hidden) -->
 <div id="assessment-loader" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50">
     <div class="text-center">
@@ -158,6 +261,171 @@
 </div>
 
 <style>
+    /* Points Animation Styles */
+    .sparkle {
+        position: absolute;
+        font-size: 1.2rem;
+        animation: sparkleFloat 2s ease-in-out infinite;
+        opacity: 0;
+    }
+
+    .sparkle-1 {
+        top: 10%;
+        left: 20%;
+        animation-delay: 0.1s;
+    }
+
+    .sparkle-2 {
+        top: 20%;
+        right: 15%;
+        animation-delay: 0.3s;
+    }
+
+    .sparkle-3 {
+        bottom: 15%;
+        left: 15%;
+        animation-delay: 0.5s;
+    }
+
+    .sparkle-4 {
+        bottom: 25%;
+        right: 20%;
+        animation-delay: 0.7s;
+    }
+
+    .sparkle-5 {
+        top: 50%;
+        left: 5%;
+        animation-delay: 0.9s;
+    }
+
+    .sparkle-6 {
+        top: 50%;
+        right: 5%;
+        animation-delay: 1.1s;
+    }
+
+    @keyframes sparkleFloat {
+        0% {
+            opacity: 0;
+            transform: translateY(0) scale(0.5);
+        }
+        20% {
+            opacity: 1;
+            transform: translateY(-10px) scale(1);
+        }
+        80% {
+            opacity: 1;
+            transform: translateY(-20px) scale(1.2);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.8);
+        }
+    }
+
+    @keyframes pointsScaleIn {
+        0% {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes floatingNumber {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-100px) scale(1.5);
+        }
+    }
+
+    @keyframes achievementSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateX(-100%) scale(0.8);
+        }
+        50% {
+            opacity: 1;
+            transform: translateX(0) scale(1.1);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    .points-circle-animate {
+        animation: pointsScaleIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .floating-number {
+        position: absolute;
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: #f59e0b;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        animation: floatingNumber 2s ease-out forwards;
+        pointer-events: none;
+        z-index: 105;
+    }
+
+    .achievement-animate {
+        animation: achievementSlideIn 0.6s ease-out forwards;
+    }
+
+    /* Celebration confetti */
+    .confetti {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+        animation: confettiDrop 3s linear infinite;
+    }
+
+    @keyframes confettiDrop {
+        0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        .floating-number {
+            font-size: 1.2rem;
+        }
+
+        .sparkle {
+            font-size: 1rem;
+        }
+    }
+
+    /* Audio feedback visual */
+    .audio-pulse {
+        animation: audioPulse 0.3s ease-in-out;
+    }
+
+    @keyframes audioPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
     /* Assessment Loader Styles */
     .pl {
         width: 6em;
@@ -757,12 +1025,16 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             window.correctAudio = new Audio('{{ asset("audio/correct.mp3") }}');
             window.incorrectAudio = new Audio('{{ asset("audio/incorrect.mp3") }}');
-            
+            window.levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
+
             window.correctAudio.volume = 0.7;
             window.incorrectAudio.volume = 0.7;
+            window.levelUpAudio.volume = 0.8;
+
             window.correctAudio.preload = 'auto';
             window.incorrectAudio.preload = 'auto';
-            
+            window.levelUpAudio.preload = 'auto';
+
             console.log('Audio system initialized');
         } catch (error) {
             console.error('Error initializing audio system:', error);
@@ -1192,7 +1464,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function playAudioFeedback(isCorrect, isTimeout = false) {
         if (!quizState.audioEnabled || isTimeout) return;
-        
+
+        // Add visual pulse to audio button
+        const audioButton = document.getElementById('audio-toggle');
+        if (audioButton) {
+            audioButton.classList.add('audio-pulse');
+            setTimeout(() => {
+                audioButton.classList.remove('audio-pulse');
+            }, 300);
+        }
+
         try {
             let audio;
             if (isCorrect) {
@@ -1200,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 audio = window.incorrectAudio;
             }
-            
+
             if (audio) {
                 audio.currentTime = 0;
                 audio.play().catch(error => {
@@ -1208,20 +1489,266 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 console.log('Audio not available - creating new instance');
-                const audioPath = isCorrect ? 
-                    '{{ asset("audio/correct.mp3") }}' : 
+                const audioPath = isCorrect ?
+                    '{{ asset("audio/correct.mp3") }}' :
                     '{{ asset("audio/incorrect.mp3") }}';
-                
+
                 const fallbackAudio = new Audio(audioPath);
                 fallbackAudio.volume = 0.7;
                 fallbackAudio.play().catch(error => {
                     console.log('Fallback audio playback failed:', error);
                 });
             }
-            
+
         } catch (error) {
             console.error('Error playing audio feedback:', error);
         }
+    }
+
+    // Points Animation Functions
+    function showPointsAnimation(data) {
+        const overlay = document.getElementById('points-animation-overlay');
+        const pointsCircle = document.getElementById('points-circle');
+        const pointsText = document.getElementById('points-earned-text');
+        const bonusDisplay = document.getElementById('bonus-points-display');
+        const bonusText = document.getElementById('bonus-points-text');
+        const achievementNotification = document.getElementById('achievement-notification');
+
+        // Set up points data
+        const totalPoints = data.points_earned || 0;
+        const basePoints = data.base_points || 0;
+        const bonusPoints = data.bonus_points || 0;
+        const gamification = data.gamification || {};
+
+        // Show main points
+        pointsText.textContent = `+${totalPoints}`;
+
+        // Reset animations
+        pointsCircle.classList.remove('points-circle-animate');
+        overlay.classList.remove('hidden');
+
+        // Trigger main animation
+        setTimeout(() => {
+            pointsCircle.classList.add('points-circle-animate');
+        }, 100);
+
+        // Show bonus points if any
+        if (bonusPoints > 0) {
+            bonusText.textContent = `+${bonusPoints} Time Bonus!`;
+            setTimeout(() => {
+                bonusDisplay.style.opacity = '1';
+                bonusDisplay.style.transform = 'translate(50%, -50%) scale(1)';
+            }, 600);
+        }
+
+        // Show achievement notifications
+        if (gamification.level_up || gamification.rank_up) {
+            showAchievementNotification(gamification);
+        }
+
+        // Create floating numbers
+        createFloatingNumbers(totalPoints, basePoints, bonusPoints);
+
+        // Show confetti for good scores
+        if (data.is_correct && totalPoints >= 15) {
+            createConfetti();
+        }
+
+        // Show points breakdown popup
+        setTimeout(() => {
+            showPointsBreakdown(data);
+        }, 1500);
+
+        // Auto-hide after duration
+        setTimeout(() => {
+            hidePointsAnimation();
+        }, 4000);
+    }
+
+    function showAchievementNotification(gamification) {
+        const achievementNotification = document.getElementById('achievement-notification');
+        const achievementIcon = document.getElementById('achievement-icon');
+        const achievementTitle = document.getElementById('achievement-title');
+        const achievementDesc = document.getElementById('achievement-desc');
+
+        if (gamification.level_up) {
+            achievementIcon.textContent = '🆙';
+            achievementTitle.textContent = 'Level Up!';
+            achievementDesc.textContent = `You reached level ${gamification.current_level}!`;
+
+            // Play level up audio
+            if (quizState.audioEnabled && window.levelUpAudio) {
+                window.levelUpAudio.currentTime = 0;
+                window.levelUpAudio.play().catch(error => {
+                    console.log('Level up audio playback failed:', error);
+                });
+            }
+        } else if (gamification.rank_up) {
+            achievementIcon.textContent = '🏆';
+            achievementTitle.textContent = 'Rank Up!';
+            achievementDesc.textContent = `New rank: ${gamification.current_rank.name}!`;
+
+            // Play level up audio for rank up too
+            if (quizState.audioEnabled && window.levelUpAudio) {
+                window.levelUpAudio.currentTime = 0;
+                window.levelUpAudio.play().catch(error => {
+                    console.log('Rank up audio playback failed:', error);
+                });
+            }
+        }
+
+        setTimeout(() => {
+            achievementNotification.style.opacity = '1';
+            achievementNotification.classList.add('achievement-animate');
+        }, 1000);
+    }
+
+    function createFloatingNumbers(total, base, bonus) {
+        const floatingContainer = document.getElementById('floating-numbers');
+
+        // Clear existing floating numbers
+        floatingContainer.innerHTML = '';
+
+        // Create floating number for total
+        if (total > 0) {
+            createFloatingNumber(floatingContainer, `+${total}`, 'center');
+        }
+
+        // Create floating numbers for base points
+        if (base > 0) {
+            setTimeout(() => {
+                createFloatingNumber(floatingContainer, `+${base}`, 'left', '#3B82F6');
+            }, 300);
+        }
+
+        // Create floating numbers for bonus
+        if (bonus > 0) {
+            setTimeout(() => {
+                createFloatingNumber(floatingContainer, `+${bonus}`, 'right', '#10B981');
+            }, 600);
+        }
+    }
+
+    function createFloatingNumber(container, text, position, color = '#f59e0b') {
+        const number = document.createElement('div');
+        number.className = 'floating-number font-baloo';
+        number.textContent = text;
+        number.style.color = color;
+
+        // Position based on parameter
+        if (position === 'center') {
+            number.style.left = '50%';
+            number.style.top = '40%';
+            number.style.transform = 'translateX(-50%)';
+        } else if (position === 'left') {
+            number.style.left = '25%';
+            number.style.top = '35%';
+        } else if (position === 'right') {
+            number.style.right = '25%';
+            number.style.top = '35%';
+        }
+
+        container.appendChild(number);
+
+        // Remove after animation
+        setTimeout(() => {
+            if (number.parentNode) {
+                number.parentNode.removeChild(number);
+            }
+        }, 2000);
+    }
+
+    function createConfetti() {
+        const overlay = document.getElementById('points-animation-overlay');
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#26de81'];
+
+        for (let i = 0; i < 30; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+
+                overlay.appendChild(confetti);
+
+                // Remove after animation
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 5000);
+            }, i * 100);
+        }
+    }
+
+    function showPointsBreakdown(data) {
+        const popup = document.getElementById('points-breakdown-popup');
+        const breakdownBase = document.getElementById('breakdown-base');
+        const breakdownBonus = document.getElementById('breakdown-bonus');
+        const breakdownBonusRow = document.getElementById('breakdown-bonus-row');
+        const breakdownTotal = document.getElementById('breakdown-total');
+        const breakdownStats = document.getElementById('breakdown-stats');
+
+        // Populate breakdown data
+        breakdownBase.textContent = `+${data.base_points || 0}`;
+        breakdownBonus.textContent = `+${data.bonus_points || 0}`;
+        breakdownTotal.textContent = `+${data.points_earned || 0}`;
+
+        // Hide bonus row if no bonus
+        if (!data.bonus_points || data.bonus_points === 0) {
+            breakdownBonusRow.style.display = 'none';
+        } else {
+            breakdownBonusRow.style.display = 'flex';
+        }
+
+        // Add gamification stats if available
+        if (data.gamification) {
+            const stats = [];
+            if (data.gamification.total_points) {
+                stats.push(`Total: ${data.gamification.total_points} pts`);
+            }
+            if (data.gamification.current_level) {
+                stats.push(`Level ${data.gamification.current_level}`);
+            }
+            if (data.gamification.streak > 1) {
+                stats.push(`${data.gamification.streak} day streak!`);
+            }
+            breakdownStats.textContent = stats.join(' • ');
+        }
+
+        // Animate popup
+        popup.style.transform = 'translateY(0)';
+        popup.style.opacity = '1';
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            hidePointsBreakdown();
+        }, 5000);
+    }
+
+    function hidePointsBreakdown() {
+        const popup = document.getElementById('points-breakdown-popup');
+        popup.style.transform = 'translateY(100%)';
+        popup.style.opacity = '0';
+    }
+
+    function hidePointsAnimation() {
+        const overlay = document.getElementById('points-animation-overlay');
+        const bonusDisplay = document.getElementById('bonus-points-display');
+        const achievementNotification = document.getElementById('achievement-notification');
+
+        // Reset all elements
+        bonusDisplay.style.opacity = '0';
+        bonusDisplay.style.transform = 'translate(50%, -50%) scale(0.8)';
+        achievementNotification.style.opacity = '0';
+        achievementNotification.classList.remove('achievement-animate');
+
+        // Hide overlay
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 500);
     }
     
     function showFeedback(data, isTimeout = false) {
@@ -1229,10 +1756,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const feedbackMessage = document.getElementById('feedback-message');
         const explanationText = document.getElementById('explanation-text');
         const nextBtn = document.getElementById('next-btn');
-        
+
         // Play audio feedback
         playAudioFeedback(data.is_correct, isTimeout);
-        
+
+        // Show points animation if points were earned
+        if (!isTimeout && data.points_earned && data.points_earned > 0) {
+            showPointsAnimation(data);
+        }
+
         // Show feedback
         if (isTimeout) {
             feedbackSection.className = 'mt-6 p-4 rounded-lg bg-orange-50 border border-orange-200';
@@ -1247,23 +1779,24 @@ document.addEventListener('DOMContentLoaded', function() {
             feedbackMessage.className = 'font-extrabold mb-2 text-red-800 text-2xl';
             feedbackMessage.textContent = '❌ Incorrect';
         }
-        
+
         if (data.explanation) {
             explanationText.textContent = data.explanation;
         }
-        
+
         if (!isTimeout && data.correct_answer) {
             explanationText.innerHTML += `<br><strong>Correct answer:</strong> ${data.correct_answer}`;
         }
-        
+
         feedbackSection.classList.remove('hidden');
-        
+
         // Handle next question or completion
         if (data.assessment_complete) {
             nextBtn.textContent = 'View Results';
+
             nextBtn.onclick = function() {
                 showAssessmentLoader();
-                
+
                 setTimeout(() => {
                     if (data.redirect_url) {
                         window.location.href = data.redirect_url;
@@ -1278,10 +1811,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update question counter before reloading
                 quizState.questionIndex++;
                 updateQuestionCounterDisplay();
-                
+
                 // Save the updated state to localStorage before reload
                 saveProgressToLocalStorage();
-                
+
                 // The page will reload to show the next question
                 // The quiz timer will continue because it's based on the stored start time
                 window.location.reload();

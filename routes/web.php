@@ -156,21 +156,31 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
         // Clear diagnostic session
         Route::post('/clear-diagnostic', [AssessmentController::class, 'clearDiagnosticSession'])->name('clear-diagnostic');
         
-        // Assessment session cleanup
+                // Assessment session cleanup
         Route::post('/assessment/cleanup', [StudentQuizController::class, 'cleanupAssessment'])->name('assessment.cleanup');
-        
-        // Assessment progress saving
-        Route::post('/assessment/save-progress', [StudentQuizController::class, 'saveAssessmentProgress'])->name('assessment.save-progress');
-        
-        // Regular quiz results routes (separate from diagnostic assessment routes)
-        Route::get('/results/complete/{category}', [RegularAssessmentController::class, 'showQuizComplete'])->name('results.complete');
-        
-        // Regular quiz review page
-        Route::get('/results/review/{category}', [RegularAssessmentController::class, 'showQuizReview'])->name('results.review');
-        
-        // Get regular quiz results data
-        Route::get('/results/data/{assessmentId}', [RegularAssessmentController::class, 'getQuizResultsData'])->name('results.data');
     });
+    
+    // Gamification API Routes
+    Route::prefix('gamification')->name('gamification.')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Student\GamificationApiController::class, 'getDashboard'])->name('dashboard');
+        Route::get('/leaderboard', [App\Http\Controllers\Student\GamificationApiController::class, 'getLeaderboard'])->name('leaderboard');
+        Route::get('/points-history', [App\Http\Controllers\Student\GamificationApiController::class, 'getPointsHistory'])->name('points-history');
+        Route::get('/badges', [App\Http\Controllers\Student\GamificationApiController::class, 'getBadges'])->name('badges');
+        Route::get('/my-ranking', [App\Http\Controllers\Student\GamificationApiController::class, 'getMyRanking'])->name('my-ranking');
+        Route::get('/stats', [App\Http\Controllers\Student\GamificationApiController::class, 'getStats'])->name('stats');
+    });
+    
+    // Assessment progress saving
+    Route::post('/assessment/save-progress', [StudentQuizController::class, 'saveAssessmentProgress'])->name('assessment.save-progress');
+    
+    // Regular quiz results routes (separate from diagnostic assessment routes)
+    Route::get('/results/complete/{category}', [RegularAssessmentController::class, 'showQuizComplete'])->name('results.complete');
+    
+    // Regular quiz review page
+    Route::get('/results/review/{category}', [RegularAssessmentController::class, 'showQuizReview'])->name('results.review');
+    
+    // Get regular quiz results data
+    Route::get('/results/data/{assessmentId}', [RegularAssessmentController::class, 'getQuizResultsData'])->name('results.data');
 });
 
 // Teacher Routes - Using Admin Auth System
