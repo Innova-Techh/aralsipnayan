@@ -4,7 +4,7 @@
 
 @section('content')
     <style>
-        .hero-bg {
+        /* .hero-bg {
             background-image: url('{{ asset('images/section/bg2.png') }}');
         }
 
@@ -12,7 +12,7 @@
             .hero-bg {
                 background-image: url('{{ asset('images/section/bg.png') }}');
             }
-        }
+        } */
     </style>
 
     <!-- Main Container with Responsive Padding -->
@@ -21,16 +21,31 @@
 
             <!-- Welcome Header (Hero) - Responsive -->
             <div
-                class="relative -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8 p-4 sm:p-5 md:p-6 text-white overflow-hidden bg-center bg-cover hero-bg">
-                <div class="relative z-10 px-4 sm:px-6 md:px-8 lg:px-12">
-                    <h1
-                        class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-baloo font-extrabold leading-tight">
-                        My Section 🏆
-                    </h1>
-                    <p class="text-xs sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
-                        Your skills update and assessment quest in one place!
-                    </p>
+                class="welcome-header relative -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple overflow-hidden min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center bg-center bg-cover hero-bg">
+
+                <!-- Grid Background -->
+                <div class="absolute inset-0 opacity-30"
+                    style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;">
                 </div>
+                <!-- Content -->
+
+                <div class="relative z-10 w-full px-4 sm:px-8 lg:px-8 max-w-8xl mx-auto">
+                    <div class="flex flex-col justify-center h-full">
+                        <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
+                            style="text-shadow: -1px -1px 0 #18337e,
+                                                       1px -1px 0 #18337e,
+                                                       -1px 1px 0 #18337e,
+                                                       1px 1px 0 #18337e,
+                                                       0 4px 0 #18337e;">
+                            My Section 🏆
+                        </h1>
+                        <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
+                            Your skills update and assessment quest in one place!
+                        </p>
+                    </div>
+                </div>
+
+
             </div>
 
             <!-- Main Content Grid - Responsive Layout -->
@@ -77,6 +92,7 @@
                                                 </div>
                                             </div>
 
+<<<<<<< Updated upstream
                                             <!-- Live Quiz Indicator -->
                                             @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
                                                 <div class="mb-4 p-2 bg-red-500/20 border border-red-300/30 rounded-lg">
@@ -103,6 +119,38 @@
                                                     Start Assessment
                                                 </button>
                                             @endif
+=======
+                                    <!-- Start Assessment Button - Responsive -->
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                                                        "
+                                        style="text-shadow:
+                                                                                                                                                                -1px -1px 0 #7A4305,
+                                                                                                                                                                1px -1px 0 #7A4305,
+                                                                                                                                                                -1px 1px 0 #7A4305,
+                                                                                                                                                                1px 1px 0 #7A4305,
+                                                                                                                                                                0 0 1px #7A4305;">
+                                        Start Assessment
+                                    </button>
+                                </div>
+
+                                <!-- Fractions and Decimals Card -->
+                                <div
+                                    class=" bg-gradient-to-r from-green-500 to-teal-500 rounded-xl lg:rounded-2xl p-4 lg:px-8 
+                                                                                                                                                    sm:p-5 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Fractions and
+                                        Decimals</h3>
+                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Practice assessment on
+                                        converting fractions to decimals</p>
+
+                                    <!-- Stats Row - Mobile Responsive -->
+                                    <div
+                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
+                                        <div class="text-center">
+                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150
+                                            </div>
+                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
+>>>>>>> Stashed changes
                                         </div>
                                     @empty
                                         <div class="text-center py-12">
@@ -110,7 +158,70 @@
                                             <h3 class="text-lg font-medium text-gray-900 mb-2">No assessments assigned</h3>
                                             <p class="text-gray-500">Your teacher hasn't assigned any assessments yet</p>
                                         </div>
+<<<<<<< Updated upstream
                                     @endforelse
+=======
+                                        <div class="text-center">
+                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Easy
+                                            </div>
+                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Start Assessment Button - Responsive -->
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                                                        "
+                                        style="text-shadow:
+                                                                                                                                                                -1px -1px 0 #7A4305,
+                                                                                                                                                                1px -1px 0 #7A4305,
+                                                                                                                                                                -1px 1px 0 #7A4305,
+                                                                                                                                                                1px 1px 0 #7A4305,
+                                                                                                                                                                0 0 1px #7A4305;">
+                                        Start Assessment
+                                    </button>
+                                </div>
+
+                                <!-- Number Operations Quiz Card -->
+                                <div
+                                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8  lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow">
+                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold mb-2">Number Operations
+                                        Quiz</h3>
+                                    <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">Quick assessment on basic
+                                        arithmetic operations</p>
+
+                                    <!-- Stats Row - Mobile Responsive -->
+                                    <div
+                                        class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
+                                        <div class="text-center">
+                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">150</div>
+                                            <div class="text-xs lg:text-sm font-medium opacity-90">XP Reward</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">25 mins
+                                            </div>
+                                            <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">Hard
+                                            </div>
+                                            <div class="text-xs lg:text-sm font-medium opacity-90">Difficulty</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Start Assessment Button - Responsive -->
+                                    <button
+                                        class="w-full bg-gradient-secondary drop-shadow-gradient-secondary  text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors
+                                                                                                                                                        "
+                                        style="text-shadow:
+                                                                                                                                                                -1px -1px 0 #7A4305,
+                                                                                                                                                                1px -1px 0 #7A4305,
+                                                                                                                                                                -1px 1px 0 #7A4305,
+                                                                                                                                                                1px 1px 0 #7A4305,
+                                                                                                                                                                0 0 1px #7A4305;">
+                                        Start Assessment
+                                    </button>
+>>>>>>> Stashed changes
                                 </div>
                             </div>
                         </div>

@@ -4,22 +4,37 @@
 
 @section('content')
 
+    <style>
+        /* Grid Lines */
+        .grid-lines {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
 
     <div class="space-y-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
         <!-- My Assessments Header -->
 
-        <div class="relative overflow-hidden mt-4 lg:mt-8">
-            <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
-                                                                            background-size: 95% clamp(120px, 10vw + 60px, 200px);
-                                                                            min-height: clamp(120px, 10vw + 60px, 200px);
-                                                                            padding-left: clamp(2rem, 8vw, 18rem);">
-                <div class="relative z-10 pr-6">
-                    <h1 class="text-3xl sm:text-3xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
+        <div
+            class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
+
+            <!-- Grid Background -->
+            <div class="absolute inset-0 opacity-30"
+                style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;">
+            </div>
+
+            <!-- Content -->
+            <div class="relative z-10 w-full px-4 sm:px-8 lg:px-8 max-w-8xl mx-auto">
+                <div class="flex flex-col justify-center h-full">
+                    <h1
+                        class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight drop-shadow-header">
                         My Assessments
                     </h1>
-                    <p class="text-[10px] sm:text-sm md:text-base lg:text-lg text-blue-100 mt-2 sm:mt-3 md:mt-4">
-                        Test your mathematical knowledge across different competencies and track your learning progress
-                        with
+                    <p
+                        class="text-base sm:text-base md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5 drop-shadow-description">
+                        Test your mathematical knowledge across different competencies and track your learning progress with
                         adaptive assessments
                     </p>
                 </div>
@@ -27,7 +42,7 @@
         </div>
 
         <!-- Feature Cards Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 px-8 pt-8">
             <!-- Ready for a Challenge Card -->
             <div class="relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 text-white min-h-[120px] md:min-h-[200px] border-b-4 border-[#2c014b] shadow-lg"
                 style="background-image: url('{{ asset('images/assessments/card1.png') }}'); background-size: cover; background-position: center;">
@@ -72,7 +87,7 @@
         </div>
 
         <!-- Assessment Categories Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8 max-w-3xl">
             <!-- Number and Algebra Card -->
             <div class="rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow relative overflow-hidden border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
                 style="background-image: url('{{ asset('images/assessments/assess1.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
@@ -99,9 +114,10 @@
                         $naHasDiagnostic = $naMastery ? $naMastery->has_taken_diagnostic : false;
                         $naIncompleteSession = $incompleteSessionData['Number_Algebra'] ?? null;
                     @endphp
-                    <span class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                            text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                            text-xs font-medium px-2 py-1 rounded-full">
+                    <span
+                        class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full">
                         {{ $naLevel }}
                     </span>
 
@@ -121,7 +137,7 @@
                         <div id="progress-bar-na"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                            background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -214,9 +230,10 @@
                         $mgHasDiagnostic = $mgMastery ? $mgMastery->has_taken_diagnostic : false;
                         $mgIncompleteSession = $incompleteSessionData['Measurement_Geometry'] ?? null;
                     @endphp
-                    <span class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                          text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                          text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                    <span
+                        class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
                         {{ $mgLevel }}
                     </span>
 
@@ -236,7 +253,7 @@
                         <div id="progress-bar-mg"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -330,9 +347,10 @@
                         $dpHasDiagnostic = $dpMastery ? $dpMastery->has_taken_diagnostic : false;
                         $dpIncompleteSession = $incompleteSessionData['Data_Probability'] ?? null;
                     @endphp
-                    <span class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                        text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                        text-xs font-medium px-2 py-1 rounded-full">
+                    <span
+                        class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
+                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
                         {{ $dpLevel }}
                     </span>
 
@@ -352,7 +370,7 @@
                         <div id="progress-bar-dp"
                             class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                             style="width: 0%;
-                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                             <!-- Static shimmer lines -->
                             <div class="absolute inset-0 flex items-center justify-between px-2">
                                 <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -594,11 +612,11 @@
             const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
             if (activeDiagnostic) {
                 diagnosticInfo.innerHTML = `
-                                                <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
-                                                <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
-                                                <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
-                                                <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
-                                            `;
+                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                                                                                                                                    `;
             }
 
             // Show modal with animation

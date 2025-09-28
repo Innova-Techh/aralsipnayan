@@ -404,6 +404,8 @@ radial-gradient(circle at center,
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
                 "mesh-gradient":
                     "radial-gradient(at 40% 20%, #449EFF 0px, transparent 50%), radial-gradient(at 80% 0%, #F59E0B 0px, transparent 50%), radial-gradient(at 0% 50%, #1E293B 0px, transparent 50%), radial-gradient(at 80% 50%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 100%, #F59E0B 0px, transparent 50%), radial-gradient(at 80% 100%, #449EFF 0px, transparent 50%), radial-gradient(at 0% 0%, #1E3A8A 0px, transparent 50%)",
+                "gradient-purple":
+                    "linear-gradient(135deg, #3775FF, #6D48E8, #611E8A)",
                 // Clean Level Up System Gradients - 10 Tiers
                 "level-bronze-card":
                     "linear-gradient(to bottom, #C77C3E, #5A2E12)",
@@ -518,6 +520,10 @@ radial-gradient(circle at center,
                 "leaderboard-points":
                     "linear-gradient(to bottom, #F59E0B, #FBBF24)",
             },
+            boxShadow: {
+                // Inner shadow utility
+                "inner-violet": "inset -4px -4px 2px #4A1B74",
+            },
             dropShadow: {
                 "gradient-primary": "0 4px 0 #312297",
                 "gradient-secondary": "0 4px 0 #7A4305",
@@ -525,6 +531,7 @@ radial-gradient(circle at center,
                 "on-board-earn": "0 4px 0 #C47E06",
                 "on-board-learn": "0 4px 0 #C1321F",
                 "on-board-progress": "0 4px 0 #1E18CB",
+                "custom-purple": "0 6px 0 #30098F",
                 "on-welcome": "0 4px 0 #1E3A8A",
                 "avatar-1": "6px 4px 0 #FFA705",
                 "avatar-2": "6px 4px 0 #FF6D87",
@@ -537,6 +544,10 @@ radial-gradient(circle at center,
                 "stats-yellow": "0 6px 0 #4A2E03",
                 "stats-red": "0 6px 0 #3B0A0A",
                 "drop-custom": "4px 4px 0 black",
+
+                header: "0 4px 0 #1E3A8A",
+                description: "0 1px 0 #1E3A8A",
+
                 // Achievement card custom drop shadows
                 "achievement-common": "4px 4px 0 #2E343C",
                 "achievement-uncommon": "4px 4px 0 #163522",
