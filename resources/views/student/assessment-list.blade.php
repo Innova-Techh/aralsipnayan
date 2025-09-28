@@ -153,15 +153,16 @@
     <!-- Assessment List Content -->
 <div class="mx-auto max-w-[1600px] px-2 sm:px-4 md:px-6 lg:px-8 pb-24">
     @if($availableQuestions > 0)
-        <div class="grid 
-                    grid-cols-1          <!-- all mobile: 1 column -->
-                    md:grid-cols-2       <!-- tablet: 2 columns -->
-                    lg:grid-cols-2       <!-- laptop: 3 columns -->
-                    xl:grid-cols-3       <!-- desktop: 3 columns -->
-                    2xl:grid-cols-4      <!-- large desktop: 5 columns -->
-                    gap-4 sm:gap-5 lg:gap-6 font-baloo">
+        @if(count($assessmentOptions) > 0)
+            <div class="grid
+                        grid-cols-1          <!-- all mobile: 1 column -->
+                        md:grid-cols-2       <!-- tablet: 2 columns -->
+                        lg:grid-cols-2       <!-- laptop: 3 columns -->
+                        xl:grid-cols-3       <!-- desktop: 3 columns -->
+                        2xl:grid-cols-4      <!-- large desktop: 5 columns -->
+                        gap-4 sm:gap-5 lg:gap-6 font-baloo">
 
-            @foreach($assessmentOptions as $index => $assessment)
+                @foreach($assessmentOptions as $index => $assessment)
             <div class="w-full 
                         bg-gradient-to-br from-[#2077AF] to-[#4720AF] 
                         rounded-xl border-b-4 border-[#0b1d30] 
@@ -231,9 +232,52 @@
                     <span class="relative z-10">Start Assessment</span>
                 </button>
             </div>
-            @endforeach
-        </div>
-    </div>
+                @endforeach
+            </div>
+        @else
+            <!-- No Assessment Options Available (playful message) -->
+            <div class="relative overflow-hidden">
+                <div class="mx-auto max-w-4xl rounded-3xl text-white transition-all duration-300 border-t-4 border-l-4 border-r-4 border-b-8 border-[#FFA500] shadow-2xl hover:shadow-3xl transform hover:scale-[1.02]"
+                     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: clamp(200px, 15vw + 100px, 300px);">
+
+                    <!-- Floating elements for playfulness -->
+                    <div class="absolute top-4 right-4 text-4xl sm:text-5xl md:text-6xl opacity-20 animate-bounce">📚</div>
+                    <div class="absolute bottom-6 left-6 text-2xl sm:text-3xl md:text-4xl opacity-20 animate-pulse">⏰</div>
+                    <div class="absolute top-1/2 right-8 text-3xl sm:text-4xl md:text-5xl opacity-15 animate-ping" style="animation-delay: 1s;">✨</div>
+
+                    <!-- Content -->
+                    <div class="relative z-10 h-full flex flex-col justify-center items-center text-center px-6 sm:px-10 md:px-16 lg:px-24 py-8 sm:py-12 md:py-16">
+                        <!-- Main Icon -->
+                        {{-- <div class="mb-4 sm:mb-6 transform hover:rotate-12 transition-transform duration-300">
+                            <div class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl">🎯</div>
+                        </div> --}}
+
+                        <!-- Main Message -->
+                        <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-baloo font-extrabold leading-tight mb-3 sm:mb-4 drop-shadow-lg">
+                            Oops! No assessments available right now
+                        </h2>
+
+                        <!-- Playful submessage -->
+                        <p class="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 mb-4 sm:mb-6 font-medium leading-relaxed max-w-2xl">
+                            🌟 There are no available assessments at the moment, come back later! 🌟<br>
+                            <span class="text-xs sm:text-sm md:text-base opacity-90">Your brain deserves a little break anyway! 🧠💤</span>
+                        </p>
+
+                        <!-- Action buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-md">
+                            <button onclick="refreshAssessments()"
+                                    class="flex-1 bg-gradient-to-r from-[#FF6B6B] to-[#FF8E8E] hover:from-[#FF5252] hover:to-[#FF6B6B] text-white font-baloo font-bold py-3 px-6 rounded-xl border-b-4 border-[#d32f2f] shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm sm:text-base">
+                                 Refresh
+                            </button>
+                            {{-- <a href="{{ route('student.assessments') }}"
+                               class="flex-1 bg-gradient-to-r from-[#4CAF50] to-[#66BB6A] hover:from-[#43A047] hover:to-[#4CAF50] text-white font-baloo font-bold py-3 px-6 rounded-xl border-b-4 border-[#2e7d32] shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm sm:text-base text-center">
+                                🏠 Check other 
+                            </a> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     @else
 
                 <!-- No Questions Available -->
