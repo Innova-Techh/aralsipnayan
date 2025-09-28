@@ -202,6 +202,14 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     // Assessment Assignment API
     Route::get('/assessments/students/{section}', [App\Http\Controllers\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
     Route::post('/assessments/assign', [App\Http\Controllers\TeacherAssessmentController::class, 'assign'])->name('assessments.assign');
+    Route::delete('/assessments/assignments/{assignment}', [App\Http\Controllers\TeacherAssessmentController::class, 'removeAssignment'])->name('assessments.remove-assignment');
+    
+    // Section Management
+    Route::get('/sections', [App\Http\Controllers\TeacherSectionController::class, 'index'])->name('sections');
+    Route::get('/sections/students/{section}', [App\Http\Controllers\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
+    Route::post('/sections', [App\Http\Controllers\TeacherSectionController::class, 'store'])->name('sections.store');
+    Route::put('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'update'])->name('sections.update');
+    Route::delete('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'destroy'])->name('sections.destroy');
     
     // Student Management
     Route::get('/students', function () {
@@ -228,13 +236,6 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
         ]);
     });
     
-    // Section Management
-    Route::get('/sections', function () {
-        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
-        }
-        return view('admin.teacher.sections.index');
-    })->name('sections');
     
     // Profile
     Route::get('/profile', function () {
@@ -294,8 +295,8 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardData'])->name('leaderboard.data');
     
-    // Sections
-    Route::get('/sections', [SectionController::class, 'index'])->name('sections.index');
+    // Sections (Student view)
+    Route::get('/my-sections', [SectionController::class, 'index'])->name('sections.index');
     Route::get('/sections/data', [SectionController::class, 'getSectionsData'])->name('sections.data');
     
     // Teacher-created assessments
