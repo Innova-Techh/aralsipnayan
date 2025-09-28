@@ -17,6 +17,9 @@ class AdminAuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::guard('admin')->check()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
             return redirect()->route('admin.login');
         }
 

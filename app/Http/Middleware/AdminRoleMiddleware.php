@@ -17,12 +17,18 @@ class AdminRoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Auth::guard('admin')->check()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
             return redirect()->route('admin.login');
         }
 
         $user = Auth::guard('admin')->user();
         
         if (!in_array($user->role, $roles)) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
             abort(403, 'Unauthorized');
         }
 
