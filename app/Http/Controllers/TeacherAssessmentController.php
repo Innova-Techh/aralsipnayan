@@ -158,7 +158,7 @@ class TeacherAssessmentController extends Controller
                     'assessment_id' => $assessment->id,
                     'student_id' => $studentId,
                     'section' => null,
-                    'accommodations' => $request->boolean('accommodations'),
+                    'accommodations' => $request->input('accommodations', false),
                     'assigned_at' => now(),
                     'due_date' => $request->available_until
                 ]);
@@ -169,7 +169,7 @@ class TeacherAssessmentController extends Controller
                 AssessmentAssignment::create([
                     'assessment_id' => $assessment->id,
                     'section' => $section,
-                    'accommodations' => $request->boolean('accommodations'),
+                    'accommodations' => $request->input('accommodations', false),
                     'assigned_at' => now(),
                     'due_date' => $request->available_until
                 ]);
@@ -181,12 +181,25 @@ class TeacherAssessmentController extends Controller
 
     public function show(Assessment $assessment)
     {
-        $assessment->load(['assignments.student', 'creator']);
+        $assessment->load(['assignments.student.studentProfile', 'creator']);
+        
+
+        
+        // If it's an AJAX request (from edit modal), return JSON
+        if (request()->ajax()) {
+            return response()->json([
+                'assessment' => $assessment,
+                'assignments' => $assessment->assignments
+            ]);
+        }
+        
         return view('admin.teacher.assessments.show', compact('assessment'));
     }
 
     public function edit(Assessment $assessment)
     {
+        // Return the edit view with assessment data
+        // The view will handle the modal display
         return view('admin.teacher.assessments.edit', compact('assessment'));
     }
 
@@ -210,6 +223,21 @@ class TeacherAssessmentController extends Controller
         ]));
 
         return redirect()->route('teacher.assessments')->with('success', 'Assessment updated successfully!');
+    }
+
+    public function removeAssignment(AssessmentAssignment $assignment)
+    {
+        // Verify the assignment belongs to a teacher's assessment
+        $teacher = Auth::guard('admin')->user();
+        $assessment = $assignment->assessment;
+        
+        if ($assessment->created_by !== $teacher->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        $assignment->delete();
+        
+        return response()->json(['success' => true, 'message' => 'Assignment removed successfully']);
     }
 
     public function destroy(Assessment $assessment)
@@ -241,25 +269,19 @@ class TeacherAssessmentController extends Controller
 
     public function assign(Request $request)
     {
-        $request->validate([
-            'assessment_id' => 'required|exists:teacher_assessments,id',
-            'section' => 'required|string',
-            'student_ids' => 'array',
-            'student_ids.*' => 'exists:users,id',
-            'accommodations' => 'boolean'
-        ]);
-
+        try {
         $assessment = Assessment::findOrFail($request->assessment_id);
         
-        // Remove any existing section-wide assignments for this assessment that match this
-        // section in any common format (e.g., "A" or "Section A").
-        AssessmentAssignment::where('assessment_id', $assessment->id)
-            ->whereNull('student_id')
-            ->where(function($q) use ($request) {
-                $q->where('section', $request->section)
-                  ->orWhere('section', 'Section ' . $request->section);
-            })
-            ->delete();
+        // If section is provided, remove existing section-wide assignments
+        if ($request->section) {
+            AssessmentAssignment::where('assessment_id', $assessment->id)
+                ->whereNull('student_id')
+                ->where(function($q) use ($request) {
+                    $q->where('section', $request->section)
+                      ->orWhere('section', 'Section ' . $request->section);
+                })
+                ->delete();
+        }
         
         // If specific students are selected
         if (!empty($request->student_ids)) {
@@ -270,7 +292,7 @@ class TeacherAssessmentController extends Controller
                     'student_id' => $studentId,
                     // Ensure student-specific rows are never treated as section-wide
                     'section' => null,
-                    'accommodations' => $request->boolean('accommodations'),
+                    'accommodations' => $request->input('accommodations', false),
                     'assigned_at' => now(),
                     'due_date' => $assessment->available_until
                 ]);
@@ -280,10 +302,11 @@ class TeacherAssessmentController extends Controller
                 $assessment->status = 'Active';
                 $assessment->save();
             }
-        } else {
+        } elseif ($request->section) {
             // Assign to entire section (no specific students selected)
             AssessmentAssignment::create([
                 'assessment_id' => $assessment->id,
+                'student_id' => null,
                 'section' => $request->section,
                 'accommodations' => $request->boolean('accommodations'),
                 'assigned_at' => now(),
@@ -297,7 +320,15 @@ class TeacherAssessmentController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Assessment assigned successfully!']);
+            \Log::info('Assignment completed successfully');
+            return response()->json(['success' => true, 'message' => 'Assessment assigned successfully!']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed:', ['errors' => $e->errors()]);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            \Log::error('Assignment failed:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'message' => 'Failed to assign assessment', 'error' => $e->getMessage()], 500);
+        }
     }
 
     // Student methods
