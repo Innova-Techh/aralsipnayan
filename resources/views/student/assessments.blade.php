@@ -236,7 +236,7 @@
             <!-- My Assessments Header -->
 
             <div
-                class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
+                class="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 text-white bg-gradient-purple shadow-inner-violet drop-shadow-custom-purple bg-center bg-no-repeat min-h-[160px] sm:min-h-[200px] lg:min-h-[220px] flex items-center">
 
                 <!-- Grid Background -->
                 <div class="absolute inset-0 opacity-30"
@@ -335,8 +335,8 @@
                         @endphp
                         <span
                             class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                                    text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                                                                                                                                                                                        text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                        text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
                             {{ $naLevel }}
                         </span>
 
@@ -356,7 +356,7 @@
                             <div id="progress-bar-na"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -452,8 +452,8 @@
                         @endphp
                         <span
                             class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                  text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                  text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                                                                                                                                                                      text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                      text-xs font-medium px-2 py-1 rounded-full relative z-20">
                             {{ $mgLevel }}
                         </span>
 
@@ -473,7 +473,7 @@
                             <div id="progress-bar-mg"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -570,8 +570,8 @@
                         @endphp
                         <span
                             class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                                text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                                text-xs font-medium px-2 py-1 rounded-full">
+                                                                                                                                                                                    text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full">
                             {{ $dpLevel }}
                         </span>
 
@@ -591,7 +591,7 @@
                             <div id="progress-bar-dp"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -941,11 +941,11 @@
             const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
             if (activeDiagnostic) {
                 diagnosticInfo.innerHTML = `
-                                                                                                                                                                        <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
-                                                                                                                                                                        <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
-                                                                                                                                                                        <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
-                                                                                                                                                                        <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
-                                                                                                                                                                    `;
+                                                                                                                                                                            <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                                                                                                                                                                            <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                                                                                                                                                                            <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                                                                                                                                                                            <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                                                                                                                                                                        `;
             }
 
             // Show modal with animation
