@@ -56,7 +56,7 @@
         <!-- Question -->
         <div class="mb-8 md:mb-10">
             <h2 class="text-gray-800 text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed">
-                {{ $question->text }}
+                {{ $currentQuestion }}. {{ $question->text }}
             </h2>
         </div>
 
