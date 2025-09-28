@@ -144,9 +144,57 @@
     <div class="max-w-5xl mx-auto mt-8 bg-white rounded-3xl shadow-xl p-6 text-center">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">Assessment Summary</h2>
         <p class="text-gray-600 mb-4">
-            You answered <strong>{{ $correctAnswers }}</strong> out of <strong>{{ $totalQuestions }}</strong> questions correctly 
+            You answered <strong>{{ $correctAnswers }}</strong> out of <strong>{{ $totalQuestions }}</strong> questions correctly
             ({{ $scorePercentage }}%).
         </p>
+
+        <!-- Difficulty Level Message -->
+        @if($mastery && $mastery->current_difficulty)
+            <div class="mb-4 p-4 rounded-xl border-2
+                @if($mastery->current_difficulty === 'beginner')
+                    bg-yellow-50 border-yellow-300
+                @elseif($mastery->current_difficulty === 'intermediate')
+                    bg-blue-50 border-blue-300
+                @elseif($mastery->current_difficulty === 'advanced')
+                    bg-green-50 border-green-300
+                @else
+                    bg-gray-50 border-gray-300
+                @endif
+                ">
+                <div class="text-lg md:text-xl font-bold mb-2
+                    @if($mastery->current_difficulty === 'beginner')
+                        text-yellow-700
+                    @elseif($mastery->current_difficulty === 'intermediate')
+                        text-blue-700
+                    @elseif($mastery->current_difficulty === 'advanced')
+                        text-green-700
+                    @else
+                        text-gray-700
+                    @endif
+                    ">
+                    @if($mastery->current_difficulty === 'beginner')
+                        🌱 You are an emerging and developing student!
+                    @elseif($mastery->current_difficulty === 'intermediate')
+                        🚀 You are a transitioning student!
+                    @elseif($mastery->current_difficulty === 'advanced')
+                        ⭐ You are at grade level student!
+                    @endif
+                </div>
+                <p class="text-sm md:text-base
+                    @if($mastery->current_difficulty === 'beginner')
+                        text-yellow-600
+                    @elseif($mastery->current_difficulty === 'intermediate')
+                        text-blue-600
+                    @elseif($mastery->current_difficulty === 'advanced')
+                        text-green-600
+                    @else
+                        text-gray-600
+                    @endif
+                    ">
+                    Current Level: {{ ucfirst($mastery->current_difficulty) }}
+                </p>
+            </div>
+        @endif
         
         <!-- Difficulty Breakdown -->
         @if($questionsByDifficulty->count() > 1)

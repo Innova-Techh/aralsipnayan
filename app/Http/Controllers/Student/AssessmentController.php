@@ -904,7 +904,13 @@ class AssessmentController extends Controller
         
         // Group questions by difficulty for additional analysis
         $questionsByDifficulty = $questionResponses->groupBy('difficulty_level');
-        
+
+        // Get user's current mastery data for this competency
+        $mastery = DB::table('student_mastery')
+            ->where('user_id', $user->id)
+            ->where('competency', $dbCompetency)
+            ->first();
+
         return view('student.assessment-review', [
             'category' => $category,
             'questionResponses' => $questionResponses,
@@ -913,7 +919,8 @@ class AssessmentController extends Controller
             'scorePercentage' => $scorePercentage,
             'questionsByDifficulty' => $questionsByDifficulty,
             'assessmentType' => $assessmentType,
-            'assessmentData' => $latestAssessment
+            'assessmentData' => $latestAssessment,
+            'mastery' => $mastery
         ]);
     }
     
