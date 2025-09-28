@@ -52,15 +52,9 @@ class TeacherSectionController extends Controller
                 // Get average performance for this section
                 $averagePerformance = $this->getSectionAveragePerformance($section);
 
-                // Get grade level for this section
-                $gradeLevel = DB::table('teacher_sections')
-                    ->where('teacher_id', $teacherProfile->id)
-                    ->where('section', $section)
-                    ->value('grade_level') ?? '7';
-
                 $sectionsData[] = [
                     'section' => $section,
-                    'grade_level' => $gradeLevel,
+                    'grade_level' => '6', // Fixed to Grade 6
                     'student_count' => $studentCount,
                     'active_assessments' => $activeAssessmentsCount,
                     'average_performance' => $averagePerformance,
@@ -97,10 +91,13 @@ class TeacherSectionController extends Controller
             ->where('users.status', 'active')
             ->select([
                 'student_profile.user_id',
+                'student_profile.student_id',
                 'student_profile.firstname',
+                'student_profile.middlename',
                 'student_profile.lastname',
                 'student_profile.section',
                 'student_profile.grade_level',
+                'student_profile.school_year',
                 'student_profile.total_points',
                 'student_profile.current_streak',
                 'student_profile.last_activity_date',
@@ -113,10 +110,15 @@ class TeacherSectionController extends Controller
                 
                 return [
                     'user_id' => $student->user_id,
-                    'name' => $student->firstname . ' ' . $student->lastname,
+                    'student_id' => $student->student_id,
+                    'firstname' => $student->firstname,
+                    'middlename' => $student->middlename,
+                    'lastname' => $student->lastname,
+                    'name' => trim($student->firstname . ' ' . ($student->middlename ? $student->middlename . ' ' : '') . $student->lastname),
                     'email' => $student->email,
                     'section' => $student->section,
                     'grade_level' => $student->grade_level,
+                    'school_year' => $student->school_year,
                     'progress' => round($progress, 1),
                     'total_points' => $student->total_points,
                     'current_streak' => $student->current_streak,
@@ -139,7 +141,6 @@ class TeacherSectionController extends Controller
     {
         $request->validate([
             'section' => 'required|string|max:50',
-            'grade_level' => 'required|string|max:10',
             'school_year' => 'nullable|string|max:20'
         ]);
 
@@ -165,7 +166,7 @@ class TeacherSectionController extends Controller
             DB::table('teacher_sections')->insert([
                 'teacher_id' => $teacherProfile->id,
                 'section' => $request->section,
-                'grade_level' => $request->grade_level,
+                'grade_level' => '6', // Fixed to Grade 6
                 'school_year' => $request->school_year,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -187,7 +188,6 @@ class TeacherSectionController extends Controller
     {
         $request->validate([
             'section' => 'required|string|max:50',
-            'grade_level' => 'required|string|max:10',
             'school_year' => 'nullable|string|max:20'
         ]);
 
@@ -204,7 +204,7 @@ class TeacherSectionController extends Controller
                 ->where('section', $section)
                 ->update([
                     'section' => $request->section,
-                    'grade_level' => $request->grade_level,
+                    'grade_level' => '6', // Fixed to Grade 6
                     'school_year' => $request->school_year,
                     'updated_at' => now()
                 ]);
