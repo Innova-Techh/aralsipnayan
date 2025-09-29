@@ -19,27 +19,27 @@
                 <div class="sparkle sparkle-1">✨</div>
                 <div class="sparkle sparkle-2">🌟</div>
                 <div class="sparkle sparkle-3">⭐</div>
-                <div class="sparkle sparkle-4">💫</div>
+                {{-- <div class="sparkle sparkle-4">💫</div> --}}
                 <div class="sparkle sparkle-5">✨</div>
-                <div class="sparkle sparkle-6">🎉</div>
+                {{-- <div class="sparkle sparkle-6">🎉</div> --}}
             </div>
         </div>
 
         <!-- Header with Animation -->
-        <h1 class="text-2xl font-bold mb-2 text-bounce">🎉 Assessment Complete! 🎉</h1>
+        <h1 class="text-2xl font-bold mb-2 text-bounce">Assessment Complete!</h1>
         <p class="text-gray-600 mb-6 fade-in-up">Great job on completing the assessment!</p>
 
         <!-- Points and Score with Pulse Animation -->
         <div class="flex justify-around mb-6 stats-container">
             <div class="bg-gradient-to-br from-green-400 to-green-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg points-card scale-in">
-                <div class="text-2xl font-bold">{{ $assessment->total_points_earned ?? 0 }}</div>
+                <div class="text-2xl font-bold" id="points-counter" data-target="{{ $assessment->total_points_earned ?? 0 }}">0</div>
                 <span class="text-sm font-normal opacity-90">Points Earned</span>
-                <div class="celebration-burst">🎊</div>
+                {{-- <div class="celebration-burst">🏆</div> --}}
             </div>
             <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg score-card scale-in">
                 <div class="text-2xl font-bold">{{ $assessment->correct_answers ?? 0 }}/{{ $assessment->total_questions ?? 15 }}</div>
                 <span class="text-sm font-normal opacity-90">Score</span>
-                <div class="celebration-burst">🏆</div>
+                {{-- <div class="celebration-burst">🏆</div> --}}
             </div>
         </div>
 
@@ -274,6 +274,12 @@
     overflow: hidden;
 }
 
+/* Points Counter Animation */
+#points-counter {
+    transition: transform 0.1s ease-in-out;
+    font-weight: bold;
+}
+
 .points-card {
     animation-delay: 0.5s;
 }
@@ -346,22 +352,65 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeConfetti();
     createFloatingParticles();
 
-    // Play assessment completion audio when page loads
-    try {
-        const assessmentCompleteAudio = new Audio('{{ asset("audio/assessmentcomplete.mp3") }}');
-        assessmentCompleteAudio.volume = 0.7;
-
-        // Add a small delay to ensure page has loaded
-        setTimeout(() => {
-            assessmentCompleteAudio.play().catch(error => {
-                console.log('Assessment complete audio playback failed:', error);
-            });
-        }, 500);
-
-    } catch (error) {
-        console.error('Error initializing assessment complete audio:', error);
-    }
+    // Initialize points counter with audio
+    initializePointsCounter();
 });
+
+// Points Counter with Audio
+function initializePointsCounter() {
+    const pointsCounter = document.getElementById('points-counter');
+    const targetPoints = parseInt(pointsCounter.getAttribute('data-target')) || 0;
+
+    // Initialize score counter audio
+    const scoreCounterAudio = new Audio('{{ asset("audio/scorecounter.mp3") }}');
+    scoreCounterAudio.volume = 0.8;
+
+    // Start counter animation after initial delay
+    setTimeout(() => {
+        startPointsCounter(pointsCounter, targetPoints, scoreCounterAudio);
+    }, 1000);
+}
+
+function startPointsCounter(element, target, audio) {
+    let current = 0;
+    const increment = Math.ceil(target / 50); // Adjust speed by changing divisor
+    const duration = 2000; // 2 seconds total duration
+    const stepTime = duration / (target / increment);
+
+    // Play the score counter audio
+    audio.play().catch(error => {
+        console.log('Score counter audio playback failed:', error);
+    });
+
+    const timer = setInterval(() => {
+        current += increment;
+
+        if (current >= target) {
+            current = target;
+            element.textContent = current;
+            clearInterval(timer);
+
+            // Play assessment completion audio when counter finishes
+            setTimeout(() => {
+                const assessmentCompleteAudio = new Audio('{{ asset("audio/assessmentcomplete.mp3") }}');
+                assessmentCompleteAudio.volume = 0.7;
+                assessmentCompleteAudio.play().catch(error => {
+                    console.log('Assessment complete audio playback failed:', error);
+                });
+            }, 300);
+
+        } else {
+            element.textContent = current;
+        }
+
+        // Add pulse effect during counting
+        element.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            element.style.transform = 'scale(1)';
+        }, 100);
+
+    }, stepTime);
+}
 
 // Confetti Animation
 function initializeConfetti() {
