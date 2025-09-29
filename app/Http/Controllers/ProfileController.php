@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use App\Models\StudentProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -84,5 +86,58 @@ class ProfileController extends Controller
         return response()->json([
             'avatar_url' => $avatarUrl
         ]);
+    }
+
+    /**
+     * Update the user's password
+     */
+    public function updatePassword(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'old_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'confirmed', Password::min(8)],
+        ], [
+            'old_password.required' => 'Please enter your current password.',
+            'new_password.required' => 'Please enter a new password.',
+            'new_password.confirmed' => 'The new password confirmation does not match.',
+            'new_password.min' => 'The new password must be at least 8 characters.',
+        ]);
+
+        $user = Auth::guard('student')->user();
+
+        // Check if the old password is correct
+        if (!Hash::check($request->old_password, $user->password)) {
+            return back()->withErrors([
+                'old_password' => 'The current password is incorrect.'
+            ])->withInput();
+        }
+
+        // Check if new password is different from old password
+        if (Hash::check($request->new_password, $user->password)) {
+            return back()->withErrors([
+                'new_password' => 'The new password must be different from your current password.'
+            ])->withInput();
+        }
+
+        // Update the password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Return with success message
+        return back()->with('success', 'Password changed successfully!');
+    }
+
+    /**
+     * Logout the student
+     */
+    public function logout(Request $request)
+    {
+        Auth::guard('student')->logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('student.login')->with('success', 'You have been logged out successfully.');
     }
 }

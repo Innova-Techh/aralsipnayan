@@ -266,9 +266,11 @@ Route::get('/admin/dashboard', function () {
     return view('admin.admin.index');
 })->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.dashboard');
 
- Route::get('/profile', function() {
-           return view('student.profile.student-profile');
-       })->name('student.profile');
+Route::get('/profile', function() {
+    $user = Auth::guard('student')->user();
+    $profile = $user->studentProfile;
+    return view('student.profile.student-profile', compact('profile'));
+})->name('student.profile');
 // Backward compatibility routes for old assessment references (redirects to student routes)
 Route::group([], function () {
     // Legacy assessment routes (redirects to student assessments)
@@ -321,9 +323,12 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
     
     // Profile routes
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
-    Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
+   // Profile routes
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
+Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
+Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('student.update-password');
+Route::post('/student/logout', [ProfileController::class, 'logout'])->name('student.logout');
     
     // Login streak routes
     Route::get('/check-login-streak', [App\Http\Controllers\LoginStreakController::class, 'checkStreak'])->name('login-streak.check');

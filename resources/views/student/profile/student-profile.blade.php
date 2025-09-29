@@ -11,13 +11,28 @@
         $userXP = auth()->guard('student')->user()->xp ?? 460; // Example: 460 XP
         $progressInfo = $rankController->getProgressInfo($userXP);
     @endphp
-    <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 py-8 px-4">
+    <div class="min-h-screen bg-[#C2DAFF] py-8 px-4">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="text-center mb-8">
+            <div class="text-left mb-8">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">Student Profile</h1>
                 <p class="text-gray-600">Track your learning journey</p>
             </div>
+
+            @if(session('success'))
+                <div class="max-w-4xl mx-auto mb-4">
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Dynamic Level Card -->
             <div class="mb-5 sm:mb-6">
@@ -145,6 +160,85 @@
                     </div>
                     <div class="text-xl sm:text-2xl font-bold relative z-10">3</div>
                     <div class="text-xs sm:text-sm opacity-90 relative z-10">Level</div>
+                </div>
+            </div>
+
+            <!-- Account Settings Section -->
+            <div class="bg-white rounded-3xl shadow-xl p-6 mb-6">
+                <div class="flex items-center mb-6">
+                    <svg class="w-6 h-6 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-gray-800">Account Settings</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Edit Avatar Button -->
+                    <a href="{{ route('profile.edit') }}"
+                        class="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 hover:from-purple-100 hover:to-pink-100 transition-all transform hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="bg-purple-500 rounded-full p-3 mr-4">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">Edit Avatar</h3>
+                                <p class="text-sm text-gray-600">Customize your profile picture</p>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+
+                    <!-- Change Password Button (Opens Modal) -->
+                    <button type="button" onclick="openPasswordModal()"
+                        class="w-full flex items-center justify-between bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 hover:from-blue-100 hover:to-cyan-100 transition-all transform hover:scale-105">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 rounded-full p-3 mr-4">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-gray-800">Change Password</h3>
+                                <p class="text-sm text-gray-600">Update your account password</p>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <!-- Logout Button -->
+                    <form action="{{ route('logout') }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit"
+                            class="w-full flex items-center justify-between bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-4 hover:from-red-100 hover:to-orange-100 transition-all transform hover:scale-105">
+                            <div class="flex items-center">
+                                <div class="bg-red-500 rounded-full p-3 mr-4">
+                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <h3 class="font-bold text-gray-800">Logout</h3>
+                                    <p class="text-sm text-gray-600">Sign out of your account</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -310,4 +404,163 @@
             </div>
         </div>
     </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="bg-white rounded-full p-2 mr-3">
+                            <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Change Password</h3>
+                    </div>
+                    <button onclick="closePasswordModal()" class="text-white hover:text-gray-200 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <form action="{{ route('student.update-password') }}" method="POST" class="p-6">
+                @csrf
+
+                <!-- Error Messages -->
+                @if ($errors->any())
+                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <div class="text-sm text-red-700">
+                                @foreach ($errors->all() as $error)
+                                    <p>{{ $error }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Old Password -->
+                <div class="mb-4">
+                    <label for="old_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Old Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input type="password" id="old_password" name="old_password" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Enter your old password">
+                    </div>
+                </div>
+
+                <!-- New Password -->
+                <div class="mb-4">
+                    <label for="new_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        New Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input type="password" id="new_password" name="new_password" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Enter your new password">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters long</p>
+                </div>
+
+                <!-- Confirm New Password -->
+                <div class="mb-6">
+                    <label for="new_password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Retype New Password
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input type="password" id="new_password_confirmation" name="new_password_confirmation" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Retype your new password">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3">
+                    <button type="button" onclick="closePasswordModal()"
+                        class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Modal -->
+    <script>
+        function openPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('passwordModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('passwordModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+
+            // Clear form inputs
+            document.getElementById('old_password').value = '';
+            document.getElementById('new_password').value = '';
+            document.getElementById('new_password_confirmation').value = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('passwordModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePasswordModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+            }
+        });
+
+        // Auto-open modal if there are validation errors
+        @if ($errors->any())
+            openPasswordModal();
+        @endif
+    </script>
 @endsection
