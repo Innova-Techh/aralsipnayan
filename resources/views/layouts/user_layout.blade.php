@@ -225,7 +225,8 @@
                             class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center border-2 border-gray-200 hover:border-blue-500 transition-all duration-200 flex-shrink-0"
                             id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                             <img src="{{ $userAvatarUrl ?? asset('images/profile/avatar5.png') }}"
-                                alt="{{ Auth::guard('student')->user()?->studentProfile?->firstname }}" class="w-full h-full object-cover">
+                                alt="{{ Auth::guard('student')->user()?->studentProfile?->firstname }}"
+                                class="w-full h-full object-cover">
                         </button>
                     </div>
 
@@ -239,7 +240,7 @@
                             </p>
                             <p class="text-xs text-gray-500">Streak: 4</p>
                         </div>
-                        <a href="{{ route('profile.edit') }}"
+                        <a href="{{ route('student.profile') }}"
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                             Profile
                         </a>

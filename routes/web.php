@@ -63,6 +63,7 @@ Route::middleware('auth:student')->group(function () {
     Route::post('/api/award-xp', [RankController::class, 'awardXP'])->name('rank.award-xp');
 });
 
+
 // Level Up System Routes
 // Route::middleware(['auth:student'])->group(function () {
 //     // Get current progress
@@ -265,7 +266,9 @@ Route::get('/admin/dashboard', function () {
     return view('admin.admin.index');
 })->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.dashboard');
 
-
+ Route::get('/profile', function() {
+           return view('student.profile.student-profile');
+       })->name('student.profile');
 // Backward compatibility routes for old assessment references (redirects to student routes)
 Route::group([], function () {
     // Legacy assessment routes (redirects to student assessments)
