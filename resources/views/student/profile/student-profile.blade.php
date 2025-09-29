@@ -15,8 +15,8 @@
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="text-left mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">Student Profile</h1>
-                <p class="text-gray-600">Track your learning journey</p>
+                <h1 class="text-3xl font-bold font-poppins text-gray-800 mb-2">Student Profile</h1>
+                <p class="text-gray-600">Track your daily learning progress</p>
             </div>
 
             @if(session('success'))
@@ -171,7 +171,7 @@
                             d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
                             clip-rule="evenodd" />
                     </svg>
-                    <h2 class="text-2xl font-bold text-gray-800">Account Settings</h2>
+                    <h2 class="text-2xl font-bold font-poppins text-gray-800">Account Settings</h2>
                 </div>
 
                 <div class="space-y-3">
@@ -249,112 +249,78 @@
                         <path
                             d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    <h2 class="text-2xl font-bold text-gray-800">Player Statistics</h2>
+                    <h2 class="text-2xl font-bold font-poppins text-gray-800">Player Statistics</h2>
                 </div>
 
                 <!-- Competency Level -->
-                <div class="bg-blue-50 rounded-2xl p-5 mb-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Competency Level</span>
+                <div class="rounded-2xl p-5 mb-4">
+                    <!-- Highlighted Stats: Difficulty Level and Accuracy Rate -->
+                    <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+                        <!-- Difficulty Level -->
+                        <div class="rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md min-h-[100px] flex items-center justify-center"
+                            style="background: linear-gradient(to bottom, #064E3B 0%, #059669 100%); box-shadow: 0 4px 0 0 #045C41;">
+                            <div class="text-[#F8FAFC]">
+                                <div class="text-xl sm:text-2xl font-bold text-[#22C55E]">Beginner</div>
+                                <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Difficulty Level</div>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-blue-600">5/5</span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <div class="flex-1 h-3 bg-blue-600 rounded-full"></div>
-                        <div class="flex-1 h-3 bg-blue-600 rounded-full"></div>
-                        <div class="flex-1 h-3 bg-blue-600 rounded-full"></div>
-                        <div class="flex-1 h-3 bg-blue-600 rounded-full"></div>
-                        <div class="flex-1 h-3 bg-blue-600 rounded-full"></div>
-                    </div>
-                </div>
 
-                <!-- Accuracy Rate -->
-                <div class="bg-cyan-50 rounded-2xl p-5 mb-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-cyan-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Accuracy Rate</span>
-                        </div>
-                        <span class="text-2xl font-bold text-cyan-600">97%</span>
-                    </div>
-                    <div class="w-full h-3 bg-cyan-200 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full" style="width: 97%">
+                        <!-- Accuracy Rate -->
+                        <div class="rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md min-h-[100px] flex items-center justify-center"
+                            style="background: linear-gradient(to bottom, #1E3A8A 0%, #2563EB 100%); box-shadow: 0 4px 0 0 #091F5E;">
+                            <div class="text-[#F8FAFC]">
+                                <div class="text-xl sm:text-2xl font-bold text-[#73A8FF]">98%</div>
+                                <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Accuracy Rate</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Login Streak -->
-                <div class="bg-orange-50 rounded-2xl p-5 mb-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Login Streak</span>
+                    <!-- Other Stats -->
+                    <div class="space-y-2 sm:space-y-3">
+                        <!-- Login Streak -->
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-3 sm:p-4">
+                            <div class="flex items-center justify-between text-sm sm:text-base">
+                                <span class="text-gray-700 font-medium">📅 Login Streak</span>
+                                <span class="text-orange-700 font-bold">10 days</span>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-orange-600">10 days</span>
-                    </div>
-                </div>
 
-                <!-- Assessments Taken -->
-                <div class="bg-purple-50 rounded-2xl p-5 mb-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Assessments Taken</span>
+                        <!-- Highest Correct Streak -->
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4">
+                            <div class="flex items-center justify-between text-sm sm:text-base">
+                                <span class="text-gray-700 font-medium">⭐ Highest Correct Streak</span>
+                                <span class="text-green-700 font-bold">7 streak</span>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-purple-600">3</span>
-                    </div>
-                </div>
 
-                <!-- Average Score -->
-                <div class="bg-indigo-50 rounded-2xl p-5 mb-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Average Score</span>
+                        <!-- Highest Points Earned -->
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3 sm:p-4">
+                            <div class="flex items-center justify-between text-sm sm:text-base">
+                                <span class="text-gray-700 font-medium">💎 Highest Points Earned</span>
+                                <span class="text-purple-700 font-bold">7 streak</span>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-indigo-600">93%</span>
-                    </div>
-                </div>
 
-                <!-- Current Level -->
-                <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span class="font-semibold text-gray-700">Current Level</span>
+                        <!-- Average Score -->
+                        <div class="bg-indigo-50 rounded-2xl p-5 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span class="font-semibold text-gray-700">Average Score</span>
+                                </div>
+                                <span class="text-2xl font-bold text-indigo-600">93%</span>
+                            </div>
                         </div>
-                        <span class="text-2xl font-bold text-purple-600">Level 13</span>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Achievements -->
             <div class="bg-white rounded-3xl shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Recent Achievements</h2>
+                <h2 class="text-2xl font-bold font-poppins text-gray-800 mb-4">Recent Achievements</h2>
                 <div class="space-y-3">
                     <div
                         class="flex items-center bg-yellow-50 rounded-xl p-4 transform hover:scale-105 transition-transform">
@@ -405,126 +371,7 @@
         </div>
     </div>
 
-    <!-- Change Password Modal -->
-    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
-            <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="bg-white rounded-full p-2 mr-3">
-                            <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white">Change Password</h3>
-                    </div>
-                    <button onclick="closePasswordModal()" class="text-white hover:text-gray-200 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Body -->
-            <form action="{{ route('student.update-password') }}" method="POST" class="p-6">
-                @csrf
-
-                <!-- Error Messages -->
-                @if ($errors->any())
-                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <div class="flex">
-                            <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <div class="text-sm text-red-700">
-                                @foreach ($errors->all() as $error)
-                                    <p>{{ $error }}</p>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Old Password -->
-                <div class="mb-4">
-                    <label for="old_password" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Old Password
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <input type="password" id="old_password" name="old_password" required
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            placeholder="Enter your old password">
-                    </div>
-                </div>
-
-                <!-- New Password -->
-                <div class="mb-4">
-                    <label for="new_password" class="block text-sm font-semibold text-gray-700 mb-2">
-                        New Password
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <input type="password" id="new_password" name="new_password" required
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            placeholder="Enter your new password">
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500">Must be at least 8 characters long</p>
-                </div>
-
-                <!-- Confirm New Password -->
-                <div class="mb-6">
-                    <label for="new_password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">
-                        Retype New Password
-                    </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <input type="password" id="new_password_confirmation" name="new_password_confirmation" required
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            placeholder="Retype your new password">
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-3">
-                    <button type="button" onclick="closePasswordModal()"
-                        class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105">
-                        Confirm
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <x-change-password-modal />
     <!-- JavaScript for Modal -->
     <script>
         function openPasswordModal() {
@@ -563,4 +410,5 @@
             openPasswordModal();
         @endif
     </script>
+    @include('components.change-password-modal')
 @endsection
