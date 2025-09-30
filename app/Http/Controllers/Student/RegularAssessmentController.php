@@ -2144,14 +2144,20 @@ class RegularAssessmentController extends Controller
             
             // Format category data
             $categoryData = $this->getCategoryData($category);
-            
+
+            // Get user progress data for level up functionality
+            $userProgress = DB::table('user_progress')
+                ->where('user_id', $user->id)
+                ->first();
+
             return view('student.assessment-complete', [
                 'category' => $category,
                 'data' => $categoryData,
                 'mastery' => $mastery,
                 'assessment' => $assessment,
                 'assessment_id' => $assessmentId,
-                'from_regular_quiz' => true
+                'from_regular_quiz' => true,
+                'userProgress' => $userProgress
             ]);
             
         } catch (\Exception $e) {

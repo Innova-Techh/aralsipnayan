@@ -34,16 +34,16 @@ Each level requires exactly 60 points to advance, creating consistent and predic
 
 Ranks are awarded every 10 levels, providing major milestone achievements:
 
-- **Level 10 - 🌱 Math Explorer** (540 points): Starting the journey
-- **Level 20 - 🚀 Math Adventurer** (1,140 points): Gaining confidence and exploring new challenges  
-- **Level 30 - 🔍 Math Seeker** (1,740 points): Developing problem-solving skills and curiosity
-- **Level 40 - 🧠 Math Strategist** (2,340 points): Learning to think critically and apply strategies
-- **Level 50 - 💡 Math Innovator** (2,940 points): Solving problems creatively and independently
-- **Level 60 - ⭐ Math Prodigy** (3,540 points): Recognized for impressive math mastery and speed
-- **Level 70 - 🎭 Math Virtuoso** (4,140 points): Demonstrating exceptional mathematical skills
-- **Level 80 - 🧙 Math Sage** (4,740 points): Reaching a higher understanding of concepts and patterns
-- **Level 90 - 🏅 Math Champion** (5,340 points): Competing at an elite level and mastering challenges
-- **Level 100 - 👑 Math Grandmaster** (5,940 points): The ultimate achievement
+- **Level range 1-10 - 🌱 Math Explorer** (540 points): Starting the journey
+- **Level range 20-29 - 🚀 Math Adventurer** (1,140 points): Gaining confidence and exploring new challenges  
+- **Level range 30-30 - 🔍 Math Seeker** (1,740 points): Developing problem-solving skills and curiosity
+- **Level range 40-49 - 🧠 Math Strategist** (2,340 points): Learning to think critically and apply strategies
+- **Level range 50-59 - 💡 Math Innovator** (2,940 points): Solving problems creatively and independently
+- **Level range 60-69 - ⭐ Math Prodigy** (3,540 points): Recognized for impressive math mastery and speed
+- **Level range 70-79 - 🎭 Math Virtuoso** (4,140 points): Demonstrating exceptional mathematical skills
+- **Level range 80-89 - 🧙 Math Sage** (4,740 points): Reaching a higher understanding of concepts and patterns
+- **Level range 90-99- 🏅 Math Champion** (5,340 points): Competing at an elite level and mastering challenges
+- **Level range 100 - 👑 Math Grandmaster** (5,940 points): The ultimate achievement
 
 ---
 

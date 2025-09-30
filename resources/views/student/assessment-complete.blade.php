@@ -3,11 +3,76 @@
 @section('title', 'Quiz - AralSipnayan')
 
 @section('content')
+@include('components.level-up-modal')
 <!-- Confetti Canvas -->
 <canvas id="confetti-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-50"></canvas>
 
 <!-- Celebration Particles -->
 <div id="celebration-particles" class="fixed inset-0 pointer-events-none z-40"></div>
+
+<!-- Simple Level Up Notification (inspired by levelup.webp) -->
+<div id="simple-level-up" class="fixed inset-0 z-[70] hidden flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <!-- Level Up Content -->
+    <div class="relative z-10 text-center">
+        <!-- Shield with Wings Badge (matching levelup.webp) -->
+        <div class="relative mb-6">
+            <!-- Outer glow effect -->
+            <div class="absolute inset-0 w-48 h-36 mx-auto bg-yellow-400 blur-3xl opacity-60 animate-pulse"></div>
+
+            <!-- Shield with Wings Container -->
+            <div class="relative w-48 h-36 mx-auto">
+                <!-- Left Wing -->
+                <div class="absolute top-4 left-0 w-16 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 transform -rotate-12 shadow-lg opacity-90" style="clip-path: polygon(0% 0%, 70% 0%, 100% 50%, 70% 100%, 0% 80%, 10% 40%);">
+                    <!-- Wing feather details -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                    <div class="absolute top-1/4 left-1/4 w-2 h-8 bg-yellow-200 opacity-30 transform rotate-45"></div>
+                    <div class="absolute top-1/2 left-1/3 w-1.5 h-6 bg-yellow-200 opacity-25 transform rotate-30"></div>
+                </div>
+
+                <!-- Right Wing -->
+                <div class="absolute top-4 right-0 w-16 h-24 bg-gradient-to-bl from-yellow-300 to-yellow-500 transform rotate-12 shadow-lg opacity-90" style="clip-path: polygon(30% 0%, 100% 0%, 90% 40%, 100% 80%, 30% 100%, 0% 50%);">
+                    <!-- Wing feather details -->
+                    <div class="absolute inset-0 bg-gradient-to-bl from-white/20 to-transparent"></div>
+                    <div class="absolute top-1/4 right-1/4 w-2 h-8 bg-yellow-200 opacity-30 transform -rotate-45"></div>
+                    <div class="absolute top-1/2 right-1/3 w-1.5 h-6 bg-yellow-200 opacity-25 transform -rotate-30"></div>
+                </div>
+
+                <!-- Main Shield -->
+                <div class="absolute top-2 left-1/2 transform -translate-x-1/2 w-28 h-32 bg-gradient-to-b from-yellow-300 via-yellow-400 to-orange-500 shadow-2xl relative overflow-hidden" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);">
+                    <!-- Inner glow -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></div>
+
+                    <!-- Shine effect -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent transform -translate-x-full animate-shimmer"></div>
+
+                    <!-- Level number -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span id="simple-level-number" class="text-4xl font-black text-white drop-shadow-2xl" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">3</span>
+                    </div>
+                </div>
+
+                <!-- Additional decorative elements -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-yellow-200 rounded-full shadow-lg animate-pulse"></div>
+                <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-orange-300 rounded-full shadow-lg animate-pulse delay-500"></div>
+            </div>
+        </div>
+
+        <!-- Text Messages -->
+        <div class="space-y-3">
+            <h2 class="text-3xl font-bold text-white drop-shadow-lg" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">You have reached new level!</h2>
+            <p id="simple-new-level-text" class="text-2xl font-bold text-yellow-300 drop-shadow-md" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Level 3</p>
+            <p class="text-xl font-bold text-white drop-shadow-lg" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">LEVEL UP!</p>
+        </div>
+
+        <!-- Continue button -->
+        <button onclick="closeSimpleLevelUp()" class="mt-8 bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors shadow-xl">
+            Continue
+        </button>
+    </div>
+</div>
 
 <div class="min-h-screen flex items-center justify-center px-4 relative">
     <div class="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center relative z-30 celebration-card">
@@ -73,6 +138,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
 /* Celebration Animations */
@@ -334,6 +400,38 @@
     left: 100%;
 }
 
+/* Shimmer effect for level up badge */
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Delay animation classes */
+.delay-500 {
+    animation-delay: 0.5s;
+}
+
+.delay-1000 {
+    animation-delay: 1s;
+}
+
+/* Custom rotation classes for wing feathers */
+.rotate-30 {
+    transform: rotate(30deg);
+}
+
+.-rotate-30 {
+    transform: rotate(-30deg);
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
     .sparkle {
@@ -354,6 +452,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize points counter with audio
     initializePointsCounter();
+
+    // Check for level up after a delay to let the points counter finish
+    setTimeout(() => {
+        checkForLevelUp();
+    }, 3000);
 });
 
 // Points Counter with Audio
@@ -410,6 +513,179 @@ function startPointsCounter(element, target, audio) {
         }, 100);
 
     }, stepTime);
+}
+
+// Level Up Detection and Display Functions
+function checkForLevelUp() {
+    // Since the API endpoint might not exist, use the user progress data we have
+    // and simulate level up detection based on points earned
+    simulateLevelUpForTesting();
+}
+
+// Fallback function for testing purposes
+function simulateLevelUpForTesting() {
+    const pointsEarned = parseInt(document.getElementById('points-counter').getAttribute('data-target')) || 0;
+
+    // Get current user progress data
+    const userData = @json([
+        'current_level' => $userProgress->current_level ?? 1,
+        'total_points' => $userProgress->total_points ?? 0
+    ]);
+
+    const currentTotalPoints = userData.total_points;
+    const currentLevel = userData.current_level;
+
+    // Calculate the previous total points (before this assessment)
+    const previousTotalPoints = currentTotalPoints - pointsEarned;
+
+    // Calculate the previous level using 60 points per level formula
+    const pointsPerLevel = 60;
+    const previousLevel = Math.floor(previousTotalPoints / pointsPerLevel) + 1;
+
+    console.log('=== LEVEL UP CALCULATION ===');
+    console.log('Points earned this assessment:', pointsEarned);
+    console.log('Current total points:', currentTotalPoints);
+    console.log('Previous total points:', previousTotalPoints);
+    console.log('Previous level (calculated):', previousLevel);
+    console.log('Current level (from DB):', currentLevel);
+
+    // Only trigger level up if there was actually a level change
+    if (currentLevel > previousLevel) {
+        console.log('Level up detected! Calling handleLevelUp...');
+        handleLevelUp(previousLevel, currentLevel, pointsEarned);
+    } else {
+        console.log('No level up occurred');
+    }
+}
+
+function handleLevelUp(previousLevel, newLevel, pointsGained) {
+    // Define rank boundaries based on updated gamification.md
+    const rankRanges = [
+        { min: 1, max: 10, name: 'Math Explorer' },      // Levels 1-10
+        { min: 20, max: 29, name: 'Math Adventurer' },   // Levels 20-29
+        { min: 30, max: 30, name: 'Math Seeker' },       // Level 30 only (as per gamification.md)
+        { min: 40, max: 49, name: 'Math Strategist' },   // Levels 40-49
+        { min: 50, max: 59, name: 'Math Innovator' },    // Levels 50-59
+        { min: 60, max: 69, name: 'Math Prodigy' },      // Levels 60-69
+        { min: 70, max: 79, name: 'Math Virtuoso' },     // Levels 70-79
+        { min: 80, max: 89, name: 'Math Sage' },         // Levels 80-89
+        { min: 90, max: 99, name: 'Math Champion' },     // Levels 90-99
+        { min: 100, max: 100, name: 'Math Grandmaster' } // Level 100
+    ];
+
+    // Find which ranks the previous and new levels belong to
+    const previousRank = rankRanges.find(rank => previousLevel >= rank.min && previousLevel <= rank.max);
+    const newRank = rankRanges.find(rank => newLevel >= rank.min && newLevel <= rank.max);
+
+    console.log('Previous level:', previousLevel, 'Previous rank:', previousRank);
+    console.log('New level:', newLevel, 'New rank:', newRank);
+
+    // Simplified rank crossing logic
+    let isRankUp = false;
+
+    // Case 1: Entering a rank for the first time (from no rank to any rank)
+    if (!previousRank && newRank) {
+        console.log('Entering rank for first time:', newRank.name);
+        isRankUp = true;
+    }
+    // Case 2: Crossing between different defined ranks
+    else if (previousRank && newRank && previousRank.name !== newRank.name) {
+        console.log('Crossing between ranks:', previousRank.name, '->', newRank.name);
+        isRankUp = true;
+    }
+    // Case 3: All other cases show simple level up
+    else {
+        console.log('No rank crossing detected, showing simple level up');
+        showSimpleLevelUp(newLevel);
+        return;
+    }
+
+    console.log('Final decision - Is rank up?', isRankUp);
+
+    if (isRankUp) {
+        // Show the fancy modal for rank ups (crossing rank boundaries)
+        showRankUpModal(newLevel, pointsGained);
+    } else {
+        // Show the simple level up notification for regular levels within same rank
+        showSimpleLevelUp(newLevel);
+    }
+}
+
+function showSimpleLevelUp(newLevel) {
+    const modal = document.getElementById('simple-level-up');
+    const levelNumber = document.getElementById('simple-level-number');
+    const levelText = document.getElementById('simple-new-level-text');
+
+    levelNumber.textContent = newLevel;
+    levelText.textContent = `Level ${newLevel}`;
+
+    // Play level up audio
+    try {
+        const levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
+        levelUpAudio.volume = 0.8;
+        levelUpAudio.play().catch(error => {
+            console.log('Level up audio playback failed:', error);
+        });
+    } catch (error) {
+        console.error('Error initializing level up audio:', error);
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Auto close after 8 seconds (longer display)
+    setTimeout(() => {
+        closeSimpleLevelUp();
+    }, 8000);
+}
+
+function showRankUpModal(newLevel, pointsGained) {
+    // Play level up audio for rank ups too
+    try {
+        const levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
+        levelUpAudio.volume = 0.8;
+        levelUpAudio.play().catch(error => {
+            console.log('Level up audio playback failed:', error);
+        });
+    } catch (error) {
+        console.error('Error initializing level up audio:', error);
+    }
+
+    // Use the existing level up modal system from the component
+    if (typeof showLevelUpModalFromLevel === 'function') {
+        // Determine which rank the new level belongs to (based on gamification.md)
+        let rankMessage = "Congratulations on reaching a new rank!";
+
+        if (newLevel >= 1 && newLevel <= 10) {
+            rankMessage = "You've become a Math Explorer! Your journey begins now!";
+        } else if (newLevel >= 20 && newLevel <= 29) {
+            rankMessage = "You're now a Math Adventurer! Ready for bigger challenges!";
+        } else if (newLevel === 30) {
+            rankMessage = "You've achieved Math Seeker status! Keep exploring!";
+        } else if (newLevel >= 40 && newLevel <= 49) {
+            rankMessage = "You're a Math Strategist now! Think critically!";
+        } else if (newLevel >= 50 && newLevel <= 59) {
+            rankMessage = "Math Innovator unlocked! Create your own solutions!";
+        } else if (newLevel >= 60 && newLevel <= 69) {
+            rankMessage = "You're a Math Prodigy! Exceptional skills!";
+        } else if (newLevel >= 70 && newLevel <= 79) {
+            rankMessage = "Math Virtuoso achieved! Masterful performance!";
+        } else if (newLevel >= 80 && newLevel <= 89) {
+            rankMessage = "You're a Math Sage! Wisdom beyond measure!";
+        } else if (newLevel >= 90 && newLevel <= 99) {
+            rankMessage = "Math Champion status! Elite level reached!";
+        } else if (newLevel >= 100) {
+            rankMessage = "Math Grandmaster! Ultimate achievement!";
+        }
+
+        showLevelUpModalFromLevel(newLevel, pointsGained * 2, pointsGained, rankMessage);
+    }
+}
+
+function closeSimpleLevelUp() {
+    const modal = document.getElementById('simple-level-up');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
 }
 
 // Confetti Animation
@@ -633,5 +909,84 @@ document.head.appendChild(style);
 
 // Initialize card celebrations after page load
 setTimeout(addCardCelebrations, 1000);
+
+// Essential level up functions (NOT testing functions)
+function showSimpleLevelUp(newLevel) {
+    const modal = document.getElementById('simple-level-up');
+    const levelNumber = document.getElementById('simple-level-number');
+    const levelText = document.getElementById('simple-new-level-text');
+
+    levelNumber.textContent = newLevel;
+    levelText.textContent = `Level ${newLevel}`;
+
+    // Play level up audio
+    try {
+        const levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
+        levelUpAudio.volume = 0.8;
+        levelUpAudio.play().catch(error => {
+            console.log('Level up audio playback failed:', error);
+        });
+    } catch (error) {
+        console.error('Error initializing level up audio:', error);
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Auto close after 8 seconds (longer display)
+    setTimeout(() => {
+        closeSimpleLevelUp();
+    }, 8000);
+}
+
+function showRankUpModal(newLevel, pointsGained) {
+    // Play level up audio for rank ups too
+    try {
+        const levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
+        levelUpAudio.volume = 0.8;
+        levelUpAudio.play().catch(error => {
+            console.log('Level up audio playback failed:', error);
+        });
+    } catch (error) {
+        console.error('Error initializing level up audio:', error);
+    }
+
+    // Use the existing level up modal system from the component
+    if (typeof showLevelUpModalFromLevel === 'function') {
+        // Determine which rank the new level belongs to (based on gamification.md)
+        let rankMessage = "Congratulations on reaching a new rank!";
+
+        if (newLevel >= 1 && newLevel <= 10) {
+            rankMessage = "You've become a Math Explorer! Your journey begins now!";
+        } else if (newLevel >= 20 && newLevel <= 29) {
+            rankMessage = "You're now a Math Adventurer! Ready for bigger challenges!";
+        } else if (newLevel === 30) {
+            rankMessage = "You've achieved Math Seeker status! Keep exploring!";
+        } else if (newLevel >= 40 && newLevel <= 49) {
+            rankMessage = "You're a Math Strategist now! Think critically!";
+        } else if (newLevel >= 50 && newLevel <= 59) {
+            rankMessage = "Math Innovator unlocked! Create your own solutions!";
+        } else if (newLevel >= 60 && newLevel <= 69) {
+            rankMessage = "You're a Math Prodigy! Exceptional skills!";
+        } else if (newLevel >= 70 && newLevel <= 79) {
+            rankMessage = "Math Virtuoso achieved! Masterful performance!";
+        } else if (newLevel >= 80 && newLevel <= 89) {
+            rankMessage = "You're a Math Sage! Wisdom beyond measure!";
+        } else if (newLevel >= 90 && newLevel <= 99) {
+            rankMessage = "Math Champion status! Elite level reached!";
+        } else if (newLevel >= 100) {
+            rankMessage = "Math Grandmaster! Ultimate achievement!";
+        }
+
+        showLevelUpModalFromLevel(newLevel, pointsGained * 2, pointsGained, rankMessage);
+    }
+}
+
+function closeSimpleLevelUp() {
+    const modal = document.getElementById('simple-level-up');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
 </script>
 @endsection
