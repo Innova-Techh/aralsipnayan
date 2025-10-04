@@ -24,8 +24,8 @@
                 <div class="text-4xl font-bold text-gray-600 mb-2" id="streakDay">
                     Day 1
                 </div>
-                <div class="text-lg text-gray-500" id="pointsEarned">
-                    10 points
+                <div class="text-lg font-semibold text-green-600" id="pointsEarned">
+                    +5 points
                 </div>
             </div>
 

@@ -1366,13 +1366,22 @@
 
                     if (data) {
                         document.getElementById('streakDay').textContent = `Day ${data.current_streak}`;
-                        document.getElementById('pointsEarned').textContent = `${data.points_earned} points`;
+                        document.getElementById('pointsEarned').textContent = `+${data.points_earned} points`;
                         document.getElementById('streakMessage').textContent = data.message || "You're doing great! Keep the streak up!";
                     }
 
 
                     modal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
+
+                    // Play streak sound
+                    try {
+                        const audio = new Audio('{{ asset("audio/streak.mp3") }}');
+                        audio.volume = 0.5;
+                        audio.play().catch(e => console.log('Audio play failed:', e));
+                    } catch (error) {
+                        console.log('Could not play streak sound:', error);
+                    }
                 }
 
 

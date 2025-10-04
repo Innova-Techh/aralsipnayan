@@ -49,8 +49,8 @@ class StudentProfile extends Model
 
     public function getPointsForDay($day)
     {
-        // Points system: Day 1 = 10 points, then +5 points each day
-        return 10 + (($day - 1) * 5);
+        // Points system: +5 points per login day (as per gamification.md)
+        return 5;
     }
 
     public function shouldShowModal()
@@ -66,7 +66,7 @@ class StudentProfile extends Model
     public function updateStreak()
     {
         $today = Carbon::today();
-        
+
         if (!$this->last_activity_date) {
             // First login ever
             $this->current_streak = 1;
@@ -74,7 +74,7 @@ class StudentProfile extends Model
             $pointsEarned = $this->getPointsForDay(1);
         } else {
             $yesterday = Carbon::yesterday();
-            
+
             if ($this->last_activity_date->isSameDay($yesterday)) {
                 // Consecutive day login
                 $this->current_streak += 1;
@@ -87,15 +87,19 @@ class StudentProfile extends Model
                 $this->current_streak = 1;
                 $pointsEarned = $this->getPointsForDay(1);
             }
-            
+
             if ($this->current_streak > $this->longest_streak) {
                 $this->longest_streak = $this->current_streak;
             }
         }
 
+        // Update student_profile table
         $this->total_points += $pointsEarned;
         $this->last_activity_date = $today;
         $this->save();
+
+        // Also update user_progress table for consistency
+        $this->syncToUserProgress($pointsEarned);
 
         return [
             'already_logged' => false,
@@ -103,6 +107,43 @@ class StudentProfile extends Model
             'current_streak' => $this->current_streak,
             'total_points' => $this->total_points
         ];
+    }
+
+    /**
+     * Sync streak data to user_progress table
+     */
+    private function syncToUserProgress($pointsEarned)
+    {
+        $userProgress = \DB::table('user_progress')->where('user_id', $this->user_id)->first();
+
+        if ($userProgress) {
+            // Update existing record
+            \DB::table('user_progress')
+                ->where('user_id', $this->user_id)
+                ->update([
+                    'current_streak' => $this->current_streak,
+                    'longest_streak' => $this->longest_streak,
+                    'total_points' => \DB::raw("total_points + {$pointsEarned}"),
+                    'updated_at' => now()
+                ]);
+        } else {
+            // Create new record if doesn't exist
+            \DB::table('user_progress')->insert([
+                'user_id' => $this->user_id,
+                'total_points' => $pointsEarned,
+                'current_level' => 1,
+                'points_in_current_level' => $pointsEarned,
+                'current_rank' => 'Math Explorer',
+                'rank_level_threshold' => 10,
+                'current_streak' => $this->current_streak,
+                'longest_streak' => $this->longest_streak,
+                'last_assessment_date' => null,
+                'daily_competencies_completed' => json_encode([]),
+                'last_daily_reset' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
     }
 
     public function getFullNameAttribute()
