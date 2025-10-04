@@ -169,6 +169,8 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
         Route::get('/badges', [App\Http\Controllers\Student\GamificationApiController::class, 'getBadges'])->name('badges');
         Route::get('/my-ranking', [App\Http\Controllers\Student\GamificationApiController::class, 'getMyRanking'])->name('my-ranking');
         Route::get('/stats', [App\Http\Controllers\Student\GamificationApiController::class, 'getStats'])->name('stats');
+        Route::get('/check-new-badges', [App\Http\Controllers\Student\GamificationApiController::class, 'checkNewBadges'])->name('check-new-badges');
+        Route::post('/mark-badges-viewed', [App\Http\Controllers\Student\GamificationApiController::class, 'markBadgesAsViewed'])->name('mark-badges-viewed');
     });
     
     // Assessment progress saving

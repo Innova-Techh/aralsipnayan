@@ -51,15 +51,15 @@ Ranks are awarded every 10 levels, providing major milestone achievements:
 
 Achievement badges awarded based on total points earned:
 
-- **🎯 First Steps** - Complete your first assessment (any competency)
-- **⚡ Quick Learner** - Earn 50 total points
-- **🔥 On Fire** - Earn 150 total points
-- **🚀 Math Explorer** - Earn 300 total points
-- **🌟 Math Whiz** - Earn 500 total points
-- **💎 Grade Champion** - Earn 750 total points
-- **♦️ Sapphire** - Earn 1,000 total points
-- **🔶 Ruby** - Earn 1,250 total points
-- **👑 Crown** - Earn 1,500 total points
+- **🎯 First Steps** - Earn 50 total points
+- **⚡ Quick Learner** - Earn 500 total points
+- **🔥 On Fire** - Earn 700 total points
+- **🌟 Math Whiz** - Earn 1000 total points
+- **💎 Grade Champion** - Earn 1500 total points
+- **🚀 Math Explorer** - Earn 2000 total points
+- **♦️ Sapphire** - Earn 2500 total points
+- **🔶 Ruby** - Earn 3000 total points
+- **👑 Crown** - Earn 3,500 total points
 
 ---
 

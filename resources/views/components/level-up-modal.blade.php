@@ -143,11 +143,11 @@
             </div>
 
             <!-- Go to Dashboard Link -->
-            <div class="text-center mt-4">
+            {{-- <div class="text-center mt-4">
                 <a href="#" class="text-gray-600 text-sm hover:text-gray-800 transition-colors">
                     Go to Dashboard
                 </a>
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>

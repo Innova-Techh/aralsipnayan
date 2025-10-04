@@ -608,10 +608,10 @@
                                     <!-- Single Test Button that opens a panel -->
                                     <div class="fixed bottom-14 right-4 z-50">
                                         <!-- Main Test Button -->
-                                        <button onclick="toggleTestPanel()" id="testPanelBtn"
+                                        {{-- <button onclick="toggleTestPanel()" id="testPanelBtn"
                                             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-full shadow-lg font-medium transition-all duration-200">
                                             🧪 Level Tests
-                                        </button>
+                                        </button> --}}
 
                                         <!-- Test Panel (Hidden by default) -->
                                         <div id="testPanel"
@@ -1436,8 +1436,101 @@
                             console.error('Error updating dashboard stats:', error);
                         });
                 }
+
+                // Check for new badges on page load
+                function checkNewBadges() {
+                    fetch('{{ route("student.gamification.check-new-badges") }}', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.has_new_badges) {
+                            console.log('New badges found:', data.new_badges);
+
+                            // Show badge modal
+                            if (typeof showBadgeModal === 'function') {
+                                showBadgeModal(data.new_badges);
+
+                                // Mark badges as viewed after a delay
+                                setTimeout(() => {
+                                    markBadgesAsViewed(data.new_badges);
+                                }, 5000);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking new badges:', error);
+                    });
+                }
+
+                // Mark badges as viewed
+                function markBadgesAsViewed(badges) {
+                    const badgeIds = badges.map(badge => badge.id);
+
+                    fetch('{{ route("student.gamification.mark-badges-viewed") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            badge_ids: badgeIds
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Badges marked as viewed:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error marking badges as viewed:', error);
+                    });
+                }
+
+                // Check for new badges when page loads
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Small delay to ensure everything is loaded
+                    setTimeout(checkNewBadges, 1000);
+                });
+
+                // Test function to show badge modal with sample data
+                function testBadgeModal() {
+                    const sampleBadges = [
+                        {
+                            id: 1,
+                            badge_key: 'first_steps',
+                            badge_name: 'First Steps',
+                            badge_description: 'Earn 50 total points',
+                            badge_icon: '🎯',
+                            points_required: 50
+                        },
+                        {
+                            id: 2,
+                            badge_key: 'quick_learner',
+                            badge_name: 'Quick Learner',
+                            badge_description: 'Earn 500 total points',
+                            badge_icon: '⚡',
+                            points_required: 500
+                        }
+                    ];
+
+                    showBadgeModal(sampleBadges);
+                }
             </script>
-    @include('components.level-up-modal')@endsection
+
+    <!-- Floating Test Button for Badge Modal -->
+    {{-- <button onclick="testBadgeModal()"
+            class="fixed bottom-4 right-4 z-50 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full shadow-2xl hover:scale-110 transition-all duration-200 flex items-center gap-2 group">
+        <span class="text-2xl">🏆</span>
+        <span class="hidden group-hover:inline-block">Test Badge Modal</span>
+    </button> --}}
+
+    @include('components.level-up-modal')
+    @include('components.badge-unlock-modal')
+@endsection
 </body>
 
 </html>

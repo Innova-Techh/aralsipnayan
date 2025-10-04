@@ -133,17 +133,17 @@ class GamificationApiController extends Controller
             $badges = $this->gamificationController->getUserBadges($user->id);
             $status = $this->gamificationController->getUserGamificationStatus($user->id);
             
-            // Get available badges that user hasn't earned yet
+            // Get available badges that user hasn't earned yet (Updated from gamification.md 2025)
             $availableBadges = collect([
-                'first_steps' => ['points' => 0, 'name' => 'First Steps', 'icon' => '🎯', 'description' => 'Complete your first assessment'],
-                'quick_learner' => ['points' => 50, 'name' => 'Quick Learner', 'icon' => '⚡', 'description' => 'Earn 50 total points'],
-                'on_fire' => ['points' => 150, 'name' => 'On Fire', 'icon' => '🔥', 'description' => 'Earn 150 total points'],
-                'math_explorer' => ['points' => 300, 'name' => 'Math Explorer', 'icon' => '🚀', 'description' => 'Earn 300 total points'],
-                'math_whiz' => ['points' => 500, 'name' => 'Math Whiz', 'icon' => '🌟', 'description' => 'Earn 500 total points'],
-                'grade_champion' => ['points' => 750, 'name' => 'Grade Champion', 'icon' => '💎', 'description' => 'Earn 750 total points'],
-                'sapphire' => ['points' => 1000, 'name' => 'Sapphire', 'icon' => '♦️', 'description' => 'Earn 1,000 total points'],
-                'ruby' => ['points' => 1250, 'name' => 'Ruby', 'icon' => '🔶', 'description' => 'Earn 1,250 total points'],
-                'crown' => ['points' => 1500, 'name' => 'Crown', 'icon' => '👑', 'description' => 'Earn 1,500 total points']
+                'first_steps' => ['points' => 50, 'name' => 'First Steps', 'icon' => '🎯', 'description' => 'Earn 50 total points'],
+                'quick_learner' => ['points' => 500, 'name' => 'Quick Learner', 'icon' => '⚡', 'description' => 'Earn 500 total points'],
+                'on_fire' => ['points' => 700, 'name' => 'On Fire', 'icon' => '🔥', 'description' => 'Earn 700 total points'],
+                'math_whiz' => ['points' => 1000, 'name' => 'Math Whiz', 'icon' => '🌟', 'description' => 'Earn 1,000 total points'],
+                'grade_champion' => ['points' => 1500, 'name' => 'Grade Champion', 'icon' => '💎', 'description' => 'Earn 1,500 total points'],
+                'math_explorer' => ['points' => 2000, 'name' => 'Math Explorer', 'icon' => '🚀', 'description' => 'Earn 2,000 total points'],
+                'sapphire' => ['points' => 2500, 'name' => 'Sapphire', 'icon' => '♦️', 'description' => 'Earn 2,500 total points'],
+                'ruby' => ['points' => 3000, 'name' => 'Ruby', 'icon' => '🔶', 'description' => 'Earn 3,000 total points'],
+                'crown' => ['points' => 3500, 'name' => 'Crown', 'icon' => '👑', 'description' => 'Earn 3,500 total points']
             ]);
             
             $earnedBadgeKeys = $badges->pluck('badge_key')->toArray();
@@ -235,6 +235,69 @@ class GamificationApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to get ranking',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check for new unviewed badges
+     */
+    public function checkNewBadges(Request $request)
+    {
+        $user = Auth::guard('student')->user();
+
+        try {
+            // Get unviewed badges
+            $newBadges = DB::table('user_badges')
+                ->where('user_id', $user->id)
+                ->where('is_viewed', false)
+                ->orderBy('awarded_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'has_new_badges' => $newBadges->count() > 0,
+                'new_badges' => $newBadges,
+                'count' => $newBadges->count()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to check new badges',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark badges as viewed
+     */
+    public function markBadgesAsViewed(Request $request)
+    {
+        $request->validate([
+            'badge_ids' => 'required|array',
+            'badge_ids.*' => 'integer'
+        ]);
+
+        $user = Auth::guard('student')->user();
+
+        try {
+            DB::table('user_badges')
+                ->where('user_id', $user->id)
+                ->whereIn('id', $request->badge_ids)
+                ->update(['is_viewed' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Badges marked as viewed'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark badges as viewed',
                 'error' => $e->getMessage()
             ], 500);
         }

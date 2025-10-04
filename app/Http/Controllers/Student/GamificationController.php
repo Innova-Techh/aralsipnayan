@@ -46,17 +46,17 @@ class GamificationController extends Controller
         100 => ['name' => 'Math Grandmaster', 'icon' => '👑', 'points' => 5940]
     ];
 
-    // Milestone Badges (from gamification.md)
+    // Milestone Badges (from gamification.md - Updated 2025)
     private const BADGES = [
-        'first_steps' => ['points' => 0, 'name' => 'First Steps', 'icon' => '🎯', 'description' => 'Complete your first assessment'],
-        'quick_learner' => ['points' => 50, 'name' => 'Quick Learner', 'icon' => '⚡', 'description' => 'Earn 50 total points'],
-        'on_fire' => ['points' => 150, 'name' => 'On Fire', 'icon' => '🔥', 'description' => 'Earn 150 total points'],
-        'math_explorer' => ['points' => 300, 'name' => 'Math Explorer', 'icon' => '🚀', 'description' => 'Earn 300 total points'],
-        'math_whiz' => ['points' => 500, 'name' => 'Math Whiz', 'icon' => '🌟', 'description' => 'Earn 500 total points'],
-        'grade_champion' => ['points' => 750, 'name' => 'Grade Champion', 'icon' => '💎', 'description' => 'Earn 750 total points'],
-        'sapphire' => ['points' => 1000, 'name' => 'Sapphire', 'icon' => '♦️', 'description' => 'Earn 1,000 total points'],
-        'ruby' => ['points' => 1250, 'name' => 'Ruby', 'icon' => '🔶', 'description' => 'Earn 1,250 total points'],
-        'crown' => ['points' => 1500, 'name' => 'Crown', 'icon' => '👑', 'description' => 'Earn 1,500 total points']
+        'first_steps' => ['points' => 50, 'name' => 'First Steps', 'icon' => '🎯', 'description' => 'Earn 50 total points'],
+        'quick_learner' => ['points' => 500, 'name' => 'Quick Learner', 'icon' => '⚡', 'description' => 'Earn 500 total points'],
+        'on_fire' => ['points' => 700, 'name' => 'On Fire', 'icon' => '🔥', 'description' => 'Earn 700 total points'],
+        'math_whiz' => ['points' => 1000, 'name' => 'Math Whiz', 'icon' => '🌟', 'description' => 'Earn 1,000 total points'],
+        'grade_champion' => ['points' => 1500, 'name' => 'Grade Champion', 'icon' => '💎', 'description' => 'Earn 1,500 total points'],
+        'math_explorer' => ['points' => 2000, 'name' => 'Math Explorer', 'icon' => '🚀', 'description' => 'Earn 2,000 total points'],
+        'sapphire' => ['points' => 2500, 'name' => 'Sapphire', 'icon' => '♦️', 'description' => 'Earn 2,500 total points'],
+        'ruby' => ['points' => 3000, 'name' => 'Ruby', 'icon' => '🔶', 'description' => 'Earn 3,000 total points'],
+        'crown' => ['points' => 3500, 'name' => 'Crown', 'icon' => '👑', 'description' => 'Earn 3,500 total points']
     ];
 
     /**
