@@ -2,81 +2,147 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AchievementController extends Controller
 {
+    // Badge definitions (master list of all possible badges)
+    private const BADGE_DEFINITIONS = [
+        'first_steps' => [
+            'title' => 'First Steps',
+            'description' => 'Earn 50 total points',
+            'icon' => 'book',
+            'rarity' => 'Common',
+            'rarity_color' => 'gray',
+            'front_image' => 'a/firststep.png',
+            'reward' => '+50 XP',
+            'background_light' => '#646565'
+        ],
+        'quick_learner' => [
+            'title' => 'Quick Learner',
+            'description' => 'Earn 500 total points',
+            'icon' => 'lightning',
+            'rarity' => 'Uncommon',
+            'rarity_color' => 'green',
+            'front_image' => 'a/quicklearner.png',
+            'reward' => '+100 XP',
+            'background_light' => '#1E8646'
+        ],
+        'on_fire' => [
+            'title' => 'On Fire',
+            'description' => 'Earn 700 total points',
+            'icon' => 'flame',
+            'rarity' => 'Rare',
+            'rarity_color' => 'red',
+            'front_image' => 'a/onfire.png',
+            'reward' => '+150 XP',
+            'background_light' => '#913311'
+        ],
+        'math_whiz' => [
+            'title' => 'Math Whiz',
+            'description' => 'Earn 1,000 total points',
+            'icon' => 'brain',
+            'rarity' => 'Epic',
+            'rarity_color' => 'purple',
+            'front_image' => 'a/mathwhiz.png',
+            'reward' => '+200 XP',
+            'background_light' => '#2C1B68'
+        ],
+        'grade_champion' => [
+            'title' => 'Grade Champion',
+            'description' => 'Earn 1,500 total points',
+            'icon' => 'medal',
+            'rarity' => 'Legendary',
+            'rarity_color' => 'yellow',
+            'front_image' => 'a/gradechampion.png',
+            'reward' => '+250 XP',
+            'background_light' => '#D17A09'
+        ],
+        'math_explorer' => [
+            'title' => 'Math Explorer',
+            'description' => 'Earn 2,000 total points',
+            'icon' => 'compass',
+            'rarity' => 'Epic',
+            'rarity_color' => 'purple',
+            'front_image' => 'a/firststep.png',
+            'reward' => '+200 XP',
+            'background_light' => '#165A9A'
+        ],
+        'sapphire' => [
+            'title' => 'Sapphire',
+            'description' => 'Earn 2,500 total points',
+            'icon' => 'gem',
+            'rarity' => 'Epic',
+            'rarity_color' => 'purple',
+            'front_image' => 'a/firststep.png',
+            'reward' => '+200 XP',
+            'background_light' => '#165A9A'
+        ],
+        'ruby' => [
+            'title' => 'Ruby',
+            'description' => 'Earn 3,000 total points',
+            'icon' => 'gem',
+            'rarity' => 'Legendary',
+            'rarity_color' => 'yellow',
+            'front_image' => 'a/firststep.png',
+            'reward' => '+250 XP',
+            'background_light' => '#913311'
+        ],
+        'crown' => [
+            'title' => 'Crown',
+            'description' => 'Earn 3,500 total points',
+            'icon' => 'crown',
+            'rarity' => 'Legendary',
+            'rarity_color' => 'yellow',
+            'front_image' => 'a/firststep.png',
+            'reward' => '+250 XP',
+            'background_light' => '#D17A09'
+        ]
+    ];
+
     /**
      * Get all achievements data (for use by other controllers)
      */
     public function getAllAchievements()
     {
-        return [
-            [
-                'id' => 1,
-                'title' => 'First Step',
-                'description' => 'Completed your first assessment',
-                'icon' => 'book',
-                'rarity' => 'Common',
-                'rarity_color' => 'gray',
-                'is_earned' => true,
-                'earned_date' => '2024-01-15',
-                'front_image' => 'a/first_step.svg',
-                'reward' => '+50 XP',
-                'background_light' => '#646565'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Quick Learner',
-                'description' => 'Completed your first assessment',
-                'icon' => 'lightning',
-                'rarity' => 'Uncommon',
-                'rarity_color' => 'green',
-                'is_earned' => true,
-                'earned_date' => '2024-01-20',
-                'front_image' => 'a/quicklearner.png',
-                'reward' => '+50 XP',
-                'background_light' => '#1E8646'
-            ],
-            [
-                'id' => 5,
-                'title' => 'Math Whiz',
-                'description' => 'Earn 3000+ points',
-                'icon' => 'brain',
-                'rarity' => 'Epic',
-                'rarity_color' => 'purple',
-                'is_earned' => false,
-                'earned_date' => null,
-                'front_image' => 'a/math_whiz.svg',
-                'reward' => '+50 XP',
-                'background_light' => '#2C1B68'
-            ],
-            [
-                'id' => 7,
-                'title' => 'Grade Champion',
-                'description' => 'Master all subtraction concepts',
-                'icon' => 'medal',
-                'rarity' => 'Legendary',
-                'rarity_color' => 'yellow',
-                'is_earned' => false,
-                'earned_date' => null,
-                'front_image' => 'a/grade_champion.svg',
-                'reward' => '+50 XP',
-                'background_light' => '#D17A09'
-            ],
-            [
-                'id' => 11,
-                'title' => 'On Fire',
-                'description' => 'Earn 3000+ points',
-                'icon' => 'flame',
-                'rarity' => 'Rare',
-                'rarity_color' => 'red',
-                'is_earned' => true,
-                'earned_date' => '2024-01-20',
-                'front_image' => 'a/on_fire.svg',
-                'reward' => '+50 XP',
-                'background_light' => '#913311'
-            ]
-        ];
+        // Use student guard to get the authenticated user ID
+        $userId = Auth::guard('student')->id();
+
+        // If user is not authenticated, return empty earned badges
+        if (!$userId) {
+            $earnedBadges = [];
+        } else {
+            // Get all badges earned by the user
+            $earnedBadges = DB::table('user_badges')
+                ->where('user_id', $userId)
+                ->pluck('awarded_at', 'badge_key')
+                ->toArray();
+        }
+
+        $achievements = [];
+        $id = 1;
+
+        // Build achievements array from definitions
+        foreach (self::BADGE_DEFINITIONS as $badgeKey => $definition) {
+            $isEarned = isset($earnedBadges[$badgeKey]);
+
+            $achievements[] = [
+                'id' => $id++,
+                'title' => $definition['title'],
+                'description' => $definition['description'],
+                'icon' => $definition['icon'],
+                'rarity' => $definition['rarity'],
+                'rarity_color' => $definition['rarity_color'],
+                'is_earned' => $isEarned,
+                'earned_date' => $isEarned ? $earnedBadges[$badgeKey] : null,
+                'front_image' => $definition['front_image'],
+                'reward' => $definition['reward'],
+                'background_light' => $definition['background_light']
+            ];
+        }
+
+        return $achievements;
     }
 
     public function index()
