@@ -18,6 +18,76 @@ class LeaderboardController extends Controller
     }
 
     /**
+     * Provide leaderboard data for the dashboard view
+     * Returns top students from the section for display on dashboard
+     */
+    public function getLeaderboardDataForView(): array
+    {
+        $user = Auth::guard('student')->user();
+        $profile = $user->studentProfile;
+
+        if (!$profile) {
+            return [
+                'top_students' => [],
+                'ranking_list' => [],
+                'current_user_rank' => 0,
+                'total_students' => 0,
+            ];
+        }
+
+        $section = $profile->section;
+        $gradeLevel = $profile->grade_level;
+        $schoolName = $profile->school_name;
+
+        // Get top students in the same section ordered by total_points from user_progress
+        $students = DB::table('student_profile')
+            ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->leftJoin('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+            ->where('student_profile.section', $section)
+            ->where('student_profile.grade_level', $gradeLevel)
+            ->where('student_profile.school_name', $schoolName)
+            ->where('users.status', 'active')
+            ->select(
+                'student_profile.user_id',
+                'student_profile.firstname',
+                'student_profile.lastname',
+                'student_profile.avatar_url',
+                DB::raw('COALESCE(user_progress.total_points, 0) as total_points')
+            )
+            ->orderBy('total_points', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Format students for dashboard
+        $rankedStudents = $students->map(function ($student, $index) use ($user) {
+            return [
+                'rank' => $index + 1,
+                'name' => trim($student->firstname . ' ' . $student->lastname),
+                'points' => $student->total_points,
+                'is_current_user' => $student->user_id == $user->id,
+            ];
+        });
+
+        // Get top 3
+        $topStudents = $rankedStudents->take(3)->values()->toArray();
+
+        // Get students 4-10
+        $rankingList = $rankedStudents->slice(3, 7)->values()->toArray();
+
+        // Find current user's rank
+        $currentUserRank = $rankedStudents->search(function ($student) {
+            return $student['is_current_user'] === true;
+        });
+
+        return [
+            'top_students' => $topStudents,
+            'ranking_list' => $rankingList,
+            'current_user_rank' => $currentUserRank !== false ? $currentUserRank + 1 : 0,
+            'total_students' => $students->count(),
+        ];
+    }
+
+    /**
      * Get section leaderboard data
      */
     public function getSectionLeaderboard(Request $request)
