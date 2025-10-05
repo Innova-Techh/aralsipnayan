@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder
                         'lastname' => 'Doe',
                         'middlename' => 'Michael',
                         'gender' => 'male',
-                        'section' => 'A',
+                        'section' => 'Einstein',
                         'grade_level' => '6',
                         'school_name' => 'Pembo Elementary School',
                         'school_year' => '2024-2025',
@@ -63,10 +63,10 @@ class DatabaseSeeder extends Seeder
                         'first_assessment_view_at' => null,
 
                         // Gamification
-                        'current_streak' => 0,
-                        'longest_streak' => 0,
-                        'last_activity_date' => null,
-                        'total_points' => 0,
+                        'current_streak' => 5,
+                        'longest_streak' => 7,
+                        'last_activity_date' => Carbon::now(),
+                        'total_points' => 850,
 
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
@@ -83,7 +83,7 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Teacher sections - Jane Smith handles sections A and B
+        // Teacher sections - Jane Smith handles sections A, B, and C
         DB::table('teacher_sections')->insert([
             [
                 'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
@@ -96,6 +96,14 @@ class DatabaseSeeder extends Seeder
             [
                 'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
                 'section' => 'B',
+                'grade_level' => '6',
+                'school_year' => '2024-2025',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
+                'section' => 'C',
                 'grade_level' => '6',
                 'school_year' => '2024-2025',
                 'created_at' => now(),

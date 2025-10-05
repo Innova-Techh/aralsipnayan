@@ -53,9 +53,42 @@
                 transform: translateY(0);
             }
         }
+
+        /* Sticky Footer */
+        .sticky-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 35;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Position above bottom nav on mobile/tablet, at bottom on desktop */
+        @media (max-width: 1279px) {
+            .sticky-footer {
+                bottom: 60px; /* Above the bottom navigation bar */
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .sticky-footer {
+                bottom: 0; /* At the very bottom on desktop */
+            }
+        }
+
+        /* Add padding to bottom of content to prevent overlap with sticky footer and nav */
+        .content-with-footer {
+            padding-bottom: 160px; /* Account for both sticky footer and bottom nav on mobile */
+        }
+
+        @media (min-width: 1280px) {
+            .content-with-footer {
+                padding-bottom: 100px; /* Less padding on desktop (no bottom nav) */
+            }
+        }
     </style>
 
-    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 content-with-footer">
         <!-- Loading Skeleton (Initially visible) -->
         <div id="leaderboardSkeleton">
             <div class="min-h-screen bg-gray-100">
@@ -174,11 +207,11 @@
                     <!-- Toggle Switch -->
                     <div class="flex justify-center pt-6 pb-4">
                         <div class="bg-white rounded-full p-1 flex">
-                            <button
+                            <button id="sectionBtn"
                                 class="px-6 py-2 rounded-full bg-primary-blue text-white font-medium text-sm transition-all">
                                 Section
                             </button>
-                            <button class="px-6 py-2 rounded-full text-primary-blue font-medium text-sm transition-all">
+                            <button id="schoolBtn" class="px-6 py-2 rounded-full text-primary-blue font-medium text-sm transition-all">
                                 School
                             </button>
                         </div>
@@ -190,39 +223,18 @@
                             <!-- Top Three -->
                             <div class="flex items-end justify-center space-x-6">
                                 <!-- Second Place -->
-                                <div class="flex flex-col items-center transform translate-y-4 ">
-                                    <div
-                                        class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
-                                        <span class="text-gray-600 font-bold text-lg">M</span>
-                                    </div>
-                                    <div class="text-center mb-2">
-                                        <div class="font-semibold text-sm text-white">Mary Soberano</div>
-                                        <div class="text-yellow-300 text-xs">1,000 pts</div>
-                                    </div>
+                                <div id="secondPlace" class="flex flex-col items-center transform translate-y-4">
+                                    <!-- Will be populated by JS -->
                                 </div>
 
                                 <!-- First Place -->
-                                <div class="flex flex-col items-center ">
-                                    <div
-                                        class="w-20 h-20 bg-red-400 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
-                                        <span class="text-white font-bold text-xl">J</span>
-                                    </div>
-                                    <div class="text-center mb-2">
-                                        <div class="font-semibold text-white">John Llyod</div>
-                                        <div class="text-yellow-300 text-sm">1,250 pts</div>
-                                    </div>
+                                <div id="firstPlace" class="flex flex-col items-center">
+                                    <!-- Will be populated by JS -->
                                 </div>
 
                                 <!-- Third Place -->
-                                <div class="flex flex-col items-center transform translate-y-4">
-                                    <div
-                                        class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-2 border-4 border-white shadow-lg">
-                                        <span class="text-gray-600 font-bold text-lg">C</span>
-                                    </div>
-                                    <div class="text-center mb-2">
-                                        <div class="font-semibold text-sm text-white">Christian Alexis</div>
-                                        <div class="text-yellow-300 text-xs">700 pts</div>
-                                    </div>
+                                <div id="thirdPlace" class="flex flex-col items-center transform translate-y-4">
+                                    <!-- Will be populated by JS -->
                                 </div>
                             </div>
 
@@ -254,139 +266,10 @@
 
                 <!-- Bottom Section with Ranked List -->
                 <div class="relative -mx-4 sm:-mx-6 lg:-mx-8 p-5 sm:p-6 bg-white rounded-2xl -mt-4 sm:-mt-4 lg:-mt-4 z-10">
-                    <div class="bg-white px-6 lg:px-24 py-6 space-y-5">
-                        <!-- Ranked List Items -->
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">A</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Anderson Silva</div>
-                                <div class="text-blue-100 text-sm">VI - Sampaguita</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">K</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Kate Villamor</div>
-                                <div class="text-blue-100 text-sm">VI - Orchid</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">A</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Angel Lopez</div>
-                                <div class="text-blue-100 text-sm">VI - Yellow Bell</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">J</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Johnson Spear</div>
-                                <div class="text-blue-100 text-sm">VI - Jasmin</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
-                        </div>
-
-                        <!-- Continue with more entries as needed -->
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">S</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Sarah Johnson</div>
-                                <div class="text-blue-100 text-sm">VI - Rose</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center">
-                            <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mr-4">
-                                <span class="text-gray-600 font-bold">M</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-white font-semibold">Michael Chen</div>
-                                <div class="text-blue-100 text-sm">VI - Lily</div>
-                            </div>
-                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                                style="text-shadow: 
-                                    -1px -1px 0 #AE6816, 
-                                    1px -1px 0 #AE6816, 
-                                    -1px 1px 0 #AE6816,
-                                    1px  1px 0 #AE6816,
-                                    -1px  2px 0 #AE6816, 
-                                    1px 2px 0 #AE6816, 
-                                    0 2px 0 #AE6816;">
-                                698 pts
-                            </div>
+                    <div class="bg-white px-6 lg:px-24 py-6">
+                        <!-- Ranked List Items (4-10) -->
+                        <div id="rankedList" class="space-y-5">
+                            <!-- Will be populated by JS -->
                         </div>
                     </div>
                 </div>
@@ -394,29 +277,92 @@
         </div>
     </div>
 
+    <!-- Sticky Footer for Current User Rank -->
+    <div id="stickyFooter" class="sticky-footer bg-gradient-to-r from-blue-600 to-blue-700 text-white hidden">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div id="footerAvatar" class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
+                        <!-- Avatar will be inserted here -->
+                    </div>
+                    <div>
+                        <div class="text-sm font-semibold">Your Rank</div>
+                        <div id="footerRank" class="text-lg font-bold">Loading...</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm font-semibold">Your Points</div>
+                    <div id="footerPoints" class="text-lg font-bold text-yellow-300">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentView = 'section'; // 'section' or 'school'
+        let leaderboardData = null;
+
         // Leaderboard Loading Logic
         document.addEventListener('DOMContentLoaded', function () {
             // Show skeleton initially, hide actual content
             const skeleton = document.getElementById('leaderboardSkeleton');
             const content = document.getElementById('leaderboardContent');
 
-            // Simulate data loading
+            // Load section leaderboard by default
             setTimeout(() => {
-                loadLeaderboardData();
-            }, 1500);
+                loadLeaderboardData('section');
+            }, 500);
+
+            // Toggle button event listeners
+            document.getElementById('sectionBtn').addEventListener('click', function() {
+                if (currentView !== 'section') {
+                    currentView = 'section';
+                    updateToggleButtons();
+                    loadLeaderboardData('section');
+                }
+            });
+
+            document.getElementById('schoolBtn').addEventListener('click', function() {
+                if (currentView !== 'school') {
+                    currentView = 'school';
+                    updateToggleButtons();
+                    loadLeaderboardData('school');
+                }
+            });
         });
 
-        async function loadLeaderboardData() {
-            try {
-                // Simulate API calls
-                const promises = [
-                    loadTopThree(),
-                    loadRankedList(),
-                    loadUserRank()
-                ];
+        function updateToggleButtons() {
+            const sectionBtn = document.getElementById('sectionBtn');
+            const schoolBtn = document.getElementById('schoolBtn');
 
-                await Promise.all(promises);
+            if (currentView === 'section') {
+                sectionBtn.classList.add('bg-primary-blue', 'text-white');
+                sectionBtn.classList.remove('text-primary-blue');
+                schoolBtn.classList.remove('bg-primary-blue', 'text-white');
+                schoolBtn.classList.add('text-primary-blue');
+            } else {
+                schoolBtn.classList.add('bg-primary-blue', 'text-white');
+                schoolBtn.classList.remove('text-primary-blue');
+                sectionBtn.classList.remove('bg-primary-blue', 'text-white');
+                sectionBtn.classList.add('text-primary-blue');
+            }
+        }
+
+        async function loadLeaderboardData(type) {
+            try {
+                const url = type === 'section'
+                    ? '{{ route("leaderboard.section") }}'
+                    : '{{ route("leaderboard.school") }}';
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                leaderboardData = data;
+
+                // Populate the UI
+                populateTopThree(data.top_three);
+                populateRankedList(data.ranked_list);
+                updateStickyFooter(data.current_user);
 
                 // Hide skeleton and show content
                 const skeleton = document.getElementById('leaderboardSkeleton');
@@ -435,6 +381,138 @@
             }
         }
 
+        function getInitials(name) {
+            const parts = name.split(' ');
+            if (parts.length >= 2) {
+                return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
+            }
+            return name.charAt(0).toUpperCase();
+        }
+
+        function populateTopThree(topThree) {
+            const firstPlace = document.getElementById('firstPlace');
+            const secondPlace = document.getElementById('secondPlace');
+            const thirdPlace = document.getElementById('thirdPlace');
+
+            // Clear previous content
+            firstPlace.innerHTML = '';
+            secondPlace.innerHTML = '';
+            thirdPlace.innerHTML = '';
+
+            // First Place (index 0)
+            if (topThree[0]) {
+                const student = topThree[0];
+                firstPlace.innerHTML = `
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-yellow-300 shadow-lg overflow-hidden">
+                        ${student.avatar_url
+                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                            : `<span class="text-gray-600 font-bold text-xl">${getInitials(student.name)}</span>`
+                        }
+                    </div>
+                    <div class="text-center mb-2">
+                        <div class="font-semibold text-white">${student.name}</div>
+                        <div class="text-yellow-300 text-sm">${student.points.toLocaleString()} pts</div>
+                    </div>
+                `;
+            }
+
+            // Second Place (index 1)
+            if (topThree[1]) {
+                const student = topThree[1];
+                secondPlace.innerHTML = `
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-gray-300 shadow-lg overflow-hidden">
+                        ${student.avatar_url
+                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                            : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
+                        }
+                    </div>
+                    <div class="text-center mb-2">
+                        <div class="font-semibold text-sm text-white">${student.name}</div>
+                        <div class="text-yellow-300 text-xs">${student.points.toLocaleString()} pts</div>
+                    </div>
+                `;
+            }
+
+            // Third Place (index 2)
+            if (topThree[2]) {
+                const student = topThree[2];
+                thirdPlace.innerHTML = `
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-orange-300 shadow-lg overflow-hidden">
+                        ${student.avatar_url
+                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                            : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
+                        }
+                    </div>
+                    <div class="text-center mb-2">
+                        <div class="font-semibold text-sm text-white">${student.name}</div>
+                        <div class="text-yellow-300 text-xs">${student.points.toLocaleString()} pts</div>
+                    </div>
+                `;
+            }
+        }
+
+        function populateRankedList(rankedList) {
+            const container = document.getElementById('rankedList');
+            container.innerHTML = '';
+
+            rankedList.forEach(student => {
+                const item = document.createElement('div');
+                item.className = 'bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center';
+
+                item.innerHTML = `
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 overflow-hidden">
+                        ${student.avatar_url
+                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                            : `<span class="text-gray-600 font-bold">${getInitials(student.name)}</span>`
+                        }
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-white font-semibold">Rank ${student.rank} - ${student.name}</div>
+                        <div class="text-blue-100 text-sm">${student.grade_level ? 'Grade ' + student.grade_level : ''} ${student.section ? '- ' + student.section : ''}</div>
+                    </div>
+                    <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                        style="text-shadow:
+                            -1px -1px 0 #AE6816,
+                            1px -1px 0 #AE6816,
+                            -1px 1px 0 #AE6816,
+                            1px  1px 0 #AE6816,
+                            -1px  2px 0 #AE6816,
+                            1px 2px 0 #AE6816,
+                            0 2px 0 #AE6816;">
+                        ${student.points.toLocaleString()} pts
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function updateStickyFooter(currentUser) {
+            if (!currentUser) {
+                document.getElementById('stickyFooter').classList.add('hidden');
+                return;
+            }
+
+            const footer = document.getElementById('stickyFooter');
+            const footerAvatar = document.getElementById('footerAvatar');
+            const footerRank = document.getElementById('footerRank');
+            const footerPoints = document.getElementById('footerPoints');
+
+            // Update avatar
+            if (currentUser.avatar_url) {
+                footerAvatar.innerHTML = `<img src="${currentUser.avatar_url}" alt="Your avatar" class="w-full h-full object-cover rounded-full">`;
+            } else {
+                footerAvatar.innerHTML = `<span class="text-gray-600 font-bold text-lg">${getInitials(currentUser.name)}</span>`;
+            }
+
+            // Update rank and points
+            footerRank.textContent = `Rank ${currentUser.rank}`;
+            footerPoints.textContent = `${currentUser.points.toLocaleString()} pts`;
+
+            // Always show the sticky footer to display current user's progress
+            footer.classList.remove('hidden');
+        }
+
         function showLeaderboardContent() {
             const skeleton = document.getElementById('leaderboardSkeleton');
             const content = document.getElementById('leaderboardContent');
@@ -442,22 +520,6 @@
             skeleton.classList.add('hidden');
             content.classList.remove('hidden');
             content.classList.add('content-loaded');
-        }
-
-        // Simulate API calls (replace with actual endpoints)
-        async function loadTopThree() {
-            // Replace with: return fetch('/api/leaderboard/top-three').then(r => r.json());
-            return new Promise(resolve => setTimeout(resolve, 400));
-        }
-
-        async function loadRankedList() {
-            // Replace with: return fetch('/api/leaderboard/ranked-list').then(r => r.json());
-            return new Promise(resolve => setTimeout(resolve, 500));
-        }
-
-        async function loadUserRank() {
-            // Replace with: return fetch('/api/leaderboard/user-rank').then(r => r.json());
-            return new Promise(resolve => setTimeout(resolve, 300));
         }
     </script>
 

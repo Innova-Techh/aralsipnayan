@@ -314,7 +314,8 @@ Route::middleware(['student.auth'])->group(function () {
     
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
-    Route::get('/leaderboard/data', [LeaderboardController::class, 'getLeaderboardData'])->name('leaderboard.data');
+    Route::get('/leaderboard/section', [LeaderboardController::class, 'getSectionLeaderboard'])->name('leaderboard.section');
+    Route::get('/leaderboard/school', [LeaderboardController::class, 'getSchoolLeaderboard'])->name('leaderboard.school');
     
     // Sections (Student view)
     Route::get('/my-sections', [SectionController::class, 'index'])->name('sections.index');

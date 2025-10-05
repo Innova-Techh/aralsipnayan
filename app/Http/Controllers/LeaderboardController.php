@@ -5,159 +5,157 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LeaderboardController extends Controller
 {
-    /**
-     * Provide leaderboard data as an array suitable for blade views.
-     */
-    public function getLeaderboardDataForView(): array
-    {
-        $user = Auth::guard('student')->user();
-        
-        // Get user profile with avatar for current user
-        $userProfile = $user->studentProfile;
-        $currentUserAvatarUrl = $userProfile && $userProfile->avatar_url 
-            ? asset($userProfile->avatar_url)
-            : asset('images/profile/avatar5.png'); // Default avatar
-        
-        // Sample data for Grade 6 Leaderboard
-        $leaderboardData = [
-            'grade' => 'Grade 6',
-            'title' => 'Grade 6 Leaderboard',
-            'subtitle' => 'See how you rank among your classmates!',
-            'top_students' => [
-                [
-                    'rank' => 1,
-                    'name' => 'Maria Santos',
-                    'points' => 1580,
-                    'lessons' => 3,
-                    'icon' => 'crown',
-                    'bg_color' => 'bg-gradient-to-br from-yellow-400 to-orange-500',
-                    'text_color' => 'text-white',
-                ],
-                [
-                    'rank' => 2,
-                    'name' => 'Carlos Reyes',
-                    'points' => 1420,
-                    'lessons' => 2,
-                    'icon' => 'medal',
-                    'bg_color' => 'bg-gradient-to-br from-blue-400 to-gray-500',
-                    'text_color' => 'text-white',
-                ],
-                [
-                    'rank' => 3,
-                    'name' => 'Ana Garcia',
-                    'points' => 1350,
-                    'lessons' => 2,
-                    'icon' => 'trophy',
-                    'bg_color' => 'bg-gradient-to-br from-orange-400 to-brown-500',
-                    'text_color' => 'text-white',
-                ],
-            ],
-            'ranking_list' => [
-                [
-                    'rank' => 4,
-                    'name' => $user ? $user->name : 'Juan Dela Cruz',
-                    'points' => 1250,
-                    'lessons' => 2,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => true,
-                    'highlight' => true,
-                ],
-                [
-                    'rank' => 5,
-                    'name' => 'Miguel Torres',
-                    'points' => 1180,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-                [
-                    'rank' => 6,
-                    'name' => 'Sofia Mendoza',
-                    'points' => 1090,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-                [
-                    'rank' => 7,
-                    'name' => 'Diego Fernandez',
-                    'points' => 980,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-                [
-                    'rank' => 8,
-                    'name' => 'Isabella Cruz',
-                    'points' => 890,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-                [
-                    'rank' => 9,
-                    'name' => 'Lucas Rodriguez',
-                    'points' => 820,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-                [
-                    'rank' => 10,
-                    'name' => 'Emma Santos',
-                    'points' => 750,
-                    'lessons' => 1,
-                    'grade' => 'Grade 6',
-                    'is_current_user' => false,
-                    'highlight' => false,
-                ],
-            ],
-            'current_user_rank' => 4,
-            'total_students' => 25,
-            'current_user_avatar' => $currentUserAvatarUrl,
-        ];
-
-        return $leaderboardData;
-    }
     /**
      * Display the leaderboard page.
      */
     public function index(): View
     {
-        $leaderboardData = $this->getLeaderboardDataForView();
-        return view('student.leaderboard', compact('leaderboardData'));
+        return view('student.leaderboard');
     }
-    
+
     /**
-     * Get leaderboard data for API calls
+     * Get section leaderboard data
      */
-    public function getLeaderboardData()
+    public function getSectionLeaderboard(Request $request)
     {
         $user = Auth::guard('student')->user();
-        
-        // Sample API response
+        $profile = $user->studentProfile;
+
+        if (!$profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
+        $section = $profile->section;
+        $gradeLevel = $profile->grade_level;
+        $schoolName = $profile->school_name;
+
+        // Get all students in the same section ordered by total_points from user_progress
+        $students = DB::table('student_profile')
+            ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->leftJoin('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+            ->where('student_profile.section', $section)
+            ->where('student_profile.grade_level', $gradeLevel)
+            ->where('student_profile.school_name', $schoolName)
+            ->where('users.status', 'active')
+            ->select(
+                'student_profile.id',
+                'student_profile.user_id',
+                'student_profile.firstname',
+                'student_profile.lastname',
+                'student_profile.avatar_url',
+                'student_profile.section',
+                'student_profile.grade_level',
+                DB::raw('COALESCE(user_progress.total_points, 0) as total_points')
+            )
+            ->orderBy('total_points', 'desc')
+            ->get();
+
+        // Add rank to each student
+        $rankedStudents = $students->map(function ($student, $index) use ($user) {
+            return [
+                'rank' => $index + 1,
+                'user_id' => $student->user_id,
+                'name' => trim($student->firstname . ' ' . $student->lastname),
+                'firstname' => $student->firstname,
+                'lastname' => $student->lastname,
+                'points' => $student->total_points,
+                'section' => $student->section,
+                'grade_level' => $student->grade_level,
+                'avatar_url' => $student->avatar_url ? asset($student->avatar_url) : asset('images/profile/default.png'),
+                'is_current_user' => $student->user_id == $user->id,
+            ];
+        });
+
+        // Get top 3 students
+        $topThree = $rankedStudents->take(3)->values();
+
+        // Get students ranked 4-10
+        $rankedList = $rankedStudents->slice(3, 7)->values();
+
+        // Find current user's rank
+        $currentUserRank = $rankedStudents->firstWhere('is_current_user', true);
+
         return response()->json([
-            'grade' => 'Grade 6',
-            'current_user_rank' => 4,
-            'total_students' => 25,
-            'top_students' => [
-                ['name' => 'Maria Santos', 'points' => 1580, 'rank' => 1],
-                ['name' => 'Carlos Reyes', 'points' => 1420, 'rank' => 2],
-                ['name' => 'Ana Garcia', 'points' => 1350, 'rank' => 3],
-            ],
-            'user_stats' => [
-                'rank' => 4,
-                'points' => 1250,
-                'lessons_completed' => 2,
-            ],
+            'type' => 'section',
+            'section_name' => "Grade {$gradeLevel} - {$section}",
+            'top_three' => $topThree,
+            'ranked_list' => $rankedList,
+            'current_user' => $currentUserRank,
+            'total_students' => $students->count(),
+        ]);
+    }
+
+    /**
+     * Get school-wide leaderboard data
+     */
+    public function getSchoolLeaderboard(Request $request)
+    {
+        $user = Auth::guard('student')->user();
+        $profile = $user->studentProfile;
+
+        if (!$profile) {
+            return response()->json(['error' => 'Profile not found'], 404);
+        }
+
+        $gradeLevel = $profile->grade_level;
+        $schoolName = $profile->school_name;
+
+        // Get all students in the same school and grade level ordered by total_points from user_progress
+        $students = DB::table('student_profile')
+            ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->leftJoin('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+            ->where('student_profile.grade_level', $gradeLevel)
+            ->where('student_profile.school_name', $schoolName)
+            ->where('users.status', 'active')
+            ->select(
+                'student_profile.id',
+                'student_profile.user_id',
+                'student_profile.firstname',
+                'student_profile.lastname',
+                'student_profile.avatar_url',
+                'student_profile.section',
+                'student_profile.grade_level',
+                DB::raw('COALESCE(user_progress.total_points, 0) as total_points')
+            )
+            ->orderBy('total_points', 'desc')
+            ->get();
+
+        // Add rank to each student
+        $rankedStudents = $students->map(function ($student, $index) use ($user) {
+            return [
+                'rank' => $index + 1,
+                'user_id' => $student->user_id,
+                'name' => trim($student->firstname . ' ' . $student->lastname),
+                'firstname' => $student->firstname,
+                'lastname' => $student->lastname,
+                'points' => $student->total_points,
+                'section' => $student->section,
+                'grade_level' => $student->grade_level,
+                'avatar_url' => $student->avatar_url ? asset($student->avatar_url) : asset('images/profile/default.png'),
+                'is_current_user' => $student->user_id == $user->id,
+            ];
+        });
+
+        // Get top 3 students
+        $topThree = $rankedStudents->take(3)->values();
+
+        // Get students ranked 4-10
+        $rankedList = $rankedStudents->slice(3, 7)->values();
+
+        // Find current user's rank
+        $currentUserRank = $rankedStudents->firstWhere('is_current_user', true);
+
+        return response()->json([
+            'type' => 'school',
+            'school_name' => $schoolName,
+            'top_three' => $topThree,
+            'ranked_list' => $rankedList,
+            'current_user' => $currentUserRank,
+            'total_students' => $students->count(),
         ]);
     }
 } 

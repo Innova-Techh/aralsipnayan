@@ -12,7 +12,7 @@ class StudentSectionsSeeder extends Seeder
 {
     public function run(): void
     {
-        $sections = ['A', 'B', 'C'];
+        $sections = ['Einstein', 'Newton', 'Curie'];
         $schoolYear = '2024-2025';
         $schoolName = 'Pembo Elementary School';
 
@@ -38,6 +38,13 @@ class StudentSectionsSeeder extends Seeder
                     'status' => 'active',
                 ]);
 
+                // Generate random points for testing leaderboard (higher points for first few students)
+                $totalPoints = rand(100, 2000);
+                // Make some students have higher points for testing
+                if ($i <= 3) {
+                    $totalPoints = rand(1000, 2500);
+                }
+
                 DB::table('student_profile')->insert([
                     'user_id' => $user->id,
                     'student_id' => 'LRN' . ($sectionIndex + 1) . str_pad((string)$i, 2, '0', STR_PAD_LEFT) . rand(100, 999),
@@ -50,19 +57,19 @@ class StudentSectionsSeeder extends Seeder
                     'school_year' => $schoolYear,
 
                     // Onboarding
-                    'has_completed_onboarding' => false,
-                    'onboarding_completed_at' => null,
-                    'is_first_login' => true,
+                    'has_completed_onboarding' => true,
+                    'onboarding_completed_at' => Carbon::now(),
+                    'is_first_login' => false,
 
                     // Assessments
-                    'has_viewed_assessments' => false,
-                    'first_assessment_view_at' => null,
+                    'has_viewed_assessments' => true,
+                    'first_assessment_view_at' => Carbon::now(),
 
                     // Gamification
-                    'current_streak' => 0,
-                    'longest_streak' => 0,
-                    'last_activity_date' => null,
-                    'total_points' => 0,
+                    'current_streak' => rand(0, 10),
+                    'longest_streak' => rand(0, 15),
+                    'last_activity_date' => Carbon::now(),
+                    'total_points' => $totalPoints,
 
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
