@@ -521,6 +521,11 @@ radial-gradient(circle at center,
                     "linear-gradient(to bottom, #F59E0B, #FBBF24)",
                 "achievement-progress":
                     "linear-gradient(to bottom, #2563EB, #1E3A8A)",
+
+
+                "submit-answer": "linear-gradient(to bottom, #005826, #00A95C)",
+                "next-question": "linear-gradient(to bottom, #3B82F6, #1D4ED8)",
+                
             },
             boxShadow: {
                 // Inner shadow utility
@@ -600,6 +605,9 @@ radial-gradient(circle at center,
                 "level-prismatic-badge": "0 4px 0 #43185C",
                 "level-prismatic-button": "0 4px 0 #43185C",
                 "level-prismatic-text": "0 3px 0 #43185C",
+
+                "submit-answer": "0 4px 0 #094724",
+                "next-question": "0 4px 0 #0E3AB1",
             },
         },
     },
