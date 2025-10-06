@@ -29,9 +29,22 @@
 
             // Get data from user_progress table or use defaults
             $totalPoints = $userProgress->total_points ?? 0;
-            $userLevel = $userProgress->current_level ?? 1;
-            $pointsInCurrentLevel = $userProgress->points_in_current_level ?? 0;
-            $currentRank = $userProgress->current_rank ?? 'Math Explorer';
+
+            // Constants from gamification.md
+            $POINTS_PER_LEVEL = 60;
+            $MAX_LEVEL = 100;
+
+            // Calculate level and points dynamically from total_points to avoid database inconsistencies
+            // Level calculation: floor(total_points / 60) + 1, capped at 100
+            $userLevel = min(floor($totalPoints / $POINTS_PER_LEVEL) + 1, $MAX_LEVEL);
+
+            // Points in current level: total_points % 60 (remainder after dividing by 60)
+            $pointsInCurrentLevel = $totalPoints % $POINTS_PER_LEVEL;
+
+            // Special case: if at max level with max points
+            if ($userLevel >= $MAX_LEVEL) {
+                $pointsInCurrentLevel = min($pointsInCurrentLevel, $POINTS_PER_LEVEL);
+            }
 
             // Determine rank image based on level ranges (every 10 levels)
             if ($userLevel >= 91) {
@@ -67,9 +80,14 @@
             }
 
             // Calculate progress within current level (each level = 60 points per gamification.md)
-            $progressPercentage = ($pointsInCurrentLevel / 60) * 100;
-            $pointsNeeded = 60 - $pointsInCurrentLevel;
-            $isMaxLevel = $userLevel >= 100;
+            // Ensure progress percentage is between 0 and 100 to prevent UI overflow
+            $progressPercentage = min(100, max(0, ($pointsInCurrentLevel / $POINTS_PER_LEVEL) * 100));
+
+            // Calculate points needed for next level
+            $pointsNeeded = $POINTS_PER_LEVEL - $pointsInCurrentLevel;
+
+            // Check if max level
+            $isMaxLevel = $userLevel >= $MAX_LEVEL;
         @endphp
         <style>
             .welcome-header {
@@ -966,6 +984,7 @@
                                     @endif --}}
 
                                     <!-- Stats Grid with Live Data -->
+                                    {{-- Total Completed Assessments --}}
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                                         <div
                                             class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-green drop-shadow-stats-green">
@@ -989,7 +1008,7 @@
                                         </div>
 
 
-
+                                        {{-- Total Accumulated Points --}}
                                         <div
                                             class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-yellow drop-shadow-stats-yellow">
                                             <div class="flex items-center justify-center mb-2">
@@ -997,12 +1016,12 @@
                                                     class="w-10 h-10 sm:w-12 sm:h-12 object-contain relative z-10">
                                             </div>
                                             <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardPoints">
-                                                {{ $profile?->total_points ?? 0 }}
+                                                {{ number_format($totalPoints) }}
                                             </div>
-                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Points</div>
+                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Total Points</div>
                                         </div>
 
-
+                                        {{-- Current Streak --}}
                                         <div
                                             class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-red drop-shadow-stats-red">
                                             <div class="flex items-center justify-center mb-2">
@@ -1010,20 +1029,20 @@
                                                     class="w-9 h-9 sm:w-11 sm:h-11 object-contain relative z-10">
                                             </div>
                                             <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardStreak">
-                                                {{ $profile?->current_streak ?? 0 }}
+                                                {{ $userProgress->current_streak ?? 0 }}
                                             </div>
-                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Streak</div>
+                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Day Streak</div>
                                         </div>
 
-
+                                        {{-- Current Level Progress --}}
                                         <div
                                             class="relative overflow-hidden rounded-2xl p-3 sm:p-4 text-white text-center bg-stats-blue drop-shadow-stats-blue">
                                             <div class="flex items-center justify-center mb-2">
                                                 <img src="{{ asset('images/dashboard/star.png') }}" alt="Level"
                                                     class="w-12 h-8 sm:w-14 sm:h-10 object-contain relative z-10">
                                             </div>
-                                            <div class="text-xl sm:text-2xl font-bold relative z-10">3</div>
-                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Level</div>
+                                            <div class="text-xl sm:text-2xl font-bold relative z-10">{{ $userLevel }}</div>
+                                            <div class="text-xs sm:text-sm opacity-90 relative z-10">Current Level</div>
                                         </div>
                                     </div>
 
@@ -1480,7 +1499,10 @@
                         .then(data => {
                             // Update the stats cards with live data
                             document.getElementById('dashboardStreak').textContent = data.current_streak;
-                            document.getElementById('dashboardPoints').textContent = data.total_points;
+
+                            // Format total points with commas (e.g., 1,234)
+                            const formattedPoints = new Intl.NumberFormat('en-US').format(data.total_points);
+                            document.getElementById('dashboardPoints').textContent = formattedPoints;
 
                             // Also update navigation bar streak counters
                             const navStreakCounter = document.getElementById('navStreakCounter');

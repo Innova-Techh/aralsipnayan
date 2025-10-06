@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LoginStreakController extends Controller
 {
@@ -47,7 +48,7 @@ class LoginStreakController extends Controller
     public function getStreakData()
     {
         $user = Auth::guard('student')->user();
-        
+
         if ($user->role !== 'Student') {
             return response()->json([
                 'current_streak' => 0,
@@ -57,9 +58,11 @@ class LoginStreakController extends Controller
             ]);
         }
 
+        // Get data from user_progress table (primary source of truth for gamification)
+        $userProgress = DB::table('user_progress')->where('user_id', $user->id)->first();
         $profile = $user->studentProfile;
 
-        if (!$profile) {
+        if (!$userProgress || !$profile) {
             return response()->json([
                 'current_streak' => 0,
                 'longest_streak' => 0,
@@ -69,10 +72,10 @@ class LoginStreakController extends Controller
         }
 
         return response()->json([
-            'current_streak' => $profile->current_streak,
-            'longest_streak' => $profile->longest_streak,
-            'total_points' => $profile->total_points,
-            'points_today' => $profile->getPointsForDay($profile->current_streak + 1),
+            'current_streak' => $userProgress->current_streak,
+            'longest_streak' => $userProgress->longest_streak,
+            'total_points' => $userProgress->total_points,  // Use user_progress as source of truth
+            'points_today' => $profile->getPointsForDay($userProgress->current_streak + 1),
             'last_activity' => $profile->last_activity_date
         ]);
     }
