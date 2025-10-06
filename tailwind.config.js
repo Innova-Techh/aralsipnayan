@@ -241,7 +241,7 @@ export default {
                 border: "#E2E8F0",
                 input: "#E2E8F0",
                 ring: "#E2E8F0",
-                background: "#F8FAFC",
+                background: "#1E3A8A",
                 foreground: "#1E293B",
                 primary: {
                     DEFAULT: "#449EFF",
@@ -522,10 +522,10 @@ radial-gradient(circle at center,
                 "achievement-progress":
                     "linear-gradient(to bottom, #2563EB, #1E3A8A)",
 
-
                 "submit-answer": "linear-gradient(to bottom, #005826, #00A95C)",
                 "next-question": "linear-gradient(to bottom, #3B82F6, #1D4ED8)",
-                
+
+                "phase-counter": "linear-gradient(to bottom, #5445E6, #763CEC)",
             },
             boxShadow: {
                 // Inner shadow utility
@@ -608,6 +608,9 @@ radial-gradient(circle at center,
 
                 "submit-answer": "0 4px 0 #094724",
                 "next-question": "0 4px 0 #0E3AB1",
+
+                "diagnostic-banner": "0 4px 0 #1E3A8A",
+                "phase-counter": "0 6px 0 #3705AD",
             },
         },
     },
