@@ -23,9 +23,53 @@
             // Initialize the RankController
             $rankController = new RankController();
 
-            // Get user's current XP (replace with your actual user XP logic)
-            $userXP = auth()->guard('student')->user()->xp ?? 460; // Example: 460 XP
-            $progressInfo = $rankController->getProgressInfo($userXP);
+            // Get user's progress data from user_progress table
+            $userId = auth()->guard('student')->user()->id;
+            $userProgress = DB::table('user_progress')->where('user_id', $userId)->first();
+
+            // Get data from user_progress table or use defaults
+            $totalPoints = $userProgress->total_points ?? 0;
+            $userLevel = $userProgress->current_level ?? 1;
+            $pointsInCurrentLevel = $userProgress->points_in_current_level ?? 0;
+            $currentRank = $userProgress->current_rank ?? 'Math Explorer';
+
+            // Determine rank image based on level ranges (every 10 levels)
+            if ($userLevel >= 91) {
+                $rankImage = 'rank-10.png';
+                $rankTitle = 'Math Grandmaster';
+            } elseif ($userLevel >= 81) {
+                $rankImage = 'rank-9.png';
+                $rankTitle = 'Math Champion';
+            } elseif ($userLevel >= 71) {
+                $rankImage = 'rank-8.png';
+                $rankTitle = 'Math Sage';
+            } elseif ($userLevel >= 61) {
+                $rankImage = 'rank-7.png';
+                $rankTitle = 'Math Virtuoso';
+            } elseif ($userLevel >= 51) {
+                $rankImage = 'rank-6.png';
+                $rankTitle = 'Math Prodigy';
+            } elseif ($userLevel >= 41) {
+                $rankImage = 'rank-5.png';
+                $rankTitle = 'Math Innovator';
+            } elseif ($userLevel >= 31) {
+                $rankImage = 'rank-4.png';
+                $rankTitle = 'Math Strategist';
+            } elseif ($userLevel >= 21) {
+                $rankImage = 'rank-3.png';
+                $rankTitle = 'Math Seeker';
+            } elseif ($userLevel >= 11) {
+                $rankImage = 'rank-2.png';
+                $rankTitle = 'Math Adventurer';
+            } else {
+                $rankImage = 'rank-1.png';
+                $rankTitle = 'Math Explorer';
+            }
+
+            // Calculate progress within current level (each level = 60 points per gamification.md)
+            $progressPercentage = ($pointsInCurrentLevel / 60) * 100;
+            $pointsNeeded = 60 - $pointsInCurrentLevel;
+            $isMaxLevel = $userLevel >= 100;
         @endphp
         <style>
             .welcome-header {
@@ -543,61 +587,58 @@
                                         <div class="text-white rounded-xl p-4 sm:p-5 shadow-inner"
                                             style="background: linear-gradient(to right, #101093, #931093); box-shadow: inset 0 -4px 4px #42045C, inset 0 2px 2px #CC39F6; box-shadow: 0 6px 0 #0A0A62;">
                                             <div class="flex items-center gap-4">
-                                                <!-- Dynamic Rank image -->
+                                                <!-- Dynamic Rank Image -->
                                                 <div class="flex-shrink-0">
-                                                    <img src="{{ asset('images/rank_insignia/' . $progressInfo['rank_info']['image']) }}"
-                                                        alt="{{ $progressInfo['rank_info']['title'] }}"
-                                                        class="w-32 h-32 sm:w-18 sm:h-18 rounded-xl object-contain">
+                                                    <img src="{{ asset('images/rank_insignia/' . $rankImage) }}"
+                                                        alt="{{ $rankTitle }}"
+                                                        class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl object-contain drop-shadow-lg">
                                                 </div>
 
                                                 <!-- Content area -->
                                                 <div class="flex-1 min-w-0 mr-2">
                                                     <!-- Group 1: Title and Level -->
                                                     <div class="mb-2">
-                                                        <h3 class="text-xl sm:text-xl font-bold">
-                                                            {{ $progressInfo['rank_info']['title'] }}
+                                                        <h3 class="text-lg sm:text-xl font-bold text-white drop-shadow-md">
+                                                            {{ $rankTitle }}
                                                         </h3>
-                                                        <p class="text-sm text-blue-200">Level
-                                                            {{ $progressInfo['current_level'] }}
-                                                        </p>
+                                                        <p class="text-sm text-blue-200 font-semibold">Level {{ $userLevel }}</p>
                                                     </div>
 
-                                                    <!-- Group 2: XP Text (standalone) -->
-                                                    <div class="mb-2 mr-4 text-right">
-                                                        @if($progressInfo['is_max_level'])
-                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold">MAX LEVEL
-                                                                ACHIEVED!
+                                                    <!-- Group 2: Points Text -->
+                                                    <div class="mb-2 mr-4">
+                                                        @if($isMaxLevel)
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold">
+                                                                🏆 MAX LEVEL ACHIEVED!
                                                             </p>
                                                         @else
-                                                            <p class="text-xs sm:text-sm text-blue-200">
-                                                                {{ number_format($progressInfo['current_xp']) }} XP /
-                                                                {{ number_format($progressInfo['rank_info']['xp_required']) }}
-                                                                XP
+                                                            <p class="text-xs sm:text-sm text-blue-100 font-medium">
+                                                                {{ number_format($pointsInCurrentLevel) }} / 60 Points
                                                             </p>
                                                         @endif
                                                     </div>
 
-                                                    <!-- Group 3: Custom Progress bar and XP remaining -->
+                                                    <!-- Group 3: Custom Progress Bar -->
                                                     <div class="mr-4">
                                                         <div class="mb-1">
-                                                            {{-- Custom Level Progress Bar with Handle --}}
+                                                            {{-- Custom Level Progress Bar --}}
                                                             <div class="relative">
-                                                                <div
-                                                                    class="level-progress-track rounded-full h-3 sm:h-4 relative overflow-visible">
+                                                                <div class="level-progress-track rounded-full h-3 sm:h-4 relative overflow-visible"
+                                                                    style="background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);">
                                                                     <div class="level-progress-fill h-3 sm:h-4 rounded-full transition-all duration-500 ease-out relative overflow-visible"
-                                                                        style="width: {{ $progressInfo['progress_percentage'] }}%">
-                                                                        {{-- Progress Handle/Thumb for Level --}}
-                                                                        <div class="level-progress-handle"></div>
+                                                                        style="width: {{ $progressPercentage }}%; background: linear-gradient(90deg, #FCD34D, #F59E0B, #FBBF24); box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6);">
+                                                                        {{-- Progress Handle/Thumb --}}
+                                                                        <div class="level-progress-handle absolute -right-1 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white shadow-lg border-2 border-yellow-400"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        @if($progressInfo['is_max_level'])
-                                                            <p class="text-xs sm:text-sm text-yellow-300">🏆 Grandmaster Status
+                                                        @if($isMaxLevel)
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-semibold">
+                                                                🎯 Grandmaster Status
                                                             </p>
                                                         @else
-                                                            <p class="text-xs sm:text-sm text-blue-200">
-                                                                {{ number_format($progressInfo['xp_remaining']) }} XP remaining
+                                                            <p class="text-xs sm:text-sm text-blue-100">
+                                                                {{ number_format($pointsNeeded) }} points to next level
                                                             </p>
                                                         @endif
                                                     </div>
