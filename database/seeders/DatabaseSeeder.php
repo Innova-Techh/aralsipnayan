@@ -63,8 +63,8 @@ class DatabaseSeeder extends Seeder
                         'first_assessment_view_at' => null,
 
                         // Gamification
-                        'current_streak' => 5,
-                        'longest_streak' => 7,
+                        // 'current_streak' => 5,
+                        // 'longest_streak' => 7,
                         'last_activity_date' => Carbon::now(),
                         'total_points' => 850,
 
@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
         DB::table('teacher_sections')->insert([
             [
                 'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'A',
+                'section' => 'Einstein',
                 'grade_level' => '6',
                 'school_year' => '2024-2025',
                 'created_at' => now(),
@@ -95,7 +95,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'B',
+                'section' => 'Newton',
                 'grade_level' => '6',
                 'school_year' => '2024-2025',
                 'created_at' => now(),
@@ -103,7 +103,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'C',
+                'section' => 'Curie',
                 'grade_level' => '6',
                 'school_year' => '2024-2025',
                 'created_at' => now(),

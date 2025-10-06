@@ -213,10 +213,15 @@
                             <span class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-20 sm:max-w-none">
                                 {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
                             </span>
-                            <span
-                                class="streak w-8 h-5 sm:w-10 sm:h-6 flex items-center justify-center text-xs text-white bg-orange-500 px-2 sm:px-1.5 py-0.5 rounded-xl ">
-                                {{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}
-                            </span>
+                
+                            <div class="flex items-center space-x-1">
+                                <span class="text-lg">🔥</span>
+                                <span
+                                    class="streak w-8 h-5 sm:w-10 sm:h-6 flex items-center justify-center text-xs text-white bg-orange-500 px-2 sm:px-1.5 py-0.5 rounded-xl">
+                                    {{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}
+                                </span>
+                            </div>
+
                         </div>
 
 
