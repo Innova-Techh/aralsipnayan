@@ -216,7 +216,7 @@
                 
                             <div class="flex items-center space-x-1">
                                 <span class="text-lg">🔥</span>
-                                <span
+                                <span id="navStreakCounter"
                                     class="streak w-8 h-5 sm:w-10 sm:h-6 flex items-center justify-center text-xs text-white bg-orange-500 px-2 sm:px-1.5 py-0.5 rounded-xl">
                                     {{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}
                                 </span>
@@ -243,7 +243,7 @@
                             <p class="text-sm font-medium text-gray-900">
                                 {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
                             </p>
-                            <p class="text-xs text-gray-500">Streak: 4</p>
+                            <p class="text-xs text-gray-500">Streak: <span id="dropdownStreakCounter">{{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}</span></p>
                         </div>
                         <a href="{{ route('student.profile') }}"
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">

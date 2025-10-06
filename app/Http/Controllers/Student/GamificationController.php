@@ -202,10 +202,10 @@ class GamificationController extends Controller
         $newRank = $this->calculateRank($newLevel);
         $rankChanged = $progress->current_rank !== $newRank['name'];
 
-        // Update daily streak if needed
-        $streakData = $this->updateDailyStreak($userId, $progress, $competency);
+        // Update competency tracking for daily limits (NOT streak - streak is login-only)
+        $competencyData = $this->updateDailyCompetencies($progress, $competency);
 
-        // Update user progress
+        // Update user progress (streak is NOT updated here - only on login)
         DB::table('user_progress')
             ->where('user_id', $userId)
             ->update([
@@ -214,11 +214,8 @@ class GamificationController extends Controller
                 'points_in_current_level' => $pointsInCurrentLevel,
                 'current_rank' => $newRank['name'],
                 'rank_level_threshold' => $newRank['level'],
-                'current_streak' => $streakData['current_streak'],
-                'longest_streak' => $streakData['longest_streak'],
-                'last_assessment_date' => $streakData['last_assessment_date'],
-                'daily_competencies_completed' => json_encode($streakData['daily_competencies']),
-                'last_daily_reset' => $streakData['last_daily_reset'],
+                'daily_competencies_completed' => json_encode($competencyData['daily_competencies']),
+                'last_daily_reset' => $competencyData['last_daily_reset'],
                 'updated_at' => now()
             ]);
 
@@ -235,8 +232,7 @@ class GamificationController extends Controller
             'rank_up' => $rankChanged,
             'new_level' => $newLevel,
             'new_rank' => $newRank,
-            'total_points' => $newTotalPoints,
-            'streak_bonus' => $streakData['streak_bonus_earned']
+            'total_points' => $newTotalPoints
         ];
     }
 
@@ -245,15 +241,22 @@ class GamificationController extends Controller
      */
     private function createUserProgress($userId)
     {
+        // Get existing streak data from student_profile if it exists
+        $studentProfile = DB::table('student_profile')->where('user_id', $userId)->first();
+
+        $currentStreak = $studentProfile ? ($studentProfile->current_streak ?? 0) : 0;
+        $longestStreak = $studentProfile ? ($studentProfile->longest_streak ?? 0) : 0;
+        $totalPoints = $studentProfile ? ($studentProfile->total_points ?? 0) : 0;
+
         DB::table('user_progress')->insert([
             'user_id' => $userId,
-            'total_points' => 0,
+            'total_points' => $totalPoints,
             'current_level' => 1,
             'points_in_current_level' => 0,
             'current_rank' => 'Math Explorer',
             'rank_level_threshold' => 10,
-            'current_streak' => 0,
-            'longest_streak' => 0,
+            'current_streak' => $currentStreak,
+            'longest_streak' => $longestStreak,
             'last_assessment_date' => null,
             'daily_competencies_completed' => json_encode([]),
             'last_daily_reset' => Carbon::today(),
@@ -294,17 +297,16 @@ class GamificationController extends Controller
     }
 
     /**
-     * Update daily streak and competency tracking
+     * Update daily competency tracking (NOT streak - streak is login-only)
      */
-    private function updateDailyStreak($userId, $progress, $competency)
+    private function updateDailyCompetencies($progress, $competency)
     {
         $today = Carbon::today();
-        $lastAssessmentDate = $progress->last_assessment_date ? Carbon::parse($progress->last_assessment_date) : null;
         $lastDailyReset = $progress->last_daily_reset ? Carbon::parse($progress->last_daily_reset) : null;
 
         // Parse daily competencies
-        $dailyCompetencies = $progress->daily_competencies_completed 
-            ? json_decode($progress->daily_competencies_completed, true) 
+        $dailyCompetencies = $progress->daily_competencies_completed
+            ? json_decode($progress->daily_competencies_completed, true)
             : [];
 
         // Reset daily tracking if new day
@@ -317,48 +319,9 @@ class GamificationController extends Controller
             $dailyCompetencies[] = $competency;
         }
 
-        // Calculate streak
-        $currentStreak = $progress->current_streak;
-        $longestStreak = $progress->longest_streak;
-        $streakBonusEarned = 0;
-
-        if (!$lastAssessmentDate || $lastAssessmentDate->lt($today)) {
-            // First assessment of the day
-            if ($lastAssessmentDate && $lastAssessmentDate->eq($today->copy()->subDay())) {
-                // Consecutive day - increase streak
-                $currentStreak++;
-                $streakBonusEarned = self::DAILY_STREAK_BONUS;
-                
-                // Record streak bonus
-                $this->recordPointsTransaction(
-                    $userId,
-                    self::DAILY_STREAK_BONUS,
-                    'daily_streak',
-                    null,
-                    null,
-                    null,
-                    null,
-                    "Daily streak bonus - Day {$currentStreak}"
-                );
-            } elseif (!$lastAssessmentDate) {
-                // First ever assessment
-                $currentStreak = 1;
-            } else {
-                // Streak broken - reset to 1
-                $currentStreak = 1;
-            }
-
-            // Update longest streak if needed
-            $longestStreak = max($longestStreak, $currentStreak);
-        }
-
         return [
-            'current_streak' => $currentStreak,
-            'longest_streak' => $longestStreak,
-            'last_assessment_date' => $today,
             'daily_competencies' => $dailyCompetencies,
-            'last_daily_reset' => $today,
-            'streak_bonus_earned' => $streakBonusEarned
+            'last_daily_reset' => $today
         ];
     }
 

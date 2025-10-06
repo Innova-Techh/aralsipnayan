@@ -63,10 +63,10 @@ class DatabaseSeeder extends Seeder
                         'first_assessment_view_at' => null,
 
                         // Gamification
-                        // 'current_streak' => 5,
-                        // 'longest_streak' => 7,
-                        'last_activity_date' => Carbon::now(),
-                        'total_points' => 850,
+                        'current_streak' => 0,
+                        'longest_streak' => 0,
+                        'last_activity_date' => null,
+                        'total_points' => 0,
 
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),

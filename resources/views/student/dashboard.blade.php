@@ -912,7 +912,7 @@
 
 
                                     {{-- Optional: Next rank preview --}}
-                                    @if(!$progressInfo['is_max_level'])
+                                    {{-- @if(!$progressInfo['is_max_level'])
                                         <div class="mb-3">
                                             <p class="text-xs text-gray-500 text-center">
                                                 <span class="font-medium">Next Rank:</span>
@@ -922,7 +922,7 @@
                                                 {{ $nextRankInfo['title'] }} - {{ $nextRankInfo['description'] }}
                                             </p>
                                         </div>
-                                    @endif
+                                    @endif --}}
 
                                     <!-- Stats Grid with Live Data -->
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -1276,10 +1276,10 @@
 
 
             <!-- Test Button (Remove when done) -->
-            <button onclick="showStreakModal({current_streak: 3, points_earned: 25, message: 'Keep it up!'})"
+            {{-- <button onclick="showStreakModal({current_streak: 3, points_earned: 25, message: 'Keep it up!'})"
                 class="fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full shadow-lg z-50 font-medium">
                 Test Modal
-            </button>
+            </button> --}}
             <script>
                 // Dashboard Loading Logic
                 document.addEventListener('DOMContentLoaded', function () {
@@ -1440,6 +1440,17 @@
                             // Update the stats cards with live data
                             document.getElementById('dashboardStreak').textContent = data.current_streak;
                             document.getElementById('dashboardPoints').textContent = data.total_points;
+
+                            // Also update navigation bar streak counters
+                            const navStreakCounter = document.getElementById('navStreakCounter');
+                            const dropdownStreakCounter = document.getElementById('dropdownStreakCounter');
+
+                            if (navStreakCounter) {
+                                navStreakCounter.textContent = data.current_streak;
+                            }
+                            if (dropdownStreakCounter) {
+                                dropdownStreakCounter.textContent = data.current_streak;
+                            }
                         })
                         .catch(error => {
                             console.error('Error updating dashboard stats:', error);
