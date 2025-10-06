@@ -339,4 +339,10 @@ Route::post('/student/logout', [ProfileController::class, 'logout'])->name('stud
     
     // Login streak page
     Route::get('/login-streak', [App\Http\Controllers\LoginStreakController::class, 'showStreakPage'])->name('login-streak.page');
+
+    // Leaderboard Badge Testing Routes (Local only)
+    if (app()->environment('local')) {
+        Route::get('/test-weekly-badges', [App\Http\Controllers\LeaderboardBadgeController::class, 'testWeeklyAward'])->name('test-weekly-badges');
+        Route::get('/test-monthly-badges', [App\Http\Controllers\LeaderboardBadgeController::class, 'testMonthlyAward'])->name('test-monthly-badges');
+    }
 });

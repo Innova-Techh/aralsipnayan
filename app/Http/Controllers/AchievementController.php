@@ -113,9 +113,15 @@ class AchievementController extends Controller
         if (!$userId) {
             $earnedBadges = [];
         } else {
-            // Get all badges earned by the user
+            // Get all badges earned by the user (including multiple instances)
             $earnedBadges = DB::table('user_badges')
                 ->where('user_id', $userId)
+                ->get()
+                ->groupBy('badge_key')
+                ->map(function ($badges) {
+                    // Return the most recent badge for each badge_key
+                    return $badges->sortByDesc('awarded_at')->first();
+                })
                 ->pluck('awarded_at', 'badge_key')
                 ->toArray();
         }
@@ -123,7 +129,7 @@ class AchievementController extends Controller
         $achievements = [];
         $id = 1;
 
-        // Build achievements array from definitions
+        // Build achievements array from point-based definitions
         foreach (self::BADGE_DEFINITIONS as $badgeKey => $definition) {
             $isEarned = isset($earnedBadges[$badgeKey]);
 
@@ -138,11 +144,57 @@ class AchievementController extends Controller
                 'earned_date' => $isEarned ? $earnedBadges[$badgeKey] : null,
                 'front_image' => $definition['front_image'],
                 'reward' => $definition['reward'],
-                'background_light' => $definition['background_light']
+                'background_light' => $definition['background_light'],
+                'badge_type' => 'points'
+            ];
+        }
+
+        // Add leaderboard badge definitions
+        $leaderboardBadges = \App\Http\Controllers\LeaderboardBadgeController::getLeaderboardBadgeDefinitions();
+        foreach ($leaderboardBadges as $badgeKey => $definition) {
+            $isEarned = isset($earnedBadges[$badgeKey]);
+
+            $achievements[] = [
+                'id' => $id++,
+                'title' => $definition['name'],
+                'description' => $definition['description'],
+                'icon' => 'trophy',
+                'rarity' => $definition['rarity'],
+                'rarity_color' => $this->getRarityColor($definition['rarity']),
+                'is_earned' => $isEarned,
+                'earned_date' => $isEarned ? $earnedBadges[$badgeKey] : null,
+                'front_image' => $this->getLeaderboardBadgeImage($badgeKey),
+                'reward' => 'Top ' . ($definition['rank'] ?? ($definition['rank_min'] . '-' . $definition['rank_max'])),
+                'background_light' => $definition['background_light'],
+                'badge_type' => 'leaderboard'
             ];
         }
 
         return $achievements;
+    }
+
+    private function getRarityColor($rarity)
+    {
+        return match($rarity) {
+            'Common' => 'gray',
+            'Uncommon' => 'green',
+            'Rare' => 'red',
+            'Epic' => 'purple',
+            'Legendary' => 'yellow',
+            default => 'gray'
+        };
+    }
+
+    private function getLeaderboardBadgeImage($badgeKey)
+    {
+        // Map leaderboard badges to images
+        if (str_contains($badgeKey, '_1')) {
+            return 'a/gradechampion.png'; // Gold/Champion image
+        } elseif (str_contains($badgeKey, '_2') || str_contains($badgeKey, '_3')) {
+            return 'a/mathwhiz.png'; // Purple/Epic image
+        } else {
+            return 'a/onfire.png'; // Orange/Fire image for top 5-10
+        }
     }
 
     public function index()

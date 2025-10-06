@@ -186,42 +186,28 @@
 <script>
     // Badge color mapping based on badge key (matching AchievementController.php)
     const badgeColorMap = {
-        'first_steps': {
-            background: '#646565',  // Gray (Common)
-            borderColor: '#525555'
-        },
-        'quick_learner': {
-            background: '#1E8646',  // Green (Uncommon)
-            borderColor: '#166D38'
-        },
-        'on_fire': {
-            background: '#913311',  // Brown/Orange (Rare)
-            borderColor: '#591E09'
-        },
-        'math_whiz': {
-            background: '#2C1B68',  // Purple (Epic)
-            borderColor: '#21125C'
-        },
-        'grade_champion': {
-            background: '#D17A09',  // Gold (Legendary)
-            borderColor: '#804B03'
-        },
-        'math_explorer': {
-            background: '#165A9A',  // Blue
-            borderColor: '#104373'
-        },
-        'sapphire': {
-            background: '#165A9A',  // Blue
-            borderColor: '#104373'
-        },
-        'ruby': {
-            background: '#913311',  // Brown/Orange
-            borderColor: '#591E09'
-        },
-        'crown': {
-            background: '#D17A09',  // Gold
-            borderColor: '#804B03'
-        }
+        // Points-based badges
+        'first_steps': { background: '#646565', borderColor: '#525555' },
+        'quick_learner': { background: '#1E8646', borderColor: '#166D38' },
+        'on_fire': { background: '#913311', borderColor: '#591E09' },
+        'math_whiz': { background: '#2C1B68', borderColor: '#21125C' },
+        'grade_champion': { background: '#D17A09', borderColor: '#804B03' },
+        'math_explorer': { background: '#165A9A', borderColor: '#104373' },
+        'sapphire': { background: '#165A9A', borderColor: '#104373' },
+        'ruby': { background: '#913311', borderColor: '#591E09' },
+        'crown': { background: '#D17A09', borderColor: '#804B03' },
+        // Leaderboard badges (Section Weekly)
+        'section_weekly_1': { background: '#D17A09', borderColor: '#804B03' },
+        'section_weekly_2': { background: '#2C1B68', borderColor: '#21125C' },
+        'section_weekly_3': { background: '#913311', borderColor: '#591E09' },
+        'section_weekly_top5': { background: '#913311', borderColor: '#591E09' },
+        'section_weekly_top10': { background: '#1E8646', borderColor: '#166D38' },
+        // Leaderboard badges (School Monthly)
+        'school_monthly_1': { background: '#D17A09', borderColor: '#804B03' },
+        'school_monthly_2': { background: '#2C1B68', borderColor: '#21125C' },
+        'school_monthly_3': { background: '#913311', borderColor: '#591E09' },
+        'school_monthly_top5': { background: '#913311', borderColor: '#591E09' },
+        'school_monthly_top10': { background: '#1E8646', borderColor: '#166D38' }
     };
 
     // Global functions for badge modal
