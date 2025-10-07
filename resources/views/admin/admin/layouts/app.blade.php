@@ -97,6 +97,25 @@
                     </div>
                 </a>
 
+                <!-- Admin Management -->
+                <a href="{{ route('admin.management.admins') }}"
+                    class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
+                    <div class="flex items-center justify-center w-8">
+                        <i class="fa-solid fa-user-gear text-lg"></i>
+                    </div>
+                    <span x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300 delay-100"
+                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition-opacity ease-in duration-100"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                        class="ml-3 font-medium whitespace-nowrap">Admin Management</span>
+
+                    <!-- Tooltip for collapsed state -->
+                    <div x-show="!sidebarOpen"
+                        class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                        Admin Management
+                    </div>
+                </a>
+
                 <!-- Student Management -->
                 <a href="#"
                     class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">

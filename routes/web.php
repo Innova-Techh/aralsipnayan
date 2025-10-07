@@ -263,6 +263,26 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('profile');
 });
 
+// Admin Management Routes
+Route::prefix('admin')->group(function () {
+    Route::get('/management/admins', function () {
+        return view('admin.admin.management.admin-management');
+    })->name('admin.management.admins');
+
+    Route::get('/management/teachers', function () {
+        return view('admin.admin.management.teacher-management');
+    })->name('admin.management.teachers');
+
+    Route::get('/management/students', function () {
+        return view('admin.admin.management.student-management');
+    })->name('admin.management.students');
+
+    Route::get('/management/sections', function () {
+        return view('admin.admin.management.section-management');
+    })->name('admin.management.sections');
+});
+
+
 // Admin Dashboard (placeholder)
 Route::get('/admin/dashboard', function () {
     return view('admin.admin.index');
