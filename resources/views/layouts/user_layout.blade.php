@@ -146,7 +146,13 @@
 
 <body
     class="min-h-screen {{ request()->routeIs('profile.edit') || request()->routeIs('leaderboard.*') || request()->routeIs('sections.*') || request()->routeIs('achievements.*') ? '' : 'bg-no-repeat bg-center sm:bg-contain lg:bg-cover page-bg' }}">
+    <audio id="hoverSound" preload="auto">
+        <source src="{{ asset('audio/buttonhover.mp3') }}" type="audio/mpeg">
+    </audio>
 
+    <audio id="clickSound" preload="auto">
+        <source src="{{ asset('audio/buttonclick.mp3') }}" type="audio/mpeg">
+    </audio>
 
     <!-- Top Navigation Bar -->
     <nav class="bg-white border-b-0 sticky top-0 z-50 shadow-sm">
@@ -360,14 +366,34 @@
 
         // Global function for inline onclick (backup)
         function toggleDropdown() {
-            const dropdown = document.getElementById('userDropdown');
-            const button = document.getElementById('user-menu-button');
-            if (dropdown && button) {
-                const isHidden = dropdown.classList.contains('hidden');
-                dropdown.classList.toggle('hidden');
-                button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                    const dropdown = document.getElementById('userDropdown');
+                    const button = document.getElementById('user-menu-button');
+                    if (dropdown && button) {
+                        const isHidden = dropdown.classList.contains('hidden');
+                        dropdown.classList.toggle('hidden');
+                        button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                    }
+                }
+
+                //Global button sound Effects
+                document.addEventListener("DOMContentLoaded", () => {
+            const hoverSound = document.getElementById("hoverSound");
+            const clickSound = document.getElementById("clickSound");
+
+            // Function to safely play sound (handles autoplay restrictions)
+            function playSound(sound) {
+                sound.currentTime = 0; // restart each time
+                sound.play().catch(() => {}); // ignore autoplay errors
             }
-        }
+
+            // Select all links and buttons
+            const interactiveElements = document.querySelectorAll("a, button");
+
+            interactiveElements.forEach(el => {
+                el.addEventListener("mouseenter", () => playSound(hoverSound));
+                el.addEventListener("click", () => playSound(clickSound));
+            });
+        });
     </script>
 
 
