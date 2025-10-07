@@ -1,7 +1,7 @@
-<div class="space-y-8">
+<div class="space-y-6">
     <!-- Flash Message -->
     @if (session()->has('message'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
             <span class="block sm:inline">{{ session('message') }}</span>
         </div>
     @endif
@@ -43,92 +43,168 @@
 
     <!-- Admin Directory -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border-b border-gray-100">
-            <div>
-                <h2 class="font-semibold text-gray-900 text-lg">Admin Directory</h2>
-                <p class="text-sm text-gray-500">Complete admin roster with profile information</p>
-            </div>
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="text-xl font-semibold text-gray-900">Admin Directory</h2>
+            <p class="text-sm text-gray-500 mt-1">Complete admin roster with profile information</p>
+        </div>
 
-            <!-- Search and Filter -->
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mt-4 sm:mt-0">
-                <div class="relative">
+        <!-- Search and Filters -->
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
+            <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <!-- Search Input -->
+                <div class="relative flex-1 w-full">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search admins..."
-                        class="pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64">
-                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                        class="pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full">
                 </div>
+
+                <!-- Status Filter -->
                 <select wire:model.live="statusFilter"
-                    class="text-sm border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="text-sm border border-gray-300 rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="archived">Archived</option>
                 </select>
-                <select wire:model.live="perPage"
-                    class="text-sm border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="10">10 per page</option>
-                    <option value="25">25 per page</option>
-                    <option value="50">50 per page</option>
-                </select>
+
+                <!-- Filter Icon Button -->
+                <button class="px-3 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-filter text-gray-600"></i>
+                </button>
+
+                <!-- Sort Icon Button -->
+                <button class="px-3 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-sort text-gray-600"></i>
+                </button>
             </div>
         </div>
 
-        <div>
-            <div class="mb-4">
-                <input type="text" wire:model.debounce.300ms="search" placeholder="Search admins..."
-                    class="border rounded px-4 py-2 w-full">
-            </div>
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Admin
+                        </th>
 
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="min-w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($admins as $admin)
-                            <tr>
-                                <td class="px-6 py-4">{{ $admin->id }}</td>
-                                <td class="px-6 py-4">{{ $admin->username }}</td>
-                                <td class="px-6 py-4">{{ $admin->email }}</td>
-                                <td class="px-6 py-4">
-                                    @if($admin->adminProfile)
-                                        {{ $admin->adminProfile->firstname }} {{ $admin->adminProfile->lastname }}
-                                    @else
-                                        <span class="text-gray-400">N/A</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Username
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Join Date
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Last Activity
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($admins as $admin)
+                        <tr class="hover:bg-gray-50 transition">
+                            <!-- Admin Column -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 flex-shrink-0">
+                                        @if($admin->adminProfile && $admin->adminProfile->profile_url)
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="{{ asset($admin->adminProfile->profile_url) }}"
+                                                alt="{{ $admin->username }}">
+                                        @else
+                                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span class="text-gray-500 font-medium text-sm">
+                                                    {{ strtoupper(substr($admin->username ?? 'A', 0, 1)) }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            @if($admin->adminProfile)
+                                                {{ $admin->adminProfile->firstname }} {{ $admin->adminProfile->lastname }}
+                                            @else
+                                                {{ $admin->username }}
+                                            @endif
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            ID: {{ $admin->id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+
+                            <!-- Username Column -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $admin->username }}</div>
+                            </td>
+
+                            <!-- Status Column -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($admin->status === 'active')
                                     <span
-                                        class="px-2 py-1 text-xs rounded {{ $admin->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ ucfirst($admin->status) }}
+                                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Active
                                     </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                    No admins found
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                @else
+                                    <span
+                                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Archived
+                                    </span>
+                                @endif
+                            </td>
 
-                <div class="px-4 py-3 border-t">
-                    {{ $admins->links() }}
-                </div>
-            </div>
+                            <!-- Join Date Column -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $admin->created_at->format('Y-m-d') }}
+                            </td>
+
+                            <!-- Last Activity Column -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                @if($admin->last_login_date)
+                                    {{ $admin->last_login_date->format('Y-m-d') }}
+                                @else
+                                    Never
+                                @endif
+                            </td>
+
+                            <!-- Actions Column -->
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="text-gray-400 hover:text-gray-600 transition" title="More options">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center text-gray-500">
+                                    <i class="fas fa-users text-4xl mb-3 text-gray-300"></i>
+                                    <p class="text-lg font-medium text-gray-600">No admins found</p>
+                                    <p class="text-sm text-gray-400">Try adjusting your search criteria</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
         <!-- Pagination -->
         @if($admins->hasPages())
-            <div class="p-4 border-t border-gray-100">
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
                 {{ $admins->links() }}
             </div>
         @endif
     </div>
+
+
 </div>

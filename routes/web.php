@@ -264,24 +264,28 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
 });
 
 
-// Admin Management Routes
+// Teacher Management Routes
 Route::prefix('admin')->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.')->group(function () {
     
     Route::prefix('management')->name('management.')->group(function () {
         
-        // Admin Management
+        // Teacher Management
+        Route::get('/teachers', function () {
+            return view('admin.admin.management.teacher-management');
+        })->name('teachers');
+        
+        Route::post('/teachers', [App\Http\Controllers\TeacherController::class, 'store'])->name('teachers.store');
+        Route::get('/teachers/{user}/edit', [App\Http\Controllers\TeacherController::class, 'edit'])->name('teachers.edit');
+        Route::put('/teachers/{user}', [App\Http\Controllers\TeacherController::class, 'update'])->name('teachers.update');
+        Route::delete('/teachers/{user}', [App\Http\Controllers\TeacherController::class, 'destroy'])->name('teachers.destroy');
+        
+        // Admin Management (existing)
         Route::get('/admins', [App\Http\Controllers\AdminController::class, 'index'])->name('admins');
-        Route::get('/admins/create', [App\Http\Controllers\AdminController::class, 'create'])->name('admins.create');
         Route::post('/admins', [App\Http\Controllers\AdminController::class, 'store'])->name('admins.store');
         Route::get('/admins/{user}/edit', [App\Http\Controllers\AdminController::class, 'edit'])->name('admins.edit');
         Route::put('/admins/{user}', [App\Http\Controllers\AdminController::class, 'update'])->name('admins.update');
         Route::delete('/admins/{user}', [App\Http\Controllers\AdminController::class, 'destroy'])->name('admins.destroy');
         
-        // Teacher Management (existing)
-        Route::get('/teachers', function () {
-            return view('admin.admin.management.teacher-management');
-        })->name('teachers');
-
         // Student Management (existing)
         Route::get('/students', function () {
             return view('admin.admin.management.student-management');
