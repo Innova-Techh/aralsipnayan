@@ -1378,6 +1378,14 @@
                     const feedbackIcon = document.getElementById('feedback-icon');
                     const explanationText = document.getElementById('explanation-text');
                     const nextBtn = document.getElementById('next-btn');
+                    const submitBtn = document.getElementById('submit-btn');
+
+                    // Update submit button to show submission is complete
+                    submitBtn.textContent = 'Submitted ✓';
+                    submitBtn.classList.remove('bg-submit-answer', 'drop-shadow-submit-answer', 'hover:scale-105');
+                    submitBtn.classList.add('cursor-not-allowed');
+                    submitBtn.style.background = 'linear-gradient(to right, #9ca3af, #6b7280)';
+                    submitBtn.style.boxShadow = '0 4px 0 #4b5563';
 
                     // Play audio feedback
                     playAudioFeedback(data.is_correct, isTimeout);
