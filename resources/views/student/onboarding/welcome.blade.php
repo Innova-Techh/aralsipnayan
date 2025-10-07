@@ -9,9 +9,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome - AralSipnayan</title>
+    <!-- Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-    <main class="min-h-screen flex items-center justify-center px-2 md:px-8 py-8">
+    <audio id="welcomeAudio" autoplay>
+        <source src="{{ asset('audio/welcome.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <main class="min-h-screen flex items-center justify-center px-2 md:px-8 py-8 mb-10 lg:mb-0 xl:mb-0">
         <div class="w-full max-w-7xl rounded-3xl p-4 relative overflow-hidden">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
                 <!-- Left Column - Character Image -->
@@ -82,6 +89,52 @@
             </div>
         </div>
     </main>
+
+     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const audio = document.getElementById("welcomeAudio");
+
+            // Try to play audio
+            audio.play().then(() => {
+                triggerConfetti(); // fire confetti when audio plays
+            }).catch(() => {
+                console.log("Autoplay was blocked, waiting for user interaction...");
+                document.body.addEventListener("click", () => {
+                    audio.play();
+                    triggerConfetti();
+                }, { once: true });
+            });
+
+            audio.volume = 0.6; // Set volume to 60%
+
+            // Confetti effect function
+            function triggerConfetti() {
+                // burst effect for trumpet sound
+                var duration = 2 * 1000;
+                var end = Date.now() + duration;
+
+                (function frame() {
+                    // random bursts
+                    confetti({
+                        particleCount: 7,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                    confetti({
+                        particleCount: 7,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }
+        });
+    </script>
 </body>
 </html>
 @endsection
