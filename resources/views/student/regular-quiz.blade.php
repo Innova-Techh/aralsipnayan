@@ -1870,6 +1870,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const feedbackMessage = document.getElementById('feedback-message');
         const explanationText = document.getElementById('explanation-text');
         const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Update submit button to show submission is complete
+        submitBtn.textContent = 'Submitted ✓';
+        submitBtn.classList.remove('from-green-500', 'to-green-600', 'hover:from-green-600', 'hover:to-green-700', 'border-[#0b830b]');
+        submitBtn.classList.add('from-gray-400', 'to-gray-500', 'border-[#5d5d5d]', 'cursor-not-allowed');
 
         // Play audio feedback
         playAudioFeedback(data.is_correct, isTimeout);
