@@ -558,7 +558,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0 4px 0 #18337e;">
                                     Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                                 </h1>
-                                <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5">
+                                <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5" id="encouragingMessage">
                                     Ready to continue your math journey?
                                 </p>
                             </div>
@@ -1349,11 +1349,42 @@
                 Test Modal
             </button> --}}
             <script>
+                // Encouraging messages array
+                const encouragingMessages = [
+                    "Ready to continue your math journey?",
+                    "Let's make today count! 🌟",
+                    "Every problem solved makes you stronger! 💪",
+                    "Keep pushing forward, you're doing amazing! 🚀",
+                    "Your dedication is truly inspiring! ✨",
+                    "Time to unlock your potential! 🔓",
+                    "Let's achieve greatness together! 🎯",
+                    "You're one step closer to mastery! 📚",
+                    "Believe in yourself and keep going! 💖",
+                    "Today is another opportunity to shine! ⭐",
+                    "You've got this! Let's do it! 💫",
+                    "Math is your superpower! 🦸",
+                    "Ready to level up your skills? 📈",
+                    "Your hard work is paying off! 🏆",
+                    "Let's conquer new challenges today! ⚡"
+                ];
+
+                // Function to set random encouraging message
+                function setRandomEncouragingMessage() {
+                    const messageElement = document.getElementById('encouragingMessage');
+                    if (messageElement) {
+                        const randomIndex = Math.floor(Math.random() * encouragingMessages.length);
+                        messageElement.textContent = encouragingMessages[randomIndex];
+                    }
+                }
+
                 // Dashboard Loading Logic
                 document.addEventListener('DOMContentLoaded', function () {
                     // Show skeleton initially, hide actual content
                     const skeleton = document.getElementById('dashboardSkeleton');
                     const content = document.getElementById('dashboardContent');
+
+                    // Set random encouraging message
+                    setRandomEncouragingMessage();
 
                     // Simulate data loading (replace with actual API calls)
                     setTimeout(() => {
