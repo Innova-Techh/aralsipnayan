@@ -447,6 +447,7 @@
             </div>
         </div>
 
+        @include('components.retry-modal')
 
         </style>
 
