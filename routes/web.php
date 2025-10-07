@@ -263,23 +263,35 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('profile');
 });
 
+
 // Admin Management Routes
-Route::prefix('admin')->group(function () {
-    Route::get('/management/admins', function () {
-        return view('admin.admin.management.admin-management');
-    })->name('admin.management.admins');
+Route::prefix('admin')->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.')->group(function () {
+    
+    Route::prefix('management')->name('management.')->group(function () {
+        
+        // Admin Management
+        Route::get('/admins', [App\Http\Controllers\AdminController::class, 'index'])->name('admins');
+        Route::get('/admins/create', [App\Http\Controllers\AdminController::class, 'create'])->name('admins.create');
+        Route::post('/admins', [App\Http\Controllers\AdminController::class, 'store'])->name('admins.store');
+        Route::get('/admins/{user}/edit', [App\Http\Controllers\AdminController::class, 'edit'])->name('admins.edit');
+        Route::put('/admins/{user}', [App\Http\Controllers\AdminController::class, 'update'])->name('admins.update');
+        Route::delete('/admins/{user}', [App\Http\Controllers\AdminController::class, 'destroy'])->name('admins.destroy');
+        
+        // Teacher Management (existing)
+        Route::get('/teachers', function () {
+            return view('admin.admin.management.teacher-management');
+        })->name('teachers');
 
-    Route::get('/management/teachers', function () {
-        return view('admin.admin.management.teacher-management');
-    })->name('admin.management.teachers');
+        // Student Management (existing)
+        Route::get('/students', function () {
+            return view('admin.admin.management.student-management');
+        })->name('students');
 
-    Route::get('/management/students', function () {
-        return view('admin.admin.management.student-management');
-    })->name('admin.management.students');
-
-    Route::get('/management/sections', function () {
-        return view('admin.admin.management.section-management');
-    })->name('admin.management.sections');
+        // Section Management (existing)
+        Route::get('/sections', function () {
+            return view('admin.admin.management.section-management');
+        })->name('sections');
+    });
 });
 
 
