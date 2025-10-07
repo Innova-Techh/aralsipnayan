@@ -88,6 +88,12 @@
 
             // Check if max level
             $isMaxLevel = $userLevel >= $MAX_LEVEL;
+
+            // Count completed assessments from assessment_sessions table
+            $completedAssessments = DB::table('assessment_sessions')
+                ->where('user_id', $userId)
+                ->where('status', 'completed')
+                ->count();
         @endphp
         <style>
             .welcome-header {
@@ -1001,7 +1007,9 @@
                                             </div>
 
                                             <!-- Number -->
-                                            <div class="text-xl sm:text-2xl font-bold relative z-10">2</div>
+                                            <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardCompletedAssessments">
+                                                {{ $completedAssessments }}
+                                            </div>
 
                                             <!-- Label -->
                                             <div class="text-xs sm:text-sm opacity-90 relative z-10">Completed</div>
