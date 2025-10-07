@@ -260,6 +260,8 @@
     </div>
 </div>
 
+@include('components.retry-modal')
+
 <style>
     /* Points Animation Styles */
     .sparkle {
@@ -1428,24 +1430,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Final submit error:', error);
-            
-            // Show retry option to user
-            const retryBtn = document.createElement('button');
-            retryBtn.textContent = 'Retry Submission';
-            retryBtn.className = 'ml-4 bg-orange-500 text-white px-4 py-2 rounded-lg';
-            retryBtn.onclick = () => {
-                retryBtn.remove();
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'SUBMIT ANSWER';
-                questionSubmitted = false;
-                // Restart auto-save since we cleared it earlier
-                startAutoSave();
-                submitAnswer();
-            };
-            
-            submitBtn.parentNode.appendChild(retryBtn);
-            
-            alert('Submission failed. Your progress is saved. You can retry or refresh the page.');
+
+            // Show retry modal instead of button
+            showRetryModal();
+
+            // Reset submit button state
             submitBtn.disabled = false;
             submitBtn.textContent = 'SUBMIT ANSWER';
             questionSubmitted = false;
@@ -1484,6 +1473,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const loader = document.getElementById('assessment-loader');
         loader.classList.add('hidden');
         loader.style.display = 'none';
+    }
+
+    function showRetryModal() {
+        const modal = document.getElementById('retry-modal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+
+        // Add event listener to reload button
+        const reloadBtn = document.getElementById('reload-page-btn');
+        reloadBtn.onclick = function() {
+            window.location.reload();
+        };
+    }
+
+    function hideRetryModal() {
+        const modal = document.getElementById('retry-modal');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
     
     function playAudioFeedback(isCorrect, isTimeout = false) {
