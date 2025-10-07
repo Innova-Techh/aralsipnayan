@@ -54,7 +54,9 @@ class LoginStreakController extends Controller
                 'current_streak' => 0,
                 'longest_streak' => 0,
                 'total_points' => 0,
-                'points_today' => 0
+                'points_today' => 0,
+                'points_in_current_level' => 0,
+                'progress_percentage' => 0
             ]);
         }
 
@@ -67,16 +69,26 @@ class LoginStreakController extends Controller
                 'current_streak' => 0,
                 'longest_streak' => 0,
                 'total_points' => 0,
-                'points_today' => 10
+                'points_today' => 10,
+                'points_in_current_level' => 0,
+                'progress_percentage' => 0
             ]);
         }
+
+        // Calculate level progress (same logic as dashboard.blade.php)
+        $POINTS_PER_LEVEL = 60;
+        $totalPoints = $userProgress->total_points ?? 0;
+        $pointsInCurrentLevel = $totalPoints % $POINTS_PER_LEVEL;
+        $progressPercentage = min(100, max(0, ($pointsInCurrentLevel / $POINTS_PER_LEVEL) * 100));
 
         return response()->json([
             'current_streak' => $userProgress->current_streak,
             'longest_streak' => $userProgress->longest_streak,
             'total_points' => $userProgress->total_points,  // Use user_progress as source of truth
             'points_today' => $profile->getPointsForDay($userProgress->current_streak + 1),
-            'last_activity' => $profile->last_activity_date
+            'last_activity' => $profile->last_activity_date,
+            'points_in_current_level' => $pointsInCurrentLevel,
+            'progress_percentage' => round($progressPercentage, 2)
         ]);
     }
 

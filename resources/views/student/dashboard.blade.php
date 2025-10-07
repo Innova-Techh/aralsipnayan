@@ -631,12 +631,12 @@
                                                     <!-- Group 2: Points Text -->
                                                     <div class="mb-2 mr-4">
                                                         @if($isMaxLevel)
-                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold">
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold" id="levelStatusText">
                                                                 🏆 MAX LEVEL ACHIEVED!
                                                             </p>
                                                         @else
-                                                            <p class="text-xs sm:text-sm text-blue-100 font-medium">
-                                                                {{ number_format($pointsInCurrentLevel) }} / 60 Points
+                                                            <p class="text-xs sm:text-sm text-blue-100 font-medium" id="levelStatusText">
+                                                                <span id="currentPointsText">{{ number_format($pointsInCurrentLevel) }}</span> / 60 Points
                                                             </p>
                                                         @endif
                                                     </div>
@@ -648,7 +648,7 @@
                                                             <div class="relative">
                                                                 <div class="level-progress-track rounded-full h-3 sm:h-4 relative overflow-visible"
                                                                     style="background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);">
-                                                                    <div class="level-progress-fill h-3 sm:h-4 rounded-full transition-all duration-500 ease-out relative overflow-visible"
+                                                                    <div id="levelProgressBar" class="level-progress-fill h-3 sm:h-4 rounded-full transition-all duration-500 ease-out relative overflow-visible"
                                                                         style="width: {{ $progressPercentage }}%; background: linear-gradient(90deg, #FCD34D, #F59E0B, #FBBF24); box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6);">
                                                                         {{-- Progress Handle/Thumb --}}
                                                                         <div class="level-progress-handle absolute -right-1 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white shadow-lg border-2 border-yellow-400"></div>
@@ -657,12 +657,12 @@
                                                             </div>
                                                         </div>
                                                         @if($isMaxLevel)
-                                                            <p class="text-xs sm:text-sm text-yellow-300 font-semibold">
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-semibold" id="pointsNeededText">
                                                                 🎯 Grandmaster Status
                                                             </p>
                                                         @else
-                                                            <p class="text-xs sm:text-sm text-blue-100">
-                                                                {{ number_format($pointsNeeded) }} points to next level
+                                                            <p class="text-xs sm:text-sm text-blue-100" id="pointsNeededText">
+                                                                <span id="pointsNeededValue">{{ number_format($pointsNeeded) }}</span> points to next level
                                                             </p>
                                                         @endif
                                                     </div>
@@ -1227,6 +1227,69 @@
                 }
 
 
+                // Function to animate progress bar with step effect
+                function animateProgressBar(targetPercentage, currentPoints, pointsNeeded) {
+                    const progressBar = document.getElementById('levelProgressBar');
+                    const currentPointsText = document.getElementById('currentPointsText');
+                    const pointsNeededValue = document.getElementById('pointsNeededValue');
+
+                    if (!progressBar) return;
+
+                    // Get current width
+                    const currentWidth = parseFloat(progressBar.style.width) || 0;
+
+                    // Calculate step size and duration
+                    const steps = 20; // Number of animation steps
+                    const stepSize = (targetPercentage - currentWidth) / steps;
+                    const stepDuration = 30; // milliseconds per step
+
+                    let currentStep = 0;
+
+                    // Animate with steps
+                    const interval = setInterval(() => {
+                        currentStep++;
+                        const newWidth = currentWidth + (stepSize * currentStep);
+
+                        if (currentStep >= steps) {
+                            progressBar.style.width = targetPercentage + '%';
+                            clearInterval(interval);
+                        } else {
+                            progressBar.style.width = newWidth + '%';
+                        }
+                    }, stepDuration);
+
+                    // Update text values with counter animation
+                    if (currentPointsText && currentPoints !== undefined) {
+                        animateNumber(currentPointsText, parseInt(currentPointsText.textContent.replace(/,/g, '')) || 0, currentPoints);
+                    }
+
+                    if (pointsNeededValue && pointsNeeded !== undefined) {
+                        animateNumber(pointsNeededValue, parseInt(pointsNeededValue.textContent.replace(/,/g, '')) || 0, pointsNeeded);
+                    }
+                }
+
+                // Function to animate number counting
+                function animateNumber(element, start, end) {
+                    const duration = 600; // milliseconds
+                    const stepTime = 30;
+                    const steps = duration / stepTime;
+                    const increment = (end - start) / steps;
+                    let current = start;
+                    let step = 0;
+
+                    const timer = setInterval(() => {
+                        step++;
+                        current += increment;
+
+                        if (step >= steps) {
+                            element.textContent = new Intl.NumberFormat('en-US').format(end);
+                            clearInterval(timer);
+                        } else {
+                            element.textContent = new Intl.NumberFormat('en-US').format(Math.round(current));
+                        }
+                    }, stepTime);
+                }
+
                 function updateDashboardStats() {
                     fetch('{{ route("login-streak.data") }}')
                         .then(response => response.json())
@@ -1237,6 +1300,13 @@
                             // Format total points with commas (e.g., 1,234)
                             const formattedPoints = new Intl.NumberFormat('en-US').format(data.total_points);
                             document.getElementById('dashboardPoints').textContent = formattedPoints;
+
+                            // Update progress bar if data includes progress information
+                            if (data.points_in_current_level !== undefined && data.progress_percentage !== undefined) {
+                                const POINTS_PER_LEVEL = 60;
+                                const pointsNeeded = POINTS_PER_LEVEL - data.points_in_current_level;
+                                animateProgressBar(data.progress_percentage, data.points_in_current_level, pointsNeeded);
+                            }
 
                             // Also update navigation bar streak counters
                             const navStreakCounter = document.getElementById('navStreakCounter');
