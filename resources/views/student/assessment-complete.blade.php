@@ -445,18 +445,29 @@
 </style>
 
 <script>
+// Check if this is from a regular quiz (gamification enabled) or diagnostic (gamification disabled)
+const isRegularQuiz = {{ isset($from_regular_quiz) && $from_regular_quiz ? 'true' : 'false' }};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize celebration effects
     initializeConfetti();
     createFloatingParticles();
 
-    // Initialize points counter with audio
-    initializePointsCounter();
+    // Only initialize gamification features for regular quizzes
+    if (isRegularQuiz) {
+        // Initialize points counter with audio
+        initializePointsCounter();
 
-    // Check for level up after a delay to let the points counter finish
-    setTimeout(() => {
-        checkForLevelUp();
-    }, 3000);
+        // Check for level up after a delay to let the points counter finish
+        setTimeout(() => {
+            checkForLevelUp();
+        }, 3000);
+    } else {
+        // For diagnostic quizzes, just show the points without animation
+        const pointsCounter = document.getElementById('points-counter');
+        const targetPoints = parseInt(pointsCounter.getAttribute('data-target')) || 0;
+        pointsCounter.textContent = targetPoints;
+    }
 });
 
 // Points Counter with Audio
