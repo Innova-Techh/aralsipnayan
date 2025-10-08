@@ -956,8 +956,8 @@ class RegularAssessmentController extends Controller
         $bktParams = [
             'prior_knowledge' => 0.15,    // Very low baseline for dramatic learning detection
             'learn_rate' => 0.65,         // Near-maximum learning rate for instant responsiveness
-            'slip_rate' => 0.003,         // Practically zero slip rate (theoretical minimum)
-            'guess_rate' => 0.008         // Practically zero guess rate (theoretical minimum)
+            'slip_rate' => 0.05,         // More academically realistic slip rate
+            'guess_rate' => 0.15         // More academically realistic guess rate
         ];
 
         $P_L = $priorBkt;
