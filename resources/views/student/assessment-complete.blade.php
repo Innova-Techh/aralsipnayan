@@ -445,18 +445,43 @@
 </style>
 
 <script>
+// Check if this is from a regular quiz (gamification enabled) or diagnostic (gamification disabled)
+const isRegularQuiz = {{ isset($from_regular_quiz) && $from_regular_quiz ? 'true' : 'false' }};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize celebration effects
     initializeConfetti();
     createFloatingParticles();
 
-    // Initialize points counter with audio
-    initializePointsCounter();
+    // Only initialize gamification features for regular quizzes
+    if (isRegularQuiz) {
+        // Initialize points counter with audio
+        initializePointsCounter();
+    // Only initialize gamification features for regular quizzes
+    if (isRegularQuiz) {
+        // Initialize points counter with audio
+        initializePointsCounter();
 
-    // Check for level up after a delay to let the points counter finish
-    setTimeout(() => {
-        checkForLevelUp();
-    }, 3000);
+        // Check for level up after a delay to let the points counter finish
+        setTimeout(() => {
+            checkForLevelUp();
+        }, 3000);
+    } else {
+        // For diagnostic quizzes, just show the points without animation
+        const pointsCounter = document.getElementById('points-counter');
+        const targetPoints = parseInt(pointsCounter.getAttribute('data-target')) || 0;
+        pointsCounter.textContent = targetPoints;
+    }
+        // Check for level up after a delay to let the points counter finish
+        setTimeout(() => {
+            checkForLevelUp();
+        }, 3000);
+    } else {
+        // For diagnostic quizzes, just show the points without animation
+        const pointsCounter = document.getElementById('points-counter');
+        const targetPoints = parseInt(pointsCounter.getAttribute('data-target')) || 0;
+        pointsCounter.textContent = targetPoints;
+    }
 });
 
 // Points Counter with Audio
@@ -517,6 +542,12 @@ function startPointsCounter(element, target, audio) {
 
 // Level Up Detection and Display Functions
 function checkForLevelUp() {
+    // Only check for level up if this is a regular quiz (not diagnostic)
+    if (!isRegularQuiz) {
+        console.log('Skipping level up check - this is a diagnostic quiz');
+        return;
+    }
+
     // Since the API endpoint might not exist, use the user progress data we have
     // and simulate level up detection based on points earned
     simulateLevelUpForTesting();
@@ -559,18 +590,19 @@ function simulateLevelUpForTesting() {
 }
 
 function handleLevelUp(previousLevel, newLevel, pointsGained) {
-    // Define rank boundaries based on updated gamification.md
+    // Define rank boundaries - split Math Explorer into two to show modal at level 6
+    // Define rank boundaries based on gamification system
     const rankRanges = [
         { min: 1, max: 10, name: 'Math Explorer' },      // Levels 1-10
-        { min: 20, max: 29, name: 'Math Adventurer' },   // Levels 20-29
-        { min: 30, max: 30, name: 'Math Seeker' },       // Level 30 only (as per gamification.md)
-        { min: 40, max: 49, name: 'Math Strategist' },   // Levels 40-49
-        { min: 50, max: 59, name: 'Math Innovator' },    // Levels 50-59
-        { min: 60, max: 69, name: 'Math Prodigy' },      // Levels 60-69
-        { min: 70, max: 79, name: 'Math Virtuoso' },     // Levels 70-79
-        { min: 80, max: 89, name: 'Math Sage' },         // Levels 80-89
-        { min: 90, max: 99, name: 'Math Champion' },     // Levels 90-99
-        { min: 100, max: 100, name: 'Math Grandmaster' } // Level 100
+        { min: 11, max: 20, name: 'Math Adventurer' },   // Levels 11-20
+        { min: 21, max: 30, name: 'Math Seeker' },       // Levels 21-30
+        { min: 31, max: 40, name: 'Math Strategist' },   // Levels 31-40
+        { min: 41, max: 50, name: 'Math Innovator' },    // Levels 41-50
+        { min: 51, max: 60, name: 'Math Prodigy' },      // Levels 51-60
+        { min: 61, max: 70, name: 'Math Virtuoso' },     // Levels 61-70
+        { min: 71, max: 80, name: 'Math Sage' },         // Levels 71-80
+        { min: 81, max: 90, name: 'Math Champion' },     // Levels 81-90
+        { min: 91, max: 100, name: 'Math Grandmaster' }  // Levels 91-100
     ];
 
     // Find which ranks the previous and new levels belong to
@@ -580,6 +612,9 @@ function handleLevelUp(previousLevel, newLevel, pointsGained) {
     console.log('Previous level:', previousLevel, 'Previous rank:', previousRank);
     console.log('New level:', newLevel, 'New rank:', newRank);
 
+    // Special case: If crossing from level 1-5 to 6+ (entering Math Explorer proper)
+    const crossedIntoMathExplorer = previousLevel <= 5 && newLevel >= 6 && newLevel <= 10;
+
     // Simplified rank crossing logic
     let isRankUp = false;
 
@@ -588,12 +623,17 @@ function handleLevelUp(previousLevel, newLevel, pointsGained) {
         console.log('Entering rank for first time:', newRank.name);
         isRankUp = true;
     }
-    // Case 2: Crossing between different defined ranks
+    // Case 2: Special - Crossing into Math Explorer (levels 6-10)
+    else if (crossedIntoMathExplorer) {
+        console.log('Crossed into Math Explorer! (levels 1-5 → 6-10)');
+        isRankUp = true;
+    }
+    // Case 3: Crossing between different defined ranks
     else if (previousRank && newRank && previousRank.name !== newRank.name) {
         console.log('Crossing between ranks:', previousRank.name, '->', newRank.name);
         isRankUp = true;
     }
-    // Case 3: All other cases show simple level up
+    // Case 4: All other cases show simple level up
     else {
         console.log('No rank crossing detected, showing simple level up');
         showSimpleLevelUp(newLevel);
@@ -656,25 +696,34 @@ function showRankUpModal(newLevel, pointsGained) {
         // Determine which rank the new level belongs to (based on gamification.md)
         let rankMessage = "Congratulations on reaching a new rank!";
 
-        if (newLevel >= 1 && newLevel <= 10) {
+        if (newLevel >= 6 && newLevel <= 10) {
             rankMessage = "You've become a Math Explorer! Your journey begins now!";
-        } else if (newLevel >= 20 && newLevel <= 29) {
+        } else if (newLevel >= 11 && newLevel <= 20) {
+        } else if (newLevel >= 11 && newLevel <= 20) {
             rankMessage = "You're now a Math Adventurer! Ready for bigger challenges!";
-        } else if (newLevel === 30) {
+        } else if (newLevel >= 21 && newLevel <= 30) {
+        } else if (newLevel >= 21 && newLevel <= 30) {
             rankMessage = "You've achieved Math Seeker status! Keep exploring!";
-        } else if (newLevel >= 40 && newLevel <= 49) {
+        } else if (newLevel >= 31 && newLevel <= 40) {
+        } else if (newLevel >= 31 && newLevel <= 40) {
             rankMessage = "You're a Math Strategist now! Think critically!";
-        } else if (newLevel >= 50 && newLevel <= 59) {
+        } else if (newLevel >= 41 && newLevel <= 50) {
+        } else if (newLevel >= 41 && newLevel <= 50) {
             rankMessage = "Math Innovator unlocked! Create your own solutions!";
-        } else if (newLevel >= 60 && newLevel <= 69) {
+        } else if (newLevel >= 51 && newLevel <= 60) {
+        } else if (newLevel >= 51 && newLevel <= 60) {
             rankMessage = "You're a Math Prodigy! Exceptional skills!";
-        } else if (newLevel >= 70 && newLevel <= 79) {
+        } else if (newLevel >= 61 && newLevel <= 70) {
+        } else if (newLevel >= 61 && newLevel <= 70) {
             rankMessage = "Math Virtuoso achieved! Masterful performance!";
-        } else if (newLevel >= 80 && newLevel <= 89) {
+        } else if (newLevel >= 71 && newLevel <= 80) {
+        } else if (newLevel >= 71 && newLevel <= 80) {
             rankMessage = "You're a Math Sage! Wisdom beyond measure!";
-        } else if (newLevel >= 90 && newLevel <= 99) {
+        } else if (newLevel >= 81 && newLevel <= 90) {
+        } else if (newLevel >= 81 && newLevel <= 90) {
             rankMessage = "Math Champion status! Elite level reached!";
-        } else if (newLevel >= 100) {
+        } else if (newLevel >= 91 && newLevel <= 100) {
+        } else if (newLevel >= 91 && newLevel <= 100) {
             rankMessage = "Math Grandmaster! Ultimate achievement!";
         }
 
@@ -956,25 +1005,34 @@ function showRankUpModal(newLevel, pointsGained) {
         // Determine which rank the new level belongs to (based on gamification.md)
         let rankMessage = "Congratulations on reaching a new rank!";
 
-        if (newLevel >= 1 && newLevel <= 10) {
+        if (newLevel >= 6 && newLevel <= 10) {
             rankMessage = "You've become a Math Explorer! Your journey begins now!";
-        } else if (newLevel >= 20 && newLevel <= 29) {
+        } else if (newLevel >= 11 && newLevel <= 20) {
+        } else if (newLevel >= 11 && newLevel <= 20) {
             rankMessage = "You're now a Math Adventurer! Ready for bigger challenges!";
-        } else if (newLevel === 30) {
+        } else if (newLevel >= 21 && newLevel <= 30) {
+        } else if (newLevel >= 21 && newLevel <= 30) {
             rankMessage = "You've achieved Math Seeker status! Keep exploring!";
-        } else if (newLevel >= 40 && newLevel <= 49) {
+        } else if (newLevel >= 31 && newLevel <= 40) {
+        } else if (newLevel >= 31 && newLevel <= 40) {
             rankMessage = "You're a Math Strategist now! Think critically!";
-        } else if (newLevel >= 50 && newLevel <= 59) {
+        } else if (newLevel >= 41 && newLevel <= 50) {
+        } else if (newLevel >= 41 && newLevel <= 50) {
             rankMessage = "Math Innovator unlocked! Create your own solutions!";
-        } else if (newLevel >= 60 && newLevel <= 69) {
+        } else if (newLevel >= 51 && newLevel <= 60) {
+        } else if (newLevel >= 51 && newLevel <= 60) {
             rankMessage = "You're a Math Prodigy! Exceptional skills!";
-        } else if (newLevel >= 70 && newLevel <= 79) {
+        } else if (newLevel >= 61 && newLevel <= 70) {
+        } else if (newLevel >= 61 && newLevel <= 70) {
             rankMessage = "Math Virtuoso achieved! Masterful performance!";
-        } else if (newLevel >= 80 && newLevel <= 89) {
+        } else if (newLevel >= 71 && newLevel <= 80) {
+        } else if (newLevel >= 71 && newLevel <= 80) {
             rankMessage = "You're a Math Sage! Wisdom beyond measure!";
-        } else if (newLevel >= 90 && newLevel <= 99) {
+        } else if (newLevel >= 81 && newLevel <= 90) {
+        } else if (newLevel >= 81 && newLevel <= 90) {
             rankMessage = "Math Champion status! Elite level reached!";
-        } else if (newLevel >= 100) {
+        } else if (newLevel >= 91 && newLevel <= 100) {
+        } else if (newLevel >= 91 && newLevel <= 100) {
             rankMessage = "Math Grandmaster! Ultimate achievement!";
         }
 

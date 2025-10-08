@@ -447,6 +447,7 @@
             </div>
         </div>
 
+        @include('components.retry-modal')
 
         </style>
 
@@ -1211,21 +1212,10 @@
                         .catch(error => {
                             console.error('Final submit error:', error);
 
-                            // Show retry option to user
-                            const retryBtn = document.createElement('button');
-                            retryBtn.textContent = 'Retry Submission';
-                            retryBtn.className = 'ml-4 bg-orange-500 text-white px-4 py-2 rounded-lg';
-                            retryBtn.onclick = () => {
-                                retryBtn.remove();
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'SUBMIT ANSWER';
-                                questionSubmitted = false;
-                                submitAnswer();
-                            };
+                            // Show retry modal instead of button
+                            showRetryModal();
 
-                            submitBtn.parentNode.appendChild(retryBtn);
-
-                            alert('Submission failed. Your progress is saved. You can retry or refresh the page.');
+                            // Reset submit button state
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'SUBMIT ANSWER';
                             questionSubmitted = false;
@@ -1325,6 +1315,24 @@
                     loader.style.display = 'none';
                 }
 
+                function showRetryModal() {
+                    const modal = document.getElementById('retry-modal');
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+
+                    // Add event listener to reload button
+                    const reloadBtn = document.getElementById('reload-page-btn');
+                    reloadBtn.onclick = function() {
+                        window.location.reload();
+                    };
+                }
+
+                function hideRetryModal() {
+                    const modal = document.getElementById('retry-modal');
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+
                 function playAudioFeedback(isCorrect, isTimeout = false) {
                     // Don't play audio if disabled, timeout, or not available
                     if (!quizState.audioEnabled || isTimeout) return;
@@ -1370,6 +1378,14 @@
                     const feedbackIcon = document.getElementById('feedback-icon');
                     const explanationText = document.getElementById('explanation-text');
                     const nextBtn = document.getElementById('next-btn');
+                    const submitBtn = document.getElementById('submit-btn');
+
+                    // Update submit button to show submission is complete
+                    submitBtn.textContent = 'Submitted ✓';
+                    submitBtn.classList.remove('bg-submit-answer', 'drop-shadow-submit-answer', 'hover:scale-105');
+                    submitBtn.classList.add('cursor-not-allowed');
+                    submitBtn.style.background = 'linear-gradient(to right, #9ca3af, #6b7280)';
+                    submitBtn.style.boxShadow = '0 4px 0 #4b5563';
 
                     // Play audio feedback
                     playAudioFeedback(data.is_correct, isTimeout);

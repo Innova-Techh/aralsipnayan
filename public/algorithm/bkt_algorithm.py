@@ -64,8 +64,8 @@ class BKTAlgorithm:
         
         # Mastery score weights
         self.weights = {
-            'accuracy': 0.55,  # weightAccuracy = 55%
-            'bkt': 0.45        # weightBKT = 45%
+            'accuracy': 0.60,  # weightAccuracy = 60%
+            'bkt': 0.40        # weightBKT = 40%
         }
         
         # Difficulty thresholds for classification
@@ -172,10 +172,10 @@ class BKTAlgorithm:
         """
         Calculate final mastery score using the exact weighted formula from mastery_calculation.md
 
-        Formula: Mastery_Score = (0.55 × Accuracy) + (0.45 × Final_BKT × Average_Time_Factor)
+        Formula: Mastery_Score = (0.60 × Accuracy) + (0.40 × Final_BKT × Average_Time_Factor)
         Final_Percentage = Mastery_Score × 100
 
-        weightAccuracy = 55%, weightBKT = 45%
+        weightAccuracy = 60%, weightBKT = 40%
         """
         accuracy_component = self.weights['accuracy'] * accuracy_score
         bkt_component = self.weights['bkt'] * bkt_score * time_factor

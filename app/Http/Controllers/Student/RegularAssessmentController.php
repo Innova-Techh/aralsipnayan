@@ -378,13 +378,25 @@ class RegularAssessmentController extends Controller
             $bonusPoints = $gamificationResult['success'] ? $gamificationResult['time_bonus'] : ($isCorrect ? $this->getTimeBonusPoints($normalizedTime) : 0);
             $totalPoints = $gamificationResult['success'] ? $gamificationResult['total_points'] : ($basePoints + $bonusPoints);
             
-            // Get BKT score before answering (for tracking only, not updating)
-            $mastery = DB::table('student_mastery')
+            // Get BKT score before answering - chain from previous question in THIS assessment
+            // This ensures proper sequential BKT progression: L0 → L1 → L2 → ... → Ln
+            $previousResponse = DB::table('question_responses')
+                ->where('assessment_id', $assessmentId)
                 ->where('user_id', $user->id)
-                ->where('competency', $assessment->competency)
+                ->orderBy('answered_at', 'desc')
                 ->first();
 
-            $bktBefore = $mastery ? $mastery->bkt_score : 0.5;
+            if ($previousResponse) {
+                // Use the previous question's bkt_after as this question's bkt_before
+                $bktBefore = $previousResponse->bkt_after;
+            } else {
+                // First question in assessment - use initial BKT from student_mastery
+                $mastery = DB::table('student_mastery')
+                    ->where('user_id', $user->id)
+                    ->where('competency', $assessment->competency)
+                    ->first();
+                $bktBefore = $mastery ? $mastery->bkt_score : 0.5;
+            }
 
             // Calculate what the BKT score would be after this question (for tracking)
             $bktAfter = $this->calculateBKTUpdate($bktBefore, $isCorrect, $timeScore, $assessment->difficulty_level);
@@ -944,8 +956,8 @@ class RegularAssessmentController extends Controller
         $bktParams = [
             'prior_knowledge' => 0.15,    // Very low baseline for dramatic learning detection
             'learn_rate' => 0.65,         // Near-maximum learning rate for instant responsiveness
-            'slip_rate' => 0.003,         // Practically zero slip rate (theoretical minimum)
-            'guess_rate' => 0.008         // Practically zero guess rate (theoretical minimum)
+            'slip_rate' => 0.05,         // More academically realistic slip rate
+            'guess_rate' => 0.15         // More academically realistic guess rate
         ];
 
         $P_L = $priorBkt;
@@ -1012,8 +1024,8 @@ class RegularAssessmentController extends Controller
     private function calculateMasteryScore($accuracy, $bktScore, $timeFactor = 1.0)
     {
         // Use exact weights from Python implementation
-        $weightAccuracy = 0.55;  // 55%
-        $weightBKT = 0.45;       // 45%
+        $weightAccuracy = 0.60;  // 60%
+        $weightBKT = 0.40;       // 40%
 
         $accuracyComponent = $weightAccuracy * $accuracy;
         $bktComponent = $weightBKT * $bktScore * $timeFactor;

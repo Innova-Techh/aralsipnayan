@@ -4,27 +4,19 @@
 
 @section('content')
 
-<div class="space-y-8 font-baloo mt-8">
+<div class="space-y-8 font-baloo mt-8 px-4 xs:px-4 sm:px-4 md:px-8 lg:px-12 pb-24 sm:pb-20 md:pb-16 lg:pb-20">
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
-        
+
         <!-- Question Counter -->
-        <div class="bg-purple-700 backdrop-blur-sm rounded-full
-                    px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                    border-b-6 border-[#4a1377]"
-             style="box-shadow: 0 6px 0 #4a1377;">
-            <span class="text-white font-semibold
-                         text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
-                  id="question-counter">
+        <div class="bg-phase-counter drop-shadow-phase-counter backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4">
+            <span class="text-white font-semibold text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
                 Question <span id="current-question-number">{{ $currentQuestion }}</span> of <span id="total-questions-number">{{ $totalQuestions }}</span>
             </span>
         </div>
 
         <!-- Timer -->
-        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full
-                    px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4
-                    flex items-center gap-2 sm:gap-3 md:gap-4
-                    border-b-6 border-[#cc4713]"
+        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2 sm:gap-3 md:gap-4 border-b-6 border-[#cc4713]"
              style="box-shadow: 0 6px 0 #cc4713;">
             <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-white"
                  fill="currentColor" viewBox="0 0 20 20">
@@ -32,21 +24,20 @@
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
                       clip-rule="evenodd"/>
             </svg>
-            <span class="text-white font-bold
-                         text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
+            <span class="text-white font-bold text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
                   id="timer-display">30:00</span>
         </div>
     </div>
 
     <!-- Quiz Card -->
-    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
-        
+    <div class="bg-white rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
+
         <!-- Controls Row -->
         <div class="flex justify-between items-center mb-6">
             <button id="hint-btn" class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#cc4713] shadow-lg">
                 💡 HINT
             </button>
-            
+
             <!-- Audio Toggle Button -->
             <button id="audio-toggle" class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
                 🔊 AUDIO ON
@@ -64,14 +55,16 @@
         <div class="mb-8 md:mb-10" id="answer-section">
             @if($question->type === 'multiple_choice' || $question->type === 'true_false')
                 <!-- Multiple Choice / True False Options -->
-                <div class="space-y-4 md:space-y-5" id="multiple-choice-container">
+                <div class="space-y-3" id="multiple-choice-container">
                     @foreach($question->options as $index => $option)
-                    <label class="flex items-center p-4 md:p-5 bg-gray-100 border-2 border-transparent rounded-xl md:rounded-2xl cursor-pointer hover:bg-gray-200 transition-all duration-200 option-label">
+                    <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label"
+                           style="border-color: #E2E8F0; background-color: white;">
                         <input type="radio" name="answer" value="{{ chr(65 + (int)$index) }}" class="hidden">
-                        <div class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-gray-500 text-white rounded-full font-bold text-sm md:text-base mr-4 md:mr-5 option-circle">
+                        <div class="flex items-center justify-center w-9 h-9 text-white rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
+                             style="background-color: #1E293B; color: white;">
                             {{ chr(65 + (int)$index) }}
                         </div>
-                        <span class="text-gray-700 font-medium text-base md:text-lg">
+                        <span class="text-gray-700 font-normal text-base option-text">
                             {{ $option }}
                         </span>
                     </label>
@@ -80,10 +73,11 @@
             @elseif($question->type === 'fill_blanks')
                 <!-- Fill in the Blanks -->
                 <div class="space-y-4">
-                    <input type="text" 
-                           name="answer" 
+                    <input type="text"
+                           name="answer"
                            id="fill-answer"
-                           class="w-full p-4 md:p-5 bg-gray-100 border-2 border-gray-300 rounded-xl md:rounded-2xl text-gray-700 font-medium text-base md:text-lg focus:border-blue-400 focus:bg-blue-50 focus:outline-none transition-all duration-200"
+                           class="w-full p-4 md:p-5 bg-white border-2 rounded-xl text-gray-700 font-medium text-base md:text-lg focus:border-blue-400 focus:bg-blue-50 focus:outline-none transition-all duration-200"
+                           style="border-color: #E2E8F0;"
                            placeholder="Type your answer here..."
                            autocomplete="off">
                 </div>
@@ -106,34 +100,29 @@
         <!-- Buttons Row -->
         <div class="flex justify-between items-center gap-2 sm:gap-4 mt-6">
             <!-- Submit Button -->
-            <button id="submit-btn" 
-                class="bg-gradient-to-r from-green-500 to-green-600 text-white 
-                    px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 
-                    rounded-2xl font-bold 
-                    text-xs sm:text-sm md:text-base lg:text-lg
-                    hover:from-green-600 hover:to-green-700 
-                    transition-all duration-200 transform hover:scale-105 
-                    border-b-4 border-[#0b830b] shadow-lg">
-                SUBMIT ANSWER
+            <button id="submit-btn"
+                class="bg-submit-answer drop-shadow-submit-answer text-white px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-200 transform hover:scale-105"
+                style="text-shadow: -1px -1px 0 #094724, 1px -1px 0 #094724,-1px 1px 0 #094724, 1px 1px 0 #094724, 0 2px 0 #094724;">
+                Submit Answer
             </button>
 
             <!-- Next Button -->
-            <button id="next-btn" 
-                class="hidden bg-gradient-to-r from-blue-500 to-blue-600 text-white 
-                    px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 
-                    rounded-2xl font-bold 
-                    text-xs sm:text-sm md:text-base lg:text-lg
-                    hover:from-blue-600 hover:to-blue-700 
-                    transition-all duration-200 transform hover:scale-105 
-                    border-b-4 border-[#0b2783] shadow-lg">
+            <button id="next-btn"
+                class="hidden bg-next-question drop-shadow-next-question text-white px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+                style="text-shadow: -1px -1px 0 #0E3AB1, 1px -1px 0 #0E3AB1,-1px 1px 0 #0E3AB1, 1px 1px 0 #0E3AB1, 0 2px 0 #0E3AB1;">
                 Next Question
             </button>
         </div>
 
         <!-- Feedback Section (initially hidden) -->
-        <div id="feedback-section" class="hidden mt-6 p-4 rounded-lg">
-            <div id="feedback-message" class="font-extrabold mb-2 font-baloo text-lg sm:text-xl md:text-2xl"></div>
-            <div id="explanation-text" class="text-base sm:text-lg md:text-xl text-gray-700 font-baloo leading-relaxed"></div>
+        <div id="feedback-section" class="hidden mt-6 p-5 md:p-6 rounded-xl">
+            <div class="flex items-start gap-3 mb-3">
+                <div id="feedback-icon"
+                    class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xl">
+                </div>
+                <div id="feedback-message" class="font-bold text-xl sm:text-2xl md:text-3xl"></div>
+            </div>
+            <div id="explanation-text" class="text-sm sm:text-base md:text-lg leading-relaxed"></div>
         </div>
     </div>
 </div>
@@ -259,6 +248,8 @@
         </div>
     </div>
 </div>
+
+@include('components.retry-modal')
 
 <style>
     /* Points Animation Styles */
@@ -1337,23 +1328,40 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeAnswerSelection() {
         const labels = document.querySelectorAll('.option-label');
         labels.forEach((label) => {
-            label.addEventListener('click', function() {
-                // Reset all labels
+            // Add hover effect
+            label.addEventListener('mouseenter', function () {
+                const radio = this.querySelector('input[type="radio"]');
+                if (!radio.checked) {
+                    this.style.backgroundColor = '#F8FAFC';
+                    this.style.borderColor = '#CBD5E1';
+                }
+            });
+
+            label.addEventListener('mouseleave', function () {
+                const radio = this.querySelector('input[type="radio"]');
+                if (!radio.checked) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#E2E8F0';
+                }
+            });
+
+            label.addEventListener('click', function () {
+                // Reset all labels to default state
                 labels.forEach(l => {
-                    l.classList.remove('bg-blue-100', 'border-blue-400');
-                    l.classList.add('bg-gray-100', 'border-transparent');
+                    l.style.backgroundColor = 'white';
+                    l.style.borderColor = '#E2E8F0';
                     const circle = l.querySelector('.option-circle');
-                    circle.classList.remove('bg-blue-500');
-                    circle.classList.add('bg-gray-500');
+                    circle.style.backgroundColor = '#1E293B';
+                    circle.style.color = 'white';
                 });
-                
-                // Set selected label
-                this.classList.remove('bg-gray-100', 'border-transparent');
-                this.classList.add('bg-blue-100', 'border-blue-400');
+
+                // Set selected label state
+                this.style.backgroundColor = '#DBEAFE'; // light blue
+                this.style.borderColor = '#3B82F6'; // blue border
                 const circle = this.querySelector('.option-circle');
-                circle.classList.remove('bg-gray-500');
-                circle.classList.add('bg-blue-500');
-                
+                circle.style.backgroundColor = '#3B82F6'; // blue circle
+                circle.style.color = 'white';
+
                 // Check the radio button
                 const radio = this.querySelector('input[type="radio"]');
                 radio.checked = true;
@@ -1428,24 +1436,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Final submit error:', error);
-            
-            // Show retry option to user
-            const retryBtn = document.createElement('button');
-            retryBtn.textContent = 'Retry Submission';
-            retryBtn.className = 'ml-4 bg-orange-500 text-white px-4 py-2 rounded-lg';
-            retryBtn.onclick = () => {
-                retryBtn.remove();
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'SUBMIT ANSWER';
-                questionSubmitted = false;
-                // Restart auto-save since we cleared it earlier
-                startAutoSave();
-                submitAnswer();
-            };
-            
-            submitBtn.parentNode.appendChild(retryBtn);
-            
-            alert('Submission failed. Your progress is saved. You can retry or refresh the page.');
+
+            // Show retry modal instead of button
+            showRetryModal();
+
+            // Reset submit button state
             submitBtn.disabled = false;
             submitBtn.textContent = 'SUBMIT ANSWER';
             questionSubmitted = false;
@@ -1484,6 +1479,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const loader = document.getElementById('assessment-loader');
         loader.classList.add('hidden');
         loader.style.display = 'none';
+    }
+
+    function showRetryModal() {
+        const modal = document.getElementById('retry-modal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+
+        // Add event listener to reload button
+        const reloadBtn = document.getElementById('reload-page-btn');
+        reloadBtn.onclick = function() {
+            window.location.reload();
+        };
+    }
+
+    function hideRetryModal() {
+        const modal = document.getElementById('retry-modal');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
     
     function playAudioFeedback(isCorrect, isTimeout = false) {
@@ -1861,8 +1874,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function showFeedback(data, isTimeout = false) {
         const feedbackSection = document.getElementById('feedback-section');
         const feedbackMessage = document.getElementById('feedback-message');
+        const feedbackIcon = document.getElementById('feedback-icon');
         const explanationText = document.getElementById('explanation-text');
         const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Update submit button to show submission is complete
+        submitBtn.textContent = 'Submitted ✓';
+        submitBtn.classList.remove('bg-submit-answer', 'drop-shadow-submit-answer', 'hover:scale-105');
+        submitBtn.classList.add('cursor-not-allowed');
+        submitBtn.style.background = 'linear-gradient(to right, #9ca3af, #6b7280)';
+        submitBtn.style.boxShadow = '0 4px 0 #4b5563';
 
         // Play audio feedback
         playAudioFeedback(data.is_correct, isTimeout);
@@ -1874,17 +1896,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show feedback
         if (isTimeout) {
-            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-orange-50 border border-orange-200';
-            feedbackMessage.className = 'font-semibold mb-2 text-orange-800';
-            feedbackMessage.textContent = '⏰ Time\'s up!';
+            feedbackSection.className = 'mt-6 p-5 md:p-6 rounded-xl bg-orange-600';
+            feedbackIcon.innerHTML = '⏰';
+            feedbackMessage.textContent = 'Time\'s up!';
         } else if (data.is_correct) {
-            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-green-200 border border-green-200';
-            feedbackMessage.className = 'font-extrabold mb-2 text-green-800 text-2xl';
-            feedbackMessage.textContent = '✅ Correct!';
+            feedbackSection.className = 'mt-6 p-5 md:p-6 rounded-xl bg-[#065F46]';
+            feedbackSection.style.boxShadow = '0 6px 0 #054835';
+            feedbackIcon.innerHTML = '✓';
+            feedbackIcon.className = 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white text-green-600 text-2xl font-bold';
+            feedbackMessage.style.color = '#A7F3D0';
+            feedbackMessage.textContent = 'You are correct!';
+            explanationText.style.color = '#E2E8F0';
         } else {
-            feedbackSection.className = 'mt-6 p-4 rounded-lg bg-red-200 border border-red-200';
-            feedbackMessage.className = 'font-extrabold mb-2 text-red-800 text-2xl';
-            feedbackMessage.textContent = '❌ Incorrect';
+            feedbackSection.className = 'mt-6 p-5 md:p-6 rounded-xl bg-[#7F1D1D]';
+            feedbackSection.style.boxShadow = '0 6px 0 #630E0E';
+            feedbackIcon.innerHTML = '✕';
+            feedbackIcon.className = 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white text-red-700 text-2xl font-bold';
+            feedbackMessage.style.color = '#F87171';
+            feedbackMessage.textContent = 'You are wrong!';
+            explanationText.style.color = '#F3F4F6';
         }
 
         if (data.explanation) {
@@ -1892,7 +1922,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!isTimeout && data.correct_answer) {
-            explanationText.innerHTML += `<br><strong>Correct answer:</strong> ${data.correct_answer}`;
+            explanationText.innerHTML += `<br><strong class="text-green-200">Correct answer: ${data.correct_answer}</strong>`;
         }
 
         feedbackSection.classList.remove('hidden');

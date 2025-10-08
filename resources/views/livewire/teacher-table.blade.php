@@ -127,9 +127,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                             Teacher
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Contact
-                        </th>
+                       
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                             School & Grade
                         </th>
@@ -175,24 +173,11 @@
                                                 {{ $teacher->username }}
                                             @endif
                                         </div>
-                                        <div class="text-xs text-gray-500">
-                                            @{{ $teacher->username }}
-                                        </div>
+
                                     </div>
                                 </div>
                             </td>
 
-                            <!-- Contact Column -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $teacher->email }}</div>
-                                <div class="text-xs text-gray-500">
-                                    @if($teacher->teacherProfile && $teacher->teacherProfile->school_name)
-                                        +63 {{ rand(900, 999) }} {{ rand(100, 999) }} {{ rand(1000, 9999) }}
-                                    @else
-                                        -
-                                    @endif
-                                </div>
-                            </td>
 
                             <!-- School & Grade Column -->
                             <td class="px-6 py-4 whitespace-nowrap">
