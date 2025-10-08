@@ -1024,8 +1024,8 @@ class RegularAssessmentController extends Controller
     private function calculateMasteryScore($accuracy, $bktScore, $timeFactor = 1.0)
     {
         // Use exact weights from Python implementation
-        $weightAccuracy = 0.55;  // 55%
-        $weightBKT = 0.45;       // 45%
+        $weightAccuracy = 0.60;  // 60%
+        $weightBKT = 0.40;       // 40%
 
         $accuracyComponent = $weightAccuracy * $accuracy;
         $bktComponent = $weightBKT * $bktScore * $timeFactor;
