@@ -448,9 +448,6 @@
 // Check if this is from a regular quiz (gamification enabled) or diagnostic (gamification disabled)
 const isRegularQuiz = {{ isset($from_regular_quiz) && $from_regular_quiz ? 'true' : 'false' }};
 
-// Check if this is from a regular quiz (gamification enabled) or diagnostic (gamification disabled)
-const isRegularQuiz = {{ isset($from_regular_quiz) && $from_regular_quiz ? 'true' : 'false' }};
-
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize celebration effects
     initializeConfetti();
