@@ -236,6 +236,31 @@
                 stroke-dashoffset: -440;
             }
         }
+
+        /* No Answer Modal Animation */
+        @keyframes modalBounce {
+            0%, 100% {
+                transform: scale(0.95);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        #no-answer-modal.show {
+            animation: modalBounce 0.3s ease-in-out;
+        }
+
+        /* Shake animation for emphasis */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
     </style>
 </head>
 
@@ -449,6 +474,36 @@
 
         @include('components.retry-modal')
 
+        <!-- No Answer Modal (initially hidden) -->
+        <div id="no-answer-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50 cursor-pointer">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 md:p-10 max-w-xs sm:max-w-sm md:max-w-md mx-4 text-center transform transition-all duration-300 scale-95 hover:scale-100">
+                <!-- Animated Emoji -->
+                <div class="mb-4 md:mb-6 animate-bounce">
+                    <div class="text-6xl sm:text-7xl md:text-8xl">🤔</div>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3 md:mb-4 font-baloo">
+                    Oops! Wait a second...
+                </h3>
+                
+                <!-- Message -->
+                <p class="text-sm sm:text-base md:text-lg text-gray-600 mb-2 leading-relaxed font-baloo" id="no-answer-message">
+                    <!-- Dynamic message will be inserted here -->
+                </p>
+                
+                <!-- Fun encouraging text -->
+                <p class="text-xs sm:text-sm md:text-base text-purple-600 font-semibold mb-4 md:mb-6 font-baloo">
+                    Take your time and choose wisely! 
+                </p>
+                
+                <!-- Tap anywhere hint -->
+                <p class="text-xs sm:text-sm text-gray-400 font-baloo italic">
+                    (Click anywhere to continue)
+                </p>
+            </div>
+        </div>
+
         </style>
 
         <script>
@@ -533,6 +588,9 @@
 
                     // Audio toggle handler
                     document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
+
+                    // No answer modal - close when clicking anywhere on the modal
+                    document.getElementById('no-answer-modal').addEventListener('click', hideNoAnswerModal);
 
                     // Hint button handler (only for non-diagnostic mode)
                     @if(!isset($diagnosticMode) || !$diagnosticMode)
@@ -1153,14 +1211,14 @@
                     @if($question->type === 'fill_blanks')
                         const fillAnswer = document.getElementById('fill-answer');
                         if (!fillAnswer.value.trim()) {
-                            alert('Please enter an answer before submitting.');
+                            showNoAnswerModal('Please type your answer in the text box before submitting! 📝');
                             return;
                         }
                         answerValue = fillAnswer.value.trim();
                     @else
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+                        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
                         if (!selectedAnswer) {
-                            alert('Please select an answer before submitting.');
+                            showNoAnswerModal('Please select one of the answer choices before submitting!');
                             return;
                         }
                         answerValue = selectedAnswer.value;
@@ -1329,6 +1387,39 @@
 
                 function hideRetryModal() {
                     const modal = document.getElementById('retry-modal');
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+
+                function showNoAnswerModal(message) {
+                    const modal = document.getElementById('no-answer-modal');
+                    const messageElement = document.getElementById('no-answer-message');
+                    
+                    // Set the custom message
+                    messageElement.textContent = message;
+                    
+                    // Show modal with animation
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                    
+                    // Add shake effect to the modal content
+                    const modalContent = modal.querySelector('.bg-white');
+                    modalContent.classList.add('shake');
+                    
+                    // Remove shake class after animation
+                    setTimeout(() => {
+                        modalContent.classList.remove('shake');
+                    }, 500);
+                    
+                    // Remove show class after animation
+                    setTimeout(() => {
+                        modal.classList.remove('show');
+                    }, 300);
+                }
+
+                function hideNoAnswerModal() {
+                    const modal = document.getElementById('no-answer-modal');
                     modal.classList.add('hidden');
                     modal.style.display = 'none';
                 }
