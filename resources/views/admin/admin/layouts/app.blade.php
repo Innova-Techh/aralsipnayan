@@ -285,8 +285,10 @@
                         <!-- Sidebar Toggle Button -->
                         <button @click="sidebarOpen = !sidebarOpen"
                             class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                            <i class="fas fa-bars text-gray-600 text-lg"></i>
+                            <i
+                                :class="sidebarOpen ? 'fas fa-arrow-left text-gray-600 text-lg' : 'fas fa-arrow-right text-gray-600 text-lg'"></i>
                         </button>
+
 
                         <!-- Page Title -->
                         <div>
