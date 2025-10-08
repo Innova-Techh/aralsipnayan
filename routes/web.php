@@ -204,25 +204,28 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('dashboard');
     
     // Assessment Management
-    Route::get('/assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'index'])->name('assessments');
-    Route::get('/assessments/create', [App\Http\Controllers\TeacherAssessmentController::class, 'create'])->name('assessments.create');
-    Route::post('/assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'store'])->name('assessments.store');
-    Route::get('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'show'])->name('assessments.show');
-    Route::get('/assessments/{assessment}/edit', [App\Http\Controllers\TeacherAssessmentController::class, 'edit'])->name('assessments.edit');
-    Route::put('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'update'])->name('assessments.update');
-    Route::delete('/assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'destroy'])->name('assessments.destroy');
+    Route::get('/assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'index'])->name('assessments');
+    Route::get('/assessments/create', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'create'])->name('assessments.create');
+    Route::post('/assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'store'])->name('assessments.store');
+    Route::get('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'show'])->name('assessments.show');
+    Route::get('/assessments/{assessment}/edit', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'edit'])->name('assessments.edit');
+    Route::put('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'update'])->name('assessments.update');
+    Route::delete('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'destroy'])->name('assessments.destroy');
     
     // Assessment Assignment API
-    Route::get('/assessments/students/{section}', [App\Http\Controllers\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
-    Route::post('/assessments/assign', [App\Http\Controllers\TeacherAssessmentController::class, 'assign'])->name('assessments.assign');
-    Route::delete('/assessments/assignments/{assignment}', [App\Http\Controllers\TeacherAssessmentController::class, 'removeAssignment'])->name('assessments.remove-assignment');
+    Route::get('/assessments/students/{section}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
+    Route::post('/assessments/assign', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'assign'])->name('assessments.assign');
+    Route::delete('/assessments/assignments/{assignment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'removeAssignment'])->name('assessments.remove-assignment');
+    
+    // Question Bank API
+    Route::post('/questions/load', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'loadQuestions'])->name('questions.load');
     
     // Section Management
-    Route::get('/sections', [App\Http\Controllers\TeacherSectionController::class, 'index'])->name('sections');
-    Route::get('/sections/students/{section}', [App\Http\Controllers\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
-    Route::post('/sections', [App\Http\Controllers\TeacherSectionController::class, 'store'])->name('sections.store');
-    Route::put('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'update'])->name('sections.update');
-    Route::delete('/sections/{section}', [App\Http\Controllers\TeacherSectionController::class, 'destroy'])->name('sections.destroy');
+    Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'index'])->name('sections');
+    Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
+    Route::post('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'store'])->name('sections.store');
+    Route::put('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'update'])->name('sections.update');
+    Route::delete('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'destroy'])->name('sections.destroy');
     // Student Overview Page (for assessment management)
     Route::get('/students', function () {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
@@ -232,9 +235,9 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     })->name('students');
     
     // Section Student Management API (used by section modals)
-    Route::post('/sections/students', [App\Http\Controllers\TeacherStudentController::class, 'store'])->name('sections.students.store');
-    Route::put('/sections/students/{student}', [App\Http\Controllers\TeacherStudentController::class, 'update'])->name('sections.students.update');
-    Route::delete('/sections/students/{student}', [App\Http\Controllers\TeacherStudentController::class, 'destroy'])->name('sections.students.destroy');
+    Route::post('/sections/students', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'store'])->name('sections.students.store');
+    Route::put('/sections/students/{student}', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'update'])->name('sections.students.update');
+    Route::delete('/sections/students/{student}', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('sections.students.destroy');
     
     // Analytics
     Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
@@ -358,8 +361,11 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/sections/data', [SectionController::class, 'getSectionsData'])->name('sections.data');
     
     // Teacher-created assessments
-    Route::get('/teacher-assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'studentIndex'])->name('teacher-assessments.index');
-    Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
+    Route::get('/teacher-assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentIndex'])->name('teacher-assessments.index');
+    Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
+    Route::get('/teacher-assessments/{assessment}/quiz', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'startQuiz'])->name('teacher-assessments.quiz');
+    Route::post('/teacher-assessments/{assessment}/submit-answer', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'submitAnswer'])->name('teacher-assessments.submit-answer');
+    Route::post('/teacher-assessments/{assessment}/complete', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'completeQuiz'])->name('teacher-assessments.complete');
     
     // Profile routes
    // Profile routes

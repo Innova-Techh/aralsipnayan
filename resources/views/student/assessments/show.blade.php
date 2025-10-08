@@ -82,32 +82,89 @@
                 <span class="material-symbols-outlined text-green-600 text-4xl mb-2">check_circle</span>
                 <h3 class="text-lg font-semibold text-green-800 mb-2">Assessment Completed</h3>
                 <p class="text-green-700">You have successfully completed this assessment.</p>
+                
+                @if($quizResult)
+                    <div class="mt-4 p-4 bg-white rounded-lg border border-green-300">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Your Results</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">{{ $quizResult->score }}/{{ $quizResult->total_questions }}</div>
+                                <div class="text-sm text-gray-600">Score</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">{{ $quizResult->percentage }}%</div>
+                                <div class="text-sm text-gray-600">Percentage</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-600">
+                                    @if($quizResult->time_taken >= 3600)
+                                        {{ gmdate('H:i:s', $quizResult->time_taken) }}
+                                    @else
+                                        {{ gmdate('i:s', $quizResult->time_taken) }}
+                                    @endif
+                                </div>
+                                <div class="text-sm text-gray-600">Time Taken</div>
+                            </div>
+                        </div>
+                        
+                        @if($quizResult->percentage >= 80)
+                            <div class="mt-3 text-center">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <span class="material-symbols-outlined text-sm mr-1">star</span>
+                                    Excellent Work!
+                                </span>
+                            </div>
+                        @elseif($quizResult->percentage >= 60)
+                            <div class="mt-3 text-center">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                    <span class="material-symbols-outlined text-sm mr-1">thumb_up</span>
+                                    Good Job!
+                                </span>
+                            </div>
+                        @else
+                            <div class="mt-3 text-center">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    <span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                                    Keep Practicing!
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+                
+                <div class="mt-4 text-center">
+                    <button onclick="viewResults()" 
+                            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <span class="material-symbols-outlined text-sm mr-2">visibility</span>
+                        View Detailed Results
+                    </button>
+                </div>
             </div>
         @endif
     </div>
 
-    <!-- Development Notice -->
-    <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <div class="flex items-center">
-            <span class="material-symbols-outlined text-gray-600 mr-2">construction</span>
-            <span class="font-medium text-gray-800">Assessment Interface - In Development</span>
-        </div>
-        <p class="text-gray-600 text-sm mt-2">
-            The assessment interface is currently under development. 
-            The actual quiz functionality will be implemented in future updates.
-        </p>
-    </div>
 </div>
 
 <script>
 function startAssessment() {
-    // This would start the actual assessment
-    alert('Assessment interface is still in development. This would start the quiz.');
+    // Redirect to the quiz interface
+    window.location.href = "{{ route('teacher-assessments.quiz', $assessment->id) }}";
 }
 
 function continueAssessment() {
-    // This would continue a partially completed assessment
-    alert('Assessment interface is still in development. This would continue the quiz.');
+    // Redirect to the quiz interface to continue
+    window.location.href = "{{ route('teacher-assessments.quiz', $assessment->id) }}";
+}
+
+function viewResults() {
+    // For now, we'll show an alert with the results
+    // In the future, this could redirect to a detailed results page
+    @if($quizResult)
+        const timeDisplay = {{ $quizResult->time_taken }} >= 3600 ? 
+            '{{ gmdate("H:i:s", $quizResult->time_taken) }}' : 
+            '{{ gmdate("i:s", $quizResult->time_taken) }}';
+        alert(`Your Assessment Results:\n\nScore: {{ $quizResult->score }}/{{ $quizResult->total_questions }}\nPercentage: {{ $quizResult->percentage }}%\nTime Taken: ${timeDisplay}`);
+    @endif
 }
 </script>
 @endsection

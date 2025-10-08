@@ -301,6 +301,9 @@
                                 {{ $details['question']->difficulty_level }}
                             </span>
                             <span class="ml-2 text-sm text-gray-500">
+                                {{ $details['question']->question_id }}
+                            </span>
+                            <span class="ml-2 text-sm text-gray-500">
                                 {{ $details['question']->topic_tag }}
                             </span>
                         </div>

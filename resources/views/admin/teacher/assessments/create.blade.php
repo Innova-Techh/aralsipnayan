@@ -171,6 +171,178 @@
                     </div>
                 </div>
 
+                <!-- Question Source -->
+                <div class="mb-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Question Source</h2>
+                    <div class="space-y-4">
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="question_source" value="question_bank" class="mr-3 text-blue-600" checked>
+                                <span class="text-sm text-gray-700">Use Question Bank</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="question_source" value="create_custom" class="mr-3 text-blue-600">
+                                <span class="text-sm text-gray-700">Create Custom Questions</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="question_source" value="mixed" class="mr-3 text-blue-600">
+                                <span class="text-sm text-gray-700">Mix Both</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Question Bank Section -->
+                        <div id="questionBankSection" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <h3 class="text-md font-medium text-gray-900 mb-3">Browse Question Bank</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Topic</label>
+                                    <select id="topicFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                        <option value="">All Topics</option>
+                                        <!-- Topics will be populated dynamically based on selected category -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Difficulty</label>
+                                    <select id="difficultyFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                        <option value="">All Difficulties</option>
+                                        <option value="Easy">Beginner</option>
+                                        <option value="Medium">Intermediate</option>
+                                        <option value="Hard">Advanced</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="button" id="loadQuestions" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                        Load Questions
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Question Bank Results -->
+                            <div id="questionBankResults" class="max-h-96 overflow-y-auto border border-gray-200 rounded-lg bg-white">
+                                <div class="p-4 text-center text-gray-500">
+                                    Click "Load Questions" to browse available questions
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Questions Summary -->
+                            <div id="selectedQuestionsFromBank" class="mt-4 hidden">
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Selected Questions from Bank (<span id="bankQuestionCount">0</span>)</h4>
+                                <div id="selectedBankQuestionsList" class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-blue-50">
+                                    <!-- Selected questions will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Questions Section -->
+                        <div id="customQuestionsSection" class="border border-gray-200 rounded-lg p-4 bg-gray-50 hidden">
+                            <h3 class="text-md font-medium text-gray-900 mb-3">Create Custom Questions</h3>
+                            
+                            <!-- Question Type Selection -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Question Type</label>
+                                <select id="customQuestionType" class="w-full md:w-1/3 border border-gray-300 rounded-lg px-3 py-2">
+                                    <option value="multiple_choice">Multiple Choice</option>
+                                    <option value="true_false">True/False</option>
+                                    <option value="fill_blanks">Fill in the Blank</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Custom Question Form -->
+                            <div id="customQuestionForm" class="space-y-4 border border-gray-300 rounded-lg p-4 bg-white">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Question Text</label>
+                                    <textarea id="customQuestionText" placeholder="Enter your question here..." rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                                </div>
+                                
+                                <!-- Multiple Choice Options -->
+                                <div id="multipleChoiceOptions">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Answer Choices</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-2">
+                                            <input type="radio" name="customCorrectAnswer" value="A" class="text-blue-600">
+                                            <span class="text-sm font-medium">A.</span>
+                                            <input type="text" id="customChoiceA" placeholder="Choice A" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <input type="radio" name="customCorrectAnswer" value="B" class="text-blue-600">
+                                            <span class="text-sm font-medium">B.</span>
+                                            <input type="text" id="customChoiceB" placeholder="Choice B" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <input type="radio" name="customCorrectAnswer" value="C" class="text-blue-600">
+                                            <span class="text-sm font-medium">C.</span>
+                                            <input type="text" id="customChoiceC" placeholder="Choice C" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <input type="radio" name="customCorrectAnswer" value="D" class="text-blue-600">
+                                            <span class="text-sm font-medium">D.</span>
+                                            <input type="text" id="customChoiceD" placeholder="Choice D" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- True/False Options -->
+                                <div id="trueFalseOptions" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Correct Answer</label>
+                                    <div class="flex space-x-4">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="customTrueFalseAnswer" value="True" class="mr-2 text-blue-600">
+                                            <span class="text-sm">True</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="customTrueFalseAnswer" value="False" class="mr-2 text-blue-600">
+                                            <span class="text-sm">False</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fill in the Blank Options -->
+                                <div id="fillBlankOptions" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Correct Answer</label>
+                                    <input type="text" id="customFillBlankAnswer" placeholder="Enter the correct answer" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                    <p class="text-xs text-gray-500 mt-1">Use underscores (_____) in your question text to indicate where the blank should be.</p>
+                                </div>
+                                
+                                <!-- Additional Fields -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Topic Tag</label>
+                                        <input type="text" id="customTopicTag" placeholder="e.g., Basic Operations" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Points</label>
+                                        <input type="number" id="customPoints" value="1" min="1" max="100" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Hint (Optional)</label>
+                                    <textarea id="customHint" placeholder="Provide a helpful hint..." rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Explanation (Optional)</label>
+                                    <textarea id="customExplanation" placeholder="Explain the correct answer..." rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button type="button" id="addCustomQuestion" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                        Add Question
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Custom Questions List -->
+                            <div id="customQuestionsList" class="mt-4 hidden">
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Created Questions (<span id="customQuestionCount">0</span>)</h4>
+                                <div id="customQuestionsContainer" class="space-y-3 max-h-64 overflow-y-auto">
+                                    <!-- Custom questions will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Schedule -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Schedule</h2>
@@ -198,6 +370,10 @@
 
                 <!-- Hidden field to carry selected students (CSV) -->
                 <input type="hidden" name="selected_students" id="selected_students_field" value="">
+                
+                <!-- Hidden fields for questions -->
+                <input type="hidden" name="selected_bank_questions" id="selected_bank_questions_field" value="">
+                <input type="hidden" name="custom_questions" id="custom_questions_field" value="">
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-4">
@@ -218,10 +394,14 @@
 <script>
 let selectedStudents = [];
 let studentsData = {};
+let selectedBankQuestions = [];
+let customQuestions = [];
+let questionIdCounter = 1;
 
 // Get teacher sections and students data from server
 const teacherSections = @json($teacherSections ?? []);
 const studentsDataFromServer = @json($studentsData ?? []);
+const availableTopics = @json($availableTopics ?? []);
 
 // Initialize students data by section
 studentsDataFromServer.forEach(student => {
@@ -229,6 +409,33 @@ studentsDataFromServer.forEach(student => {
         studentsData[student.section] = [];
     }
     studentsData[student.section].push(student);
+});
+
+// Update topic filter when category changes
+document.querySelector('select[name="category"]').addEventListener('change', function() {
+    updateTopicFilter(this.value);
+});
+
+function updateTopicFilter(category) {
+    const topicFilter = document.getElementById('topicFilter');
+    topicFilter.innerHTML = '<option value="">All Topics</option>';
+    
+    if (category && availableTopics[category]) {
+        availableTopics[category].forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic;
+            option.textContent = topic;
+            topicFilter.appendChild(option);
+        });
+    }
+}
+
+// Initialize topic filter on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.querySelector('select[name="category"]');
+    if (categorySelect.value) {
+        updateTopicFilter(categorySelect.value);
+    }
 });
 
 // Toggle specific students selection
@@ -342,6 +549,301 @@ updateSelectedStudentsList = function() {
     syncSelectedStudentsHiddenField();
 }
 
+// Question Source Management
+document.querySelectorAll('input[name="question_source"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const questionBankSection = document.getElementById('questionBankSection');
+        const customQuestionsSection = document.getElementById('customQuestionsSection');
+        
+        if (this.value === 'question_bank') {
+            questionBankSection.classList.remove('hidden');
+            customQuestionsSection.classList.add('hidden');
+        } else if (this.value === 'create_custom') {
+            questionBankSection.classList.add('hidden');
+            customQuestionsSection.classList.remove('hidden');
+        } else if (this.value === 'mixed') {
+            questionBankSection.classList.remove('hidden');
+            customQuestionsSection.classList.remove('hidden');
+        }
+    });
+});
+
+// Custom Question Type Management
+document.getElementById('customQuestionType').addEventListener('change', function() {
+    const multipleChoiceOptions = document.getElementById('multipleChoiceOptions');
+    const trueFalseOptions = document.getElementById('trueFalseOptions');
+    const fillBlankOptions = document.getElementById('fillBlankOptions');
+    
+    // Hide all options first
+    multipleChoiceOptions.classList.add('hidden');
+    trueFalseOptions.classList.add('hidden');
+    fillBlankOptions.classList.add('hidden');
+    
+    // Show relevant options
+    if (this.value === 'multiple_choice') {
+        multipleChoiceOptions.classList.remove('hidden');
+    } else if (this.value === 'true_false') {
+        trueFalseOptions.classList.remove('hidden');
+    } else if (this.value === 'fill_blanks') {
+        fillBlankOptions.classList.remove('hidden');
+    }
+});
+
+// Load Questions from Bank
+document.getElementById('loadQuestions').addEventListener('click', function() {
+    const category = document.querySelector('select[name="category"]').value;
+    const topicFilter = document.getElementById('topicFilter').value;
+    const difficultyFilter = document.getElementById('difficultyFilter').value;
+    
+    if (!category) {
+        alert('Please select a category first.');
+        return;
+    }
+    
+    // Show loading state
+    const resultsContainer = document.getElementById('questionBankResults');
+    resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500">Loading questions...</div>';
+    
+    // Make AJAX request to load questions
+    fetch('/teacher/questions/load', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            category: category,
+            topic: topicFilter,
+            difficulty: difficultyFilter
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayQuestionBankResults(data.questions || []);
+    })
+    .catch(error => {
+        console.error('Error loading questions:', error);
+        resultsContainer.innerHTML = '<div class="p-4 text-center text-red-500">Error loading questions. Please try again.</div>';
+    });
+});
+
+function displayQuestionBankResults(questions) {
+    const resultsContainer = document.getElementById('questionBankResults');
+    
+    if (questions.length === 0) {
+        resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500">No questions found matching your criteria.</div>';
+        return;
+    }
+    
+    const questionsHtml = questions.map(question => `
+        <div class="border-b border-gray-200 p-4 hover:bg-gray-50">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" value="${question.question_id}" class="mr-3 bank-question-checkbox">
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${question.difficulty_level}</span>
+                        <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded ml-2">${question.question_id}</span>
+                        <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded ml-2">${question.topic_tag}</span>
+                    </div>
+                    <p class="text-sm text-gray-900 mb-2">${question.question_text}</p>
+                    ${question.question_type === 'multiple_choice' ? `
+                        <div class="text-xs text-gray-600 space-y-1">
+                            <div>A. ${question.choice_a}</div>
+                            <div>B. ${question.choice_b}</div>
+                            <div>C. ${question.choice_c}</div>
+                            <div>D. ${question.choice_d}</div>
+                            <div class="font-medium text-green-600">Correct: ${question.correct_answer}</div>
+                        </div>
+                    ` : `
+                        <div class="text-xs text-gray-600">
+                            <div class="font-medium text-green-600">Answer: ${question.correct_answer}</div>
+                        </div>
+                    `}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    resultsContainer.innerHTML = questionsHtml;
+    
+    // Add event listeners to checkboxes
+    document.querySelectorAll('.bank-question-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedBankQuestions);
+    });
+}
+
+function updateSelectedBankQuestions() {
+    const checkedBoxes = document.querySelectorAll('.bank-question-checkbox:checked');
+    selectedBankQuestions = Array.from(checkedBoxes).map(cb => cb.value);
+    
+    const summaryDiv = document.getElementById('selectedQuestionsFromBank');
+    const countSpan = document.getElementById('bankQuestionCount');
+    const listDiv = document.getElementById('selectedBankQuestionsList');
+    
+    countSpan.textContent = selectedBankQuestions.length;
+    
+    if (selectedBankQuestions.length > 0) {
+        summaryDiv.classList.remove('hidden');
+        listDiv.innerHTML = selectedBankQuestions.map(questionId => `
+            <div class="flex items-center justify-between py-1">
+                <span class="text-sm text-gray-700">${questionId}</span>
+                <button type="button" onclick="removeBankQuestion('${questionId}')" class="text-red-600 hover:text-red-800 text-xs">Remove</button>
+            </div>
+        `).join('');
+    } else {
+        summaryDiv.classList.add('hidden');
+    }
+    
+    // Update hidden field
+    document.getElementById('selected_bank_questions_field').value = selectedBankQuestions.join(',');
+}
+
+function removeBankQuestion(questionId) {
+    const checkbox = document.querySelector(`input[value="${questionId}"]`);
+    if (checkbox) {
+        checkbox.checked = false;
+        updateSelectedBankQuestions();
+    }
+}
+
+// Add Custom Question
+document.getElementById('addCustomQuestion').addEventListener('click', function() {
+    const questionType = document.getElementById('customQuestionType').value;
+    const questionText = document.getElementById('customQuestionText').value.trim();
+    const topicTag = document.getElementById('customTopicTag').value.trim();
+    const points = document.getElementById('customPoints').value;
+    const hint = document.getElementById('customHint').value.trim();
+    const explanation = document.getElementById('customExplanation').value.trim();
+    
+    if (!questionText) {
+        alert('Please enter the question text.');
+        return;
+    }
+    
+    let correctAnswer = '';
+    let choices = {};
+    
+    if (questionType === 'multiple_choice') {
+        const choiceA = document.getElementById('customChoiceA').value.trim();
+        const choiceB = document.getElementById('customChoiceB').value.trim();
+        const choiceC = document.getElementById('customChoiceC').value.trim();
+        const choiceD = document.getElementById('customChoiceD').value.trim();
+        const selectedAnswer = document.querySelector('input[name="customCorrectAnswer"]:checked');
+        
+        if (!choiceA || !choiceB || !choiceC || !choiceD) {
+            alert('Please fill in all answer choices.');
+            return;
+        }
+        
+        if (!selectedAnswer) {
+            alert('Please select the correct answer.');
+            return;
+        }
+        
+        choices = { A: choiceA, B: choiceB, C: choiceC, D: choiceD };
+        correctAnswer = selectedAnswer.value;
+    } else if (questionType === 'true_false') {
+        const selectedAnswer = document.querySelector('input[name="customTrueFalseAnswer"]:checked');
+        if (!selectedAnswer) {
+            alert('Please select the correct answer (True or False).');
+            return;
+        }
+        correctAnswer = selectedAnswer.value;
+    } else if (questionType === 'fill_blanks') {
+        correctAnswer = document.getElementById('customFillBlankAnswer').value.trim();
+        if (!correctAnswer) {
+            alert('Please enter the correct answer for the fill-in-the-blank question.');
+            return;
+        }
+    }
+    
+    const customQuestion = {
+        id: 'custom_' + questionIdCounter++,
+        question_type: questionType,
+        question_text: questionText,
+        choices: choices,
+        correct_answer: correctAnswer,
+        topic_tag: topicTag || 'Custom',
+        base_points: parseInt(points),
+        hint_text: hint,
+        explanation: explanation
+    };
+    
+    customQuestions.push(customQuestion);
+    displayCustomQuestions();
+    clearCustomQuestionForm();
+    
+    // Update hidden field
+    document.getElementById('custom_questions_field').value = JSON.stringify(customQuestions);
+});
+
+function displayCustomQuestions() {
+    const listDiv = document.getElementById('customQuestionsList');
+    const countSpan = document.getElementById('customQuestionCount');
+    const containerDiv = document.getElementById('customQuestionsContainer');
+    
+    countSpan.textContent = customQuestions.length;
+    
+    if (customQuestions.length > 0) {
+        listDiv.classList.remove('hidden');
+        containerDiv.innerHTML = customQuestions.map((question, index) => `
+            <div class="border border-gray-200 rounded-lg p-3 bg-white">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">${question.question_type.replace('_', ' ')}</span>
+                            <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded ml-2">${question.topic_tag}</span>
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">${question.base_points} pts</span>
+                        </div>
+                        <p class="text-sm text-gray-900 mb-2">${question.question_text}</p>
+                        ${question.question_type === 'multiple_choice' ? `
+                            <div class="text-xs text-gray-600 space-y-1">
+                                <div>A. ${question.choices.A}</div>
+                                <div>B. ${question.choices.B}</div>
+                                <div>C. ${question.choices.C}</div>
+                                <div>D. ${question.choices.D}</div>
+                                <div class="font-medium text-green-600">Correct: ${question.correct_answer}</div>
+                            </div>
+                        ` : `
+                            <div class="text-xs text-gray-600">
+                                <div class="font-medium text-green-600">Answer: ${question.correct_answer}</div>
+                            </div>
+                        `}
+                    </div>
+                    <button type="button" onclick="removeCustomQuestion(${index})" class="text-red-600 hover:text-red-800 text-sm ml-2">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        listDiv.classList.add('hidden');
+    }
+}
+
+function removeCustomQuestion(index) {
+    customQuestions.splice(index, 1);
+    displayCustomQuestions();
+    document.getElementById('custom_questions_field').value = JSON.stringify(customQuestions);
+}
+
+function clearCustomQuestionForm() {
+    document.getElementById('customQuestionText').value = '';
+    document.getElementById('customChoiceA').value = '';
+    document.getElementById('customChoiceB').value = '';
+    document.getElementById('customChoiceC').value = '';
+    document.getElementById('customChoiceD').value = '';
+    document.getElementById('customFillBlankAnswer').value = '';
+    document.getElementById('customTopicTag').value = '';
+    document.getElementById('customPoints').value = '10';
+    document.getElementById('customHint').value = '';
+    document.getElementById('customExplanation').value = '';
+    
+    // Clear radio buttons
+    document.querySelectorAll('input[name="customCorrectAnswer"]').forEach(radio => radio.checked = false);
+    document.querySelectorAll('input[name="customTrueFalseAnswer"]').forEach(radio => radio.checked = false);
+}
+
 // Validate and finalize payload on submit
 createForm.addEventListener('submit', function(e) {
     const pickingSpecific = document.getElementById('pickSpecificStudents').checked;
@@ -356,6 +858,35 @@ createForm.addEventListener('submit', function(e) {
             checkbox.checked = false;
         });
         syncSelectedStudentsHiddenField();
+    }
+    
+    // Validate questions
+    const questionSource = document.querySelector('input[name="question_source"]:checked').value;
+    const totalQuestions = selectedBankQuestions.length + customQuestions.length;
+    const requiredQuestions = parseInt(document.querySelector('input[name="number_of_questions"]').value);
+    
+    if (questionSource === 'question_bank' && selectedBankQuestions.length === 0) {
+        e.preventDefault();
+        alert('Please select questions from the question bank or change the question source.');
+        return;
+    }
+    
+    if (questionSource === 'create_custom' && customQuestions.length === 0) {
+        e.preventDefault();
+        alert('Please create at least one custom question or change the question source.');
+        return;
+    }
+    
+    if (questionSource === 'mixed' && totalQuestions === 0) {
+        e.preventDefault();
+        alert('Please select questions from the bank or create custom questions.');
+        return;
+    }
+    
+    if (totalQuestions < requiredQuestions) {
+        e.preventDefault();
+        alert(`You have selected/created ${totalQuestions} questions, but the assessment requires ${requiredQuestions} questions. Please add more questions or reduce the number of questions required.`);
+        return;
     }
 });
 </script>
