@@ -1,5 +1,5 @@
 @extends('layouts.user_layout')
-
+@section('title', 'Profile')
 @section('content')
     @php
         use App\Http\Controllers\RankController;
