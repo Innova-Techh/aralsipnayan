@@ -363,6 +363,82 @@ class TeacherStudentController extends Controller
     }
 
     /**
+     * Deactivate a student's account (set users.status to 'inactive').
+     */
+    public function deactivate($studentId)
+    {
+        $teacher = Auth::guard('admin')->user();
+
+        // Verify the student exists
+        $studentProfile = StudentProfile::where('user_id', $studentId)->first();
+        if (!$studentProfile) {
+            return response()->json(['error' => 'Student not found'], 404);
+        }
+
+        // Verify teacher manages this student's section
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        if (!in_array($studentProfile->section, $teacherSections)) {
+            return response()->json(['error' => 'Access denied to this student'], 403);
+        }
+
+        try {
+            $user = User::findOrFail($studentId);
+            $user->status = 'inactive';
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student account set to inactive.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to deactivate student: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Activate a student's account (set users.status to 'active').
+     */
+    public function activate($studentId)
+    {
+        $teacher = Auth::guard('admin')->user();
+
+        // Verify the student exists
+        $studentProfile = StudentProfile::where('user_id', $studentId)->first();
+        if (!$studentProfile) {
+            return response()->json(['error' => 'Student not found'], 404);
+        }
+
+        // Verify teacher manages this student's section
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        if (!in_array($studentProfile->section, $teacherSections)) {
+            return response()->json(['error' => 'Access denied to this student'], 403);
+        }
+
+        try {
+            $user = User::findOrFail($studentId);
+            $user->status = 'active';
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student account set to active.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to activate student: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Get average performance for a section
      */
     private function getSectionAveragePerformance($section)
