@@ -3,6 +3,7 @@
 @section('title', 'Quiz - AralSipnayan')
 
 @section('content')
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 
 <div class="space-y-8 font-baloo mt-8 px-4 xs:px-4 sm:px-4 md:px-8 lg:px-12 pb-24 sm:pb-20 md:pb-16 lg:pb-20">
     <!-- Header Section -->
@@ -250,6 +251,7 @@
 </div>
 
 @include('components.retry-modal')
+@include('components.sweetalert-config')
 
 <style>
     /* Points Animation Styles */
@@ -1378,14 +1380,14 @@ document.addEventListener('DOMContentLoaded', function() {
         @if($question->type === 'fill_blanks')
             const fillAnswer = document.getElementById('fill-answer');
             if (!fillAnswer.value.trim()) {
-                alert('Please enter an answer before submitting.');
+                showNoAnswerToast('fill_blanks');
                 return;
             }
             answerValue = fillAnswer.value.trim();
         @else
             const selectedAnswer = document.querySelector('input[name="answer"]:checked');
             if (!selectedAnswer) {
-                alert('Please select an answer before submitting.');
+                showNoAnswerToast('multiple_choice');
                 return;
             }
             answerValue = selectedAnswer.value;
@@ -1869,6 +1871,15 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             overlay.classList.add('hidden');
         }, 500);
+    }
+
+    // SweetAlert toast for empty answers
+    function showNoAnswerToast(questionType) {
+        if (questionType === 'fill_blanks') {
+            showWarningToast('Please type your answer in the text box before submitting! 📝');
+        } else {
+            showWarningToast('Please select one of the answer choices before submitting! 🎯');
+        }
     }
     
     function showFeedback(data, isTimeout = false) {
