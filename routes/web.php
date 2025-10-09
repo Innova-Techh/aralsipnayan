@@ -203,7 +203,11 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
         return view('admin.teacher.index');
     })->name('dashboard');
     
-
+// Section Management
+Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'index'])->name('sections');
+Route::get('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'show'])->name('sections.show'); // ADD THIS LINE
+Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
+    
    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
     // Assessment Management
