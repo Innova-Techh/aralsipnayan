@@ -38,7 +38,7 @@ function refreshCaptcha() {
 
         <!-- Login Card -->
         <div class="bg-primary-blue rounded-2xl p-8 w-full max-w-sm shadow-lg">
-            <h2 class="text-white text-xl font-semibold text-center mb-8">Student Login</h2>
+            <h2 class="text-white text-xl font-semibold text-center mb-8">Login</h2>
             <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
                 @csrf
                 <div class="mb-5">
@@ -98,12 +98,11 @@ function refreshCaptcha() {
         <!-- Right Section -->
         <div class="flex-1 bg-gray-100 flex items-center justify-center">
             <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
-                <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Student Login</h2>
+                <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm">
                     @csrf
                     <div class="mb-6">
-                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Student
-                            Number</label>
+                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Username or Email</label>
                         <input type="text"
                             class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
                             name="username" id="desktop-username" required>

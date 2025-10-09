@@ -1,6 +1,6 @@
 @extends('admin.teacher.layouts.app')
 
-@section('title', 'Section Details - Aralsipnayan')
+@section('title', 'AralSipnayan')
 
 @section('content')
     <div class="min-h-screen bg-gray-50">
@@ -12,11 +12,18 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span class="font-medium">Back to Sections</span>
                 </button>
-                <button id="createAssessmentBtn"
+                <!-- <button id="createAssessmentBtn"
                     class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
                     <span class="material-symbols-outlined">add</span>
                     Create Assessment
-                </button>
+                </button> --> 
+                <!-- Add Student Button -->
+                <div class="mb-4">
+                    <button onclick="openAddStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+                        <span class="material-symbols-outlined mr-2">person_add</span>
+                        Add New Student
+                    </button>
+                </div>
             </div>
 
             <!-- Section Title -->
@@ -212,9 +219,13 @@
 
                                     <!-- Status -->
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            active
+                                        @php
+                                            $isActive = strtolower($student['status'] ?? 'active') === 'active';
+                                            $badgeBg = $isActive ? 'bg-green-100' : 'bg-gray-200';
+                                            $badgeText = $isActive ? 'text-green-800' : 'text-gray-700';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $badgeBg }} {{ $badgeText }}">
+                                            {{ $student['status'] ?? 'active' }}
                                         </span>
                                     </td>
 
@@ -246,16 +257,151 @@
         </div>
     </div>
 
+    <!-- Global Message Toasts -->
+    <div id="messageContainer"
+     class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-80"
+     aria-live="polite">
+        <!-- Success -->
+        <div id="successMessage"
+            class="hidden flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 shadow">
+            <span class="material-symbols-outlined text-green-600">check_circle</span>
+            <div class="text-sm text-green-800">
+                <span id="successText"></span>
+            </div>
+        </div>
+        <!-- Error -->
+        <div id="errorMessage"
+            class="hidden flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 shadow">
+            <span class="material-symbols-outlined text-red-600">error</span>
+            <div class="text-sm text-red-800">
+                <span id="errorText"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Add New Student</h3>
+                    <button onclick="closeAddStudentModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="addStudentForm">
+                    @csrf
+                    <input type="hidden" id="studentSection" name="section">
+                    <div class="mb-4">
+                        <label for="studentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" id="studentFirstName" name="firstname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="studentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name (Optional)</label>
+                        <input type="text" id="studentMiddleName" name="middlename" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="studentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" id="studentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email(Should be Unique)</label>
+                        <input type="email" id="studentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="studentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
+                        <input type="text" id="studentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
+                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                            Grade 6 (Fixed)
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Student ID (LRN)</label>
+                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                            Auto-generated 6-digit number
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeAddStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                            Add Student
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>
+
+  <!-- Edit Student Modal -->
+  <div id="editStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Edit Student</h3>
+                    <button onclick="closeEditStudentModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form id="editStudentForm">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="editStudentId" name="student_id">
+                    <input type="hidden" id="editStudentSection" name="section">
+                    <div class="mb-4">
+                        <label for="editStudentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" id="editStudentFirstName" name="firstname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name (Optional)</label>
+                        <input type="text" id="editStudentMiddleName" name="middlename" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" id="editStudentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="editStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
+                        <input type="text" id="editStudentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
+                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                            Grade 6 (Fixed)
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeEditStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            Update Student
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Student Actions Modal -->
     <div id="studentActionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Student Actions</h3>
                 <div class="space-y-2">
-                    <button
+                    <button 
+                        onclick="openEditStudentModal()"
                         class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
                         <span class="material-symbols-outlined text-blue-600">visibility</span>
-                        <span class="font-medium text-gray-700">View Details</span>
+                        <span class="font-medium text-gray-700">View/Edit Details</span>
                     </button>
                     <button
                         class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
@@ -272,6 +418,12 @@
                         <span class="material-symbols-outlined text-red-600">person_remove</span>
                         <span class="font-medium text-gray-700">Remove from Section</span>
                     </button>
+                    <button id="toggleActivationBtn"
+                        onclick="toggleActivation()"
+                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
+                        <span id="toggleActivationIcon" class="material-symbols-outlined text-red-600">person_off</span>
+                        <span id="toggleActivationText" class="font-medium text-gray-700">Deactivate Account</span>
+                    </button>
                 </div>
                 <button onclick="closeStudentActionsModal()"
                     class="mt-4 w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
@@ -282,11 +434,94 @@
     </div>
 
     <script>
-        function showStudentActions(studentId) {
-            document.getElementById('studentActionsModal').classList.remove('hidden');
+        let selectedStudentId = null;
+        const currentSection = '{{ $section['raw_name'] ?? ($section['section'] ?? '') }}';
+
+        // Add Student Modal Functions
+        window.openAddStudentModal = function () {
+            // Ensure the hidden section input is set before showing the modal
+            const sectionInput = document.getElementById('studentSection');
+            if (sectionInput && currentSection) {
+                sectionInput.value = currentSection;
+            }
+            document.getElementById('addStudentModal').classList.remove('hidden');
         }
 
-        function closeStudentActionsModal() {
+        window.closeAddStudentModal = function () {
+            document.getElementById('addStudentModal').classList.add('hidden');
+            document.getElementById('addStudentForm').reset();
+        }
+
+        // Add Student Form Submission
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/teacher/sections/students', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(async response => {
+                let data;
+                try { data = await response.json(); } catch (_) { data = {}; }
+                if (response.ok && data.success) {
+                    showMessage(data.message || 'Student added successfully', 'success');
+                    closeAddStudentModal();
+                    if (typeof loadStudents === 'function') {
+                        loadStudents(currentSection);
+                    }
+                } else {
+                    const msg = (data && (data.error || data.message)) || 'Failed to add student';
+                    showMessage(msg, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('An error occurred while adding the student', 'error');
+            });
+        });
+
+        window.showStudentActions = function (studentId) {
+            selectedStudentId = studentId;
+            document.getElementById('studentActionsModal').classList.remove('hidden');
+
+            // Update Activate/Deactivate action label and icon based on current status
+            try {
+                const rows = document.querySelectorAll('#studentsTableBody tr');
+                let statusText = 'active';
+                rows.forEach(tr => {
+                    const btn = tr.querySelector('button[onclick^="showStudentActions("]');
+                    if (btn && btn.getAttribute('onclick').includes(String(studentId))) {
+                        const statusEl = tr.querySelector('td:nth-child(7) span');
+                        if (statusEl) statusText = (statusEl.textContent || '').trim().toLowerCase();
+                    }
+                });
+
+                const toggleTextEl = document.getElementById('toggleActivationText');
+                const toggleIconEl = document.getElementById('toggleActivationIcon');
+                const toggleBtnEl = document.getElementById('toggleActivationBtn');
+                if (statusText === 'inactive') {
+                    toggleTextEl.textContent = 'Activate Account';
+                    toggleIconEl.textContent = 'person';
+                    toggleIconEl.classList.remove('text-red-600');
+                    toggleIconEl.classList.add('text-green-600');
+                    if (toggleBtnEl) toggleBtnEl.dataset.action = 'activate';
+                } else {
+                    toggleTextEl.textContent = 'Deactivate Account';
+                    toggleIconEl.textContent = 'person_off';
+                    toggleIconEl.classList.remove('text-green-600');
+                    toggleIconEl.classList.add('text-red-600');
+                    if (toggleBtnEl) toggleBtnEl.dataset.action = 'deactivate';
+                }
+            } catch (_) { /* ignore */ }
+        }
+
+        window.closeStudentActionsModal = function () {
             document.getElementById('studentActionsModal').classList.add('hidden');
         }
 
@@ -296,5 +531,161 @@
                 closeStudentActionsModal();
             }
         });
+
+
+        // Utility Functions
+        window.showMessage = function (message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const successText = document.getElementById('successText');
+            const errorText = document.getElementById('errorText');
+            
+            // Hide all messages first
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            if (type === 'success') {
+                successText.textContent = message;
+                successMessage.classList.remove('hidden');
+            } else {
+                errorText.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+            
+            messageContainer.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Edit Student Modal logic
+        window.openEditStudentModal = function () {
+            if (!selectedStudentId) {
+                showMessage('No student selected', 'error');
+                return;
+            }
+
+            // Close actions modal if open
+            closeStudentActionsModal();
+
+            // Populate hidden fields
+            const sectionInput = document.getElementById('editStudentSection');
+            const idInput = document.getElementById('editStudentId');
+            if (sectionInput) sectionInput.value = currentSection || '';
+            if (idInput) idInput.value = selectedStudentId;
+
+            // Fetch students for this section, then find the selected one to prefill
+            fetch(`/teacher/sections/students/${encodeURIComponent(currentSection)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                let payload;
+                try { payload = await response.json(); } catch (_) { payload = null; }
+                if (response.ok && payload && Array.isArray(payload.students)) {
+                    const student = payload.students.find(s => String(s.user_id) === String(selectedStudentId));
+                    if (student) {
+                        document.getElementById('editStudentFirstName').value = student.firstname || '';
+                        document.getElementById('editStudentMiddleName').value = student.middlename || '';
+                        document.getElementById('editStudentLastName').value = student.lastname || '';
+                        document.getElementById('editStudentEmail').value = student.email || '';
+                        document.getElementById('editStudentSchoolYear').value = student.school_year || '';
+                    }
+                }
+            })
+            .catch(() => { /* ignore prefill errors */ });
+
+            document.getElementById('editStudentModal').classList.remove('hidden');
+        }
+
+        window.closeEditStudentModal = function () {
+            document.getElementById('editStudentModal').classList.add('hidden');
+            document.getElementById('editStudentForm').reset();
+        }
+
+        // Handle edit form submit
+        document.getElementById('editStudentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!selectedStudentId) {
+                showMessage('No student selected', 'error');
+                return;
+            }
+
+            const formData = new FormData(this);
+            // Ensure method override for Laravel
+            formData.set('_method', 'PUT');
+
+            fetch(`/teacher/sections/students/${selectedStudentId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(async response => {
+                let data;
+                try { data = await response.json(); } catch (_) { data = {}; }
+                if (response.ok && data.success) {
+                    showMessage(data.message || 'Student updated successfully', 'success');
+                    closeEditStudentModal();
+                    if (typeof loadStudents === 'function') {
+                        loadStudents(currentSection);
+                    }
+                } else {
+                    const msg = (data && (data.error || data.message)) || 'Failed to update student';
+                    showMessage(msg, 'error');
+                }
+            })
+            .catch(() => {
+                showMessage('An error occurred while updating the student', 'error');
+            });
+        });
+
+        // Toggle activation
+        window.toggleActivation = function () {
+            if (!selectedStudentId) {
+                showMessage('No student selected', 'error');
+                return;
+            }
+
+            const action = document.getElementById('toggleActivationBtn')?.dataset?.action;
+            const isActivate = action === 'activate';
+            const url = isActivate
+                ? `/teacher/sections/students/${selectedStudentId}/activate`
+                : `/teacher/sections/students/${selectedStudentId}/deactivate`;
+            const confirmMsg = isActivate ? 'Activate this student account?' : 'Set this student account to inactive?';
+            if (!confirm(confirmMsg)) return;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                let data;
+                try { data = await response.json(); } catch (_) { data = {}; }
+                if (response.ok && data.success) {
+                    showMessage(data.message || (isActivate ? 'Student activated' : 'Student deactivated'), 'success');
+                    closeStudentActionsModal();
+                    if (typeof loadStudents === 'function') {
+                        loadStudents(currentSection);
+                    }
+                } else {
+                    const msg = (data && (data.error || data.message)) || 'Request failed';
+                    showMessage(msg, 'error');
+                }
+            })
+            .catch(() => {
+                showMessage('An error occurred while updating the student status', 'error');
+            });
+        }
     </script>
 @endsection
