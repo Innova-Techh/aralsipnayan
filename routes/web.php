@@ -203,6 +203,9 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
         return view('admin.teacher.index');
     })->name('dashboard');
     
+
+   Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
     // Assessment Management
     Route::get('/assessments', [App\Http\Controllers\TeacherAssessmentController::class, 'index'])->name('assessments');
     Route::get('/assessments/create', [App\Http\Controllers\TeacherAssessmentController::class, 'create'])->name('assessments.create');

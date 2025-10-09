@@ -90,7 +90,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Manage Admins -->
-            <a href="#"
+            <a href="{{ route('admin.management.admins') }}"
                 class="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start space-x-4">
                     <div class="p-2 bg-gray-50 rounded-lg">
@@ -104,7 +104,7 @@
             </a>
 
             <!-- Manage Teachers -->
-            <a href="#"
+            <a href="{{ route('admin.management.teachers') }}"
                 class="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start space-x-4">
                     <div class="p-2 bg-gray-50 rounded-lg">
@@ -132,7 +132,7 @@
             </a>
 
             <!-- Manage Sections -->
-            <a href="#"
+            <a href="{{ route('admin.management.sections') }}"
                 class="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start space-x-4">
                     <div class="p-2 bg-gray-50 rounded-lg">

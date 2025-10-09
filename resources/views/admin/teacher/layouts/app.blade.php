@@ -2,116 +2,85 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Aralsipnayan')</title>
 
-    <!-- Tailwind (Vite) -->
+    <!-- Vite (Tailwind + app JS) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Material Icons -->
+    <!-- Material Icons (teacher icons preserved) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0"
         rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <!-- Font Awesome (for header toggle/search/notifications to match admin header) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS (keeps teacher font + small tweaks) -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
         }
 
         .material-symbols-outlined {
             transition: all 0.25s ease;
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-variation-settings: 'FILL' 0, 'wght' 400;
         }
 
-        /* Hover effect (all devices) */
-        .nav-link:hover .material-symbols-outlined {
-            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 28;
-            transform: scale(1.2);
-            color: #2563eb;
+        /* small tooltip helper for collapsed sidebar entries (kept minimal) */
+        [x-cloak] {
+            display: none !important;
         }
 
-        /* Active effect (all devices) */
-        .nav-link.active .material-symbols-outlined {
-            font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
-            transform: scale(1.2);
-            color: #2563eb;
+        /* Sidebar scrollbar */
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
 
-        /* Remove active background (desktop + mobile) */
-        .nav-link.active {
-            background-color: transparent !important;
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Baloo 2 Regular */
-        @font-face {
-            font-family: 'Baloo 2';
-            src: url('{{ asset("fonts/baloo2/Baloo2-Regular.ttf") }}') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 3px;
         }
 
-        /* Baloo 2 Bold */
-        @font-face {
-            font-family: 'Baloo 2';
-            src: url('{{ asset("fonts/baloo2/Baloo2-Bold.ttf") }}') format('truetype');
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* Baloo 2 ExtraBold */
-        @font-face {
-            font-family: 'Baloo 2';
-            src: url('{{ asset("fonts/baloo2/Baloo2-ExtraBold.ttf") }}') format('truetype');
-            font-weight: 800;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* Remove global background image */
-
-        @media (max-width: 1279px) {
-            .nav-link.active span:last-child {
-                font-weight: 600;
-                color: #2563eb;
-            }
-        }
-
-        /* Custom scrollbar for mobile navigation */
-        .mobile-nav-scroll::-webkit-scrollbar {
-            display: none;
-        }
-
-        .mobile-nav-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.12);
         }
     </style>
 
     @stack('styles')
 </head>
 
-<body class="min-h-screen bg-gray-100">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg flex flex-col">
+<body x-data="{ sidebarOpen: true }" class="min-h-screen bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar (teacher icons kept as material-symbols) -->
+        <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
+            class="relative flex flex-col h-full bg-white shadow-lg transition-all duration-300 ease-in-out">
             <!-- Logo/Brand -->
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center space-x-3">
+            <div class="flex items-center h-16 px-4 border-b border-gray-200"
+                :class="sidebarOpen ? 'justify-start' : 'justify-center'">
+                <div class="flex items-center" :class="sidebarOpen ? 'space-x-3' : ''">
                     <div class="w-10 h-10 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
-                        class="w-10 h-10 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-xl">
+                            class="w-10 h-10 rounded-xl">
                     </div>
-                    <div>
+
+                    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300"
+                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition-opacity ease-in duration-100"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
                         <h1
                             class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold text-gray-900 whitespace-nowrap">
                             Aral<span class="text-red-600">Sipnayan</span>
@@ -122,130 +91,247 @@
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="flex-1 px-4 py-6">
-                <ul class="space-y-2">
+            <nav class="flex-1 px-2 py-4 sidebar-scrollbar overflow-y-auto">
+                <ul class="space-y-1">
                     <li>
                         <a href="{{ route('teacher.dashboard') }}"
-                           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.dashboard') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">dashboard</span>
-                            Dashboard
+                            <span x-show="sidebarOpen">Dashboard</span>
+
+                            <!-- tooltip when collapsed -->
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Dashboard
+                            </div>
                         </a>
                     </li>
-                    
-                    <!-- Assessment Management with Submenu -->
-                    <li>
-                        <div class="space-y-1">
-                            <a href="{{ route('teacher.assessments') }}"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.assessments*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                                <span class="material-symbols-outlined mr-3">assignment</span>
-                                Assessment Management
-                                <span class="material-symbols-outlined ml-auto">expand_more</span>
-                            </a>
-                            @if(request()->routeIs('teacher.assessments*'))
-                            <ul class="ml-10 space-y-1">
-                                <li>
-                                    <a href="{{ route('teacher.assessments.create') }}"
-                                       class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                                        <span class="material-symbols-outlined mr-2 text-sm">add_circle</span>
-                                        Create Assessment
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('teacher.assessments') }}"
-                                       class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                                        <span class="material-symbols-outlined mr-2 text-sm">list</span>
-                                        Manage Assessments
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                       class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
-                                        <span class="material-symbols-outlined mr-2 text-sm">quiz</span>
-                                        Assessment Templates
-                                    </a>
-                                </li>
-                            </ul>
-                            @endif
-                        </div>
+
+                    <!-- Assessment Management with submenu -->
+                    <li x-data="{ openSub: {{ request()->routeIs('teacher.assessments*') ? 'true' : 'false' }} }">
+                        <button @click="openSub = !openSub"
+                            class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                            <span class="material-symbols-outlined mr-3">assignment</span>
+                            <span x-show="sidebarOpen">Assessment Management</span>
+                            <span class="material-symbols-outlined ml-auto"
+                                :class="openSub ? 'rotate-180' : ''">expand_more</span>
+                        </button>
+
+                        <ul x-show="openSub" x-collapse class="ml-10 mt-1 space-y-1">
+                            <li>
+                                <a href="{{ route('teacher.assessments.create') }}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    <span class="material-symbols-outlined mr-2 text-sm">add_circle</span>
+                                    Create Assessment
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('teacher.assessments') }}"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    <span class="material-symbols-outlined mr-2 text-sm">list</span>
+                                    Manage Assessments
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    <span class="material-symbols-outlined mr-2 text-sm">quiz</span>
+                                    Assessment Templates
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <li>
                         <a href="{{ route('teacher.sections') }}"
-                           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.sections*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.sections*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">groups</span>
-                            Section Management
+                            <span x-show="sidebarOpen">Section Management</span>
+
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Section Management
+                            </div>
                         </a>
                     </li>
 
                     <li>
                         <a href="{{ route('teacher.students') }}"
-                           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.students*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.students*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">school</span>
-                            Student Management
+                            <span x-show="sidebarOpen">Student Management</span>
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Student Management
+                            </div>
                         </a>
                     </li>
 
                     <li>
                         <a href="{{ route('teacher.analytics') }}"
-                           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.analytics*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.analytics*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">analytics</span>
-                            Analytics
+                            <span x-show="sidebarOpen">Analytics</span>
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Analytics
+                            </div>
                         </a>
                     </li>
 
                     <li>
                         <a href="{{ route('teacher.profile') }}"
-                           class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.profile*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.profile*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">person</span>
-                            Profile
+                            <span x-show="sidebarOpen">Profile</span>
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Profile
+                            </div>
                         </a>
                     </li>
 
                     <li>
                         <a href="#"
-                           class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
                             <span class="material-symbols-outlined mr-3">settings</span>
-                            Settings
+                            <span x-show="sidebarOpen">Settings</span>
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                Settings
+                            </div>
                         </a>
                     </li>
                 </ul>
             </nav>
-        </div>
+
+            <!-- User Profile & Logout Section (preserved logic) -->
+            <div class="border-t border-gray-200 p-4">
+                <div class="flex items-center mb-3" :class="sidebarOpen ? '' : 'justify-center'">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Teacher') }}&background=3B82F6&color=fff"
+                        alt="Teacher Avatar" class="w-10 h-10 rounded-full flex-shrink-0">
+                    <div x-show="sidebarOpen" x-transition class="ml-3">
+                        <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name ?? 'Teacher' }}</p>
+                        <p class="text-xs text-gray-500">Educator</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('teacher.logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="relative w-full flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                        :class="sidebarOpen ? 'justify-start' : 'justify-center'">
+                        <div class="flex items-center justify-center w-8">
+                            <i class="fas fa-sign-out-alt text-lg"></i>
+                        </div>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Logout</span>
+
+                        <div x-cloak x-show="!sidebarOpen"
+                            class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                            Logout
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </aside>
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Header -->
-            <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-                <div class="flex items-center justify-between">
+            <!-- Top Header (now matches admin header layout exactly) -->
+            <header class="bg-white shadow-sm border-b border-gray-200">
+                <div class="flex items-center justify-between h-16 px-6">
+                    <!-- Left Side: Toggle Button and Title -->
                     <div class="flex items-center space-x-4">
-                        <span class="text-white font-medium bg-black p-2 rounded-full">Teacher</span>
+                        <!-- Sidebar Toggle Button -->
+                        <button @click="sidebarOpen = !sidebarOpen"
+                            class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                            <i
+                                :class="sidebarOpen ? 'fas fa-arrow-left text-gray-600 text-lg' : 'fas fa-arrow-right text-gray-600 text-lg'"></i>
+                        </button>
+
+                        <!-- Page Title -->
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">Teacher</h2>
+                        </div>
                     </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <!-- Search Bar -->
+
+                    <!-- Center: Search Bar (matches admin spacing) -->
+                    <div class="flex-1 max-w-2xl mx-8">
                         <div class="relative">
-                            <input type="text" placeholder="Search..." 
-                                   class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
+                            <input type="text" placeholder="Search..."
+                                class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <i
+                                class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Notifications & User (matches admin layout) -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <div class="relative" x-data="{ notificationOpen: false }">
+                            <button @click="notificationOpen = !notificationOpen"
+                                class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative">
+                                <i class="fas fa-bell text-gray-600"></i>
+                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            </button>
+
+                            <!-- Notification Dropdown -->
+                            <div x-show="notificationOpen" x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95" @click.away="notificationOpen = false"
+                                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                <div class="p-4 border-b border-gray-200">
+                                    <h3 class="font-semibold text-gray-800">Notifications</h3>
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                        <p class="text-sm text-gray-800">Exam grading completed</p>
+                                        <p class="text-xs text-gray-500 mt-1">5 minutes ago</p>
+                                    </a>
+                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                                        <p class="text-sm text-gray-800">New student joined your section</p>
+                                        <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
+                                    </a>
+                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50">
+                                        <p class="text-sm text-gray-800">15 new students enrolled</p>
+                                        <p class="text-xs text-gray-500 mt-1">3 hours ago</p>
+                                    </a>
+                                </div>
+                                <div class="p-3 border-t border-gray-200">
+                                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800">View all
+                                        notifications</a>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- User Profile -->
+                        <!-- User Profile (keeps your JS dropdown IDs intact) -->
                         <div class="flex items-center space-x-3">
                             <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">{{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}</p>
+                                <!-- preserved original teacher profile display call -->
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}</p>
                                 <p class="text-xs text-gray-500">Grade 6 Teacher</p>
                             </div>
                             <div class="relative">
-                                <button id="user-menu-button" class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
-                                    <img src="{{ asset('images/profile/avatar1.png') }}" alt="Profile" class="w-full h-full object-cover">
+                                <button id="user-menu-button"
+                                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
+                                    <img src="{{ asset('images/profile/avatar1.png') }}" alt="Profile"
+                                        class="w-full h-full object-cover">
                                 </button>
-                                
-                                <!-- Dropdown Menu -->
-                                <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
-                                    <a href="{{ route('teacher.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile Settings</a>
+
+                                <!-- Dropdown Menu (your existing JS toggles this) -->
+                                <div id="userDropdown"
+                                    class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                                    <a href="{{ route('teacher.profile') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile
+                                        Settings</a>
                                     <form method="POST" action="{{ route('admin.logout') }}">
                                         @csrf
-                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                        <button type="submit"
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                                             Sign out
                                         </button>
                                     </form>
@@ -263,7 +349,7 @@
         </div>
     </div>
 
-    <!-- JavaScript for dropdown functionality -->
+    <!-- KEEP ORIGINAL JS LOGIC (unchanged) -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const userMenuButton = document.getElementById('user-menu-button');
