@@ -28,10 +28,7 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Admin/Teacher Auth Routes
-Route::get('/adminlogin', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/adminlogin', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+// Admin/Teacher Auth Routes - removed in favor of unified login
 
 // General dashboard redirect (based on role)
 Route::get('/dashboard', function() {
@@ -192,12 +189,12 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
     Route::get('/dashboard', function () {
         // Check if user is authenticated and has Teacher role
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login');
+            return redirect()->route('login');
         }
         
         if (Auth::guard('admin')->user()->role !== 'Teacher') {
             Auth::guard('admin')->logout();
-            return redirect()->route('admin.login')->withErrors(['access' => 'Teacher access required.']);
+            return redirect()->route('login')->withErrors(['access' => 'Teacher access required.']);
         }
         
         return view('admin.teacher.index');
@@ -208,7 +205,7 @@ Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::
 Route::get('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'show'])->name('sections.show'); // ADD THIS LINE
 Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
     
-   Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+   Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Assessment Management
     Route::get('/assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'index'])->name('assessments');
@@ -236,7 +233,7 @@ Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\Teacher
     // Student Overview Page (for assessment management)
     Route::get('/students', function () {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
+            return redirect()->route('login');
         }
         return view('admin.teacher.students.index');
     })->name('students');
@@ -245,6 +242,8 @@ Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\Teacher
     Route::post('/sections/students', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'store'])->name('sections.students.store');
     Route::put('/sections/students/{student}', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'update'])->name('sections.students.update');
     Route::delete('/sections/students/{student}', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('sections.students.destroy');
+    Route::post('/sections/students/{student}/deactivate', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'deactivate'])->name('sections.students.deactivate');
+    Route::post('/sections/students/{student}/activate', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'activate'])->name('sections.students.activate');
     
     // Analytics
     Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
@@ -267,7 +266,7 @@ Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\Teacher
     // Profile
     Route::get('/profile', function () {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
+            return redirect()->route('login');
         }
         return view('admin.teacher.profile.index');
     })->name('profile');
