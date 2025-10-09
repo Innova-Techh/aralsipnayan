@@ -1047,20 +1047,20 @@
                 // Encouraging messages array
                 const encouragingMessages = [
                     "Ready to continue your math journey?",
-                    "Let's make today count! 🌟",
-                    "Every problem solved makes you stronger! 💪",
-                    "Keep pushing forward, you're doing amazing! 🚀",
-                    "Your dedication is truly inspiring! ✨",
-                    "Time to unlock your potential! 🔓",
-                    "Let's achieve greatness together! 🎯",
-                    "You're one step closer to mastery! 📚",
-                    "Believe in yourself and keep going! 💖",
-                    "Today is another opportunity to shine! ⭐",
-                    "You've got this! Let's do it! 💫",
-                    "Math is your superpower! 🦸",
-                    "Ready to level up your skills? 📈",
-                    "Your hard work is paying off! 🏆",
-                    "Let's conquer new challenges today! ⚡"
+                    "Let's make today count! ",
+                    "Every problem solved makes you stronger!",
+                    "Keep pushing forward, you're doing amazing!",
+                    "Your dedication is truly inspiring!",
+                    "Time to unlock your potential!",
+                    "Let's achieve greatness together!",
+                    "You're one step closer to mastery!",
+                    "Believe in yourself and keep going!",
+                    "Today is another opportunity to shine!",
+                    "You've got this! Let's do it!",
+                    "Math is your superpower!",
+                    "Ready to level up your skills?",
+                    "Your hard work is paying off!",
+                    "Let's conquer new challenges today!"
                 ];
 
                 // Function to set random encouraging message

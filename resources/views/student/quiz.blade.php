@@ -805,20 +805,42 @@
                 }
 
                 function initializeAudio() {
-                    // Preload audio files for better performance
+                    // Preload audio files for layered feedback system
                     try {
-                        window.correctAudio = new Audio('{{ asset("audio/correct.mp3") }}');
-                        window.incorrectAudio = new Audio('{{ asset("audio/incorrect.mp3") }}');
+                        // Initialize correct sound arrays (base + special sounds)
+                        window.correctSounds = [
+                            new Audio('{{ asset("audio/correct.mp3") }}'),
+                            new Audio('{{ asset("audio/awesome.mp3") }}'),
+                            new Audio('{{ asset("audio/excellent.mp3") }}'),
+                            new Audio('{{ asset("audio/terrific.mp3") }}')
+                        ];
 
-                        // Set volume
-                        window.correctAudio.volume = 0.7;
-                        window.incorrectAudio.volume = 0.7;
+                        // Initialize incorrect sound arrays (base + special sounds)
+                        window.incorrectSounds = [
+                            new Audio('{{ asset("audio/incorrect.mp3") }}'),
+                            new Audio('{{ asset("audio/goodeffort.mp3") }}'),
+                            new Audio('{{ asset("audio/nicetry.mp3") }}')
+                        ];
 
-                        // Preload the audio files
-                        window.correctAudio.preload = 'auto';
-                        window.incorrectAudio.preload = 'auto';
+                        // Initialize level up sound
+                        window.levelUpAudio = new Audio('{{ asset("audio/levelup.mp3") }}');
 
-                        console.log('Audio system initialized');
+                        // Set volume for feedback sounds
+                        window.correctSounds.forEach(sound => {
+                            sound.volume = 0.7;
+                            sound.preload = 'auto';
+                        });
+
+                        window.incorrectSounds.forEach(sound => {
+                            sound.volume = 0.7;
+                            sound.preload = 'auto';
+                        });
+
+                        // Set volume for level up sound
+                        window.levelUpAudio.volume = 0.8;
+                        window.levelUpAudio.preload = 'auto';
+
+                        console.log('Audio system initialized with layered sounds');
                     } catch (error) {
                         console.error('Error initializing audio system:', error);
                     }
@@ -826,18 +848,24 @@
                     // Add user interaction listener to enable audio (required by many browsers)
                     function enableAudioOnFirstInteraction() {
                         try {
-                            // Try to play and immediately pause to "unlock" audio
-                            if (window.correctAudio) {
-                                window.correctAudio.play().then(() => {
-                                    window.correctAudio.pause();
-                                    window.correctAudio.currentTime = 0;
-                                }).catch(() => { });
+                            // Play and pause all sounds to enable them
+                            if (window.correctSounds && window.correctSounds.length > 0) {
+                                window.correctSounds.forEach(sound => {
+                                    sound.play().then(() => sound.pause()).catch(() => {});
+                                    sound.currentTime = 0;
+                                });
                             }
-                            if (window.incorrectAudio) {
-                                window.incorrectAudio.play().then(() => {
-                                    window.incorrectAudio.pause();
-                                    window.incorrectAudio.currentTime = 0;
-                                }).catch(() => { });
+
+                            if (window.incorrectSounds && window.incorrectSounds.length > 0) {
+                                window.incorrectSounds.forEach(sound => {
+                                    sound.play().then(() => sound.pause()).catch(() => {});
+                                    sound.currentTime = 0;
+                                });
+                            }
+
+                            if (window.levelUpAudio) {
+                                window.levelUpAudio.play().then(() => window.levelUpAudio.pause()).catch(() => {});
+                                window.levelUpAudio.currentTime = 0;
                             }
 
                             // Remove the event listener after first interaction
@@ -1351,35 +1379,67 @@
                     if (!quizState.audioEnabled || isTimeout) return;
 
                     try {
-                        let audio;
                         if (isCorrect) {
-                            audio = window.correctAudio;
+                            // Play layered correct sounds
+                            if (window.correctSounds && window.correctSounds.length > 0) {
+                                // Play base correct sound (index 0)
+                                const baseSound = window.correctSounds[0];
+                                baseSound.currentTime = 0;
+                                baseSound.volume = 0.6; // Slightly lower for layering
+                                baseSound.play().catch(error => {
+                                    console.error('Error playing base correct sound:', error);
+                                });
+
+                                // Play random special correct sound (index 1-3) with slight delay
+                                setTimeout(() => {
+                                    const randomIndex = Math.floor(Math.random() * 3) + 1; // Random from 1-3
+                                    const specialSound = window.correctSounds[randomIndex];
+                                    specialSound.currentTime = 0;
+                                    specialSound.volume = 0.7;
+                                    specialSound.play().catch(error => {
+                                        console.error('Error playing special correct sound:', error);
+                                    });
+                                }, 100); // 100ms delay for layered effect
+                            } else {
+                                // Fallback to simple correct sound if arrays not loaded
+                                const fallbackSound = new Audio('{{ asset("audio/correct.mp3") }}');
+                                fallbackSound.volume = 0.7;
+                                fallbackSound.play().catch(error => {
+                                    console.error('Error playing fallback correct sound:', error);
+                                });
+                            }
                         } else {
-                            audio = window.incorrectAudio;
+                            // Play layered incorrect sounds
+                            if (window.incorrectSounds && window.incorrectSounds.length > 0) {
+                                // Play base incorrect sound (index 0)
+                                const baseSound = window.incorrectSounds[0];
+                                baseSound.currentTime = 0;
+                                baseSound.volume = 0.6; // Slightly lower for layering
+                                baseSound.play().catch(error => {
+                                    console.error('Error playing base incorrect sound:', error);
+                                });
+
+                                // Play random special incorrect sound (index 1-2) with slight delay
+                                setTimeout(() => {
+                                    const randomIndex = Math.floor(Math.random() * 2) + 1; // Random from 1-2
+                                    const specialSound = window.incorrectSounds[randomIndex];
+                                    specialSound.currentTime = 0;
+                                    specialSound.volume = 0.7;
+                                    specialSound.play().catch(error => {
+                                        console.error('Error playing special incorrect sound:', error);
+                                    });
+                                }, 100); // 100ms delay for layered effect
+                            } else {
+                                // Fallback to simple incorrect sound if arrays not loaded
+                                const fallbackSound = new Audio('{{ asset("audio/incorrect.mp3") }}');
+                                fallbackSound.volume = 0.7;
+                                fallbackSound.play().catch(error => {
+                                    console.error('Error playing fallback incorrect sound:', error);
+                                });
+                            }
                         }
 
-                        if (audio) {
-                            // Reset audio to beginning
-                            audio.currentTime = 0;
-
-                            // Play audio with error handling
-                            audio.play().catch(error => {
-                                console.log('Audio playback failed:', error);
-                            });
-                        } else {
-                            console.log('Audio not available - creating new instance');
-                            // Fallback: create new audio instance
-                            const audioPath = isCorrect ?
-                                '{{ asset("audio/correct.mp3") }}' :
-                                '{{ asset("audio/incorrect.mp3") }}';
-
-                            const fallbackAudio = new Audio(audioPath);
-                            fallbackAudio.volume = 0.7;
-                            fallbackAudio.play().catch(error => {
-                                console.log('Fallback audio playback failed:', error);
-                            });
-                        }
-
+                        console.log(`Playing ${isCorrect ? 'correct' : 'incorrect'} audio feedback`);
                     } catch (error) {
                         console.error('Error playing audio feedback:', error);
                     }
