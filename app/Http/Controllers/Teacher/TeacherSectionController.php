@@ -137,7 +137,7 @@ class TeacherSectionController extends Controller
         ];
         
         // FIXED: Use the correct view path - teacher.sections.student-profile
-        return view('teacher.sections.student-profile', [
+        return view('admin.teacher.sections.student-profile', [
             'student' => $student,
             'section' => $sectionObj
         ]);
