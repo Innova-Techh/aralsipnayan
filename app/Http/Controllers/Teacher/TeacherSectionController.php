@@ -14,6 +14,136 @@ use Illuminate\Support\Facades\DB;
 class TeacherSectionController extends Controller
 {
     /**
+     * Show student profile with detailed information
+     */
+    public function showStudentProfile($studentId)
+    {
+        // Check authentication
+        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
+            return redirect()->route('admin.login');
+        }
+        
+        $teacher = Auth::guard('admin')->user();
+        
+        // Fetch the student data
+        $user = User::find($studentId);
+        
+        if (!$user || $user->role !== 'Student') {
+            return redirect()->back()->with('error', 'Student not found');
+        }
+        
+        // Get student profile
+        $studentProfile = DB::table('student_profile')
+            ->where('user_id', $studentId)
+            ->first();
+        
+        if (!$studentProfile) {
+            return redirect()->back()->with('error', 'Student profile not found');
+        }
+        
+        // Verify teacher has access to this student's section
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+        
+        if (!$teacherProfile) {
+            return redirect()->back()->with('error', 'Teacher profile not found');
+        }
+        
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+        
+        if (!in_array($studentProfile->section, $teacherSections)) {
+            return redirect()->back()->with('error', 'Access denied to this student');
+        }
+        
+        // Get section details
+        $section = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->where('section', $studentProfile->section)
+            ->first();
+        
+        // Get student's assessment history
+        $assessmentResults = collect([]);
+        
+        try {
+            if (DB::getSchemaBuilder()->hasTable('teacher_assessment_results')) {
+                $assessmentResults = DB::table('teacher_assessment_results')
+                    ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
+                    ->join('teacher_assessments', 'teacher_assessment_assignments.assessment_id', '=', 'teacher_assessments.id')
+                    ->where('teacher_assessment_results.student_id', $studentId)
+                    ->where('teacher_assessment_results.status', 'completed')
+                    ->select([
+                        'teacher_assessments.title as name',
+                        'teacher_assessment_results.score',
+                        'teacher_assessment_results.completed_at as date',
+                        'teacher_assessment_results.time_spent as time',
+                        'teacher_assessments.assessment_type as type'
+                    ])
+                    ->orderByDesc('teacher_assessment_results.completed_at')
+                    ->limit(10)
+                    ->get()
+                    ->map(function($assessment) {
+                        return [
+                            'name' => $assessment->name,
+                            'score' => round($assessment->score) . '%',
+                            'date' => \Carbon\Carbon::parse($assessment->date)->format('Y-m-d'),
+                            'time' => round($assessment->time / 60, 1) . ' min',
+                            'type' => ucfirst($assessment->type)
+                        ];
+                    });
+            }
+        } catch (\Exception $e) {
+            $assessmentResults = collect([]);
+        }
+        
+        // Calculate statistics
+        $totalAssessments = $assessmentResults->count();
+        $avgScore = $assessmentResults->isNotEmpty() ? $assessmentResults->avg(function($item) {
+            return (float) str_replace('%', '', $item['score']);
+        }) : 0;
+        
+        // Build student object for the view
+        $student = (object)[
+            'id' => $user->id,
+            'name' => trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname),
+            'email' => $user->email,
+            'phone' => $studentProfile->phone ?? '+1 (555) 123-4567',
+            'grade_level' => $studentProfile->grade_level ?? '6',
+            'section_id' => $studentProfile->section,
+            'total_points' => $studentProfile->total_points ?? 0,
+            'assessment_count' => $totalAssessments,
+            'best_streak' => $studentProfile->longest_streak ?? 0,
+            'time_spent' => round(($studentProfile->total_points ?? 0) / 10, 1),
+            'avg_time_per_question' => '1.8',
+            'numerical_literacy_score' => 96,
+            'algebraic_thinking_score' => 89,
+            'geometric_reasoning_score' => 94,
+            'problem_solving_score' => 91,
+            'last_assessment_name' => $assessmentResults->first()['name'] ?? 'No assessments yet',
+            'last_assessment_score' => $assessmentResults->first()['score'] ?? '0%',
+            'last_assessment_date' => $assessmentResults->first()['date'] ?? 'N/A',
+            'last_assessment_time' => $assessmentResults->first()['time'] ?? '0 min',
+            'last_assessment_accuracy' => $assessmentResults->isNotEmpty() ? $assessmentResults->first()['score'] : '0%',
+            'assessments' => $assessmentResults->toArray(),
+            'struggling_areas' => [],
+            'achievements' => []
+        ];
+        
+        // Build section object
+        $sectionObj = (object)[
+            'id' => $section->id ?? null,
+            'name' => $studentProfile->section
+        ];
+        
+        // FIXED: Use the correct view path - teacher.sections.student-profile
+        return view('teacher.sections.student-profile', [
+            'student' => $student,
+            'section' => $sectionObj
+        ]);
+    }
+
+    /**
      * Display the section management page with real data
      */
     public function index()

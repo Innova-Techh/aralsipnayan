@@ -5,7 +5,7 @@
 @section('content')
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
-        <div class="bg-white border-b border-gray-200 px-8 py-6">
+        <div class="rounded-xl border border-gray-200 px-8 py-6">
             <div class="flex items-center justify-between mb-4">
                 <button onclick="window.location.href='{{ route('teacher.sections') }}'"
                     class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Section Info Grid -->
-            <div class="grid grid-cols-4 gap-6 bg-gray-50 rounded-lg p-6">
+            <div class="grid grid-cols-4 gap-6 bg-gray-100 rounded-2l p-6">
                 <div>
                     <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
                         <span class="material-symbols-outlined text-lg">person</span>
@@ -118,28 +118,36 @@
                             <tr>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Rank</th>
+                                    Rank
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Student</th>
+                                    Student
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Overall Score</th>
+                                    Overall Score
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Progress</th>
+                                    Progress
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Points</th>
+                                    Points
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Last Activity</th>
+                                    Last Activity
+                                </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Status</th>
+                                    Status
+                                </th>
                                 <th
                                     class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Actions</th>
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody" class="bg-white divide-y divide-gray-200">
@@ -171,7 +179,7 @@
                                                 class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                                 <span class="material-symbols-outlined text-gray-500">person</span>
                                             </div>
-                                            <div>
+                                            <div class="flex-1">
                                                 <div class="font-semibold text-gray-900">{{ $student['name'] }}</div>
                                                 <div class="text-sm text-gray-500">{{ $student['email'] }}</div>
                                             </div>
@@ -180,7 +188,12 @@
 
                                     <!-- Overall Score -->
                                     <td class="px-6 py-4">
-                                        <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ $student['completed'] }}/{{ $student['total'] }} assessments
+                                            </div>
+                                        </div>
                                     </td>
 
                                     <!-- Progress -->
@@ -220,11 +233,62 @@
 
                                     <!-- Actions -->
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center justify-center">
-                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                                onclick="showStudentActions({{ $student['id'] }})">
-                                                <span class="material-symbols-outlined text-gray-600">more_vert</span>
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <!-- Send Message Button -->
+                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors group relative"
+                                                onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')"
+                                                title="Send Message">
+                                                <span
+                                                    class="material-symbols-outlined text-gray-600 group-hover:text-orange-600">mail</span>
                                             </button>
+
+                                            <!-- More Actions Dropdown -->
+                                            <div class="relative" x-data="{ open: false }">
+                                                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                    @click="open = !open">
+                                                    <span class="material-symbols-outlined text-gray-600">more_vert</span>
+                                                </button>
+
+                                                <!-- Dropdown Menu -->
+                                                <div x-show="open" @click.away="open = false"
+                                                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                                                    <!-- View Profile -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="viewProfile('{{ $student['id'] }}')">
+                                                        <span
+                                                            class="material-symbols-outlined text-blue-600 text-sm">visibility</span>
+                                                        View Profile
+                                                    </button>
+
+                                                    <!-- Assign Assessment -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="assignAssessment('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span
+                                                            class="material-symbols-outlined text-green-600 text-sm">assignment</span>
+                                                        Assign Assessment
+                                                    </button>
+
+                                                    <!-- Send Message -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span
+                                                            class="material-symbols-outlined text-orange-600 text-sm">mail</span>
+                                                        Send Message
+                                                    </button>
+
+                                                    <!-- Remove from Section -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center gap-2"
+                                                        onclick="removeFromSection('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span
+                                                            class="material-symbols-outlined text-red-600 text-sm">person_remove</span>
+                                                        Remove from Section
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -246,55 +310,48 @@
         </div>
     </div>
 
-    <!-- Student Actions Modal -->
-    <div id="studentActionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Student Actions</h3>
-                <div class="space-y-2">
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-blue-600">visibility</span>
-                        <span class="font-medium text-gray-700">View Details</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-green-600">assignment</span>
-                        <span class="font-medium text-gray-700">Assign Assessment</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-orange-600">mail</span>
-                        <span class="font-medium text-gray-700">Send Message</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-red-600">person_remove</span>
-                        <span class="font-medium text-gray-700">Remove from Section</span>
-                    </button>
-                </div>
-                <button onclick="closeStudentActionsModal()"
-                    class="mt-4 w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        function showStudentActions(studentId) {
-            document.getElementById('studentActionsModal').classList.remove('hidden');
+        // Action functions
+        function viewProfile(studentId) {
+            console.log('View profile for student:', studentId);
+            // Use Laravel route helper to generate the correct URL
+            window.location.href = "{{ route('teacher.students.profile', ['student' => '__STUDENT_ID__']) }}".replace('__STUDENT_ID__', studentId);
         }
 
-        function closeStudentActionsModal() {
-            document.getElementById('studentActionsModal').classList.add('hidden');
+        function assignAssessment(studentId, studentName) {
+            console.log('Assign assessment to:', studentName, studentId);
+            // Implement assign assessment logic
+            // This could open a modal or redirect to assessment assignment page
+            alert(`Assign assessment to ${studentName}`);
         }
 
-        // Close modal when clicking outside
-        document.getElementById('studentActionsModal').addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeStudentActionsModal();
+        function sendMessage(studentId, studentName) {
+            console.log('Send message to:', studentName, studentId);
+            // Implement send message logic
+            // This could open a messaging modal
+            alert(`Send message to ${studentName}`);
+        }
+
+        function removeFromSection(studentId, studentName) {
+            console.log('Remove from section:', studentName, studentId);
+            // Implement remove from section logic
+            if (confirm(`Are you sure you want to remove ${studentName} from this section?`)) {
+                // Perform removal action
+                alert(`${studentName} removed from section`);
             }
+        }
+
+        // Alpine.js initialization for dropdowns
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dropdown', () => ({
+                open: false,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                }
+            }));
         });
     </script>
 @endsection
