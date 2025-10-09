@@ -67,6 +67,158 @@ class TeacherSectionController extends Controller
     }
 
     /**
+     * Show detailed section information with students
+     */
+    public function show($section)
+    {
+        $teacher = Auth::guard('admin')->user();
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+
+        if (!$teacherProfile) {
+            abort(404, 'Teacher profile not found');
+        }
+
+        // Verify teacher has access to this section
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        if (!in_array($section, $teacherSections)) {
+            abort(403, 'Access denied to this section');
+        }
+
+        // Get section details
+        $sectionDetails = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->where('section', $section)
+            ->first();
+
+        // Get students with detailed information
+        $students = DB::table('student_profile')
+            ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->where('student_profile.section', $section)
+            ->where('users.status', 'active')
+            ->select([
+                'student_profile.user_id',
+                'student_profile.student_id',
+                'student_profile.firstname',
+                'student_profile.middlename',
+                'student_profile.lastname',
+                'student_profile.section',
+                'student_profile.total_points',
+                'student_profile.current_streak',
+                'student_profile.last_activity_date',
+                'users.email'
+            ])
+            ->orderByDesc('student_profile.total_points')
+            ->get()
+            ->map(function ($student, $index) use ($section) {
+                // Check if teacher_assessment_assignments table exists
+                $totalAssessments = 0;
+                $completedAssessments = 0;
+                $avgScore = 0;
+
+                try {
+                    // Get total assignments for this section
+                    $totalAssessments = DB::table('teacher_assessment_assignments')
+                        ->where('section', $section)
+                        ->count();
+
+                    // Try to get completed assessments (if table exists)
+                    if (DB::getSchemaBuilder()->hasTable('teacher_assessment_results')) {
+                        $completedAssessments = DB::table('teacher_assessment_results')
+                            ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
+                            ->where('teacher_assessment_results.student_id', $student->user_id)
+                            ->where('teacher_assessment_assignments.section', $section)
+                            ->where('teacher_assessment_results.status', 'completed')
+                            ->count();
+
+                        // Calculate average score
+                        $avgScore = DB::table('teacher_assessment_results')
+                            ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
+                            ->where('teacher_assessment_results.student_id', $student->user_id)
+                            ->where('teacher_assessment_assignments.section', $section)
+                            ->where('teacher_assessment_results.status', 'completed')
+                            ->avg('teacher_assessment_results.score');
+                    }
+                } catch (\Exception $e) {
+                    // If tables don't exist, use default values
+                    $totalAssessments = 0;
+                    $completedAssessments = 0;
+                    $avgScore = 0;
+                }
+
+                // If no assessment data, use points-based score estimate
+                if (!$avgScore) {
+                    $avgScore = min(($student->total_points / 30), 100); // Estimate based on points
+                }
+
+                return [
+                    'id' => $student->user_id,
+                    'student_id' => $student->student_id,
+                    'name' => trim($student->firstname . ' ' . ($student->middlename ? $student->middlename . ' ' : '') . $student->lastname),
+                    'email' => $student->email,
+                    'score' => round($avgScore),
+                    'progress' => $totalAssessments > 0 ? "$completedAssessments/$totalAssessments" : "0/0",
+                    'completed' => $completedAssessments,
+                    'total' => $totalAssessments,
+                    'points' => $student->total_points,
+                    'streak' => $student->current_streak,
+                    'last_activity' => $student->last_activity_date ? 
+                        \Carbon\Carbon::parse($student->last_activity_date)->diffForHumans() : 
+                        'Never',
+                    'rank' => $index + 1
+                ];
+            });
+
+        // Calculate section statistics
+        $totalStudents = $students->count();
+        $activeStudents = $students->count(); // All queried students are active
+        $averageScore = $students->avg('score');
+        
+        // Calculate completion rate
+        $totalPossibleCompletions = $students->sum('total');
+        $totalCompletions = $students->sum('completed');
+        $completionRate = $totalPossibleCompletions > 0 ? 
+            round(($totalCompletions / $totalPossibleCompletions) * 100) : 0;
+
+        // Get top performer
+        $topPerformer = $students->first();
+        $topPerformerName = $topPerformer ? $topPerformer['name'] : 'N/A';
+        $topPerformerScore = $topPerformer ? $topPerformer['score'] : 0;
+
+        // Get teacher name
+        $teacherName = $teacher->firstname . ' ' . $teacher->lastname;
+
+        // Get section room (you can customize this based on your database)
+        $room = 'Room 201'; // Default or fetch from database
+
+        // Format section name nicely
+        $formattedSectionName = 'Mathematics 101 - Section ' . strtoupper($section);
+
+        $sectionData = [
+            'name' => $formattedSectionName,
+            'raw_name' => $section,
+            'section_id' => 'MATH101-' . strtoupper(substr($section, -1)),
+        ];
+
+        return view('admin.teacher.sections.manage-section', [
+            'section' => $sectionData,
+            'students' => $students,
+            'totalStudents' => $totalStudents,
+            'activeStudents' => $activeStudents,
+            'averageScore' => round($averageScore),
+            'completionRate' => $completionRate,
+            'topPerformer' => $topPerformerName,
+            'topPerformerScore' => $topPerformerScore,
+            'teacher' => $teacherName,
+            'room' => $room,
+            'sectionId' => $sectionData['section_id']
+        ]);
+    }
+
+    /**
      * Get students for a specific section
      */
     public function getSectionStudents($section)
