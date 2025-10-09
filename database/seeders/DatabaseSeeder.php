@@ -124,7 +124,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-        TrophiesSeeder::class,
         QuestionsTableSeeder::class,
         StudentSectionsSeeder::class,
         // add any other seeders you created
