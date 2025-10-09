@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') AralSipnayan</title>
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Custom glow animation */
         @keyframes glow-pulse {
@@ -471,17 +471,40 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Show success message
-                                alert(data.message);
-                                // Redirect to dashboard
-                                window.location.href = data.redirect_url;
+                                // Show success message with SweetAlert
+                                // If message is empty, 'success', or not meaningful, use our default
+                                const successMessage = (data.message && 
+                                                       data.message.toLowerCase() !== 'success.' && 
+                                                       data.message.trim().length > 0) 
+                                    ? data.message 
+                                    : 'Avatar saved successfully!';
+                                
+                                // Check if SweetAlert is loaded
+                                if (typeof showSuccessToast === 'function') {
+                                    showSuccessToast(successMessage);
+                                } else {
+                                    alert(successMessage); // Fallback
+                                }
+                                
+                                // Redirect to dashboard after a short delay
+                                setTimeout(() => {
+                                    window.location.href = data.redirect_url;
+                                }, 1500);
                             } else {
-                                alert('Error: ' + (data.message || 'Unknown error'));
+                                if (typeof showErrorToast === 'function') {
+                                    showErrorToast(data.message || 'Unknown error occurred');
+                                } else {
+                                    alert('Error: ' + (data.message || 'Unknown error occurred'));
+                                }
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('Error updating avatar. Please try again.');
+                            if (typeof showErrorToast === 'function') {
+                                showErrorToast('Error updating avatar. Please try again.');
+                            } else {
+                                alert('Error updating avatar. Please try again.');
+                            }
                         })
                         .finally(() => {
                             // Reset button state
@@ -491,6 +514,8 @@
                 });
             });
         </script>
+
+        @include('components.sweetalert-config')
     @endsection
 </body>
 
