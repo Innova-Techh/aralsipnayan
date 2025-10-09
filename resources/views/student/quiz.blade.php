@@ -10,6 +10,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Vite Assets (includes SweetAlert2) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <!-- Baloo Font -->
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -236,31 +239,6 @@
                 stroke-dashoffset: -440;
             }
         }
-
-        /* No Answer Modal Animation */
-        @keyframes modalBounce {
-            0%, 100% {
-                transform: scale(0.95);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        #no-answer-modal.show {
-            animation: modalBounce 0.3s ease-in-out;
-        }
-
-        /* Shake animation for emphasis */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .shake {
-            animation: shake 0.5s ease-in-out;
-        }
     </style>
 </head>
 
@@ -324,7 +302,7 @@
                     </div>
                 @endif
                 <!-- Settings Button -->
-                <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
+                {{-- <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
                                 hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -335,7 +313,7 @@
                             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
                     <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
-                </button>
+                </button> --}}
             </div>
 
             @include('components.music-setting-modal')
@@ -473,36 +451,7 @@
         </div>
 
         @include('components.retry-modal')
-
-        <!-- No Answer Modal (initially hidden) -->
-        <div id="no-answer-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50 cursor-pointer">
-            <div class="bg-white rounded-3xl p-6 sm:p-8 md:p-10 max-w-xs sm:max-w-sm md:max-w-md mx-4 text-center transform transition-all duration-300 scale-95 hover:scale-100">
-                <!-- Animated Emoji -->
-                <div class="mb-4 md:mb-6 animate-bounce">
-                    <div class="text-6xl sm:text-7xl md:text-8xl">🤔</div>
-                </div>
-                
-                <!-- Title -->
-                <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3 md:mb-4 font-baloo">
-                    Oops! Wait a second...
-                </h3>
-                
-                <!-- Message -->
-                <p class="text-sm sm:text-base md:text-lg text-gray-600 mb-2 leading-relaxed font-baloo" id="no-answer-message">
-                    <!-- Dynamic message will be inserted here -->
-                </p>
-                
-                <!-- Fun encouraging text -->
-                <p class="text-xs sm:text-sm md:text-base text-purple-600 font-semibold mb-4 md:mb-6 font-baloo">
-                    Take your time and choose wisely! 
-                </p>
-                
-                <!-- Tap anywhere hint -->
-                <p class="text-xs sm:text-sm text-gray-400 font-baloo italic">
-                    (Click anywhere to continue)
-                </p>
-            </div>
-        </div>
+        @include('components.sweetalert-config')
 
         </style>
 
@@ -588,9 +537,6 @@
 
                     // Audio toggle handler
                     document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
-
-                    // No answer modal - close when clicking anywhere on the modal
-                    document.getElementById('no-answer-modal').addEventListener('click', hideNoAnswerModal);
 
                     // Hint button handler (only for non-diagnostic mode)
                     @if(!isset($diagnosticMode) || !$diagnosticMode)
@@ -1211,14 +1157,14 @@
                     @if($question->type === 'fill_blanks')
                         const fillAnswer = document.getElementById('fill-answer');
                         if (!fillAnswer.value.trim()) {
-                            showNoAnswerModal('Please type your answer in the text box before submitting! 📝');
+                            showNoAnswerToast('Please type your answer before submitting! ');
                             return;
                         }
                         answerValue = fillAnswer.value.trim();
                     @else
                         const selectedAnswer = document.querySelector('input[name="answer"]:checked');
                         if (!selectedAnswer) {
-                            showNoAnswerModal('Please select one of the answer choices before submitting!');
+                            showNoAnswerToast('Please select your choice before submitting!');
                             return;
                         }
                         answerValue = selectedAnswer.value;
@@ -1391,37 +1337,13 @@
                     modal.style.display = 'none';
                 }
 
-                function showNoAnswerModal(message) {
-                    const modal = document.getElementById('no-answer-modal');
-                    const messageElement = document.getElementById('no-answer-message');
-                    
-                    // Set the custom message
-                    messageElement.textContent = message;
-                    
-                    // Show modal with animation
-                    modal.classList.remove('hidden');
-                    modal.style.display = 'flex';
-                    modal.classList.add('show');
-                    
-                    // Add shake effect to the modal content
-                    const modalContent = modal.querySelector('.bg-white');
-                    modalContent.classList.add('shake');
-                    
-                    // Remove shake class after animation
-                    setTimeout(() => {
-                        modalContent.classList.remove('shake');
-                    }, 500);
-                    
-                    // Remove show class after animation
-                    setTimeout(() => {
-                        modal.classList.remove('show');
-                    }, 300);
-                }
-
-                function hideNoAnswerModal() {
-                    const modal = document.getElementById('no-answer-modal');
-                    modal.classList.add('hidden');
-                    modal.style.display = 'none';
+                function showNoAnswerToast(message) {
+                    // Use the custom toast helper from sweetalert-config component
+                    if (typeof window.showWarningToast === 'function') {
+                        window.showWarningToast(message, 4000);
+                    } else {
+                        console.error('SweetAlert toast helper not loaded');
+                    }
                 }
 
                 function playAudioFeedback(isCorrect, isTimeout = false) {

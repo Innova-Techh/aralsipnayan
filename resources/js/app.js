@@ -1,4 +1,8 @@
 import './bootstrap';
+import Swal from 'sweetalert2';
+
+// Make Swal globally available
+window.Swal = Swal;
 
 // Auto-scroll for the 2nd section carousel (one full slide at a time)
 document.addEventListener('DOMContentLoaded', () => {
