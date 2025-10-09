@@ -39,4 +39,9 @@ class Assessment extends Model
     {
         return $this->hasMany(AssessmentAssignment::class);
     }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(TeacherAssessmentQuestion::class, 'teacher_assessment_id');
+    }
 }
