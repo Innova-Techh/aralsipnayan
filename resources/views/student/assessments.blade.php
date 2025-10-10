@@ -3,7 +3,12 @@
 @section('title', 'AralSipnayan')
 
 @section('content')
+    <!-- GSAP Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
+    <!-- Assessment Animations -->
+    <script src="{{ asset('js/assessment-animations.js') }}"></script>
     <style>
         /* Grid Lines */
         .grid-lines {
@@ -335,8 +340,8 @@
                         @endphp
                         <span
                             class="bg-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                                                                        text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                                                                        text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
+                                                                                                                                                                                                                                            text-{{ $naLevel === 'Beginner' ? 'green' : ($naLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                                                                            text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ml-2">
                             {{ $naLevel }}
                         </span>
 
@@ -356,7 +361,7 @@
                             <div id="progress-bar-na"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                                                                            background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -452,8 +457,8 @@
                         @endphp
                         <span
                             class="bg-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                                                      text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                                                      text-xs font-medium px-2 py-1 rounded-full relative z-20">
+                                                                                                                                                                                                                          text-{{ $mgLevel === 'Beginner' ? 'green' : ($mgLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                                                          text-xs font-medium px-2 py-1 rounded-full relative z-20">
                             {{ $mgLevel }}
                         </span>
 
@@ -473,7 +478,7 @@
                             <div id="progress-bar-mg"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -570,8 +575,8 @@
                         @endphp
                         <span
                             class="bg-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-100 
-                                                                                                                                                                                                                    text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
-                                                                                                                                                                                                                    text-xs font-medium px-2 py-1 rounded-full">
+                                                                                                                                                                                                                                        text-{{ $dpLevel === 'Beginner' ? 'green' : ($dpLevel === 'Intermediate' ? 'yellow' : 'red') }}-700 
+                                                                                                                                                                                                                                        text-xs font-medium px-2 py-1 rounded-full">
                             {{ $dpLevel }}
                         </span>
 
@@ -591,7 +596,7 @@
                             <div id="progress-bar-dp"
                                 class="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 overflow-hidden"
                                 style="width: 0%;
-                                                                                                                                                                                                                                                    background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
+                                                                                                                                                                                                                                                                        background: linear-gradient(90deg, #DE4A0F, #F9C74F);">
                                 <!-- Static shimmer lines -->
                                 <div class="absolute inset-0 flex items-center justify-between px-2">
                                     <div class="w-2 h-10 bg-gradient-to-t from-white/30 to-white/0 rotate-45"></div>
@@ -733,13 +738,14 @@
 
 
     <script>
-        // Assessments Loading Logic
+
+        // Your existing loading logic remains the same
         document.addEventListener('DOMContentLoaded', function () {
             // Show skeleton initially, hide actual content
             const skeleton = document.getElementById('assessmentsSkeleton');
             const content = document.getElementById('assessmentsContent');
 
-            // Simulate data loading (replace with actual API calls)
+            // Simulate data loading
             setTimeout(() => {
                 loadAssessmentsData();
             }, 1500);
@@ -747,7 +753,6 @@
 
         async function loadAssessmentsData() {
             try {
-                // Simulate API calls for different data sections
                 const promises = [
                     loadMasteryData(),
                     loadIncompleteSessionData(),
@@ -755,10 +760,8 @@
                     loadActiveDiagnostics()
                 ];
 
-                // Wait for all data to load
                 await Promise.all(promises);
 
-                // Hide skeleton and show actual content with animation
                 const skeleton = document.getElementById('assessmentsSkeleton');
                 const content = document.getElementById('assessmentsContent');
 
@@ -767,8 +770,6 @@
                     skeleton.classList.add('hidden');
                     content.classList.remove('hidden');
                     content.classList.add('content-loaded');
-
-                    // Start progress bar animations after content loads
                     startProgressBarAnimations();
                 }, 300);
 
@@ -785,9 +786,33 @@
             skeleton.classList.add('hidden');
             content.classList.remove('hidden');
             content.classList.add('content-loaded');
-
-            // Start progress bar animations
             startProgressBarAnimations();
+        }
+
+        function startProgressBarAnimations() {
+            const progressBarNA = document.getElementById('progress-bar-na');
+            const progressNA = {{ $naProgress ?? 0 }};
+            if (progressBarNA) {
+                setTimeout(() => {
+                    progressBarNA.style.width = progressNA + '%';
+                }, 2000);
+            }
+
+            const progressBarMG = document.getElementById('progress-bar-mg');
+            const progressMG = {{ $mgProgress ?? 0 }};
+            if (progressBarMG) {
+                setTimeout(() => {
+                    progressBarMG.style.width = progressMG + '%';
+                }, 2200);
+            }
+
+            const progressBarDP = document.getElementById('progress-bar-dp');
+            const progressDP = {{ $dpProgress ?? 0 }};
+            if (progressBarDP) {
+                setTimeout(() => {
+                    progressBarDP.style.width = progressDP + '%';
+                }, 2400);
+            }
         }
 
         // Simulate API calls (replace with actual endpoints)
@@ -811,32 +836,7 @@
             return new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        function startProgressBarAnimations() {
-            // Move your existing progress bar animation code here
-            const progressBarNA = document.getElementById('progress-bar-na');
-            const progressNA = {{ $naProgress ?? 0 }};
-            if (progressBarNA) {
-                setTimeout(() => {
-                    progressBarNA.style.width = progressNA + '%';
-                }, 100);
-            }
 
-            const progressBarMG = document.getElementById('progress-bar-mg');
-            const progressMG = {{ $mgProgress ?? 0 }};
-            if (progressBarMG) {
-                setTimeout(() => {
-                    progressBarMG.style.width = progressMG + '%';
-                }, 200);
-            }
-
-            const progressBarDP = document.getElementById('progress-bar-dp');
-            const progressDP = {{ $dpProgress ?? 0 }};
-            if (progressBarDP) {
-                setTimeout(() => {
-                    progressBarDP.style.width = progressDP + '%';
-                }, 300);
-            }
-        }
 
         // Keep all your existing functions below (checkDiagnosticBeforeStart, etc.)
 
@@ -941,11 +941,11 @@
             const diagnosticInfo = document.getElementById('activeDiagnosticInfo');
             if (activeDiagnostic) {
                 diagnosticInfo.innerHTML = `
-                                                                                                                                                                                                            <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
-                                                                                                                                                                                                            <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
-                                                                                                                                                                                                            <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
-                                                                                                                                                                                                            <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
-                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                <div><strong>Test:</strong> ${activeDiagnostic.title}</div>
+                                                                                                                                                                                                                                <div><strong>Phase:</strong> ${activeDiagnostic.phase_name} (Phase ${activeDiagnostic.current_phase})</div>
+                                                                                                                                                                                                                                <div><strong>Progress:</strong> ${activeDiagnostic.progress}/${activeDiagnostic.total_questions} questions</div>
+                                                                                                                                                                                                                                <div><strong>Started:</strong> ${new Date(activeDiagnostic.started_at).toLocaleString()}</div>
+                                                                                                                                                                                                                            `;
             }
 
             // Show modal with animation

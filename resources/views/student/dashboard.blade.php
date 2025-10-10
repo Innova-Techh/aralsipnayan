@@ -8,6 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard</title>
     <href rel="stylesheet" href="css/dashboard.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="{{ asset('js/dashboard-animations.js') }}" defer></script>
 </head>
 
 <body>
@@ -552,13 +554,14 @@
                             <div class="flex flex-col justify-center h-full">
                                 <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                                     style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       0 4px 0 #18337e;">
                                     Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                                 </h1>
-                                <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5" id="encouragingMessage">
+                                <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5"
+                                    id="encouragingMessage">
                                     Ready to continue your math journey?
                                 </p>
                             </div>
@@ -625,18 +628,24 @@
                                                         <h3 class="text-lg sm:text-xl font-bold text-white drop-shadow-md">
                                                             {{ $rankTitle }}
                                                         </h3>
-                                                        <p class="text-sm text-blue-200 font-semibold">Level {{ $userLevel }}</p>
+                                                        <p class="text-sm text-blue-200 font-semibold">Level
+                                                            {{ $userLevel }}
+                                                        </p>
                                                     </div>
 
                                                     <!-- Group 2: Points Text -->
                                                     <div class="mb-2 mr-4">
                                                         @if($isMaxLevel)
-                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold" id="levelStatusText">
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-bold"
+                                                                id="levelStatusText">
                                                                 🏆 MAX LEVEL ACHIEVED!
                                                             </p>
                                                         @else
-                                                            <p class="text-xs sm:text-sm text-blue-100 font-medium" id="levelStatusText">
-                                                                <span id="currentPointsText">{{ number_format($pointsInCurrentLevel) }}</span> / 60 Points
+                                                            <p class="text-xs sm:text-sm text-blue-100 font-medium"
+                                                                id="levelStatusText">
+                                                                <span
+                                                                    id="currentPointsText">{{ number_format($pointsInCurrentLevel) }}</span>
+                                                                / 60 Points
                                                             </p>
                                                         @endif
                                                     </div>
@@ -648,21 +657,27 @@
                                                             <div class="relative">
                                                                 <div class="level-progress-track rounded-full h-3 sm:h-4 relative overflow-visible"
                                                                     style="background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);">
-                                                                    <div id="levelProgressBar" class="level-progress-fill h-3 sm:h-4 rounded-full transition-all duration-500 ease-out relative overflow-visible"
+                                                                    <div id="levelProgressBar"
+                                                                        class="level-progress-fill h-3 sm:h-4 rounded-full transition-all duration-500 ease-out relative overflow-visible"
                                                                         style="width: {{ $progressPercentage }}%; background: linear-gradient(90deg, #FCD34D, #F59E0B, #FBBF24); box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6);">
                                                                         {{-- Progress Handle/Thumb --}}
-                                                                        <div class="level-progress-handle absolute -right-1 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white shadow-lg border-2 border-yellow-400"></div>
+                                                                        <div
+                                                                            class="level-progress-handle absolute -right-1 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white shadow-lg border-2 border-yellow-400">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         @if($isMaxLevel)
-                                                            <p class="text-xs sm:text-sm text-yellow-300 font-semibold" id="pointsNeededText">
+                                                            <p class="text-xs sm:text-sm text-yellow-300 font-semibold"
+                                                                id="pointsNeededText">
                                                                 🎯 Grandmaster Status
                                                             </p>
                                                         @else
                                                             <p class="text-xs sm:text-sm text-blue-100" id="pointsNeededText">
-                                                                <span id="pointsNeededValue">{{ number_format($pointsNeeded) }}</span> points to next level
+                                                                <span
+                                                                    id="pointsNeededValue">{{ number_format($pointsNeeded) }}</span>
+                                                                points to next level
                                                             </p>
                                                         @endif
                                                     </div>
@@ -673,15 +688,16 @@
                                     <!-- End of Level Card -->
                                     {{-- Optional: Next rank preview --}}
                                     {{-- @if(!$progressInfo['is_max_level'])
-                                        <div class="mb-3">
-                                            <p class="text-xs text-gray-500 text-center">
-                                                <span class="font-medium">Next Rank:</span>
-                                                @php
-                                                    $nextRankInfo = $rankController->getRankInfo($progressInfo['current_level'] + 1);
-                                                @endphp
-                                                {{ $nextRankInfo['title'] }} - {{ $nextRankInfo['description'] }}
-                                            </p>
-                                        </div>
+                                    <div class="mb-3">
+                                        <p class="text-xs text-gray-500 text-center">
+                                            <span class="font-medium">Next Rank:</span>
+                                            @php
+                                            $nextRankInfo = $rankController->getRankInfo($progressInfo['current_level'] +
+                                            1);
+                                            @endphp
+                                            {{ $nextRankInfo['title'] }} - {{ $nextRankInfo['description'] }}
+                                        </p>
+                                    </div>
                                     @endif --}}
 
                                     <!-- Stats Grid with Live Data -->
@@ -702,7 +718,8 @@
                                             </div>
 
                                             <!-- Number -->
-                                            <div class="text-xl sm:text-2xl font-bold relative z-10" id="dashboardCompletedAssessments">
+                                            <div class="text-xl sm:text-2xl font-bold relative z-10"
+                                                id="dashboardCompletedAssessments">
                                                 {{ $completedAssessments }}
                                             </div>
 
@@ -902,7 +919,7 @@
                                             <a href="{{ route('achievements.index') }}"
                                                 class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
                                                 style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
-                                                                                                                                                                                        box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                                                                                                                                                                                                box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                                 View All
                                             </a>
                                         </div>
@@ -1093,7 +1110,6 @@
 
                 async function loadDashboardData() {
                     try {
-                        // Simulate API calls for different data sections
                         const promises = [
                             loadUserProgress(),
                             loadAchievements(),
@@ -1102,10 +1118,8 @@
                             updateDashboardStats()
                         ];
 
-                        // Wait for all data to load
                         await Promise.all(promises);
 
-                        // Hide skeleton and show actual content with animation
                         const skeleton = document.getElementById('dashboardSkeleton');
                         const content = document.getElementById('dashboardContent');
 
@@ -1114,14 +1128,26 @@
                             skeleton.classList.add('hidden');
                             content.classList.remove('hidden');
                             content.classList.add('content-loaded');
+
+                            // TRIGGER ANIMATIONS HERE
+                            if (window.dashboardAnimations && window.dashboardAnimations.initDashboardAnimations) {
+                                console.log('Triggering dashboard animations...');
+                                window.dashboardAnimations.initDashboardAnimations();
+                            } else {
+                                setTimeout(() => {
+                                    if (window.dashboardAnimations && window.dashboardAnimations.initDashboardAnimations) {
+                                        window.dashboardAnimations.initDashboardAnimations();
+                                    }
+                                }, 500);
+                            }
                         }, 300);
 
                     } catch (error) {
                         console.error('Error loading dashboard data:', error);
-                        // Show content anyway to prevent infinite loading
                         showDashboardContent();
                     }
                 }
+
 
                 function showDashboardContent() {
                     const skeleton = document.getElementById('dashboardSkeleton');
@@ -1130,6 +1156,11 @@
                     skeleton.classList.add('hidden');
                     content.classList.remove('hidden');
                     content.classList.add('content-loaded');
+
+                    // Trigger animations
+                    if (window.dashboardAnimations && window.dashboardAnimations.initDashboardAnimations) {
+                        window.dashboardAnimations.initDashboardAnimations();
+                    }
                 }
 
                 // Simulate API calls (replace with actual endpoints)
@@ -1227,47 +1258,46 @@
                 }
 
 
-                // Function to animate progress bar with step effect
+                // Update the animateProgressBar function to use GSAP if available
                 function animateProgressBar(targetPercentage, currentPoints, pointsNeeded) {
-                    const progressBar = document.getElementById('levelProgressBar');
-                    const currentPointsText = document.getElementById('currentPointsText');
-                    const pointsNeededValue = document.getElementById('pointsNeededValue');
+                    // Use the new animated version if available
+                    if (window.dashboardAnimations && window.dashboardAnimations.animateProgressBarUpdate) {
+                        window.dashboardAnimations.animateProgressBarUpdate(targetPercentage, currentPoints, pointsNeeded);
+                    } else {
+                        // Fallback to original implementation
+                        const progressBar = document.getElementById('levelProgressBar');
+                        const currentPointsText = document.getElementById('currentPointsText');
+                        const pointsNeededValue = document.getElementById('pointsNeededValue');
 
-                    if (!progressBar) return;
+                        if (!progressBar) return;
 
-                    // Get current width
-                    const currentWidth = parseFloat(progressBar.style.width) || 0;
+                        const currentWidth = parseFloat(progressBar.style.width) || 0;
+                        const steps = 20;
+                        const stepSize = (targetPercentage - currentWidth) / steps;
+                        const stepDuration = 30;
+                        let currentStep = 0;
 
-                    // Calculate step size and duration
-                    const steps = 20; // Number of animation steps
-                    const stepSize = (targetPercentage - currentWidth) / steps;
-                    const stepDuration = 30; // milliseconds per step
+                        const interval = setInterval(() => {
+                            currentStep++;
+                            const newWidth = currentWidth + (stepSize * currentStep);
 
-                    let currentStep = 0;
+                            if (currentStep >= steps) {
+                                progressBar.style.width = targetPercentage + '%';
+                                clearInterval(interval);
+                            } else {
+                                progressBar.style.width = newWidth + '%';
+                            }
+                        }, stepDuration);
 
-                    // Animate with steps
-                    const interval = setInterval(() => {
-                        currentStep++;
-                        const newWidth = currentWidth + (stepSize * currentStep);
-
-                        if (currentStep >= steps) {
-                            progressBar.style.width = targetPercentage + '%';
-                            clearInterval(interval);
-                        } else {
-                            progressBar.style.width = newWidth + '%';
+                        if (currentPointsText && currentPoints !== undefined) {
+                            animateNumber(currentPointsText, parseInt(currentPointsText.textContent.replace(/,/g, '')) || 0, currentPoints);
                         }
-                    }, stepDuration);
 
-                    // Update text values with counter animation
-                    if (currentPointsText && currentPoints !== undefined) {
-                        animateNumber(currentPointsText, parseInt(currentPointsText.textContent.replace(/,/g, '')) || 0, currentPoints);
-                    }
-
-                    if (pointsNeededValue && pointsNeeded !== undefined) {
-                        animateNumber(pointsNeededValue, parseInt(pointsNeededValue.textContent.replace(/,/g, '')) || 0, pointsNeeded);
+                        if (pointsNeededValue && pointsNeeded !== undefined) {
+                            animateNumber(pointsNeededValue, parseInt(pointsNeededValue.textContent.replace(/,/g, '')) || 0, pointsNeeded);
+                        }
                     }
                 }
-
                 // Function to animate number counting
                 function animateNumber(element, start, end) {
                     const duration = 600; // milliseconds
@@ -1333,25 +1363,25 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         }
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.has_new_badges) {
-                            console.log('New badges found:', data.new_badges);
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.has_new_badges) {
+                                console.log('New badges found:', data.new_badges);
 
-                            // Show badge modal
-                            if (typeof showBadgeModal === 'function') {
-                                showBadgeModal(data.new_badges);
+                                // Show badge modal
+                                if (typeof showBadgeModal === 'function') {
+                                    showBadgeModal(data.new_badges);
 
-                                // Mark badges as viewed after a delay
-                                setTimeout(() => {
-                                    markBadgesAsViewed(data.new_badges);
-                                }, 5000);
+                                    // Mark badges as viewed after a delay
+                                    setTimeout(() => {
+                                        markBadgesAsViewed(data.new_badges);
+                                    }, 5000);
+                                }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error checking new badges:', error);
-                    });
+                        })
+                        .catch(error => {
+                            console.error('Error checking new badges:', error);
+                        });
                 }
 
                 // Mark badges as viewed
@@ -1368,17 +1398,17 @@
                             badge_ids: badgeIds
                         })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Badges marked as viewed:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error marking badges as viewed:', error);
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Badges marked as viewed:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error marking badges as viewed:', error);
+                        });
                 }
 
                 // Check for new badges when page loads
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     // Small delay to ensure everything is loaded
                     setTimeout(checkNewBadges, 1000);
                 });
@@ -1408,16 +1438,16 @@
                 }
             </script>
 
-    <!-- Floating Test Button for Badge Modal -->
-    {{-- <button onclick="testBadgeModal()"
-            class="fixed bottom-4 right-4 z-50 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full shadow-2xl hover:scale-110 transition-all duration-200 flex items-center gap-2 group">
-        <span class="text-2xl">🏆</span>
-        <span class="hidden group-hover:inline-block">Test Badge Modal</span>
-    </button> --}}
+            <!-- Floating Test Button for Badge Modal -->
+            {{-- <button onclick="testBadgeModal()"
+                class="fixed bottom-4 right-4 z-50 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full shadow-2xl hover:scale-110 transition-all duration-200 flex items-center gap-2 group">
+                <span class="text-2xl">🏆</span>
+                <span class="hidden group-hover:inline-block">Test Badge Modal</span>
+            </button> --}}
 
-    @include('components.level-up-modal')
-    @include('components.badge-unlock-modal')
-@endsection
+            @include('components.level-up-modal')
+            @include('components.badge-unlock-modal')
+    @endsection
 </body>
 
 </html>

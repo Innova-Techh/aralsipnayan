@@ -3,7 +3,6 @@
 @section('title', 'AralSipnayan')
 
 @section('content')
-
     <style>
         /* Skeleton Loading Animations */
         @keyframes shimmer {
@@ -66,32 +65,63 @@
         /* Position above bottom nav on mobile/tablet, at bottom on desktop */
         @media (max-width: 1279px) {
             .sticky-footer {
-                bottom: 60px; /* Above the bottom navigation bar */
+                bottom: 60px;
+                /* Above the bottom navigation bar */
             }
         }
 
         @media (min-width: 1280px) {
             .sticky-footer {
-                bottom: 0; /* At the very bottom on desktop */
+                bottom: 0;
+                /* At the very bottom on desktop */
             }
         }
 
         /* Add padding to bottom of content to prevent overlap with sticky footer and nav */
         .content-with-footer {
-            padding-bottom: 160px; /* Account for both sticky footer and bottom nav on mobile */
+            padding-bottom: 160px;
+            /* Account for both sticky footer and bottom nav on mobile */
         }
 
         @media (min-width: 1280px) {
             .content-with-footer {
-                padding-bottom: 100px; /* Less padding on desktop (no bottom nav) */
+                padding-bottom: 100px;
+                /* Less padding on desktop (no bottom nav) */
             }
         }
+
+        /* Initial animation states - CRITICAL FOR ANIMATIONS */
+        .podium-element {
+            opacity: 0;
+            transform: translateY(50px) scale(0.8);
+        }
+
+        .rank-element {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .sticky-footer-element {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        /* Ensure transitions work smoothly */
+        .podium-element,
+        .rank-element,
+        .sticky-footer-element {
+            will-change: transform, opacity;
+        }
     </style>
+
+    <!-- Include GSAP Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="{{ asset('js/leaderboard-animations.js') }}"></script>
 
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 content-with-footer">
         <!-- Loading Skeleton (Initially visible) -->
         <div id="leaderboardSkeleton">
-            <div class="min-h-screen bg-gray-100">
+            <div class="min-h-screen">
                 <!-- Top Section Skeleton -->
                 <div
                     class="relative -mx-4 sm:-mx-6 lg:-mx-8 pt-2 sm:pt-2 overflow-hidden bg-gradient-to-b bg-center bg-cover from-blue-600 to-blue-700 text-white">
@@ -200,7 +230,7 @@
 
         <!-- Actual Leaderboard Content (Initially hidden) -->
         <div id="leaderboardContent" class="hidden">
-            <div class="min-h-screen bg-gray-100">
+            <div class="min-h-screen">
                 <!-- Top Section with Blue Background -->
                 <div
                     class="relative -mx-4 sm:-mx-6 lg:-mx-8 pt-2 sm:pt-2 overflow-hidden bg-gradient-to-b bg-center bg-cover from-blue-600 to-blue-700 text-white">
@@ -211,7 +241,8 @@
                                 class="px-6 py-2 rounded-full bg-primary-blue text-white font-medium text-sm transition-all">
                                 Section
                             </button>
-                            <button id="schoolBtn" class="px-6 py-2 rounded-full text-primary-blue font-medium text-sm transition-all">
+                            <button id="schoolBtn"
+                                class="px-6 py-2 rounded-full text-primary-blue font-medium text-sm transition-all">
                                 School
                             </button>
                         </div>
@@ -223,23 +254,25 @@
                             <!-- Top Three -->
                             <div class="flex items-end justify-center space-x-6">
                                 <!-- Second Place -->
-                                <div id="secondPlace" class="flex flex-col items-center transform translate-y-4">
+                                <div id="secondPlace"
+                                    class="flex flex-col items-center transform translate-y-4 podium-element">
                                     <!-- Will be populated by JS -->
                                 </div>
 
                                 <!-- First Place -->
-                                <div id="firstPlace" class="flex flex-col items-center">
+                                <div id="firstPlace" class="flex flex-col items-center podium-element">
                                     <!-- Will be populated by JS -->
                                 </div>
 
                                 <!-- Third Place -->
-                                <div id="thirdPlace" class="flex flex-col items-center transform translate-y-4">
+                                <div id="thirdPlace"
+                                    class="flex flex-col items-center transform translate-y-4 podium-element">
                                     <!-- Will be populated by JS -->
                                 </div>
                             </div>
 
                             <!-- Image Podium -->
-                            <div class="relative">
+                            <div class="relative podium-element" id="podiumImage">
                                 <img src="{{ asset('images/leaderboards/Group 26.png') }}" alt="podium"
                                     class="w-max h-max object-cover">
                                 <!-- 2nd place background -->
@@ -278,11 +311,13 @@
     </div>
 
     <!-- Sticky Footer for Current User Rank -->
-    <div id="stickyFooter" class="sticky-footer bg-gradient-to-r from-blue-600 to-blue-700 text-white hidden">
+    <div id="stickyFooter"
+        class="sticky-footer bg-gradient-to-r from-blue-600 to-blue-700 text-white hidden sticky-footer-element">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div id="footerAvatar" class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
+                    <div id="footerAvatar"
+                        class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-yellow-300">
                         <!-- Avatar will be inserted here -->
                     </div>
                     <div>
@@ -304,6 +339,8 @@
 
         // Leaderboard Loading Logic
         document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM Content Loaded - Initializing leaderboard');
+
             // Show skeleton initially, hide actual content
             const skeleton = document.getElementById('leaderboardSkeleton');
             const content = document.getElementById('leaderboardContent');
@@ -314,7 +351,7 @@
             }, 500);
 
             // Toggle button event listeners
-            document.getElementById('sectionBtn').addEventListener('click', function() {
+            document.getElementById('sectionBtn').addEventListener('click', function () {
                 if (currentView !== 'section') {
                     currentView = 'section';
                     updateToggleButtons();
@@ -322,7 +359,7 @@
                 }
             });
 
-            document.getElementById('schoolBtn').addEventListener('click', function() {
+            document.getElementById('schoolBtn').addEventListener('click', function () {
                 if (currentView !== 'school') {
                     currentView = 'school';
                     updateToggleButtons();
@@ -350,6 +387,8 @@
 
         async function loadLeaderboardData(type) {
             try {
+                console.log('Loading leaderboard data for:', type);
+
                 const url = type === 'section'
                     ? '{{ route("leaderboard.section") }}'
                     : '{{ route("leaderboard.school") }}';
@@ -373,6 +412,23 @@
                     skeleton.classList.add('hidden');
                     content.classList.remove('hidden');
                     content.classList.add('content-loaded');
+
+                    // DEBUG: Check if elements exist and have correct classes
+                    console.log('Podium elements found:', document.querySelectorAll('.podium-element').length);
+                    console.log('Rank elements found:', document.querySelectorAll('.rank-element').length);
+                    console.log('Sticky footer found:', document.querySelector('.sticky-footer-element') ? 'Yes' : 'No');
+
+                    // Check initial states
+                    const podiumEls = document.querySelectorAll('.podium-element');
+                    podiumEls.forEach((el, index) => {
+                        console.log(`Podium element ${index} opacity:`, window.getComputedStyle(el).opacity);
+                        console.log(`Podium element ${index} transform:`, window.getComputedStyle(el).transform);
+                    });
+
+                    // Trigger animations after a short delay to ensure DOM is ready
+                    setTimeout(() => {
+                        triggerLeaderboardAnimations();
+                    }, 100);
                 }, 300);
 
             } catch (error) {
@@ -382,6 +438,7 @@
         }
 
         function getInitials(name) {
+            if (!name) return '?';
             const parts = name.split(' ');
             if (parts.length >= 2) {
                 return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
@@ -399,55 +456,99 @@
             secondPlace.innerHTML = '';
             thirdPlace.innerHTML = '';
 
+            // Ensure animation classes are set (important!)
+            firstPlace.classList.add('podium-element');
+            secondPlace.classList.add('podium-element');
+            thirdPlace.classList.add('podium-element');
+
+            // Reset GSAP properties if available
+            if (typeof gsap !== 'undefined') {
+                gsap.set([firstPlace, secondPlace, thirdPlace], {
+                    opacity: 0,
+                    y: 50,
+                    scale: 0.8
+                });
+            }
+
             // First Place (index 0)
-            if (topThree[0]) {
+            if (topThree && topThree[0]) {
                 const student = topThree[0];
                 firstPlace.innerHTML = `
-                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-yellow-300 shadow-lg overflow-hidden">
-                        ${student.avatar_url
-                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
-                            : `<span class="text-gray-600 font-bold text-xl">${getInitials(student.name)}</span>`
-                        }
-                    </div>
-                    <div class="text-center mb-2">
-                        <div class="font-semibold text-white">${student.name}</div>
-                        <div class="text-yellow-300 text-sm">${student.points.toLocaleString()} pts</div>
-                    </div>
-                `;
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-yellow-300 shadow-lg overflow-hidden">
+                                ${student.avatar_url
+                        ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                        : `<span class="text-gray-600 font-bold text-xl">${getInitials(student.name)}</span>`
+                    }
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-white">${student.name || 'Unknown'}</div>
+                                <div class="text-yellow-300 text-sm">${(student.points || 0).toLocaleString()} pts</div>
+                            </div>
+                        `;
+            } else {
+                firstPlace.innerHTML = `
+                            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-yellow-300 shadow-lg">
+                                <span class="text-gray-400 font-bold text-xl">?</span>
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-white">No Data</div>
+                                <div class="text-yellow-300 text-sm">0 pts</div>
+                            </div>
+                        `;
             }
 
             // Second Place (index 1)
-            if (topThree[1]) {
+            if (topThree && topThree[1]) {
                 const student = topThree[1];
                 secondPlace.innerHTML = `
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-gray-300 shadow-lg overflow-hidden">
-                        ${student.avatar_url
-                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
-                            : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
-                        }
-                    </div>
-                    <div class="text-center mb-2">
-                        <div class="font-semibold text-sm text-white">${student.name}</div>
-                        <div class="text-yellow-300 text-xs">${student.points.toLocaleString()} pts</div>
-                    </div>
-                `;
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-gray-300 shadow-lg overflow-hidden">
+                                ${student.avatar_url
+                        ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                        : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
+                    }
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-sm text-white">${student.name || 'Unknown'}</div>
+                                <div class="text-yellow-300 text-xs">${(student.points || 0).toLocaleString()} pts</div>
+                            </div>
+                        `;
+            } else {
+                secondPlace.innerHTML = `
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-gray-300 shadow-lg">
+                                <span class="text-gray-400 font-bold text-lg">?</span>
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-sm text-white">No Data</div>
+                                <div class="text-yellow-300 text-xs">0 pts</div>
+                            </div>
+                        `;
             }
 
             // Third Place (index 2)
-            if (topThree[2]) {
+            if (topThree && topThree[2]) {
                 const student = topThree[2];
                 thirdPlace.innerHTML = `
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-orange-300 shadow-lg overflow-hidden">
-                        ${student.avatar_url
-                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
-                            : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
-                        }
-                    </div>
-                    <div class="text-center mb-2">
-                        <div class="font-semibold text-sm text-white">${student.name}</div>
-                        <div class="text-yellow-300 text-xs">${student.points.toLocaleString()} pts</div>
-                    </div>
-                `;
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-orange-300 shadow-lg overflow-hidden">
+                                ${student.avatar_url
+                        ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                        : `<span class="text-gray-600 font-bold text-lg">${getInitials(student.name)}</span>`
+                    }
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-sm text-white">${student.name || 'Unknown'}</div>
+                                <div class="text-yellow-300 text-xs">${(student.points || 0).toLocaleString()} pts</div>
+                            </div>
+                        `;
+            } else {
+                thirdPlace.innerHTML = `
+                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-2 border-4 border-orange-300 shadow-lg">
+                                <span class="text-gray-400 font-bold text-lg">?</span>
+                            </div>
+                            <div class="text-center mb-2">
+                                <div class="font-semibold text-sm text-white">No Data</div>
+                                <div class="text-yellow-300 text-xs">0 pts</div>
+                            </div>
+                        `;
             }
         }
 
@@ -455,50 +556,66 @@
             const container = document.getElementById('rankedList');
             container.innerHTML = '';
 
-            rankedList.forEach(student => {
+            if (!rankedList || rankedList.length === 0) {
+                container.innerHTML = `
+                            <div class="text-center py-8 text-gray-500">
+                                <div class="text-lg font-semibold">No rankings available</div>
+                                <div class="text-sm">There are no students to display in this leaderboard yet.</div>
+                            </div>
+                        `;
+                return;
+            }
+
+            rankedList.forEach((student, index) => {
                 const item = document.createElement('div');
-                item.className = 'bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center';
+                item.className = 'bg-[#3B82F6] drop-shadow-leaderboard-container rounded-xl p-4 shadow-md flex items-center rank-element';
+
+                // Set initial state for animation
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(30px)';
 
                 item.innerHTML = `
-                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 overflow-hidden">
-                        ${student.avatar_url
-                            ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
-                            : `<span class="text-gray-600 font-bold">${getInitials(student.name)}</span>`
-                        }
-                    </div>
-                    <div class="flex-1">
-                        <div class="text-white font-semibold">Rank ${student.rank} - ${student.name}</div>
-                        <div class="text-blue-100 text-sm">${student.grade_level ? 'Grade ' + student.grade_level : ''} ${student.section ? '- ' + student.section : ''}</div>
-                    </div>
-                    <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
-                        style="text-shadow:
-                            -1px -1px 0 #AE6816,
-                            1px -1px 0 #AE6816,
-                            -1px 1px 0 #AE6816,
-                            1px  1px 0 #AE6816,
-                            -1px  2px 0 #AE6816,
-                            1px 2px 0 #AE6816,
-                            0 2px 0 #AE6816;">
-                        ${student.points.toLocaleString()} pts
-                    </div>
-                `;
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 overflow-hidden">
+                                ${student.avatar_url
+                        ? `<img src="${student.avatar_url}" alt="${student.name}" class="w-full h-full object-cover">`
+                        : `<span class="text-gray-600 font-bold">${getInitials(student.name)}</span>`
+                    }
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-white font-semibold">Rank ${student.rank || 'N/A'} - ${student.name || 'Unknown'}</div>
+                                <div class="text-blue-100 text-sm">${student.grade_level ? 'Grade ' + student.grade_level : ''} ${student.section ? '- ' + student.section : ''}</div>
+                            </div>
+                            <div class="bg-leaderboard-points drop-shadow-leaderboard-points text-white px-3 py-1 rounded-full text-base font-medium font-baloo"
+                                style="text-shadow:
+                                    -1px -1px 0 #AE6816,
+                                    1px -1px 0 #AE6816,
+                                    -1px 1px 0 #AE6816,
+                                    1px  1px 0 #AE6816,
+                                    -1px  2px 0 #AE6816,
+                                    1px 2px 0 #AE6816,
+                                    0 2px 0 #AE6816;">
+                                ${(student.points || 0).toLocaleString()} pts
+                            </div>
+                        `;
 
                 container.appendChild(item);
             });
         }
 
         function updateStickyFooter(currentUser) {
+            const footer = document.getElementById('stickyFooter');
+
             if (!currentUser) {
-                document.getElementById('stickyFooter').classList.add('hidden');
+                footer.classList.add('hidden');
                 return;
             }
 
-            const footer = document.getElementById('stickyFooter');
             const footerAvatar = document.getElementById('footerAvatar');
             const footerRank = document.getElementById('footerRank');
             const footerPoints = document.getElementById('footerPoints');
 
             // Update avatar
+            footerAvatar.innerHTML = '';
             if (currentUser.avatar_url) {
                 footerAvatar.innerHTML = `<img src="${currentUser.avatar_url}" alt="Your avatar" class="w-full h-full object-cover rounded-full">`;
             } else {
@@ -506,11 +623,16 @@
             }
 
             // Update rank and points
-            footerRank.textContent = `Rank ${currentUser.rank}`;
-            footerPoints.textContent = `${currentUser.points.toLocaleString()} pts`;
+            footerRank.textContent = `Rank ${currentUser.rank || 'N/A'}`;
+            footerPoints.textContent = `${(currentUser.points || 0).toLocaleString()} pts`;
 
-            // Always show the sticky footer to display current user's progress
+            // Show the sticky footer and ensure animation class
             footer.classList.remove('hidden');
+            footer.classList.add('sticky-footer-element');
+
+            // Set initial state
+            footer.style.opacity = '0';
+            footer.style.transform = 'translateY(50px)';
         }
 
         function showLeaderboardContent() {
@@ -521,6 +643,75 @@
             content.classList.remove('hidden');
             content.classList.add('content-loaded');
         }
+
+        function triggerLeaderboardAnimations() {
+            console.log('=== TRIGGERING LEADERBOARD ANIMATIONS ===');
+
+            // Use the external animation library
+            if (typeof window.LeaderboardAnimations !== 'undefined') {
+                console.log('Using external animation library');
+                window.LeaderboardAnimations.triggerAllAnimations();
+            } else {
+                console.log('External library not found, using fallback animations');
+                animateLeaderboardFallback();
+            }
+        }
+
+        function animateLeaderboardFallback() {
+            console.log('Running fallback CSS animations');
+
+            // Simple fallback animations using CSS transitions
+            const podiumElements = document.querySelectorAll('.podium-element');
+            const rankElements = document.querySelectorAll('.rank-element');
+            const footerElement = document.querySelector('.sticky-footer-element');
+
+            // Animate podium with stagger
+            podiumElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0) scale(1)';
+                }, index * 200);
+            });
+
+            // Animate rank list with stagger
+            rankElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100 + 600); // Start after podium
+            });
+
+            // Animate sticky footer
+            if (footerElement) {
+                setTimeout(() => {
+                    footerElement.style.transition = 'all 0.7s ease-out';
+                    footerElement.style.opacity = '1';
+                    footerElement.style.transform = 'translateY(0)';
+                }, 1000);
+            }
+        }
+
+        // Handle page visibility changes (in case animations get stuck)
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                // Page became visible again, check if animations need restarting
+                const animatedElements = document.querySelectorAll('.podium-element, .rank-element, .sticky-footer-element');
+                let allVisible = true;
+
+                animatedElements.forEach(el => {
+                    if (window.getComputedStyle(el).opacity === '0') {
+                        allVisible = false;
+                    }
+                });
+
+                if (!allVisible) {
+                    console.log('Some elements not visible, re-triggering animations');
+                    triggerLeaderboardAnimations();
+                }
+            }
+        });
     </script>
 
 @endsection
