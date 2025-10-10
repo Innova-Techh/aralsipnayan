@@ -32,23 +32,52 @@ class AuthController extends Controller
         // delay to test the loader (remove in production)
         sleep(1);
 
-        $credentials = $request->only('username', 'password');
-
-        if (Auth::guard('student')->attempt($credentials)) {
+        // Try authenticating against admin/teacher first (supports username or email)
+        $loginField = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        if (Auth::guard('admin')->attempt([$loginField => $request->username, 'password' => $request->password])) {
             $request->session()->regenerate();
-            
-            $user = Auth::guard('student')->user();
 
-            // Only handle Student role - redirect others to appropriate login
-            if ($user->role === 'Student') {
-                return $this->handleStudentLogin($user);
-            } else {
-                // Non-student users should use admin login
-                Auth::guard('student')->logout();
+            $adminUser = Auth::guard('admin')->user();
+            // Block inactive admin/teacher accounts
+            if (isset($adminUser->status) && strtolower($adminUser->status) !== 'active') {
+                Auth::guard('admin')->logout();
                 return back()->withErrors([
-                    'username' => 'Please use the admin login for teacher/admin accounts.',
+                    'username' => 'This account is inactive. Please contact support.',
                 ])->withInput($request->only('username'));
             }
+            if (in_array($adminUser->role, ['Admin', 'Teacher'])) {
+                if ($adminUser->role === 'Admin') {
+                    return redirect()->route('admin.dashboard');
+                }
+                if ($adminUser->role === 'Teacher') {
+                    return redirect()->route('teacher.dashboard');
+                }
+            }
+
+            // Unexpected role in admin guard, logout and continue
+            Auth::guard('admin')->logout();
+        }
+
+        // Fallback: try authenticating as student (supports username or email)
+        $studentLoginField = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $studentCredentials = [$studentLoginField => $request->username, 'password' => $request->password];
+        if (Auth::guard('student')->attempt($studentCredentials)) {
+            $request->session()->regenerate();
+
+            $user = Auth::guard('student')->user();
+            // Block inactive student accounts
+            if (isset($user->status) && strtolower($user->status) !== 'active') {
+                Auth::guard('student')->logout();
+                return back()->withErrors([
+                    'username' => 'This account is inactive. Please contact admin or your teacher.',
+                ])->withInput($request->only('username'));
+            }
+            if ($user->role === 'Student') {
+                return $this->handleStudentLogin($user);
+            }
+
+            // Not a student role on student guard; logout and error
+            Auth::guard('student')->logout();
         }
 
         return back()->withErrors([
@@ -95,7 +124,14 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('student')->logout();
+        // Log out of both guards to ensure full sign-out from unified login
+        if (Auth::guard('student')->check()) {
+            Auth::guard('student')->logout();
+        }
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        }
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

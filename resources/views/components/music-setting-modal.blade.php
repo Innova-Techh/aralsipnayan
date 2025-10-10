@@ -54,6 +54,9 @@
     }
 </style>
 <script>
+    // Background Music Audio Element
+    window.bgMusicAudio = null;
+
     // Settings Modal Functions
     function openSettingsModal() {
         const modal = document.getElementById('music-settings-modal');
@@ -62,7 +65,7 @@
 
         // Load saved settings
         const bgMusicEnabled = localStorage.getItem('bg_music_enabled') === 'true';
-        const soundEffectsEnabled = localStorage.getItem('sound_effects_enabled') === 'true';
+        const soundEffectsEnabled = localStorage.getItem('sound_effects_enabled') !== 'false'; // Default to true
 
         updateToggleState('bg-music-toggle', bgMusicEnabled);
         updateToggleState('sound-effects-toggle', soundEffectsEnabled);
@@ -92,44 +95,156 @@
         }
     }
 
-    // Initialize settings modal handlers
-    document.getElementById('settings-btn').addEventListener('click', openSettingsModal);
-    document.getElementById('close-settings-modal').addEventListener('click', closeSettingsModal);
+    // Initialize background music
+    function initBackgroundMusic() {
+        if (!window.bgMusicAudio) {
+            window.bgMusicAudio = new Audio('{{ asset("audio/bgmusic.mp3") }}');
+            window.bgMusicAudio.loop = false; // Start with loop disabled, enable it after seeking
+            window.bgMusicAudio.volume = 0.3; // Set background music volume to 30%
+            window.bgMusicAudio.preload = 'auto'; // Preload the full audio for faster playback
+            
+            // Store the Audio object globally to prevent recreation
+            window.bgMusicAudioInitialized = true;
+            
+            // Save playback position periodically
+            window.bgMusicAudio.addEventListener('timeupdate', function() {
+                if (window.bgMusicAudio && !window.bgMusicAudio.paused) {
+                    localStorage.setItem('bg_music_position', window.bgMusicAudio.currentTime);
+                }
+            });
 
-    // Background Music Toggle
-    document.getElementById('bg-music-toggle').addEventListener('click', function () {
-        const isActive = this.querySelector('div').classList.contains('toggle-active');
-        const newState = !isActive;
-
-        updateToggleState('bg-music-toggle', newState);
-        localStorage.setItem('bg_music_enabled', newState);
-
-        // Add your background music logic here
-        if (newState) {
-            // Play background music
-            console.log('Background music enabled');
-        } else {
-            // Stop background music
-            console.log('Background music disabled');
+            // Save position before page unload
+            window.addEventListener('beforeunload', function() {
+                if (window.bgMusicAudio && !window.bgMusicAudio.paused) {
+                    localStorage.setItem('bg_music_position', window.bgMusicAudio.currentTime);
+                }
+            });
         }
-    });
+    }
 
-    // Sound Effects Toggle
-    document.getElementById('sound-effects-toggle').addEventListener('click', function () {
-        const isActive = this.querySelector('div').classList.contains('toggle-active');
-        const newState = !isActive;
+    // Play background music
+    function playBackgroundMusic() {
+        if (window.bgMusicAudio) {
+            // Restore saved playback position if available
+            const savedPosition = localStorage.getItem('bg_music_position');
+            
+            if (savedPosition && !isNaN(savedPosition)) {
+                const position = parseFloat(savedPosition);
+                
+                // Load the audio file
+                window.bgMusicAudio.load();
+                
+                // Wait for loadeddata event which means we can seek
+                window.bgMusicAudio.addEventListener('loadeddata', function onLoadedData() {
+                    // Set position while audio is still paused
+                    window.bgMusicAudio.currentTime = position;
+                    
+                    // Now start playing
+                    window.bgMusicAudio.play().then(() => {
+                        // Enable loop
+                        window.bgMusicAudio.loop = true;
+                    }).catch(error => {
+                        console.error('Error playing background music:', error);
+                    });
+                    
+                    // Remove this one-time listener
+                    window.bgMusicAudio.removeEventListener('loadeddata', onLoadedData);
+                }, { once: true });
+                
+            } else {
+                // No saved position, just play normally
+                window.bgMusicAudio.loop = true;
+                window.bgMusicAudio.play().catch(error => {
+                    console.error('Error playing background music:', error);
+                });
+            }
+        }
+    }
 
-        updateToggleState('sound-effects-toggle', newState);
-        localStorage.setItem('sound_effects_enabled', newState);
-        quizState.audioEnabled = newState;
+    // Pause background music
+    function pauseBackgroundMusic() {
+        if (window.bgMusicAudio) {
+            // Save current position before pausing
+            localStorage.setItem('bg_music_position', window.bgMusicAudio.currentTime);
+            window.bgMusicAudio.pause();
+        }
+    }
 
-        console.log('Sound effects:', newState ? 'enabled' : 'disabled');
-    });
+    // Initialize settings modal handlers on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize background music
+        initBackgroundMusic();
 
-    // Close modal when clicking outside
-    document.getElementById('music-settings-modal').addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeSettingsModal();
+        // Restore background music state
+        const bgMusicEnabled = localStorage.getItem('bg_music_enabled') === 'true';
+        if (bgMusicEnabled) {
+            playBackgroundMusic();
+        }
+
+        // Make sure quizState audio is synced with localStorage
+        const soundEffectsEnabled = localStorage.getItem('sound_effects_enabled') !== 'false'; // Default to true
+        if (window.quizState) {
+            window.quizState.audioEnabled = soundEffectsEnabled;
+        }
+
+        // Initialize settings modal handlers
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeModalBtn = document.getElementById('close-settings-modal');
+        const bgMusicToggle = document.getElementById('bg-music-toggle');
+        const soundEffectsToggle = document.getElementById('sound-effects-toggle');
+        const modal = document.getElementById('music-settings-modal');
+
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', openSettingsModal);
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeSettingsModal);
+        }
+
+        // Background Music Toggle
+        if (bgMusicToggle) {
+            bgMusicToggle.addEventListener('click', function () {
+                const isActive = this.querySelector('div').classList.contains('toggle-active');
+                const newState = !isActive;
+
+                updateToggleState('bg-music-toggle', newState);
+                localStorage.setItem('bg_music_enabled', newState);
+
+                // Control background music
+                if (newState) {
+                    playBackgroundMusic();
+                } else {
+                    pauseBackgroundMusic();
+                    // Clear saved position when user manually turns off music
+                    localStorage.removeItem('bg_music_position');
+                }
+            });
+        }
+
+        // Sound Effects Toggle
+        if (soundEffectsToggle) {
+            soundEffectsToggle.addEventListener('click', function () {
+                const isActive = this.querySelector('div').classList.contains('toggle-active');
+                const newState = !isActive;
+
+                updateToggleState('sound-effects-toggle', newState);
+                localStorage.setItem('sound_effects_enabled', newState);
+                
+                // Update quiz state if available
+                if (window.quizState) {
+                    window.quizState.audioEnabled = newState;
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closeSettingsModal();
+                }
+            });
         }
     });
 </script>

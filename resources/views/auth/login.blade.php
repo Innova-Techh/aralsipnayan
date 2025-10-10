@@ -7,13 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Three.js (required for Vanta) -->
+    <!-- Three.js (required for Vanta) - from josh-branch -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Vanta.js FOG Effect -->
+    <!-- Vanta.js FOG Effect - from josh-branch -->
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
 
     <style>
-        /* Math symbols floating animation */
+        /* Math symbols floating animation - from josh-branch */
         .math-symbol {
             position: absolute;
             color: rgba(255, 255, 255, 0.15);
@@ -25,98 +25,34 @@
         }
 
         @keyframes float-symbol {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0) rotate(0deg);
                 opacity: 0.15;
             }
-
             25% {
                 transform: translateY(-30px) rotate(5deg);
                 opacity: 0.25;
             }
-
             50% {
                 transform: translateY(-15px) rotate(-5deg);
                 opacity: 0.2;
             }
-
             75% {
                 transform: translateY(-40px) rotate(3deg);
                 opacity: 0.18;
             }
         }
 
-        .math-symbol:nth-child(1) {
-            top: 10%;
-            left: 15%;
-            animation-delay: 0s;
-            font-size: 3rem;
-        }
-
-        .math-symbol:nth-child(2) {
-            top: 25%;
-            left: 75%;
-            animation-delay: 2s;
-            font-size: 2.5rem;
-        }
-
-        .math-symbol:nth-child(3) {
-            top: 45%;
-            left: 25%;
-            animation-delay: 4s;
-            font-size: 2.8rem;
-        }
-
-        .math-symbol:nth-child(4) {
-            top: 65%;
-            left: 70%;
-            animation-delay: 6s;
-            font-size: 2.3rem;
-        }
-
-        .math-symbol:nth-child(5) {
-            top: 80%;
-            left: 30%;
-            animation-delay: 8s;
-            font-size: 3.2rem;
-        }
-
-        .math-symbol:nth-child(6) {
-            top: 35%;
-            left: 85%;
-            animation-delay: 10s;
-            font-size: 2.6rem;
-        }
-
-        .math-symbol:nth-child(7) {
-            top: 55%;
-            left: 10%;
-            animation-delay: 12s;
-            font-size: 2.9rem;
-        }
-
-        .math-symbol:nth-child(8) {
-            top: 15%;
-            left: 50%;
-            animation-delay: 14s;
-            font-size: 2.4rem;
-        }
-
-        .math-symbol:nth-child(9) {
-            top: 75%;
-            left: 60%;
-            animation-delay: 16s;
-            font-size: 3.1rem;
-        }
-
-        .math-symbol:nth-child(10) {
-            top: 90%;
-            left: 80%;
-            animation-delay: 18s;
-            font-size: 2.7rem;
-        }
+        .math-symbol:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; font-size: 3rem; }
+        .math-symbol:nth-child(2) { top: 25%; left: 75%; animation-delay: 2s; font-size: 2.5rem; }
+        .math-symbol:nth-child(3) { top: 45%; left: 25%; animation-delay: 4s; font-size: 2.8rem; }
+        .math-symbol:nth-child(4) { top: 65%; left: 70%; animation-delay: 6s; font-size: 2.3rem; }
+        .math-symbol:nth-child(5) { top: 80%; left: 30%; animation-delay: 8s; font-size: 3.2rem; }
+        .math-symbol:nth-child(6) { top: 35%; left: 85%; animation-delay: 10s; font-size: 2.6rem; }
+        .math-symbol:nth-child(7) { top: 55%; left: 10%; animation-delay: 12s; font-size: 2.9rem; }
+        .math-symbol:nth-child(8) { top: 15%; left: 50%; animation-delay: 14s; font-size: 2.4rem; }
+        .math-symbol:nth-child(9) { top: 75%; left: 60%; animation-delay: 16s; font-size: 3.1rem; }
+        .math-symbol:nth-child(10) { top: 90%; left: 80%; animation-delay: 18s; font-size: 2.7rem; }
 
         #vanta-bg {
             position: absolute;
@@ -132,7 +68,7 @@
             z-index: 1;
         }
 
-        /* Glassmorphism for mobile/tablet */
+        /* Glassmorphism for mobile/tablet - from josh-branch */
         .glass-card {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
@@ -147,7 +83,7 @@
             -webkit-backdrop-filter: blur(10px);
         }
 
-        /* Mobile/Tablet full-screen background */
+        /* Mobile/Tablet full-screen background - from josh-branch */
         .mobile-vanta-container {
             position: fixed;
             top: 0;
@@ -181,7 +117,7 @@
 </script>
 
 <body class="min-h-screen font-sans overflow-x-hidden">
-    <!-- Mobile/Tablet layout with full-screen background -->
+    <!-- Mobile/Tablet layout with full-screen background (from josh-branch) -->
     <div class="md:hidden">
         <!-- Vanta.js Background for Mobile/Tablet -->
         <div class="mobile-vanta-container" id="mobile-vanta-bg">
@@ -212,9 +148,9 @@
                 <p class="text-white text-opacity-90 text-sm">Math learning made fun!</p>
             </div>
 
-            <!-- Glassmorphism Login Card -->
+            <!-- Glassmorphism Login Card (from josh-branch) -->
             <div class="glass-card rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-                <h2 class="text-white text-xl font-semibold text-center mb-6">Student Login</h2>
+                <h2 class="text-white text-xl font-semibold text-center mb-6">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
                     @csrf
                     <div class="mb-5">
@@ -256,9 +192,9 @@
         </div>
     </div>
 
-    <!-- Desktop layout -->
+    <!-- Desktop layout (combining both branches) -->
     <div class="hidden md:flex min-h-screen">
-        <!-- Left Section with Vanta.js Background -->
+        <!-- Left Section with Vanta.js Background (from josh-branch) -->
         <div class="flex-1 relative overflow-hidden">
             <!-- Vanta.js container -->
             <div id="vanta-bg"></div>
@@ -290,15 +226,14 @@
             </div>
         </div>
 
-        <!-- Right Section -->
+        <!-- Right Section (from main-branch with all functionality intact) -->
         <div class="flex-1 bg-gray-100 flex items-center justify-center">
             <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
-                <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Student Login</h2>
+                <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm">
                     @csrf
                     <div class="mb-6">
-                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Student
-                            Number</label>
+                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Username or Email</label>
                         <input type="text"
                             class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
                             name="username" id="desktop-username" required>
@@ -311,8 +246,7 @@
                             name="password" id="desktop-password" required>
                     </div>
                     <div class="mb-8">
-                        <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
-                            Code</label>
+                        <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security Code</label>
                         <div class="flex gap-3 items-center">
                             <input type="text"
                                 class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
@@ -337,7 +271,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Vanta.js FOG effect for all screen sizes
+            // Initialize Vanta.js FOG effect for all screen sizes (from josh-branch)
             const isMobile = window.innerWidth < 768;
 
             if (isMobile) {
@@ -376,6 +310,7 @@
                 });
             }
 
+            // Form submission logic (from main-branch - all functionality preserved)
             const forms = document.querySelectorAll("form");
             const loaderWrapper = document.querySelector("#loader-wrapper");
 
@@ -424,6 +359,7 @@
 
 </html>
 
+<!-- Error Modal (from main-branch - all functionality preserved) -->
 @if ($errors->any())
     <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-lg w-96 p-6 relative">

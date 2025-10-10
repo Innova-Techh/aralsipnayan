@@ -39,10 +39,19 @@
                 💡 HINT
             </button>
 
-            <!-- Audio Toggle Button -->
-            <button id="audio-toggle" class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
-                🔊 AUDIO ON
-            </button>
+            <!-- Settings Button -->
+                        <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
+                                        hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
+                        </button>
         </div>
 
         <!-- Question -->
@@ -250,6 +259,7 @@
     </div>
 </div>
 
+@include('components.music-setting-modal')
 @include('components.retry-modal')
 @include('components.sweetalert-config')
 
@@ -619,8 +629,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxRetryAttempts = 3;
     const nextBtn = document.getElementById('next-btn');
 
-    // Quiz progress state
-    const quizState = {
+    // Quiz progress state (make it globally accessible)
+    window.quizState = {
         sessionId: '{{ session("quiz_session_id") ?? "quiz_" . time() }}',
         questionId: '{{ $question->question_id }}',
         competency: '{{ $category ?? "" }}',
@@ -633,6 +643,9 @@ document.addEventListener('DOMContentLoaded', function() {
         quizTimeRemaining: quizTimeRemaining,
         audioEnabled: true
     };
+    
+    // Alias for backward compatibility
+    const quizState = window.quizState;
     
     // Debug log quiz state
     console.log('Quiz state initialized:', quizState);
@@ -809,9 +822,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Submit button handler
         document.getElementById('submit-btn').addEventListener('click', submitAnswer);
         
-        // Audio toggle handler
-        document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
-        
         // Hint button handler
         const hintBtn = document.getElementById('hint-btn');
         if (hintBtn) {
@@ -894,24 +904,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function restoreAudioPreference() {
         try {
-            const savedAudioPreference = localStorage.getItem('quiz_audio_enabled');
+            const savedAudioPreference = localStorage.getItem('sound_effects_enabled');
             if (savedAudioPreference !== null) {
-                quizState.audioEnabled = savedAudioPreference === 'true';
-                updateAudioButtonDisplay();
+                quizState.audioEnabled = savedAudioPreference !== 'false'; // Default to true
             }
         } catch (error) {
             console.error('Failed to restore audio preference:', error);
-        }
-    }
-    
-    function updateAudioButtonDisplay() {
-        const audioToggleBtn = document.getElementById('audio-toggle');
-        if (quizState.audioEnabled) {
-            audioToggleBtn.innerHTML = '🔊 AUDIO ON';
-            audioToggleBtn.className = 'bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg';
-        } else {
-            audioToggleBtn.innerHTML = '🔇 AUDIO OFF';
-            audioToggleBtn.className = 'bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-gray-500 hover:to-gray-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#5d5d5d] shadow-lg';
         }
     }
     
@@ -1079,25 +1077,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.addEventListener('click', enableAudioOnFirstInteraction);
         document.addEventListener('touchstart', enableAudioOnFirstInteraction);
-    }
-    
-    function toggleAudio() {
-        quizState.audioEnabled = !quizState.audioEnabled;
-        updateAudioButtonDisplay();
-
-        if (quizState.audioEnabled && window.correctSounds && window.correctSounds.length > 0) {
-            // Play a random correct sound as feedback for enabling audio
-            const randomIndex = Math.floor(Math.random() * window.correctSounds.length);
-            const testSound = window.correctSounds[randomIndex];
-            testSound.currentTime = 0;
-            testSound.play().catch(() => {});
-        }
-
-        try {
-            localStorage.setItem('quiz_audio_enabled', quizState.audioEnabled);
-        } catch (error) {
-            console.error('Failed to save audio preference:', error);
-        }
     }
     
     function getHint() {
@@ -1503,15 +1482,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function playAudioFeedback(isCorrect, isTimeout = false) {
         if (!quizState.audioEnabled || isTimeout) return;
-
-        // Add visual pulse to audio button
-        const audioButton = document.getElementById('audio-toggle');
-        if (audioButton) {
-            audioButton.classList.add('audio-pulse');
-            setTimeout(() => {
-                audioButton.classList.remove('audio-pulse');
-            }, 300);
-        }
 
         try {
             if (isCorrect) {

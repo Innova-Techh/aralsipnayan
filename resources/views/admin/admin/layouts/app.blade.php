@@ -249,7 +249,7 @@
                 </div>
 
                 <!-- Logout Button -->
-                <form method="POST" action="{{ route('admin.logout', [], false) }}">
+                <form method="POST" action="{{ route('logout', [], false) }}">
                     @csrf
                     <button type="submit"
                         class="relative w-full flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
