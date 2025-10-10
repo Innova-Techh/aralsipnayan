@@ -1,5 +1,6 @@
 import './bootstrap';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import Swal from 'sweetalert2'; 
 
 // Make Swal globally available
 window.Swal = Swal;

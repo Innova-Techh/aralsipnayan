@@ -255,7 +255,7 @@
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                             Profile
                         </a>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form">
                             @csrf
                             <button type="submit"
                                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
@@ -324,6 +324,19 @@
         document.addEventListener('DOMContentLoaded', function () {
             const userMenuButton = document.getElementById('user-menu-button');
             const dropdown = document.getElementById('userDropdown');
+
+            // Handle logout form submission with fresh CSRF token
+            const logoutForm = document.getElementById('logout-form');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    // Update CSRF token from meta tag before submitting
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    const csrfInput = this.querySelector('input[name="_token"]');
+                    if (csrfToken && csrfInput) {
+                        csrfInput.value = csrfToken.getAttribute('content');
+                    }
+                });
+            }
 
 
             if (userMenuButton && dropdown) {

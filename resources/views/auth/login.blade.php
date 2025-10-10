@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>AralSipnayan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Three.js (required for Vanta) - from josh-branch -->
@@ -315,8 +316,43 @@
             const loaderWrapper = document.querySelector("#loader-wrapper");
 
             forms.forEach(form => {
-                form.addEventListener("submit", function (e) {
-                    // Show loader immediately when form is submitted
+                form.addEventListener("submit", async function (e) {
+                    e.preventDefault(); // Prevent default submission initially
+
+                    // Fetch fresh CSRF token from server
+                    try {
+                        const response = await fetch('/login', {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const html = await response.text();
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const freshToken = doc.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                            if (freshToken) {
+                                // Update meta tag
+                                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                                if (csrfMeta) {
+                                    csrfMeta.setAttribute('content', freshToken);
+                                }
+
+                                // Update form input
+                                const csrfInput = this.querySelector('input[name="_token"]');
+                                if (csrfInput) {
+                                    csrfInput.value = freshToken;
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Could not refresh CSRF token, proceeding with existing token');
+                    }
+
+                    // Show loader
                     if (loaderWrapper) {
                         loaderWrapper.style.display = "flex";
                     }
@@ -333,6 +369,9 @@
                     const desktopLayout = document.querySelector('.hidden.md\\:flex');
                     if (mobileLayout) mobileLayout.style.display = 'none';
                     if (desktopLayout) desktopLayout.style.display = 'none';
+
+                    // Submit the form
+                    this.submit();
                 });
             });
 

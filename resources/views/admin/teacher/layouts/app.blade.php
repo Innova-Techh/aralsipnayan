@@ -287,7 +287,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('teacher.logout') }}">
+                <form method="POST" action="{{ route('teacher.logout') }}" id="sidebar-logout-form">
                     @csrf
                     <button type="submit"
                         class="relative w-full tooltip-container flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
@@ -400,7 +400,7 @@
                                     <a href="{{ route('teacher.profile') }}"
                                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile
                                         Settings</a>
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <form method="POST" action="{{ route('logout') }}" id="header-logout-form">
                                         @csrf
                                         <button type="submit"
                                             class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -424,6 +424,23 @@
     <!-- KEEP ORIGINAL JS LOGIC (unchanged) -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Handle CSRF token refresh for logout forms
+            const sidebarLogoutForm = document.getElementById('sidebar-logout-form');
+            const headerLogoutForm = document.getElementById('header-logout-form');
+
+            [sidebarLogoutForm, headerLogoutForm].forEach(form => {
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        // Update CSRF token from meta tag before submitting
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                        const csrfInput = this.querySelector('input[name="_token"]');
+                        if (csrfToken && csrfInput) {
+                            csrfInput.value = csrfToken.getAttribute('content');
+                        }
+                    });
+                }
+            });
+
             const userMenuButton = document.getElementById('user-menu-button');
             const dropdown = document.getElementById('userDropdown');
 

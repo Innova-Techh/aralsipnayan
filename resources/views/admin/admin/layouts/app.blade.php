@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin - @yield('title', 'Dashboard')</title>
 
     <!-- Tailwind CSS -->
@@ -249,7 +250,7 @@
                 </div>
 
                 <!-- Logout Button -->
-                <form method="POST" action="{{ route('logout', [], false) }}">
+                <form method="POST" action="{{ route('logout', [], false) }}" id="admin-logout-form">
                     @csrf
                     <button type="submit"
                         class="relative w-full flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
@@ -369,6 +370,24 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle CSRF token refresh for logout form
+            const adminLogoutForm = document.getElementById('admin-logout-form');
+
+            if (adminLogoutForm) {
+                adminLogoutForm.addEventListener('submit', function(e) {
+                    // Update CSRF token from meta tag before submitting
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    const csrfInput = this.querySelector('input[name="_token"]');
+                    if (csrfToken && csrfInput) {
+                        csrfInput.value = csrfToken.getAttribute('content');
+                    }
+                });
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>
