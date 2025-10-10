@@ -21,17 +21,17 @@
             font-family: 'Baloo 2', cursive;
         }
 
-        /* New gradient background */
+        /* New gradient background with animated circles */
         .full-screen-section {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #1E3A8A 0%, #0f1a3a 100%);
+            background: linear-gradient(135deg, #1E3A8A 0%, #0f172a 50%, #1e293b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
         }
 
-        /* GSAP animated circles */
+        /* Container for animated elements */
         .moving-circles {
             position: absolute;
             top: 0;
@@ -42,10 +42,21 @@
             z-index: 0;
         }
 
+        /* Radial circle styles */
         .circle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 40%, rgba(59, 130, 246, 0) 70%);
+            filter: blur(2px);
+        }
+
+        /* Math symbol styles */
+        .math-symbol {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 3rem;
+            font-weight: bold;
+            pointer-events: none;
         }
 
         /* Animations */
@@ -192,7 +203,6 @@
             pointer-events: none;
         }
 
-        /* Ensure slides don't overflow the container */
         .swiper-slide {
             max-width: calc(100vw - 40px);
         }
@@ -248,32 +258,41 @@
         }
 
         @media (max-width: 768px) {
-
-            .swiper-button-next,
-            .swiper-button-prev {
-                top: auto;
-                bottom: 0;
-                transform: none;
-                width: 40px;
-                height: 40px;
+            .swiper {
+                padding-top: 15px;
+                padding-bottom: 100px;
             }
 
-            .swiper-button-next:hover,
-            .swiper-button-prev:hover {
-                transform: scale(1.1);
+            .swiper-slide {
+                width: 420px;
+                height: 340px;
+                padding: 1.75rem 1.5rem;
             }
 
-            .swiper-button-next {
-                right: calc(50% - 60px);
+            .swiper-slide h1 {
+                font-size: 1.75rem;
+                margin-top: 0;
+                margin-bottom: 1rem;
             }
 
-            .swiper-button-prev {
-                left: calc(50% - 60px);
+            .swiper-slide img {
+                width: 160px;
+                height: 160px;
+                margin: 1rem 0;
             }
 
-            .swiper-button-next::after,
-            .swiper-button-prev::after {
-                font-size: 18px;
+            .swiper-slide p {
+                font-size: 1.1rem;
+                margin-top: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .swiper-slide-prev {
+                transform: scale(0.75) translateX(-70%) translateZ(-150px) rotateY(10deg);
+            }
+
+            .swiper-slide-next {
+                transform: scale(0.75) translateX(70%) translateZ(-150px) rotateY(-10deg);
             }
         }
 
@@ -345,41 +364,10 @@
         }
 
         @media (max-width: 768px) {
-            .swiper {
-                padding-top: 15px;
-                padding-bottom: 100px;
-            }
 
-            .swiper-slide {
-                width: 420px;
-                height: 340px;
-                padding: 1.75rem 1.5rem;
-            }
-
-            .swiper-slide h1 {
-                font-size: 1.75rem;
-                margin-top: 0;
-                margin-bottom: 1rem;
-            }
-
-            .swiper-slide img {
-                width: 160px;
-                height: 160px;
-                margin: 1rem 0;
-            }
-
-            .swiper-slide p {
-                font-size: 1.1rem;
-                margin-top: auto;
-                padding-bottom: 0.5rem;
-            }
-
-            .swiper-slide-prev {
-                transform: scale(0.75) translateX(-70%) translateZ(-150px) rotateY(10deg);
-            }
-
-            .swiper-slide-next {
-                transform: scale(0.75) translateX(70%) translateZ(-150px) rotateY(-10deg);
+            .swiper-button-next,
+            .swiper-button-prev {
+                display: none;
             }
         }
 
@@ -490,13 +478,23 @@
 
     <!-- Section 1 -->
     <section class="py-12 md:py-12 text-white full-screen-section">
-        <!-- GSAP animated circles -->
+        <!-- GSAP animated circles and math symbols container -->
         <div class="moving-circles">
+            <!-- Radial circles will be animated by JavaScript -->
             <div class="circle" id="circle1"></div>
             <div class="circle" id="circle2"></div>
             <div class="circle" id="circle3"></div>
             <div class="circle" id="circle4"></div>
             <div class="circle" id="circle5"></div>
+
+            <!-- Math symbols will be animated by JavaScript -->
+            <div class="math-symbol" id="math1">+</div>
+            <div class="math-symbol" id="math2">−</div>
+            <div class="math-symbol" id="math3">×</div>
+            <div class="math-symbol" id="math4">÷</div>
+            <div class="math-symbol" id="math5">=</div>
+            <div class="math-symbol" id="math6">π</div>
+            <div class="math-symbol" id="math7">√</div>
         </div>
 
         <!-- Decorative Elements -->
@@ -507,10 +505,6 @@
         <div class="absolute bottom-80 left-12 w-2 h-2 bg-green-400 rounded-full opacity-60 animate-pulse-slow z-10">
         </div>
         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
-
-        <!-- Mathematical Symbols -->
-        <div class="absolute top-20 right-20 text-white opacity-20 text-4xl animate-float z-10">÷</div>
-        <div class="absolute bottom-40 left-20 text-white opacity-20 text-4xl animate-float z-10">+</div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
@@ -601,7 +595,7 @@
                                 <!-- Card 4 -->
                                 <div class="swiper-slide" style="--gradient-from: #F97316; --gradient-to: #DC2626;">
                                     <h1 class="font-baloo font-extrabold text-white text-4xl"
-                                        style="text-shadow: 0 4px 0 #aa4e0c; ">Progress Tracking</h1>
+                                        style="text-shadow: 0 4px 0 #aa4e0c;">Progress Tracking</h1>
                                     <img src="{{ asset('images/carousel/caro4.png') }}" alt="Progress Tracking">
                                     <p>Monitor learning journey and achievements</p>
                                 </div>
@@ -613,7 +607,6 @@
                                     <img src="{{ asset('images/carousel/caro4.png') }}" alt="Gamified Experience">
                                     <p>Points, badges, and leaderboards</p>
                                 </div>
-
                             </div>
 
                             <!-- Navigation -->
@@ -635,6 +628,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <!-- Section 3 -->
@@ -652,7 +646,7 @@
                     <div
                         class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features1.png') }}" alt="Achievements"
+                            <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
                             <div class="flex-1">
                                 <h3 class="text-white font-semibold">Adaptive Learning</h3>
@@ -686,7 +680,7 @@
                     <div
                         class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features3.png') }}" alt="Achievements"
+                            <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
                             <div class="flex-1">
                                 <h3 class="text-white font-semibold">Progress Tracking</h3>
@@ -706,7 +700,7 @@
                     <div
                         class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features4.png') }}" alt="Achievements"
+                            <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
                             <div class="flex-1">
                                 <h3 class="text-white font-semibold">Leaderboard</h3>
@@ -730,10 +724,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
-
         </div>
 
         <!-- Desktop/Tablet design (md and up) -->
@@ -749,7 +741,7 @@
                         <div
                             class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features1.png') }}" alt="Achievements"
+                                <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
                                 <div class="flex-1">
                                     <h3 class="text-white font-semibold">Adaptive Learning</h3>
@@ -783,7 +775,7 @@
                         <div
                             class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features3.png') }}" alt="Achievements"
+                                <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
                                 <div class="flex-1">
                                     <h3 class="text-white font-semibold">Progress Tracking</h3>
@@ -803,7 +795,7 @@
                         <div
                             class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features4.png') }}" alt="Achievements"
+                                <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
                                 <div class="flex-1">
                                     <h3 class="text-white font-semibold">Leaderboard</h3>
@@ -831,6 +823,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Bottom decorative waves (stick to section bottom, mobile only) -->
         <div class="absolute bottom-0 left-0 w-full md:hidden pointer-events-none select-none z-0 mt-6">
             <svg viewBox="0 0 375 120" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -842,6 +835,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Swiper
             function initSwiper() {
                 const screenWidth = window.innerWidth;
                 let slideWidth = screenWidth < 768 ? 280 : 550;
@@ -909,7 +903,6 @@
                     },
                     on: {
                         beforeInit: function () {
-                            // Adjust container width to prevent overflow
                             let container = this.el.closest('.swiper-container');
                             if (container) {
                                 container.style.overflow = 'hidden';
@@ -918,7 +911,6 @@
                             }
                         },
                         slideChange: function () {
-                            // Ensure proper z-index for active and adjacent slides
                             const slides = this.slides;
                             slides.forEach((slide, index) => {
                                 if (index === this.activeIndex) {
@@ -936,7 +928,6 @@
                     }
                 });
 
-                // Update on window resize
                 window.addEventListener('resize', function () {
                     viewportWidth = document.querySelector('.swiper-viewport').offsetWidth;
                     edgeOffset = (viewportWidth - slideWidth) / 2;
@@ -948,92 +939,199 @@
                 });
             }
 
-            // Initialize the swiper
             initSwiper();
 
-            // GSAP Animations for moving circles
-            // Set initial positions and sizes for circles
+            // GSAP Animations for moving circles with varying sizes
             gsap.set('#circle1', {
-                width: '120px',
-                height: '120px',
-                top: '10%',
+                width: '200px',
+                height: '200px',
+                top: '15%',
                 left: '10%'
             });
 
             gsap.set('#circle2', {
-                width: '80px',
-                height: '80px',
-                top: '70%',
-                left: '80%'
+                width: '150px',
+                height: '150px',
+                top: '60%',
+                left: '75%'
             });
 
             gsap.set('#circle3', {
-                width: '150px',
-                height: '150px',
-                top: '40%',
-                left: '70%'
+                width: '180px',
+                height: '180px',
+                top: '35%',
+                left: '65%'
             });
 
             gsap.set('#circle4', {
-                width: '100px',
-                height: '100px',
-                top: '80%',
-                left: '20%'
+                width: '120px',
+                height: '120px',
+                top: '75%',
+                left: '15%'
             });
 
             gsap.set('#circle5', {
-                width: '60px',
-                height: '60px',
-                top: '20%',
-                left: '85%'
+                width: '160px',
+                height: '160px',
+                top: '10%',
+                left: '80%'
             });
 
-            // Create GSAP animations for each circle
+            // Animate circles with smooth, slow movements
             gsap.to('#circle1', {
-                x: 'random(-100, 100)',
-                y: 'random(-50, 50)',
-                rotation: 'random(-180, 180)',
-                duration: 'random(15, 25)',
+                x: 'random(-150, 150)',
+                y: 'random(-80, 80)',
+                duration: 'random(20, 30)',
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
 
             gsap.to('#circle2', {
-                x: 'random(-80, 80)',
-                y: 'random(-40, 40)',
-                rotation: 'random(-180, 180)',
-                duration: 'random(12, 18)',
+                x: 'random(-120, 120)',
+                y: 'random(-60, 60)',
+                duration: 'random(18, 25)',
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
 
             gsap.to('#circle3', {
-                x: 'random(-120, 120)',
-                y: 'random(-60, 60)',
-                rotation: 'random(-180, 180)',
-                duration: 'random(18, 28)',
+                x: 'random(-180, 180)',
+                y: 'random(-90, 90)',
+                duration: 'random(22, 32)',
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
 
             gsap.to('#circle4', {
-                x: 'random(-90, 90)',
-                y: 'random(-45, 45)',
-                rotation: 'random(-180, 180)',
-                duration: 'random(14, 20)',
+                x: 'random(-100, 100)',
+                y: 'random(-50, 50)',
+                duration: 'random(16, 24)',
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
 
             gsap.to('#circle5', {
+                x: 'random(-140, 140)',
+                y: 'random(-70, 70)',
+                duration: 'random(19, 28)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Position and animate math symbols
+            gsap.set('#math1', {
+                top: '20%',
+                left: '25%',
+                fontSize: '2.5rem'
+            });
+
+            gsap.set('#math2', {
+                top: '45%',
+                left: '15%',
+                fontSize: '3rem'
+            });
+
+            gsap.set('#math3', {
+                top: '65%',
+                left: '70%',
+                fontSize: '2.8rem'
+            });
+
+            gsap.set('#math4', {
+                top: '30%',
+                left: '80%',
+                fontSize: '2.5rem'
+            });
+
+            gsap.set('#math5', {
+                top: '75%',
+                left: '40%',
+                fontSize: '3.2rem'
+            });
+
+            gsap.set('#math6', {
+                top: '50%',
+                left: '85%',
+                fontSize: '2.7rem'
+            });
+
+            gsap.set('#math7', {
+                top: '85%',
+                left: '60%',
+                fontSize: '2.9rem'
+            });
+
+            // Animate math symbols with smooth, slow movements
+            gsap.to('#math1', {
+                x: 'random(-80, 80)',
+                y: 'random(-50, 50)',
+                rotation: 'random(-15, 15)',
+                duration: 'random(15, 22)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math2', {
                 x: 'random(-70, 70)',
+                y: 'random(-40, 40)',
+                rotation: 'random(-20, 20)',
+                duration: 'random(18, 25)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math3', {
+                x: 'random(-90, 90)',
+                y: 'random(-55, 55)',
+                rotation: 'random(-18, 18)',
+                duration: 'random(16, 24)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math4', {
+                x: 'random(-75, 75)',
+                y: 'random(-45, 45)',
+                rotation: 'random(-22, 22)',
+                duration: 'random(17, 23)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math5', {
+                x: 'random(-85, 85)',
+                y: 'random(-50, 50)',
+                rotation: 'random(-16, 16)',
+                duration: 'random(19, 26)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math6', {
+                x: 'random(-65, 65)',
                 y: 'random(-35, 35)',
-                rotation: 'random(-180, 180)',
-                duration: 'random(10, 16)',
+                rotation: 'random(-25, 25)',
+                duration: 'random(14, 21)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#math7', {
+                x: 'random(-95, 95)',
+                y: 'random(-60, 60)',
+                rotation: 'random(-20, 20)',
+                duration: 'random(20, 28)',
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
