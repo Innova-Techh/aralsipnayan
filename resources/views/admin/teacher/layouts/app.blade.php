@@ -28,6 +28,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
+            overflow-x: hidden;
         }
 
         .material-symbols-outlined {
@@ -57,17 +58,62 @@
         .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.12);
         }
+
+        /* Ensure submenu items are visible when sidebar is collapsed */
+        .submenu-item {
+            position: relative;
+        }
+
+        /* Prevent horizontal overflow and constrain tooltips */
+        .sidebar-container {
+            flex-shrink: 0;
+            overflow: visible;
+        }
+
+        .main-content {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* Constrain tooltips to prevent horizontal scroll */
+        .tooltip-container {
+            position: relative;
+        }
+
+        .tooltip {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 0.5rem;
+            pointer-events: none;
+            z-index: 50;
+            white-space: nowrap;
+        }
+
+        /* Hide tooltips that would cause overflow */
+        @media (max-width: 1024px) {
+            .tooltip {
+                display: none !important;
+            }
+        }
+
+        /* Ensure the main container doesn't overflow */
+        .flex.h-screen {
+            overflow: hidden;
+        }
     </style>
 
     @stack('styles')
 </head>
 
-<body x-data="{ sidebarOpen: true }" class="min-h-screen bg-gray-50">
-    <div class="flex h-screen overflow-hidden">
+<body x-data="{ sidebarOpen: true }" class="min-h-screen bg-gray-50" style="overflow-x: hidden;">
+    <div class="flex h-screen overflow-hidden" style="overflow-x: hidden;">
 
         <!-- Sidebar (teacher icons kept as material-symbols) -->
         <aside :class="sidebarOpen ? 'w-64' : 'w-20'"
-            class="relative flex flex-col h-full bg-white shadow-lg transition-all duration-300 ease-in-out">
+            class="sidebar-container relative flex flex-col h-full bg-white shadow-lg transition-all duration-300 ease-in-out"
+            style="overflow: visible;">
             <!-- Logo/Brand -->
             <div class="flex items-center h-16 px-4 border-b border-gray-200"
                 :class="sidebarOpen ? 'justify-start' : 'justify-center'">
@@ -91,9 +137,9 @@
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="flex-1 px-2 py-4 sidebar-scrollbar overflow-y-auto">
+            <nav class="flex-1 px-2 py-4 sidebar-scrollbar overflow-y-auto" style="overflow-x: hidden;">
                 <ul class="space-y-1">
-                    <li>
+                    <li class="tooltip-container">
                         <a href="{{ route('teacher.dashboard') }}"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">dashboard</span>
@@ -101,103 +147,128 @@
 
                             <!-- tooltip when collapsed -->
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Dashboard
                             </div>
                         </a>
                     </li>
 
-                    <!-- Assessment Management with submenu -->
-                    <li x-data="{ openSub: {{ request()->routeIs('teacher.assessments*') ? 'true' : 'false' }} }">
+                    <!-- Assessment Management with submenu - FIXED -->
+                    <li x-data="{ openSub: {{ request()->routeIs('teacher.assessments*') ? 'true' : 'false' }} }"
+                        class="tooltip-container">
                         <button @click="openSub = !openSub"
-                            class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                            class="w-full group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 transition">
                             <span class="material-symbols-outlined mr-3">assignment</span>
                             <span x-show="sidebarOpen">Assessment Management</span>
-                            <span class="material-symbols-outlined ml-auto"
+                            <span x-show="sidebarOpen" class="material-symbols-outlined ml-auto"
                                 :class="openSub ? 'rotate-180' : ''">expand_more</span>
+
+                            <!-- Tooltip for main button when collapsed -->
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                Assessment Management
+                            </div>
                         </button>
 
-                        <ul x-show="openSub" x-collapse class="ml-10 mt-1 space-y-1">
-                            <li>
+                        <ul x-show="openSub" x-collapse :class="sidebarOpen ? 'ml-10' : 'ml-2'" class="mt-1 space-y-1">
+                            <li class="submenu-item tooltip-container">
                                 <a href="{{ route('teacher.assessments.create') }}"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">add_circle</span>
-                                    Create Assessment
+                                    <span x-show="sidebarOpen">Create Assessment</span>
+
+                                    <!-- Tooltip for submenu item when collapsed -->
+                                    <div x-cloak x-show="!sidebarOpen"
+                                        class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Create Assessment
+                                    </div>
                                 </a>
                             </li>
-                            <li>
+                            <li class="submenu-item tooltip-container">
                                 <a href="{{ route('teacher.assessments') }}"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">list</span>
-                                    Manage Assessments
+                                    <span x-show="sidebarOpen">Manage Assessments</span>
+
+                                    <!-- Tooltip for submenu item when collapsed -->
+                                    <div x-cloak x-show="!sidebarOpen"
+                                        class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Manage Assessments
+                                    </div>
                                 </a>
                             </li>
-                            <li>
+                            <li class="submenu-item tooltip-container">
                                 <a href="#"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg">
+                                    class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">quiz</span>
-                                    Assessment Templates
+                                    <span x-show="sidebarOpen">Assessment Templates</span>
+
+                                    <!-- Tooltip for submenu item when collapsed -->
+                                    <div x-cloak x-show="!sidebarOpen"
+                                        class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Assessment Templates
+                                    </div>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <li>
+                    <li class="tooltip-container">
                         <a href="{{ route('teacher.sections') }}"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.sections*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">groups</span>
                             <span x-show="sidebarOpen">Section Management</span>
 
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Section Management
                             </div>
                         </a>
                     </li>
 
-                    <li>
+                    <li class="tooltip-container">
                         <a href="{{ route('teacher.students') }}"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.students*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">school</span>
                             <span x-show="sidebarOpen">Student Management</span>
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Student Management
                             </div>
                         </a>
                     </li>
 
-                    <li>
+                    <li class="tooltip-container">
                         <a href="{{ route('teacher.analytics') }}"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.analytics*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">analytics</span>
                             <span x-show="sidebarOpen">Analytics</span>
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Analytics
                             </div>
                         </a>
                     </li>
 
-                    <li>
+                    <li class="tooltip-container">
                         <a href="{{ route('teacher.profile') }}"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.profile*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             <span class="material-symbols-outlined mr-3">person</span>
                             <span x-show="sidebarOpen">Profile</span>
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Profile
                             </div>
                         </a>
                     </li>
 
-                    <li>
+                    <li class="tooltip-container">
                         <a href="#"
                             class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
                             <span class="material-symbols-outlined mr-3">settings</span>
                             <span x-show="sidebarOpen">Settings</span>
                             <div x-cloak x-show="!sidebarOpen"
-                                class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Settings
                             </div>
                         </a>
@@ -207,7 +278,7 @@
 
             <!-- User Profile & Logout Section (preserved logic) -->
             <div class="border-t border-gray-200 p-4">
-                <div class="flex items-center mb-3" :class="sidebarOpen ? '' : 'justify-center'">
+                <div class="flex items-center mb-3 tooltip-container" :class="sidebarOpen ? '' : 'justify-center'">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Teacher') }}&background=3B82F6&color=fff"
                         alt="Teacher Avatar" class="w-10 h-10 rounded-full flex-shrink-0">
                     <div x-show="sidebarOpen" x-transition class="ml-3">
@@ -219,7 +290,7 @@
                 <form method="POST" action="{{ route('teacher.logout') }}">
                     @csrf
                     <button type="submit"
-                        class="relative w-full flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                        class="relative w-full tooltip-container flex items-center justify-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
                         :class="sidebarOpen ? 'justify-start' : 'justify-center'">
                         <div class="flex items-center justify-center w-8">
                             <i class="fas fa-sign-out-alt text-lg"></i>
@@ -227,7 +298,7 @@
                         <span x-show="sidebarOpen" class="ml-3 font-medium whitespace-nowrap">Logout</span>
 
                         <div x-cloak x-show="!sidebarOpen"
-                            class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
+                            class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                             Logout
                         </div>
                     </button>
@@ -236,7 +307,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="main-content flex-1 flex flex-col overflow-hidden">
             <!-- Top Header (now matches admin header layout exactly) -->
             <header class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex items-center justify-between h-16 px-6">
@@ -312,7 +383,8 @@
                             <div class="text-right">
                                 <!-- preserved original teacher profile display call -->
                                 <p class="text-sm font-medium text-gray-900">
-                                    {{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}</p>
+                                    {{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}
+                                </p>
                                 <p class="text-xs text-gray-500">Grade 6 Teacher</p>
                             </div>
                             <div class="relative">

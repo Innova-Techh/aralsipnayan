@@ -200,6 +200,12 @@ Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(fu
         return view('admin.teacher.index');
     })->name('dashboard');
     
+    
+    // Student Profile Route
+Route::get('/students/{student}/profile', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'showStudentProfile'])
+    ->name('students.profile');
+
+
 // Section Management
 Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'index'])->name('sections');
 Route::get('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'show'])->name('sections.show'); // ADD THIS LINE

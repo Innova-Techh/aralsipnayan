@@ -12,16 +12,17 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span class="font-medium">Back to Sections</span>
                 </button>
-                <!-- <button id="createAssessmentBtn"
-                    class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
-                    <span class="material-symbols-outlined">add</span>
-                    Create Assessment
-                </button> --> 
-                <!-- Add Student Button -->
-                <div class="mb-4">
+                <div class="flex items-center gap-3">
+                    <!-- Add Student Button -->
                     <button onclick="openAddStudentModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
                         <span class="material-symbols-outlined mr-2">person_add</span>
                         Add New Student
+                    </button>
+                    <!-- Create Assessment Button -->
+                    <button id="createAssessmentBtn"
+                        class="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
+                        <span class="material-symbols-outlined">add</span>
+                        Create Assessment
                     </button>
                 </div>
             </div>
@@ -123,29 +124,21 @@
                     <table class="w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Rank</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Student</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Overall Score</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Progress</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Points</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Last Activity</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
                         </thead>
@@ -174,8 +167,7 @@
                                     <!-- Student Info -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div
-                                                class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                                                 <span class="material-symbols-outlined text-gray-500">person</span>
                                             </div>
                                             <div>
@@ -185,9 +177,14 @@
                                         </div>
                                     </td>
 
-                                    <!-- Overall Score -->
+                                    <!-- Overall Score (with assessment count from josh-branch) -->
                                     <td class="px-6 py-4">
-                                        <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ $student['completed'] }}/{{ $student['total'] }} assessments
+                                            </div>
+                                        </div>
                                     </td>
 
                                     <!-- Progress -->
@@ -229,13 +226,84 @@
                                         </span>
                                     </td>
 
-                                    <!-- Actions -->
+                                    <!-- Actions (Combined: inline button + dropdown from josh-branch) -->
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center justify-center">
-                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                                onclick="showStudentActions({{ $student['id'] }})">
-                                                <span class="material-symbols-outlined text-gray-600">more_vert</span>
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <!-- Send Message Button (from josh-branch) -->
+                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors group relative"
+                                                onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')"
+                                                title="Send Message">
+                                                <span class="material-symbols-outlined text-gray-600 group-hover:text-orange-600">mail</span>
                                             </button>
+
+                                            <!-- More Actions Dropdown (from josh-branch with main-branch actions) -->
+                                            <div class="relative" x-data="{ open: false }">
+                                                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                    @click="open = !open; selectedStudentId = {{ $student['id'] }}">
+                                                    <span class="material-symbols-outlined text-gray-600">more_vert</span>
+                                                </button>
+
+                                                <!-- Dropdown Menu -->
+                                                <div x-show="open" @click.away="open = false"
+                                                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
+                                                    style="display: none;">
+                                                    <!-- View Profile (from josh-branch) -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="viewProfile('{{ $student['id'] }}')">
+                                                        <span class="material-symbols-outlined text-blue-600 text-sm">visibility</span>
+                                                        View Profile
+                                                    </button>
+
+                                                    <!-- Edit Details (from main-branch) -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="openEditStudentModal({{ $student['id'] }})">
+                                                        <span class="material-symbols-outlined text-blue-600 text-sm">edit</span>
+                                                        Edit Details
+                                                    </button>
+
+                                                    <!-- Assign Assessment (from josh-branch) -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="assignAssessment('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span class="material-symbols-outlined text-green-600 text-sm">assignment</span>
+                                                        Assign Assessment
+                                                    </button>
+
+                                                    <!-- Send Message (from josh-branch) -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span class="material-symbols-outlined text-orange-600 text-sm">mail</span>
+                                                        Send Message
+                                                    </button>
+
+                                                    <!-- Divider -->
+                                                    <div class="border-t border-gray-200 my-1"></div>
+
+                                                    <!-- Toggle Activation (from main-branch) -->
+                                                    @php
+                                                        $isActive = strtolower($student['status'] ?? 'active') === 'active';
+                                                    @endphp
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                                        onclick="toggleActivation({{ $student['id'] }}, '{{ $isActive ? 'deactivate' : 'activate' }}')">
+                                                        <span class="material-symbols-outlined {{ $isActive ? 'text-red-600' : 'text-green-600' }} text-sm">
+                                                            {{ $isActive ? 'person_off' : 'person' }}
+                                                        </span>
+                                                        {{ $isActive ? 'Deactivate Account' : 'Activate Account' }}
+                                                    </button>
+
+                                                    <!-- Remove from Section (from josh-branch) -->
+                                                    <button
+                                                        class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50 flex items-center gap-2"
+                                                        onclick="removeFromSection('{{ $student['id'] }}', '{{ $student['name'] }}')">
+                                                        <span class="material-symbols-outlined text-red-600 text-sm">person_remove</span>
+                                                        Remove from Section
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -257,10 +325,10 @@
         </div>
     </div>
 
-    <!-- Global Message Toasts -->
+    <!-- Global Message Toasts (from main-branch) -->
     <div id="messageContainer"
-     class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-80"
-     aria-live="polite">
+         class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-80"
+         aria-live="polite">
         <!-- Success -->
         <div id="successMessage"
             class="hidden flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 shadow">
@@ -279,7 +347,7 @@
         </div>
     </div>
 
-    <!-- Add Student Modal -->
+    <!-- Add Student Modal (from main-branch) -->
     <div id="addStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
@@ -305,7 +373,7 @@
                         <input type="text" id="studentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
-                        <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email(Should be Unique)</label>
+                        <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email (Should be Unique)</label>
                         <input type="email" id="studentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
@@ -335,10 +403,10 @@
                 </form>
             </div>
         </div>
-</div>
+    </div>
 
-  <!-- Edit Student Modal -->
-  <div id="editStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <!-- Edit Student Modal (from main-branch) -->
+    <div id="editStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-4">
@@ -391,55 +459,12 @@
         </div>
     </div>
 
-    <!-- Student Actions Modal -->
-    <div id="studentActionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Student Actions</h3>
-                <div class="space-y-2">
-                    <button 
-                        onclick="openEditStudentModal()"
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-blue-600">visibility</span>
-                        <span class="font-medium text-gray-700">View/Edit Details</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-green-600">assignment</span>
-                        <span class="font-medium text-gray-700">Assign Assessment</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-orange-600">mail</span>
-                        <span class="font-medium text-gray-700">Send Message</span>
-                    </button>
-                    <button
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span class="material-symbols-outlined text-red-600">person_remove</span>
-                        <span class="font-medium text-gray-700">Remove from Section</span>
-                    </button>
-                    <button id="toggleActivationBtn"
-                        onclick="toggleActivation()"
-                        class="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3">
-                        <span id="toggleActivationIcon" class="material-symbols-outlined text-red-600">person_off</span>
-                        <span id="toggleActivationText" class="font-medium text-gray-700">Deactivate Account</span>
-                    </button>
-                </div>
-                <button onclick="closeStudentActionsModal()"
-                    class="mt-4 w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         let selectedStudentId = null;
         const currentSection = '{{ $section['raw_name'] ?? ($section['section'] ?? '') }}';
 
-        // Add Student Modal Functions
+        // Add Student Modal Functions (from main-branch)
         window.openAddStudentModal = function () {
-            // Ensure the hidden section input is set before showing the modal
             const sectionInput = document.getElementById('studentSection');
             if (sectionInput && currentSection) {
                 sectionInput.value = currentSection;
@@ -452,7 +477,7 @@
             document.getElementById('addStudentForm').reset();
         }
 
-        // Add Student Form Submission
+        // Add Student Form Submission (from main-branch)
         document.getElementById('addStudentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -474,6 +499,8 @@
                     closeAddStudentModal();
                     if (typeof loadStudents === 'function') {
                         loadStudents(currentSection);
+                    } else {
+                        location.reload();
                     }
                 } else {
                     const msg = (data && (data.error || data.message)) || 'Failed to add student';
@@ -486,90 +513,14 @@
             });
         });
 
-        window.showStudentActions = function (studentId) {
-            selectedStudentId = studentId;
-            document.getElementById('studentActionsModal').classList.remove('hidden');
-
-            // Update Activate/Deactivate action label and icon based on current status
-            try {
-                const rows = document.querySelectorAll('#studentsTableBody tr');
-                let statusText = 'active';
-                rows.forEach(tr => {
-                    const btn = tr.querySelector('button[onclick^="showStudentActions("]');
-                    if (btn && btn.getAttribute('onclick').includes(String(studentId))) {
-                        const statusEl = tr.querySelector('td:nth-child(7) span');
-                        if (statusEl) statusText = (statusEl.textContent || '').trim().toLowerCase();
-                    }
-                });
-
-                const toggleTextEl = document.getElementById('toggleActivationText');
-                const toggleIconEl = document.getElementById('toggleActivationIcon');
-                const toggleBtnEl = document.getElementById('toggleActivationBtn');
-                if (statusText === 'inactive') {
-                    toggleTextEl.textContent = 'Activate Account';
-                    toggleIconEl.textContent = 'person';
-                    toggleIconEl.classList.remove('text-red-600');
-                    toggleIconEl.classList.add('text-green-600');
-                    if (toggleBtnEl) toggleBtnEl.dataset.action = 'activate';
-                } else {
-                    toggleTextEl.textContent = 'Deactivate Account';
-                    toggleIconEl.textContent = 'person_off';
-                    toggleIconEl.classList.remove('text-green-600');
-                    toggleIconEl.classList.add('text-red-600');
-                    if (toggleBtnEl) toggleBtnEl.dataset.action = 'deactivate';
-                }
-            } catch (_) { /* ignore */ }
-        }
-
-        window.closeStudentActionsModal = function () {
-            document.getElementById('studentActionsModal').classList.add('hidden');
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('studentActionsModal').addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeStudentActionsModal();
-            }
-        });
-
-
-        // Utility Functions
-        window.showMessage = function (message, type) {
-            const messageContainer = document.getElementById('messageContainer');
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-            const successText = document.getElementById('successText');
-            const errorText = document.getElementById('errorText');
+        // Edit Student Modal Functions (from main-branch)
+        window.openEditStudentModal = function (studentId) {
+            selectedStudentId = studentId || selectedStudentId;
             
-            // Hide all messages first
-            successMessage.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-            
-            if (type === 'success') {
-                successText.textContent = message;
-                successMessage.classList.remove('hidden');
-            } else {
-                errorText.textContent = message;
-                errorMessage.classList.remove('hidden');
-            }
-            
-            messageContainer.classList.remove('hidden');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                messageContainer.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Edit Student Modal logic
-        window.openEditStudentModal = function () {
             if (!selectedStudentId) {
                 showMessage('No student selected', 'error');
                 return;
             }
-
-            // Close actions modal if open
-            closeStudentActionsModal();
 
             // Populate hidden fields
             const sectionInput = document.getElementById('editStudentSection');
@@ -608,7 +559,7 @@
             document.getElementById('editStudentForm').reset();
         }
 
-        // Handle edit form submit
+        // Handle edit form submit (from main-branch)
         document.getElementById('editStudentForm').addEventListener('submit', function (e) {
             e.preventDefault();
             if (!selectedStudentId) {
@@ -617,7 +568,6 @@
             }
 
             const formData = new FormData(this);
-            // Ensure method override for Laravel
             formData.set('_method', 'PUT');
 
             fetch(`/teacher/sections/students/${selectedStudentId}`, {
@@ -636,6 +586,8 @@
                     closeEditStudentModal();
                     if (typeof loadStudents === 'function') {
                         loadStudents(currentSection);
+                    } else {
+                        location.reload();
                     }
                 } else {
                     const msg = (data && (data.error || data.message)) || 'Failed to update student';
@@ -647,19 +599,49 @@
             });
         });
 
-        // Toggle activation
-        window.toggleActivation = function () {
-            if (!selectedStudentId) {
+        // Utility Functions (from main-branch)
+        window.showMessage = function (message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const successText = document.getElementById('successText');
+            const errorText = document.getElementById('errorText');
+            
+            // Hide all messages first
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            if (type === 'success') {
+                successText.textContent = message;
+                successMessage.classList.remove('hidden');
+            } else {
+                errorText.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+            
+            messageContainer.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Toggle activation (from main-branch, modified to work with dropdown)
+        window.toggleActivation = function (studentId, action) {
+            const id = studentId || selectedStudentId;
+            
+            if (!id) {
                 showMessage('No student selected', 'error');
                 return;
             }
 
-            const action = document.getElementById('toggleActivationBtn')?.dataset?.action;
             const isActivate = action === 'activate';
             const url = isActivate
-                ? `/teacher/sections/students/${selectedStudentId}/activate`
-                : `/teacher/sections/students/${selectedStudentId}/deactivate`;
+                ? `/teacher/sections/students/${id}/activate`
+                : `/teacher/sections/students/${id}/deactivate`;
             const confirmMsg = isActivate ? 'Activate this student account?' : 'Set this student account to inactive?';
+            
             if (!confirm(confirmMsg)) return;
 
             fetch(url, {
@@ -674,9 +656,10 @@
                 try { data = await response.json(); } catch (_) { data = {}; }
                 if (response.ok && data.success) {
                     showMessage(data.message || (isActivate ? 'Student activated' : 'Student deactivated'), 'success');
-                    closeStudentActionsModal();
                     if (typeof loadStudents === 'function') {
                         loadStudents(currentSection);
+                    } else {
+                        location.reload();
                     }
                 } else {
                     const msg = (data && (data.error || data.message)) || 'Request failed';
@@ -687,5 +670,68 @@
                 showMessage('An error occurred while updating the student status', 'error');
             });
         }
+
+        // Action functions (from josh-branch)
+        window.viewProfile = function(studentId) {
+            console.log('View profile for student:', studentId);
+            window.location.href = "{{ route('teacher.students.profile', ['student' => '__STUDENT_ID__']) }}".replace('__STUDENT_ID__', studentId);
+        }
+
+        window.assignAssessment = function(studentId, studentName) {
+            console.log('Assign assessment to:', studentName, studentId);
+            // Implement assign assessment logic
+            alert(`Assign assessment to ${studentName}`);
+        }
+
+        window.sendMessage = function(studentId, studentName) {
+            console.log('Send message to:', studentName, studentId);
+            // Implement send message logic
+            alert(`Send message to ${studentName}`);
+        }
+
+        window.removeFromSection = function(studentId, studentName) {
+            console.log('Remove from section:', studentName, studentId);
+            if (confirm(`Are you sure you want to remove ${studentName} from this section?`)) {
+                // Implement actual removal via API
+                fetch(`/teacher/sections/students/${studentId}/remove`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ section: currentSection })
+                })
+                .then(async response => {
+                    let data;
+                    try { data = await response.json(); } catch (_) { data = {}; }
+                    if (response.ok && data.success) {
+                        showMessage(`${studentName} removed from section`, 'success');
+                        if (typeof loadStudents === 'function') {
+                            loadStudents(currentSection);
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        showMessage('Failed to remove student', 'error');
+                    }
+                })
+                .catch(() => {
+                    showMessage('An error occurred', 'error');
+                });
+            }
+        }
+
+        // Alpine.js initialization for dropdowns (from josh-branch)
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dropdown', () => ({
+                open: false,
+                toggle() {
+                    this.open = !this.open;
+                },
+                close() {
+                    this.open = false;
+                }
+            }));
+        });
     </script>
 @endsection
