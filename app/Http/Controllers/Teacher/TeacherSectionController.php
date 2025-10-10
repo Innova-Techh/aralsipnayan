@@ -228,7 +228,7 @@ class TeacherSectionController extends Controller
         $students = DB::table('student_profile')
             ->join('users', 'student_profile.user_id', '=', 'users.id')
             ->where('student_profile.section', $section)
-            ->where('users.status', 'active')
+            // Include all users; status will be displayed in UI
             ->select([
                 'student_profile.user_id',
                 'student_profile.student_id',
@@ -239,7 +239,8 @@ class TeacherSectionController extends Controller
                 'student_profile.total_points',
                 'student_profile.current_streak',
                 'student_profile.last_activity_date',
-                'users.email'
+                'users.email',
+                'users.status'
             ])
             ->orderByDesc('student_profile.total_points')
             ->get()
@@ -289,6 +290,7 @@ class TeacherSectionController extends Controller
                     'student_id' => $student->student_id,
                     'name' => trim($student->firstname . ' ' . ($student->middlename ? $student->middlename . ' ' : '') . $student->lastname),
                     'email' => $student->email,
+                    'status' => $student->status,
                     'score' => round($avgScore),
                     'progress' => $totalAssessments > 0 ? "$completedAssessments/$totalAssessments" : "0/0",
                     'completed' => $completedAssessments,

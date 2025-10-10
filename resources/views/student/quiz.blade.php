@@ -301,19 +301,6 @@
                             id="timer-display">30:00</span>
                     </div>
                 @endif
-                <!-- Settings Button -->
-                {{-- <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
-                                hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
-                </button> --}}
             </div>
 
             @include('components.music-setting-modal')
@@ -332,18 +319,34 @@
                             💡 HINT
                         </button>
 
-                        <!-- Audio Toggle Button -->
-                        <button id="audio-toggle"
-                            class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
-                            🔊 AUDIO ON
+                        <!-- Settings Button -->
+                        <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
+                                        hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
                         </button>
                     </div>
                 @else
                     <div class="flex justify-end mb-6">
-                        <!-- Audio Toggle Button for Diagnostic -->
-                        <button id="audio-toggle"
-                            class="bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg">
-                            🔊 AUDIO ON
+                        <!-- Settings Button for Diagnostic -->
+                        <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
+                                        hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
                         </button>
                     </div>
                 @endif
@@ -486,8 +489,8 @@
                 const maxRetryAttempts = 3;
                 const nextBtn = document.getElementById('next-btn');
 
-                // Quiz progress state
-                const quizState = {
+                // Quiz progress state (make it globally accessible)
+                window.quizState = {
                     sessionId: '{{ session("diagnostic_session_id") ?? session("quiz_session_id") ?? "quiz_" . time() }}',
                     questionId: '{{ $question->question_id }}',
                     competency: '{{ session("diagnostic_competency") ?? $category ?? "" }}',
@@ -501,6 +504,9 @@
                     quizTimeRemaining: quizTimeRemaining,
                     audioEnabled: true // Audio enabled by default
                 };
+
+                // Alias for backward compatibility
+                const quizState = window.quizState;
 
                 // Initialize quiz
                 initializeQuiz();
@@ -534,9 +540,6 @@
 
                     // Submit button handler
                     document.getElementById('submit-btn').addEventListener('click', submitAnswer);
-
-                    // Audio toggle handler
-                    document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
 
                     // Hint button handler (only for non-diagnostic mode)
                     @if(!isset($diagnosticMode) || !$diagnosticMode)
@@ -616,24 +619,12 @@
 
                 function restoreAudioPreference() {
                     try {
-                        const savedAudioPreference = localStorage.getItem('quiz_audio_enabled');
+                        const savedAudioPreference = localStorage.getItem('sound_effects_enabled');
                         if (savedAudioPreference !== null) {
                             quizState.audioEnabled = savedAudioPreference === 'true';
-                            updateAudioButtonDisplay();
                         }
                     } catch (error) {
                         console.error('Failed to restore audio preference:', error);
-                    }
-                }
-
-                function updateAudioButtonDisplay() {
-                    const audioToggleBtn = document.getElementById('audio-toggle');
-                    if (quizState.audioEnabled) {
-                        audioToggleBtn.innerHTML = '🔊 AUDIO ON';
-                        audioToggleBtn.className = 'bg-gradient-to-r from-purple-400 to-purple-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-purple-500 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#6d1f7d] shadow-lg';
-                    } else {
-                        audioToggleBtn.innerHTML = '🔇 AUDIO OFF';
-                        audioToggleBtn.className = 'bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-gray-500 hover:to-gray-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#5d5d5d] shadow-lg';
                     }
                 }
 
@@ -880,24 +871,6 @@
                     // Listen for first user interaction
                     document.addEventListener('click', enableAudioOnFirstInteraction);
                     document.addEventListener('touchstart', enableAudioOnFirstInteraction);
-                }
-
-                function toggleAudio() {
-                    quizState.audioEnabled = !quizState.audioEnabled;
-                    updateAudioButtonDisplay();
-
-                    // Play a test sound to confirm audio is working when enabled
-                    if (quizState.audioEnabled && window.correctAudio) {
-                        window.correctAudio.currentTime = 0;
-                        window.correctAudio.play().catch(() => { });
-                    }
-
-                    // Save audio preference to localStorage
-                    try {
-                        localStorage.setItem('quiz_audio_enabled', quizState.audioEnabled);
-                    } catch (error) {
-                        console.error('Failed to save audio preference:', error);
-                    }
                 }
 
                 function getHint() {
