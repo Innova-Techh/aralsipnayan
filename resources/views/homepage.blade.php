@@ -1,505 +1,518 @@
 <!DOCTYPE html>
-<html lang="        .swiper {
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AralSipnayan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-baloo {
+            font-family: 'Baloo 2', cursive;
+        }
+
+        /* New gradient background */
+        .full-screen-section {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1E3A8A 0%, #0f1a3a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        /* GSAP animated circles */
+        .moving-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+
+        /* Animations */
+        @keyframes pulse-slow {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 3s ease-in-out infinite;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hover-pop:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Swiper Styles */
+        .swiper-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .swiper {
             width: 100%;
             padding-top: 30px;
             padding-bottom: 120px;
-            overflow: visible;
+            overflow: hidden;
             perspective: 1200px;
+        }
+
+        .swiper-wrapper {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .swiper-viewport {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .swiper-slide {
+            width: 550px;
+            height: 400px;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform: scale(0.6) translateX(0) translateZ(-400px);
+            border-radius: 2rem;
+            position: relative;
+            background: linear-gradient(to bottom, var(--gradient-from), var(--gradient-to));
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            justify-content: flex-start;
+            pointer-events: none;
+            visibility: hidden;
+            will-change: transform, opacity;
+            transform-origin: center center;
+        }
+
+        .swiper-slide h1 {
+            margin-top: -0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .swiper-slide p {
+            margin-top: auto;
+            padding-bottom: 1rem;
+        }
+
+        .swiper-slide-active {
+            opacity: 1;
+            transform: scale(1) translateX(0) translateZ(0) rotateY(0);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            z-index: 3;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .swiper-slide-prev,
+        .swiper-slide-next {
+            opacity: 0.85;
+            visibility: visible;
+            pointer-events: none;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .swiper-slide-prev {
+            transform: translateX(-75%) translateZ(-100px) rotateY(25deg);
+            transform-origin: right center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .swiper-slide-next {
+            transform: translateX(75%) translateZ(-100px) rotateY(-25deg);
+            transform-origin: left center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .swiper-slide:not(.swiper-slide-active):not(.swiper-slide-prev):not(.swiper-slide-next) {
+            opacity: 0.4;
+            transform: translateZ(-200px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Ensure slides don't overflow the container */
+        .swiper-slide {
+            max-width: calc(100vw - 40px);
+        }
+
+        .swiper-slide img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin: 1.5rem 0;
+            transition: transform 0.3s ease;
+        }
+
+        .swiper-slide-active img {
+            transform: scale(1.05);
+        }
+
+        .swiper-slide p {
+            color: white;
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: white;
+            background: rgba(79, 70, 229, 0.9);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-size: 0;
+        }
+
+        .swiper-button-next {
+            right: 2%;
+        }
+
+        .swiper-button-prev {
+            left: 2%;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background: #4F46E5;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                top: auto;
+                bottom: 0;
+                transform: none;
+                width: 40px;
+                height: 40px;
+            }
+
+            .swiper-button-next:hover,
+            .swiper-button-prev:hover {
+                transform: scale(1.1);
+            }
+
+            .swiper-button-next {
+                right: calc(50% - 60px);
+            }
+
+            .swiper-button-prev {
+                left: calc(50% - 60px);
+            }
+
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 36px;
+                height: 36px;
+            }
+
+            .swiper-button-next {
+                right: calc(50% - 50px);
+            }
+
+            .swiper-button-prev {
+                left: calc(50% - 50px);
+            }
+
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+                font-size: 16px;
+            }
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-family: swiper-icons;
+            font-size: 20px;
+            text-transform: none !important;
+            letter-spacing: 0;
+            font-variant: initial;
+            line-height: 1;
+        }
+
+        .swiper-button-prev::after {
+            content: 'prev';
+        }
+
+        .swiper-button-next::after {
+            content: 'next';
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .swiper {
+                padding-top: 20px;
+            }
+
+            .swiper-slide {
+                width: 500px;
+                height: 380px;
+                padding: 2rem 1.5rem;
+            }
+
+            .swiper-slide h1 {
+                font-size: 2rem;
+                margin-top: -0.25rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .swiper-slide-prev {
+                transform: scale(0.8) translateX(-80%) translateZ(-200px) rotateY(12deg);
+            }
+
+            .swiper-slide-next {
+                transform: scale(0.8) translateX(80%) translateZ(-200px) rotateY(-12deg);
+            }
         }
 
         @media (max-width: 768px) {
             .swiper {
-                padding-bottom: 80px;
+                padding-top: 15px;
+                padding-bottom: 100px;
+            }
+
+            .swiper-slide {
+                width: 420px;
+                height: 340px;
+                padding: 1.75rem 1.5rem;
+            }
+
+            .swiper-slide h1 {
+                font-size: 1.75rem;
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+
+            .swiper-slide img {
+                width: 160px;
+                height: 160px;
+                margin: 1rem 0;
+            }
+
+            .swiper-slide p {
+                font-size: 1.1rem;
+                margin-top: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .swiper-slide-prev {
+                transform: scale(0.75) translateX(-70%) translateZ(-150px) rotateY(10deg);
+            }
+
+            .swiper-slide-next {
+                transform: scale(0.75) translateX(70%) translateZ(-150px) rotateY(-10deg);
             }
         }
 
         @media (max-width: 480px) {
             .swiper {
-                padding-bottom: 60px;
+                padding-top: 10px;
+                padding-bottom: 80px;
+                perspective: 1000px;
             }
-        }head>
-    <meta charset=" UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AralSipnayan</title>
-@vite(['resources/css/app.css', 'resources/js/app.js'])
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            .swiper-slide {
+                width: 280px;
+                height: 300px;
+                padding: 1.5rem 1rem;
+            }
 
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+            .swiper-slide h1 {
+                font-size: 1.5rem;
+                margin-top: 0;
+                margin-bottom: 0.75rem;
+            }
 
-    /* Swiper Styles */
-    .swiper-container {
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        padding: 0 20px;
-    }
+            .swiper-slide img {
+                width: 140px;
+                height: 140px;
+                margin: 0.75rem 0;
+            }
 
-    .swiper {
-        width: 100%;
-        padding-top: 30px;
-        padding-bottom: 120px;
-        overflow: hidden;
-        perspective: 1200px;
-    }
+            .swiper-slide p {
+                font-size: 1rem;
+                margin-top: auto;
+                padding-bottom: 0.25rem;
+            }
 
-    .swiper-wrapper {
-        transform-style: preserve-3d;
-        position: relative;
-        width: 100%;
-        margin: 0 auto;
-    }
+            .swiper-slide-prev,
+            .swiper-slide-next {
+                opacity: 0.75;
+                visibility: visible;
+                width: 280px;
+            }
 
-    .swiper-viewport {
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
+            .swiper-slide-prev {
+                transform: scale(0.85) translateX(-65%) translateZ(-50px) rotateY(25deg);
+            }
 
-    .swiper-slide {
-        width: 550px;
-        height: 400px;
-        opacity: 0;
-        transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
-        transform: scale(0.6) translateX(0) translateZ(-400px);
-        border-radius: 2rem;
-        position: relative;
-        background: linear-gradient(to bottom, var(--gradient-from), var(--gradient-to));
-        padding: 2.5rem 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        justify-content: flex-start;
-        pointer-events: none;
-        visibility: hidden;
-        will-change: transform, opacity;
-        transform-origin: center center;
-    }
+            .swiper-slide-next {
+                transform: scale(0.85) translateX(65%) translateZ(-50px) rotateY(-25deg);
+            }
 
-    .swiper-slide h1 {
-        margin-top: -0.5rem;
-        margin-bottom: 1.5rem;
-    }
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 40px;
+                height: 40px;
+                top: auto;
+                bottom: 0;
+            }
 
-    .swiper-slide p {
-        margin-top: auto;
-        padding-bottom: 1rem;
-    }
+            .swiper-button-next {
+                right: 30%;
+            }
 
-    .swiper-slide-active {
-        opacity: 1;
-        transform: scale(1) translateX(0) translateZ(0) rotateY(0);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-        z-index: 3;
-        pointer-events: auto;
-        visibility: visible;
-    }
-
-    .swiper-slide-prev,
-    .swiper-slide-next {
-        opacity: 0.85;
-        visibility: visible;
-        pointer-events: none;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    }
-
-    .swiper-slide-prev {
-        transform: translateX(-75%) translateZ(-100px) rotateY(25deg);
-        transform-origin: right center;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .swiper-slide-next {
-        transform: translateX(75%) translateZ(-100px) rotateY(-25deg);
-        transform-origin: left center;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .swiper-slide:not(.swiper-slide-active):not(.swiper-slide-prev):not(.swiper-slide-next) {
-        opacity: 0.4;
-        transform: translateZ(-200px);
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    /* Ensure slides don't overflow the container */
-    .swiper-slide {
-        max-width: calc(100vw - 40px);
-    }
-
-
-    .swiper-slide img {
-        width: 200px;
-        height: 200px;
-        object-fit: contain;
-        margin: 1.5rem 0;
-        transition: transform 0.3s ease;
-    }
-
-    .swiper-slide-active img {
-        transform: scale(1.05);
-    }
-
-    .swiper-slide p {
-        color: white;
-        font-size: 1.25rem;
-        opacity: 0.9;
-        max-width: 80%;
-        margin: 0 auto;
-    }
-
-    .swiper-button-next,
-    .swiper-button-prev {
-        color: white;
-        background: rgba(79, 70, 229, 0.9);
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-        font-size: 0;
-    }
-
-    .swiper-button-next {
-        right: 2%;
-    }
-
-    .swiper-button-prev {
-        left: 2%;
-    }
-
-    .swiper-button-next:hover,
-    .swiper-button-prev:hover {
-        background: #4F46E5;
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    @media (max-width: 768px) {
-
-        .swiper-button-next,
-        .swiper-button-prev {
-            top: auto;
-            bottom: 0;
-            transform: none;
-            width: 40px;
-            height: 40px;
+            .swiper-button-prev {
+                left: 30%;
+            }
         }
 
-        .swiper-button-next:hover,
-        .swiper-button-prev:hover {
-            transform: scale(1.1);
+        @media (max-width: 360px) {
+            .swiper-slide {
+                width: 260px;
+                height: 280px;
+            }
+
+            .swiper-slide img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .swiper-button-next {
+                right: 25%;
+            }
+
+            .swiper-button-prev {
+                left: 25%;
+            }
         }
-
-        .swiper-button-next {
-            right: calc(50% - 60px);
-        }
-
-        .swiper-button-prev {
-            left: calc(50% - 60px);
-        }
-
-        .swiper-button-next::after,
-        .swiper-button-prev::after {
-            font-size: 18px;
-        }
-    }
-
-    @media (max-width: 480px) {
-
-        .swiper-button-next,
-        .swiper-button-prev {
-            width: 36px;
-            height: 36px;
-        }
-
-        .swiper-button-next {
-            right: calc(50% - 50px);
-        }
-
-        .swiper-button-prev {
-            left: calc(50% - 50px);
-        }
-
-        .swiper-button-next::after,
-        .swiper-button-prev::after {
-            font-size: 16px;
-        }
-    }
-
-    .swiper-button-next::after,
-    .swiper-button-prev::after {
-        font-family: swiper-icons;
-        font-size: 20px;
-        text-transform: none !important;
-        letter-spacing: 0;
-        font-variant: initial;
-        line-height: 1;
-    }
-
-    .swiper-button-prev::after {
-        content: 'prev';
-    }
-
-    .swiper-button-next::after {
-        content: 'next';
-    }
-
-    /* .swiper-pagination {
-            position: relative;
-            bottom: -2rem;
-        }
-
-        .swiper-pagination-bullet {
-            background: rgba(79, 70, 229, 0.5);
-            opacity: 1;
-            width: 12px;
-            height: 12px;
-            margin: 0 6px;
-            transition: all 0.3s ease;
-        }
-
-        .swiper-pagination-bullet-active {
-            opacity: 1;
-            background: #4F46E5;
-            transform: scale(1.3);
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
-        } */
-
-    /* Responsive adjustments */
-    @media (max-width: 1024px) {
-        .swiper {
-            padding-top: 20px;
-        }
-
-        .swiper-slide {
-            width: 500px;
-            height: 380px;
-            padding: 2rem 1.5rem;
-        }
-
-        .swiper-slide h1 {
-            font-size: 2rem;
-            margin-top: -0.25rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .swiper-slide-prev {
-            transform: scale(0.8) translateX(-80%) translateZ(-200px) rotateY(12deg);
-        }
-
-        .swiper-slide-next {
-            transform: scale(0.8) translateX(80%) translateZ(-200px) rotateY(-12deg);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .swiper {
-            padding-top: 15px;
-            padding-bottom: 100px;
-        }
-
-        .swiper-slide {
-            width: 420px;
-            height: 340px;
-            padding: 1.75rem 1.5rem;
-        }
-
-        .swiper-slide h1 {
-            font-size: 1.75rem;
-            margin-top: 0;
-            margin-bottom: 1rem;
-        }
-
-        .swiper-slide img {
-            width: 160px;
-            height: 160px;
-            margin: 1rem 0;
-        }
-
-        .swiper-slide p {
-            font-size: 1.1rem;
-            margin-top: auto;
-            padding-bottom: 0.5rem;
-        }
-
-        .swiper-slide-prev {
-            transform: scale(0.75) translateX(-70%) translateZ(-150px) rotateY(10deg);
-        }
-
-        .swiper-slide-next {
-            transform: scale(0.75) translateX(70%) translateZ(-150px) rotateY(-10deg);
-        }
-    }
-
-    @media (max-width: 480px) {
-        .swiper {
-            padding-top: 10px;
-            padding-bottom: 80px;
-            perspective: 1000px;
-        }
-
-        .swiper-slide {
-            width: 280px;
-            height: 300px;
-            padding: 1.5rem 1rem;
-        }
-
-        .swiper-slide h1 {
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 0.75rem;
-        }
-
-        .swiper-slide img {
-            width: 140px;
-            height: 140px;
-            margin: 0.75rem 0;
-        }
-
-        .swiper-slide p {
-            font-size: 1rem;
-            margin-top: auto;
-            padding-bottom: 0.25rem;
-        }
-
-        .swiper-slide-prev,
-        .swiper-slide-next {
-            opacity: 0.75;
-            visibility: visible;
-            width: 280px;
-        }
-
-        .swiper-slide-prev {
-            transform: scale(0.85) translateX(-65%) translateZ(-50px) rotateY(25deg);
-        }
-
-        .swiper-slide-next {
-            transform: scale(0.85) translateX(65%) translateZ(-50px) rotateY(-25deg);
-        }
-
-        .swiper-button-next,
-        .swiper-button-prev {
-            width: 40px;
-            height: 40px;
-            top: auto;
-            bottom: 0;
-        }
-
-        .swiper-button-next {
-
-            right: 30%;
-        }
-
-        .swiper-button-prev {
-
-            left: 30%;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .swiper-slide {
-            width: 260px;
-            height: 280px;
-        }
-
-        .swiper-slide img {
-            width: 120px;
-            height: 120px;
-        }
-
-        .swiper-button-next {
-            right: 25%;
-        }
-
-        .swiper-button-prev {
-            left: 25%;
-        }
-    }
-
-    /* Baloo 2 Regular */
-    @font-face {
-        font-family: 'Baloo 2';
-        src: url('{{ asset("fonts/baloo2/Baloo2-Regular.ttf") }}') format('truetype');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    /* Baloo 2 Bold */
-    @font-face {
-        font-family: 'Baloo 2';
-        src: url('{{ asset("fonts/baloo2/Baloo2-Bold.ttf") }}') format('truetype');
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    /* Baloo 2 ExtraBold */
-    @font-face {
-        font-family: 'Baloo 2';
-        src: url('{{ asset("fonts/baloo2/Baloo2-ExtraBold.ttf") }}') format('truetype');
-        font-weight: 800;
-        font-style: normal;
-        font-display: swap;
-    }
-
-
-    }
-</style>
+    </style>
 </head>
 
-
-<body class="bg-gray-50 font-poppins">
+<body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row justify-between items-center py-3 sm:py-4">
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10  rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
                             class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl">
                     </div>
                     <h1 class="text-2xl sm:text-3xl font-bold">
-                        <span class="text-primary-blue">Aral</span><span class="text-primary-red">Sipnayan</span>
+                        <span class="text-blue-600">Aral</span><span class="text-red-600">Sipnayan</span>
                     </h1>
                 </div>
                 <a href="{{ route('login') }}"
-                    class="btn bg-primary-blue btn-lg px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">Login</a>
+                    class="bg-blue-900 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">Login</a>
             </div>
         </nav>
     </header>
 
     <!-- Section 1 -->
-    <section class="py-12 md:py-12 bg-gradient-math text-white full-screen-section relative overflow-hidden">
+    <section class="py-12 md:py-12 text-white full-screen-section">
+        <!-- GSAP animated circles -->
+        <div class="moving-circles">
+            <div class="circle" id="circle1"></div>
+            <div class="circle" id="circle2"></div>
+            <div class="circle" id="circle3"></div>
+            <div class="circle" id="circle4"></div>
+            <div class="circle" id="circle5"></div>
+        </div>
+
         <!-- Decorative Elements -->
-        <div class="absolute top-32 left-8 w-2 h-2 bg-red-400 rounded-full opacity-80 animate-pulse-slow"></div>
-        <div class="absolute top-40 right-12 text-yellow-400 opacity-60 text-2xl animate-float">✦</div>
-        <div class="absolute top-64 left-16 w-1 h-1 bg-blue-300 rounded-full animate-float"></div>
-        <div class="absolute top-80 right-8 w-2 h-2 bg-pink-400 rounded-full opacity-70 animate-float"></div>
-        <div class="absolute bottom-80 left-12 w-2 h-2 bg-green-400 rounded-full opacity-60 animate-pulse-slow"></div>
-        <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float">✦</div>
+        <div class="absolute top-32 left-8 w-2 h-2 bg-red-400 rounded-full opacity-80 animate-pulse-slow z-10"></div>
+        <div class="absolute top-40 right-12 text-yellow-400 opacity-60 text-2xl animate-float z-10">✦</div>
+        <div class="absolute top-64 left-16 w-1 h-1 bg-blue-300 rounded-full animate-float z-10"></div>
+        <div class="absolute top-80 right-8 w-2 h-2 bg-pink-400 rounded-full opacity-70 animate-float z-10"></div>
+        <div class="absolute bottom-80 left-12 w-2 h-2 bg-green-400 rounded-full opacity-60 animate-pulse-slow z-10">
+        </div>
+        <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
 
         <!-- Mathematical Symbols -->
-        <div class="absolute top-20 right-20 text-white opacity-20 text-4xl animate-float">÷</div>
-        <div class="absolute bottom-40 left-20 text-white opacity-20 text-4xl animate-float">+</div>
+        <div class="absolute top-20 right-20 text-white opacity-20 text-4xl animate-float z-10">÷</div>
+        <div class="absolute bottom-40 left-20 text-white opacity-20 text-4xl animate-float z-10">+</div>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Master <span class="text-yellow-400">Advanced<br>Mathematics</span> with<br>
                 <span class="text-white">Interactive Learning</span>
@@ -572,7 +585,7 @@
                                 <div class="swiper-slide" style="--gradient-from: #9333EA; --gradient-to: #EC4899;">
                                     <h1 class="font-baloo font-extrabold text-white text-4xl"
                                         style="text-shadow: 0 6px 0 #4a167a;">Interactive Learning</h1>
-                                    <img src=" {{ asset('images/carousel/caro2.png') }}" alt="Interactive Learning"
+                                    <img src="{{ asset('images/carousel/caro2.png') }}" alt="Interactive Learning"
                                         style="margin-top: -16px">
                                     <p>Engaging quizzes and instant feedback</p>
                                 </div>
@@ -618,9 +631,6 @@
                                         d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </div>
-
-                            <!-- Pagination -->
-                            {{-- <div class="swiper-pagination"></div> --}}
                         </div>
                     </div>
                 </div>
@@ -829,118 +839,207 @@
             </svg>
         </div>
     </section>
-</body>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function initSwiper() {
-            const screenWidth = window.innerWidth;
-            let slideWidth = screenWidth < 768 ? 280 : 550;
-            let viewportWidth = document.querySelector('.swiper-viewport').offsetWidth;
-            let edgeOffset = (viewportWidth - slideWidth) / 2;
 
-            const swiper = new Swiper(".mySwiper", {
-                effect: "coverflow",
-                grabCursor: true,
-                centeredSlides: true,
-                slidesPerView: "auto",
-                initialSlide: 2,
-                loop: true,
-                speed: 800,
-                watchSlidesProgress: true,
-                slideToClickedSlide: true,
-                coverflowEffect: {
-                    rotate: 0,
-                    stretch: 0,
-                    depth: 200,
-                    modifier: 1,
-                    slideShadows: false,
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-                breakpoints: {
-                    320: {
-                        spaceBetween: -20,
-                        coverflowEffect: {
-                            stretch: 20,
-                            depth: 100,
-                            rotate: 0,
-                            modifier: 1,
-                        }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function initSwiper() {
+                const screenWidth = window.innerWidth;
+                let slideWidth = screenWidth < 768 ? 280 : 550;
+                let viewportWidth = document.querySelector('.swiper-viewport').offsetWidth;
+                let edgeOffset = (viewportWidth - slideWidth) / 2;
+
+                const swiper = new Swiper(".mySwiper", {
+                    effect: "coverflow",
+                    grabCursor: true,
+                    centeredSlides: true,
+                    slidesPerView: "auto",
+                    initialSlide: 2,
+                    loop: true,
+                    speed: 800,
+                    watchSlidesProgress: true,
+                    slideToClickedSlide: true,
+                    coverflowEffect: {
+                        rotate: 0,
+                        stretch: 0,
+                        depth: 200,
+                        modifier: 1,
+                        slideShadows: false,
                     },
-                    480: {
-                        spaceBetween: -30,
-                        coverflowEffect: {
-                            stretch: 30,
-                            depth: 150,
-                            rotate: 0,
-                            modifier: 1,
-                        }
+                    navigation: {
+                        nextEl: ".swiper-button-next",
+                        prevEl: ".swiper-button-prev",
                     },
-                    768: {
-                        spaceBetween: -40,
-                        coverflowEffect: {
-                            stretch: 40,
-                            depth: 150,
-                            rotate: 0,
-                            modifier: 1,
-                        }
-                    },
-                    1024: {
-                        spaceBetween: -50,
-                        coverflowEffect: {
-                            stretch: 50,
-                            depth: 200,
-                            rotate: 0,
-                            modifier: 1,
-                        }
-                    }
-                },
-                on: {
-                    beforeInit: function () {
-                        // Adjust container width to prevent overflow
-                        let container = this.el.closest('.swiper-container');
-                        if (container) {
-                            container.style.overflow = 'hidden';
-                            container.style.width = viewportWidth + 'px';
-                            container.style.margin = '0 auto';
-                        }
-                    },
-                    slideChange: function () {
-                        // Ensure proper z-index for active and adjacent slides
-                        const slides = this.slides;
-                        slides.forEach((slide, index) => {
-                            if (index === this.activeIndex) {
-                                slide.style.zIndex = '3';
-                            } else if (
-                                index === this.activeIndex - 1 ||
-                                index === this.activeIndex + 1
-                            ) {
-                                slide.style.zIndex = '2';
-                            } else {
-                                slide.style.zIndex = '1';
+                    breakpoints: {
+                        320: {
+                            spaceBetween: -20,
+                            coverflowEffect: {
+                                stretch: 20,
+                                depth: 100,
+                                rotate: 0,
+                                modifier: 1,
                             }
-                        });
+                        },
+                        480: {
+                            spaceBetween: -30,
+                            coverflowEffect: {
+                                stretch: 30,
+                                depth: 150,
+                                rotate: 0,
+                                modifier: 1,
+                            }
+                        },
+                        768: {
+                            spaceBetween: -40,
+                            coverflowEffect: {
+                                stretch: 40,
+                                depth: 150,
+                                rotate: 0,
+                                modifier: 1,
+                            }
+                        },
+                        1024: {
+                            spaceBetween: -50,
+                            coverflowEffect: {
+                                stretch: 50,
+                                depth: 200,
+                                rotate: 0,
+                                modifier: 1,
+                            }
+                        }
+                    },
+                    on: {
+                        beforeInit: function () {
+                            // Adjust container width to prevent overflow
+                            let container = this.el.closest('.swiper-container');
+                            if (container) {
+                                container.style.overflow = 'hidden';
+                                container.style.width = viewportWidth + 'px';
+                                container.style.margin = '0 auto';
+                            }
+                        },
+                        slideChange: function () {
+                            // Ensure proper z-index for active and adjacent slides
+                            const slides = this.slides;
+                            slides.forEach((slide, index) => {
+                                if (index === this.activeIndex) {
+                                    slide.style.zIndex = '3';
+                                } else if (
+                                    index === this.activeIndex - 1 ||
+                                    index === this.activeIndex + 1
+                                ) {
+                                    slide.style.zIndex = '2';
+                                } else {
+                                    slide.style.zIndex = '1';
+                                }
+                            });
+                        }
                     }
-                }
+                });
+
+                // Update on window resize
+                window.addEventListener('resize', function () {
+                    viewportWidth = document.querySelector('.swiper-viewport').offsetWidth;
+                    edgeOffset = (viewportWidth - slideWidth) / 2;
+                    let container = document.querySelector('.swiper-container');
+                    if (container) {
+                        container.style.width = viewportWidth + 'px';
+                    }
+                    swiper.update();
+                });
+            }
+
+            // Initialize the swiper
+            initSwiper();
+
+            // GSAP Animations for moving circles
+            // Set initial positions and sizes for circles
+            gsap.set('#circle1', {
+                width: '120px',
+                height: '120px',
+                top: '10%',
+                left: '10%'
             });
 
-            // Update on window resize
-            window.addEventListener('resize', function () {
-                viewportWidth = document.querySelector('.swiper-viewport').offsetWidth;
-                edgeOffset = (viewportWidth - slideWidth) / 2;
-                let container = document.querySelector('.swiper-container');
-                if (container) {
-                    container.style.width = viewportWidth + 'px';
-                }
-                swiper.update();
+            gsap.set('#circle2', {
+                width: '80px',
+                height: '80px',
+                top: '70%',
+                left: '80%'
             });
-        }
 
-        // Initialize the swiper
-        initSwiper();
-    });
-</script>
+            gsap.set('#circle3', {
+                width: '150px',
+                height: '150px',
+                top: '40%',
+                left: '70%'
+            });
+
+            gsap.set('#circle4', {
+                width: '100px',
+                height: '100px',
+                top: '80%',
+                left: '20%'
+            });
+
+            gsap.set('#circle5', {
+                width: '60px',
+                height: '60px',
+                top: '20%',
+                left: '85%'
+            });
+
+            // Create GSAP animations for each circle
+            gsap.to('#circle1', {
+                x: 'random(-100, 100)',
+                y: 'random(-50, 50)',
+                rotation: 'random(-180, 180)',
+                duration: 'random(15, 25)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#circle2', {
+                x: 'random(-80, 80)',
+                y: 'random(-40, 40)',
+                rotation: 'random(-180, 180)',
+                duration: 'random(12, 18)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#circle3', {
+                x: 'random(-120, 120)',
+                y: 'random(-60, 60)',
+                rotation: 'random(-180, 180)',
+                duration: 'random(18, 28)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#circle4', {
+                x: 'random(-90, 90)',
+                y: 'random(-45, 45)',
+                rotation: 'random(-180, 180)',
+                duration: 'random(14, 20)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            gsap.to('#circle5', {
+                x: 'random(-70, 70)',
+                y: 'random(-35, 35)',
+                rotation: 'random(-180, 180)',
+                duration: 'random(10, 16)',
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+        });
+    </script>
+</body>
 
 </html>
