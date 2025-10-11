@@ -69,7 +69,7 @@
                     @foreach($question->options as $index => $option)
                     <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label"
                            style="border-color: #E2E8F0; background-color: white;">
-                        <input type="radio" name="answer" value="{{ chr(65 + (int)$index) }}" class="hidden">
+                        <input type="radio" name="answer" value="{{ chr(65 + (int)$index) }}" class="hidden" autocomplete="off">
                         <div class="flex items-center justify-center w-9 h-9 text-white rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
                              style="background-color: #1E293B; color: white;">
                             {{ chr(65 + (int)$index) }}
@@ -602,6 +602,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Force clear all radio buttons immediately (Firefox fix)
+    document.querySelectorAll('input[type="radio"][name="answer"]').forEach(radio => {
+        radio.checked = false;
+    });
+
     // Quiz-wide timer settings (get time limit from database, default 30 minutes)
     const quizTimeLimit = {{ $timeLimit ?? 30 }} * 60; // Convert minutes to seconds
     
@@ -1932,6 +1937,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Save the updated state to localStorage before reload
                 saveProgressToLocalStorage();
+
+                // Clear all form inputs before reload (Firefox fix)
+                document.querySelectorAll('input[type="radio"][name="answer"]').forEach(radio => {
+                    radio.checked = false;
+                });
 
                 // The page will reload to show the next question
                 // The quiz timer will continue because it's based on the stored start time
