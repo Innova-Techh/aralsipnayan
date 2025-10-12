@@ -286,6 +286,12 @@ Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\Teacher
 // Admin Management Routes
 Route::prefix('admin')->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.')->group(function () {
     
+    // Admin Profile Routes - OUTSIDE management prefix
+    Route::get('/profile', [App\Http\Controllers\AdminController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [App\Http\Controllers\AdminController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [App\Http\Controllers\AdminController::class, 'updatePassword'])->name('profile.update-password');
+    Route::delete('/profile', [App\Http\Controllers\AdminController::class, 'destroy'])->name('profile.delete');
+    
     Route::prefix('management')->name('management.')->group(function () {
         
         // Teacher Management

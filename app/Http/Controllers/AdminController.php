@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\AdminProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class AdminController extends Controller
@@ -15,6 +17,12 @@ class AdminController extends Controller
      */
     public function index()
     {
+        // Check if this is for the profile page or admin management page
+        if (request()->is('admin/profile')) {
+            return view('admin.admin.profile.admin-profile');
+        }
+        
+        // Otherwise, show admin management page
         return view('admin.admin.management.admin-management');
     }
 
@@ -30,38 +38,38 @@ class AdminController extends Controller
      * Store a newly created admin in storage.
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'fullname' => ['required', 'string', 'max:255'],
-        'username' => ['required', 'string', 'max:255', 'unique:users'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'password' => ['required', 'string', 'min:8', 'confirmed'],
-    ]);
+    {
+        $validated = $request->validate([
+            'fullname' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
 
-    // Split fullname into firstname and lastname
-    $nameParts = explode(' ', $validated['fullname'], 2);
-    $firstname = $nameParts[0];
-    $lastname = $nameParts[1] ?? '';
+        // Split fullname into firstname and lastname
+        $nameParts = explode(' ', $validated['fullname'], 2);
+        $firstname = $nameParts[0];
+        $lastname = $nameParts[1] ?? '';
 
-    // Create the user
-    $user = User::create([
-        'username' => $validated['username'],
-        'email' => $validated['email'],
-        'password' => Hash::make($validated['password']),
-        'role' => 'Admin',
-        'status' => 'active',
-    ]);
+        // Create the user
+        $user = User::create([
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'Admin',
+            'status' => 'active',
+        ]);
 
-    // Create admin profile
-    AdminProfile::create([
-        'user_id' => $user->id,
-        'firstname' => $firstname,
-        'lastname' => $lastname,
-    ]);
+        // Create admin profile
+        AdminProfile::create([
+            'user_id' => $user->id,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+        ]);
 
-    return redirect()->route('admin.management.admins')
-        ->with('success', 'Admin created successfully.');
-}
+        return redirect()->route('admin.management.admins')
+            ->with('success', 'Admin created successfully.');
+    }
 
     /**
      * Show the form for editing the specified admin.
@@ -78,8 +86,19 @@ class AdminController extends Controller
     /**
      * Update the specified admin in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user = null)
     {
+        // If no user is passed, this is a profile update for the logged-in admin
+        if (!$user) {
+            $user = Auth::guard('admin')->user();
+        }
+
+        // Check if this is a profile update (no user parameter in route)
+        if (request()->is('admin/profile')) {
+            return $this->updateProfile($request);
+        }
+
+        // Otherwise, it's an admin management update
         if ($user->role !== 'Admin') {
             abort(404);
         }
@@ -120,10 +139,107 @@ class AdminController extends Controller
     }
 
     /**
+     * Update the admin profile (for logged-in user).
+     */
+    protected function updateProfile(Request $request)
+    {
+        $user = Auth::guard('admin')->user();
+        
+        $validated = $request->validate([
+            'fullname' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'school_name' => ['nullable', 'string', 'max:255'],
+            'grade_level_focus' => ['nullable', 'string', 'max:255'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:1024'],
+        ]);
+
+        // Split fullname into firstname and lastname
+        $nameParts = explode(' ', $validated['fullname'], 2);
+        $firstname = $nameParts[0];
+        $lastname = $nameParts[1] ?? '';
+
+        // Update user basic info
+        $user->update([
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+        ]);
+
+        // Handle profile photo upload
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if exists
+            if ($user->adminProfile && $user->adminProfile->profile_photo) {
+                Storage::disk('public')->delete($user->adminProfile->profile_photo);
+            }
+
+            // Store new photo
+            $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+            
+            $user->adminProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'firstname' => $firstname,
+                    'lastname' => $lastname,
+                    'school_name' => $validated['school_name'] ?? null,
+                    'grade_level_focus' => $validated['grade_level_focus'] ?? null,
+                    'profile_photo' => $photoPath,
+                ]
+            );
+        } else {
+            // Update profile without changing photo
+            $user->adminProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'firstname' => $firstname,
+                    'lastname' => $lastname,
+                    'school_name' => $validated['school_name'] ?? null,
+                    'grade_level_focus' => $validated['grade_level_focus'] ?? null,
+                ]
+            );
+        }
+
+        return redirect()->route('admin.profile.index')
+            ->with('success', 'Profile updated successfully.');
+    }
+
+    /**
+     * Update the admin password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::guard('admin')->user();
+
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        // Verify current password
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return redirect()->route('admin.profile.index')
+                ->with('error', 'Current password is incorrect.');
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($validated['new_password']),
+        ]);
+
+        return redirect()->route('admin.profile.index')
+            ->with('success', 'Password updated successfully.');
+    }
+
+    /**
      * Remove the specified admin from storage.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user = null)
     {
+        // If no user is passed, this is account deletion for logged-in admin
+        if (!$user) {
+            return $this->deleteOwnAccount($request);
+        }
+
+        // Otherwise, it's deleting another admin
         if ($user->role !== 'Admin' || $user->id === auth()->id()) {
             return redirect()->route('admin.management.admins')
                 ->with('error', 'Cannot delete this admin.');
@@ -134,5 +250,47 @@ class AdminController extends Controller
 
         return redirect()->route('admin.management.admins')
             ->with('success', 'Admin deleted successfully.');
+    }
+
+    /**
+     * Delete own account (for logged-in admin).
+     */
+    protected function deleteOwnAccount(Request $request)
+    {
+        $user = Auth::guard('admin')->user();
+
+        $validated = $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        // Verify password
+        if (!Hash::check($validated['password'], $user->password)) {
+            return redirect()->route('admin.profile.index')
+                ->with('error', 'Password is incorrect.');
+        }
+
+        // Prevent deleting yourself if you're the last admin
+        $adminCount = User::where('role', 'Admin')->where('status', 'active')->count();
+        if ($adminCount <= 1) {
+            return redirect()->route('admin.profile.index')
+                ->with('error', 'Cannot delete the last admin account.');
+        }
+
+        // Delete profile photo if exists
+        if ($user->adminProfile && $user->adminProfile->profile_photo) {
+            Storage::disk('public')->delete($user->adminProfile->profile_photo);
+        }
+
+        // Delete profile and user
+        $user->adminProfile()->delete();
+        $user->delete();
+
+        // Logout
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')
+            ->with('success', 'Account deleted successfully.');
     }
 }
