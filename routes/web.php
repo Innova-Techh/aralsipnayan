@@ -206,6 +206,10 @@ Route::get('/students/{student}/profile', [App\Http\Controllers\Teacher\TeacherS
     ->name('students.profile');
 
 
+    // Assessment Review Route
+Route::get('/assessments/review/{student}/{assessment}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'reviewAssessment'])
+    ->name('assessments.review');
+
 // Section Management
 Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'index'])->name('sections');
 Route::get('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'show'])->name('sections.show'); // ADD THIS LINE

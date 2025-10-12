@@ -234,47 +234,58 @@
                             </div>
                         </div>
 
-                        <!-- Assessments Content -->
-                        <div id="assessments-content" class="tab-content hidden">
-                            <div class="mb-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Assessment History</h3>
-                                <p class="text-gray-600 mb-6">Complete record of all assessments taken</p>
-                                
-                                <div class="space-y-4">
-                                    @forelse($student->assessments ?? [] as $assessment)
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                            <div class="flex-1">
-                                                <div class="font-medium text-gray-900">{{ $assessment['name'] }}</div>
-                                                <div class="text-sm text-gray-500">{{ $assessment['date'] }} • {{ $assessment['time'] }} • {{ $assessment['type'] }}</div>
-                                            </div>
-                                            <div class="text-right">
-                                                <div class="text-lg font-bold text-gray-900">{{ $assessment['score'] }}</div>
-                                                <div class="text-xs text-gray-500">Score</div>
-                                            </div>
-                                        </div>
-                                    @empty
-                                        @foreach([
-                                                ['name' => 'Algebra Basics Quiz', 'date' => '2024-01-18', 'time' => '14.5 min', 'type' => 'Quiz', 'score' => '92%'],
-                                                ['name' => 'Geometric Shapes Test', 'date' => '2024-01-15', 'time' => '22.3 min', 'type' => 'Test', 'score' => '88%'],
-                                                ['name' => 'Fractions Review', 'date' => '2024-01-12', 'time' => '11.8 min', 'type' => 'Quiz', 'score' => '95%'],
-                                                ['name' => 'Problem Solving Strategies', 'date' => '2024-01-10', 'time' => '28.7 min', 'type' => 'Assessment', 'score' => '87%'],
-                                                ['name' => 'Data Interpretation', 'date' => '2024-01-08', 'time' => '19.2 min', 'type' => 'Quiz', 'score' => '83%']
-                                            ] as $assessment)
-                                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                                <div class="flex-1">
-                                                    <div class="font-medium text-gray-900">{{ $assessment['name'] }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $assessment['date'] }} • {{ $assessment['time'] }} • {{ $assessment['type'] }}</div>
-                                                </div>
-                                                <div class="text-right">
-                                                    <div class="text-lg font-bold text-gray-900">{{ $assessment['score'] }}</div>
-                                                    <div class="text-xs text-gray-500">Score</div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endforelse
-                                </div>
-                            </div>
+                        <!-- This replaces the Assessments Content section in student-profile.blade.php -->
+<!-- Find and replace the entire "Assessments Content" div -->
+
+<!-- Assessments Content -->
+<div id="assessments-content" class="tab-content hidden">
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Assessment History</h3>
+        <p class="text-gray-600 mb-6">Complete record of all assessments taken - Click to view detailed results</p>
+        
+        <div class="space-y-4">
+            @forelse($student->assessments ?? [] as $assessment)
+                <a href="{{ route('teacher.assessments.review', ['student' => $student->id, 'assessment' => $assessment['id'] ?? 0]) }}" 
+                   class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-blue-50 hover:border-blue-200 border border-gray-200 transition-all cursor-pointer group">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{{ $assessment['name'] }}</div>
+                        <div class="text-sm text-gray-500">{{ $assessment['date'] }} • {{ $assessment['time'] }} • {{ $assessment['type'] }}</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-900">{{ $assessment['score'] }}</div>
+                            <div class="text-xs text-gray-500">Score</div>
                         </div>
+                        <span class="material-symbols-outlined text-gray-400 group-hover:text-blue-600 transition-colors">chevron_right</span>
+                    </div>
+                </a>
+            @empty
+                @foreach([
+                        ['id' => 1, 'name' => 'Algebra Basics Quiz', 'date' => '2024-01-18', 'time' => '14.5 min', 'type' => 'Quiz', 'score' => '92%'],
+                        ['id' => 2, 'name' => 'Geometric Shapes Test', 'date' => '2024-01-15', 'time' => '22.3 min', 'type' => 'Test', 'score' => '88%'],
+                        ['id' => 3, 'name' => 'Fractions Review', 'date' => '2024-01-12', 'time' => '11.8 min', 'type' => 'Quiz', 'score' => '95%'],
+                        ['id' => 4, 'name' => 'Problem Solving Strategies', 'date' => '2024-01-10', 'time' => '28.7 min', 'type' => 'Assessment', 'score' => '87%'],
+                        ['id' => 5, 'name' => 'Data Interpretation', 'date' => '2024-01-08', 'time' => '19.2 min', 'type' => 'Quiz', 'score' => '83%']
+                    ] as $assessment)
+                    <a href="{{ route('teacher.assessments.review', ['student' => $student->id, 'assessment' => $assessment['id']]) }}" 
+                       class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-blue-50 hover:border-blue-200 border border-gray-200 transition-all cursor-pointer group">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{{ $assessment['name'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $assessment['date'] }} • {{ $assessment['time'] }} • {{ $assessment['type'] }}</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-gray-900">{{ $assessment['score'] }}</div>
+                                <div class="text-xs text-gray-500">Score</div>
+                            </div>
+                            <span class="material-symbols-outlined text-gray-400 group-hover:text-blue-600 transition-colors">chevron_right</span>
+                        </div>
+                    </a>
+                @endforeach
+            @endforelse
+        </div>
+    </div>
+</div>
 
                         <!-- Competencies Content -->
                         <div id="competencies-content" class="tab-content hidden">
