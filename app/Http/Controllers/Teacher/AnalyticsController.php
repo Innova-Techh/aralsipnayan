@@ -33,11 +33,72 @@ class AnalyticsController extends Controller
         // Get overall statistics (filtered by teacher sections)
         $statistics = $this->getOverallStatistics($teacherSections);
 
+        // Get section comparison statistics
+        $sectionStats = $this->getSectionStatistics($teacherSections);
+
         return view('admin.teacher.analytics.index', [
             'recentAssessments' => $recentAssessments,
             'statistics' => $statistics,
-            'teacherSections' => $teacherSections
+            'teacherSections' => $teacherSections,
+            'sectionStats' => $sectionStats
         ]);
+    }
+
+    /**
+     * Get section-based statistics for comparison charts
+     */
+    private function getSectionStatistics($teacherSections = [])
+    {
+        try {
+            if (empty($teacherSections)) {
+                return [
+                    'avg_scores' => [],
+                    'avg_accuracy' => [],
+                    'avg_time' => []
+                ];
+            }
+
+            $avgScores = [];
+            $avgAccuracy = [];
+            $avgTime = [];
+
+            foreach ($teacherSections as $section) {
+                // Get average score per section
+                $scoreData = DB::table('assessments')
+                    ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                    ->where('student_profile.section', $section)
+                    ->where('assessments.status', 'completed')
+                    ->where('assessments.assessment_type', 'regular')
+                    ->selectRaw('
+                        AVG(assessments.total_score) as avg_score,
+                        AVG(assessments.accuracy_percentage) as avg_accuracy,
+                        AVG(assessments.total_time_spent) as avg_time_spent
+                    ')
+                    ->first();
+
+                // Store data for this section
+                $avgScores[] = round($scoreData->avg_score ?? 0, 2);
+                $avgAccuracy[] = round($scoreData->avg_accuracy ?? 0, 2);
+                
+                // Convert seconds to minutes
+                $timeInMinutes = ($scoreData->avg_time_spent ?? 0) / 60;
+                $avgTime[] = round($timeInMinutes, 2);
+            }
+
+            return [
+                'avg_scores' => $avgScores,
+                'avg_accuracy' => $avgAccuracy,
+                'avg_time' => $avgTime
+            ];
+
+        } catch (\Exception $e) {
+            \Log::error('Error fetching section statistics: ' . $e->getMessage());
+            return [
+                'avg_scores' => array_fill(0, count($teacherSections), 0),
+                'avg_accuracy' => array_fill(0, count($teacherSections), 0),
+                'avg_time' => array_fill(0, count($teacherSections), 0)
+            ];
+        }
     }
 
     /**
