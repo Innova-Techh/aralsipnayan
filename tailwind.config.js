@@ -526,6 +526,8 @@ radial-gradient(circle at center,
                 "next-question": "linear-gradient(to bottom, #3B82F6, #1D4ED8)",
 
                 "phase-counter": "linear-gradient(to bottom, #5445E6, #763CEC)",
+
+                "cancel-button": "linear-gradient(to bottom, #5B5E63, #2B2E33)",
             },
             boxShadow: {
                 // Inner shadow utility
@@ -611,6 +613,7 @@ radial-gradient(circle at center,
 
                 "diagnostic-banner": "0 4px 0 #1E3A8A",
                 "phase-counter": "0 6px 0 #3705AD",
+                "cancel-button": "0 4px 0 #1A1A1A",
             },
         },
     },

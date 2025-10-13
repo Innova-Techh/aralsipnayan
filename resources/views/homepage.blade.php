@@ -466,12 +466,15 @@
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
                             class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl">
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-bold">
+                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tighter">
                         <span class="text-blue-600">Aral</span><span class="text-red-600">Sipnayan</span>
                     </h1>
                 </div>
                 <a href="{{ route('login') }}"
-                    class="bg-blue-900 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">Login</a>
+                    class="bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">
+                    Login
+                </a>
+
             </div>
         </nav>
     </header>
