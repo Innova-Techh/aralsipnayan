@@ -141,10 +141,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 7 - Section A') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
@@ -185,10 +185,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 7 - Section B') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
@@ -229,10 +229,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 8 - Section A') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
@@ -273,10 +273,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 8 - Section B') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
@@ -317,10 +317,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 9 - Section A') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
@@ -361,10 +361,10 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <button
+                            <a href="{{ route('admin.management.sections.students', 'Grade 9 - Section B') }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
-                            </button>
+                            </a>
                             <button
                                 class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive

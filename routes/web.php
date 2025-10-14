@@ -316,6 +316,22 @@ Route::prefix('admin')->middleware(['admin.auth', 'admin.role:Admin'])->name('ad
             return view('admin.admin.management.student-management');
         })->name('students');
 
+        // Student Management Routes for Sections
+    Route::get('/sections/{section}/students', [App\Http\Controllers\StudentManagementController::class, 'index'])
+        ->name('sections.students');
+    Route::post('/sections/{section}/students', [App\Http\Controllers\StudentManagementController::class, 'store'])
+        ->name('sections.students.store');
+    Route::get('/students/{student}/edit', [App\Http\Controllers\StudentManagementController::class, 'edit'])
+        ->name('students.edit');
+    Route::put('/students/{student}', [App\Http\Controllers\StudentManagementController::class, 'update'])
+        ->name('students.update');
+    Route::post('/students/{student}/archive', [App\Http\Controllers\StudentManagementController::class, 'archive'])
+        ->name('students.archive');
+    Route::delete('/students/{student}', [App\Http\Controllers\StudentManagementController::class, 'destroy'])
+        ->name('students.destroy');
+    Route::post('/students/{student}/restore', [App\Http\Controllers\StudentManagementController::class, 'restore'])
+        ->name('students.restore');
+
         // Section Management
         Route::get('/sections', function () {
             return view('admin.admin.management.section-management');
