@@ -234,7 +234,7 @@ const animateAssignments = () => {
     }
 };
 
-// Animate Achievements Section
+// Animate Achievements Section - NO ANIMATION ON ITEMS
 const animateAchievements = () => {
     const achievementsSection = document
         .querySelector(
@@ -243,7 +243,7 @@ const animateAchievements = () => {
         ?.closest(".rounded-xl");
 
     if (achievementsSection) {
-        // Animate section entrance
+        // Animate section entrance only
         gsap.from(achievementsSection, {
             duration: 0.8,
             opacity: 0,
@@ -252,33 +252,7 @@ const animateAchievements = () => {
             delay: 1.8,
         });
 
-        // Animate achievement items
-        const achievementItems =
-            achievementsSection.querySelectorAll(".grid > div");
-        achievementItems.forEach((item, index) => {
-            gsap.from(item, {
-                duration: 0.7,
-                opacity: 0,
-                y: 30,
-                scale: 0.5,
-                rotation: -180,
-                ease: "back.out(1.7)",
-                delay: 2 + index * 0.1,
-            });
-
-            // Animate achievement images
-            const img = item.querySelector("img");
-            if (img) {
-                gsap.from(img, {
-                    duration: 0.8,
-                    opacity: 0,
-                    scale: 0,
-                    rotation: 360,
-                    ease: "elastic.out(1, 0.5)",
-                    delay: 2.2 + index * 0.1,
-                });
-            }
-        });
+        // No animations on individual achievement items or images
     }
 };
 
@@ -407,49 +381,11 @@ const addHoverAnimations = () => {
         });
     });
 
-    // Achievement items hover
+    // Achievement items hover - NO ANIMATION
     const achievementItems = document.querySelectorAll(
         ".grid.grid-cols-2.sm\\:grid-cols-3 > div"
     );
-    achievementItems.forEach((item) => {
-        item.addEventListener("mouseenter", () => {
-            gsap.to(item, {
-                duration: 0.3,
-                y: -15,
-                scale: 1.1,
-                ease: "back.out(1.7)",
-            });
-
-            const img = item.querySelector("img");
-            if (img) {
-                gsap.to(img, {
-                    duration: 0.5,
-                    rotation: 360,
-                    scale: 1.2,
-                    ease: "elastic.out(1, 0.5)",
-                });
-            }
-        });
-
-        item.addEventListener("mouseleave", () => {
-            gsap.to(item, {
-                duration: 0.3,
-                y: 0,
-                scale: 1,
-                ease: "power2.out",
-            });
-
-            const img = item.querySelector("img");
-            if (img) {
-                gsap.to(img, {
-                    duration: 0.3,
-                    rotation: 0,
-                    scale: 1,
-                    ease: "power2.out",
-                });
-            }
-        });
-    });
+    // No hover animations for achievement items
 
     // Leaderboard items hover
     const leaderboardItems = document.querySelectorAll(
