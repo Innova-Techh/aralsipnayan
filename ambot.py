@@ -292,27 +292,19 @@ class SimpleQuestionBot:
             conn.close()
 
     def _ensure_student_mastery_row(self, user_id, competency):
-        """Create student_mastery row if it does not exist yet, so counters can be updated by backend."""
+        """Safely ensure a student_mastery row exists (thread-safe)."""
         conn = self.connect_db()
         if not conn:
             return False
 
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM student_mastery WHERE user_id = %s AND competency = %s", (user_id, competency))
-            exists = cursor.fetchone()[0] > 0
-            if exists:
-                return True
-
-            # Insert minimal row; defaults in schema handle most fields
             mastery_id = f"MAST_{user_id}_{competency}_{int(time.time())}"
-            cursor.execute(
-                """
+            cursor.execute("""
                 INSERT INTO student_mastery (mastery_id, user_id, competency, current_difficulty, created_at, updated_at)
                 VALUES (%s, %s, %s, 'beginner', NOW(), NOW())
-                """,
-                (mastery_id, user_id, competency)
-            )
+                ON DUPLICATE KEY UPDATE updated_at = NOW()
+            """, (mastery_id, user_id, competency))
             conn.commit()
             print(f"✓ Ensured student_mastery row for user {user_id}, {competency}")
             return True
