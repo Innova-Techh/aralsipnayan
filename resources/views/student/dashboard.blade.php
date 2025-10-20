@@ -993,7 +993,7 @@
                                         </h1>
 
                                         <p class="text-xs sm:text-sm text-yellow-100 opacity-90 mt-1">
-                                            See the top performing students.
+                                            See the top performing students in your section.
                                         </p>
                                     </div>
 
