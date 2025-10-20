@@ -185,7 +185,6 @@ class TeacherStudentController extends Controller
                     // Student profile exists, just update the section and school year
                     $existingProfile->update([
                         'section' => $request->section,
-                        'school_year' => $request->school_year,
                         'firstname' => $request->firstname,
                         'middlename' => $request->middlename,
                         'lastname' => $request->lastname,
@@ -205,7 +204,7 @@ class TeacherStudentController extends Controller
                         'lastname' => $request->lastname,
                         'section' => $request->section,
                         'grade_level' => '6', // Fixed to Grade 6
-                        'school_year' => $request->school_year,
+                        'school_year' => $request->school_year ?: '2024-2025',
                         'total_points' => 0,
                         'current_streak' => 0,
                         'longest_streak' => 0
@@ -236,7 +235,7 @@ class TeacherStudentController extends Controller
                     'lastname' => $request->lastname,
                     'section' => $request->section,
                     'grade_level' => '6', // Fixed to Grade 6
-                    'school_year' => $request->school_year,
+                    'school_year' => '2024-2025',
                     'total_points' => 0,
                     'current_streak' => 0,
                     'longest_streak' => 0
@@ -303,7 +302,7 @@ class TeacherStudentController extends Controller
                 'lastname' => $request->lastname,
                 'section' => $request->section,
                 'grade_level' => '6', // Fixed to Grade 6
-                'school_year' => $request->school_year
+                'school_year' => $request->school_year ?: '2024-2025'
             ]);
 
             DB::commit();
@@ -443,12 +442,33 @@ class TeacherStudentController extends Controller
      */
     private function getSectionAveragePerformance($section)
     {
-        // This is a simplified calculation - you can enhance this based on your performance metrics
-        $avgPoints = DB::table('student_profile')
-            ->where('section', $section)
-            ->avg('total_points');
+        try {
+            // Get average accuracy from completed assessments for this section
+            $avgAccuracy = DB::table('assessments')
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                ->where('student_profile.section', $section)
+                ->where('assessments.status', 'completed')
+                ->where('assessments.assessment_type', 'regular')
+                ->avg('assessments.accuracy_percentage');
             
-        return $avgPoints ? round($avgPoints, 1) : 0;
+            // Debug: Log the performance calculation
+            \Log::info("Section {$section} average performance calculation (Student Controller):", [
+                'avg_accuracy' => $avgAccuracy,
+                'section' => $section
+            ]);
+            
+            return $avgAccuracy ? round($avgAccuracy, 1) : 0;
+            
+        } catch (\Exception $e) {
+            \Log::error('Error calculating section performance (Student Controller): ' . $e->getMessage());
+            
+            // Fallback to total_points if assessment data is not available
+            $avgPoints = DB::table('student_profile')
+                ->where('section', $section)
+                ->avg('total_points');
+                
+            return $avgPoints ? round($avgPoints, 1) : 0;
+        }
     }
 
     /**
@@ -469,24 +489,24 @@ class TeacherStudentController extends Controller
      */
     private function generateSectionBasedUsername($section)
     {
-        // Extract the section letter (A, B, C, etc.) from section name
-        $sectionLetter = strtolower(substr(trim($section), -1)); // Get last character and make lowercase
-        
-        // If section doesn't end with a letter, default to 'a'
-        if (!ctype_alpha($sectionLetter)) {
-            $sectionLetter = 'a';
+        // Clean and normalize the section name (remove spaces and make lowercase)
+        $sectionName = strtolower(preg_replace('/\s+/', '', trim($section)));
+    
+        // If section name is empty, default to "sectiona"
+        if (empty($sectionName)) {
+            $sectionName = 'sectiona';
         }
-        
+    
         $number = 1;
-
+    
         while (true) {
-            $username = 'student' . $sectionLetter . $number;
-            
+            $username = 'student' . $sectionName . $number;
+    
             // Check if this username already exists
             if (!User::where('username', $username)->exists()) {
                 return $username;
             }
-            
+    
             $number++;
         }
     }

@@ -48,9 +48,11 @@ class TeacherSectionController extends Controller
             return redirect()->back()->with('error', 'Teacher profile not found');
         }
         
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
+        $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->pluck('sections.name')
             ->toArray();
         
         if (!in_array($studentProfile->section, $teacherSections)) {
@@ -156,10 +158,13 @@ class TeacherSectionController extends Controller
         if (!$teacherProfile) {
             $sectionsData = [];
         } else {
-            $teacherSections = DB::table('teacher_sections')
-                ->where('teacher_id', $teacherProfile->id)
-                ->pluck('section')
-                ->toArray();
+            // Get sections assigned to this teacher from sections table
+            $teacherSections = DB::table('sections')
+                ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+                ->where('teacher_sections.teacher_id', $teacherProfile->id)
+                ->where('sections.is_active', true)
+                ->select('sections.name', 'sections.grade_level', 'sections.school_year')
+                ->get();
 
             $sectionsData = [];
             
@@ -167,28 +172,28 @@ class TeacherSectionController extends Controller
                 // Get student count for this section
                 $studentCount = DB::table('student_profile')
                     ->join('users', 'student_profile.user_id', '=', 'users.id')
-                    ->where('student_profile.section', $section)
+                    ->where('student_profile.section', $section->name)
                     ->where('users.status', 'active')
                     ->count();
 
                 // Get active assessments count for this section
                 $activeAssessmentsCount = DB::table('teacher_assessment_assignments')
                     ->join('teacher_assessments', 'teacher_assessment_assignments.assessment_id', '=', 'teacher_assessments.id')
-                    ->where('teacher_assessment_assignments.section', $section)
+                    ->where('teacher_assessment_assignments.section', $section->name)
                     ->where('teacher_assessments.status', 'Active')
                     ->where('teacher_assessments.created_by', $teacher->id)
                     ->count();
 
                 // Get average performance for this section
-                $averagePerformance = $this->getSectionAveragePerformance($section);
+                $averagePerformance = $this->getSectionAveragePerformance($section->name);
 
                 $sectionsData[] = [
-                    'section' => $section,
-                    'grade_level' => '6', // Fixed to Grade 6
+                    'section' => $section->name,
+                    'grade_level' => $section->grade_level,
                     'student_count' => $studentCount,
                     'active_assessments' => $activeAssessmentsCount,
                     'average_performance' => $averagePerformance,
-                    'last_activity' => $this->getLastActivityForSection($section)
+                    'last_activity' => $this->getLastActivityForSection($section->name)
                 ];
             }
         }
@@ -209,19 +214,21 @@ class TeacherSectionController extends Controller
         }
 
         // Verify teacher has access to this section
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
+        $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->pluck('sections.name')
             ->toArray();
 
         if (!in_array($section, $teacherSections)) {
             abort(403, 'Access denied to this section');
         }
 
-        // Get section details
-        $sectionDetails = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->where('section', $section)
+        // Get section details from sections table
+        $sectionDetails = DB::table('sections')
+            ->where('name', $section)
+            ->where('is_active', true)
             ->first();
 
         // Get students with detailed information
@@ -359,9 +366,11 @@ class TeacherSectionController extends Controller
         
         // Verify teacher has access to this section
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
+        $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->pluck('sections.name')
             ->toArray();
 
         if (!in_array($section, $teacherSections)) {
@@ -435,10 +444,9 @@ class TeacherSectionController extends Controller
             return response()->json(['error' => 'Teacher profile not found'], 404);
         }
 
-        // Check if section already exists for this teacher
-        $existingSection = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->where('section', $request->section)
+        // Check if section already exists in sections table
+        $existingSection = DB::table('sections')
+            ->where('name', $request->section)
             ->where('school_year', $request->school_year)
             ->first();
 
@@ -447,18 +455,35 @@ class TeacherSectionController extends Controller
         }
 
         try {
-            DB::table('teacher_sections')->insert([
-                'teacher_id' => $teacherProfile->id,
-                'section' => $request->section,
+            DB::beginTransaction();
+
+            // First, create the section in sections table
+            DB::table('sections')->insert([
+                'name' => $request->section,
                 'grade_level' => '6', // Fixed to Grade 6
-                'school_year' => $request->school_year,
+                'school_year' => $request->school_year ?? '2024-2025',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
 
+            // Then, assign the teacher to the section
+            DB::table('teacher_sections')->insert([
+                'teacher_id' => $teacherProfile->id,
+                'section' => $request->section,
+                'grade_level' => '6', // Fixed to Grade 6
+                'school_year' => $request->school_year ?? '2024-2025',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            DB::commit();
+
+
             return response()->json([
                 'success' => true,
-                'message' => 'Section created successfully!'
+                'message' => 'Section created successfully!',
+                'section' => $request->section // Include section name for frontend
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create section: ' . $e->getMessage()], 500);
@@ -470,10 +495,6 @@ class TeacherSectionController extends Controller
      */
     public function update(Request $request, $section)
     {
-        $request->validate([
-            'section' => 'required|string|max:50',
-            'school_year' => 'nullable|string|max:20'
-        ]);
 
         $teacher = Auth::guard('admin')->user();
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
@@ -483,6 +504,18 @@ class TeacherSectionController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
+            // Update the section in sections table
+            DB::table('sections')
+                ->where('name', $section)
+                ->update([
+                    'name' => $request->section,
+                    'grade_level' => '6', // Fixed to Grade 6
+                    'updated_at' => now()
+                ]);
+
+            // Update the teacher_sections table
             DB::table('teacher_sections')
                 ->where('teacher_id', $teacherProfile->id)
                 ->where('section', $section)
@@ -492,6 +525,8 @@ class TeacherSectionController extends Controller
                     'school_year' => $request->school_year,
                     'updated_at' => now()
                 ]);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -526,10 +561,30 @@ class TeacherSectionController extends Controller
                 ], 422);
             }
 
+            DB::beginTransaction();
+
+            // Remove teacher assignment from teacher_sections
             DB::table('teacher_sections')
                 ->where('teacher_id', $teacherProfile->id)
                 ->where('section', $section)
                 ->delete();
+
+            // Check if any other teachers are assigned to this section
+            $otherTeachers = DB::table('teacher_sections')
+                ->where('section', $section)
+                ->count();
+
+            // If no other teachers are assigned, deactivate the section
+            if ($otherTeachers == 0) {
+                DB::table('sections')
+                    ->where('name', $section)
+                    ->update([
+                        'is_active' => false,
+                        'updated_at' => now()
+                    ]);
+            }
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -545,12 +600,32 @@ class TeacherSectionController extends Controller
      */
     private function getSectionAveragePerformance($section)
     {
-        // This is a simplified calculation - you can enhance this based on your performance metrics
-        $avgPoints = DB::table('student_profile')
-            ->where('section', $section)
-            ->avg('total_points');
+        try {
+            // Get average accuracy from completed assessments for this section
+            $avgAccuracy = DB::table('assessments')
+                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                ->where('student_profile.section', $section)
+                ->where('assessments.status', 'completed')
+                ->where('assessments.assessment_type', 'regular')
+                ->avg('assessments.accuracy_percentage');
             
-        return $avgPoints ? round($avgPoints, 1) : 0;
+            // Debug: Log the performance calculation
+            \Log::info("Section {$section} average performance calculation:", [
+                'avg_accuracy' => $avgAccuracy,
+                'section' => $section
+            ]);
+            
+            return $avgAccuracy ? round($avgAccuracy, 1) : 0;
+            
+        } catch (\Exception $e) {
+            
+            // Fallback to total_points if assessment data is not available
+            $avgPoints = DB::table('student_profile')
+                ->where('section', $section)
+                ->avg('total_points');
+                
+            return $avgPoints ? round($avgPoints, 1) : 0;
+        }
     }
 
     /**
@@ -601,9 +676,11 @@ public function reviewAssessment($studentId, $assessmentId)
         return redirect()->back()->with('error', 'Teacher profile not found');
     }
     
-    $teacherSections = DB::table('teacher_sections')
-        ->where('teacher_id', $teacherProfile->id)
-        ->pluck('section')
+    $teacherSections = DB::table('sections')
+        ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+        ->where('teacher_sections.teacher_id', $teacherProfile->id)
+        ->where('sections.is_active', true)
+        ->pluck('sections.name')
         ->toArray();
     
     if (!in_array($studentProfile->section, $teacherSections)) {

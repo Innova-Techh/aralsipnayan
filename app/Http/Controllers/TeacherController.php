@@ -29,7 +29,6 @@ class TeacherController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'grade_level_focus' => ['required', 'string'],
             'sections' => ['nullable', 'array'],
         ]);
 
@@ -54,7 +53,6 @@ class TeacherController extends Controller
                 'user_id' => $user->id,
                 'firstname' => $firstname,
                 'lastname' => $lastname,
-                'grade_level_focus' => $validated['grade_level_focus'],
                 'school_name' => 'AralSip School', // Default school name
             ]);
 
@@ -63,8 +61,8 @@ class TeacherController extends Controller
                 foreach ($validated['sections'] as $section) {
                     DB::table('teacher_sections')->insert([
                         'teacher_id' => $teacherProfile->id,
-                        'section' => 'Section ' . $section,
-                        'grade_level' => $validated['grade_level_focus'],
+                        'section' => $section,
+                        'grade_level' => '6',
                         'school_year' => date('Y') . '-' . (date('Y') + 1),
                         'created_at' => now(),
                         'updated_at' => now()
@@ -110,7 +108,6 @@ class TeacherController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'grade_level_focus' => ['required', 'string'],
             'sections' => ['nullable', 'array'],
             'status' => ['required', 'in:active,archived'],
         ]);
@@ -137,7 +134,6 @@ class TeacherController extends Controller
                 [
                     'firstname' => $firstname,
                     'lastname' => $lastname,
-                    'grade_level_focus' => $validated['grade_level_focus'],
                 ]
             );
 
@@ -154,8 +150,8 @@ class TeacherController extends Controller
                 foreach ($validated['sections'] as $section) {
                     DB::table('teacher_sections')->insert([
                         'teacher_id' => $teacherProfile->id,
-                        'section' => 'Section ' . $section,
-                        'grade_level' => $validated['grade_level_focus'],
+                        'section' => $section,
+                        'grade_level' => '6',
                         'school_year' => date('Y') . '-' . (date('Y') + 1),
                         'created_at' => now(),
                         'updated_at' => now()
