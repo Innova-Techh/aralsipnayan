@@ -67,26 +67,12 @@
                 </div>
             </div>
 
-            <!-- Average Performance -->
-            <div class="bg-white rounded-lg border border-gray-200 p-5">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 mb-1">Avg Performance</p>
-                        <h3 class="text-2xl font-bold text-gray-900">85%</h3>
-                        <p class="text-xs text-gray-500 mt-1">Section average</p>
-                    </div>
-                    <div class="bg-purple-50 rounded-lg p-3">
-                        <i class="fas fa-chart-line text-purple-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-
             <!-- Assigned Teacher -->
             <div class="bg-white rounded-lg border border-gray-200 p-5">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Teacher</p>
-                        <h3 class="text-base font-bold text-gray-900">Not Assigned</h3>
+                        <h3 class="text-base font-bold text-gray-900">{{ $section->teacher }}</h3>
                         <p class="text-xs text-gray-500 mt-1">Section adviser</p>
                     </div>
                     <div class="bg-orange-50 rounded-lg p-3">
@@ -120,7 +106,7 @@
                             <option value="all">All Status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
-                            <option value="archived">Archived</option>
+                            <option value="archive">Archived</option>
                         </select>
                     </div>
                 </div>
@@ -148,10 +134,6 @@
                                 </th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Performance
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Enrolled Date
                                 </th>
                                 <th scope="col"
@@ -162,62 +144,36 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="studentTableBody">
                             @forelse($students as $student)
-                                <tr class="hover:bg-gray-50 transition">
+                                <tr class="hover:bg-gray-50 transition student-row">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">
+                                        <div class="text-sm font-medium text-gray-900 student-id">
                                             {{ $student->studentProfile->student_id ?? 'N/A' }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                @if($student->studentProfile && $student->studentProfile->avatar_url)
-                                                    <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ asset('storage/' . $student->studentProfile->avatar_url) }}"
-                                                        alt="{{ $student->studentProfile->firstname }}">
-                                                @else
-                                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                        <span class="text-blue-600 font-medium text-sm">
-                                                            {{ $student->studentProfile ? strtoupper(substr($student->studentProfile->firstname, 0, 1) . substr($student->studentProfile->lastname, 0, 1)) : strtoupper(substr($student->username, 0, 2)) }}
-                                                        </span>
-                                                    </div>
-                                                @endif
-                                            </div>
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
+                                                <div class="text-sm font-medium text-gray-900 student-name">
                                                     {{ $student->studentProfile ? $student->studentProfile->firstname . ' ' . $student->studentProfile->lastname : $student->username }}
-                                                </div>
-                                                <div class="text-xs text-gray-500">
-                                                    Grade {{ $student->studentProfile->grade_level ?? 'N/A' }}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $student->email }}</div>
+                                        <div class="text-sm text-gray-900 student-email">{{ $student->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @php
-                                            $statusColors = [
-                                                'active' => 'bg-green-100 text-green-800',
-                                                'inactive' => 'bg-yellow-100 text-yellow-800',
-                                                'archived' => 'bg-gray-100 text-gray-800',
-                                            ];
-                                            $statusColor = $statusColors[$student->status] ?? 'bg-gray-100 text-gray-800';
-                                        @endphp
+                        @php
+                            $statusColors = [
+                                'active' => 'bg-green-100 text-green-800',
+                                'inactive' => 'bg-yellow-100 text-yellow-800',
+                                'archive' => 'bg-gray-100 text-gray-800',
+                            ];
+                            $statusColor = $statusColors[$student->status] ?? 'bg-gray-100 text-gray-800';
+                        @endphp
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
                                             {{ ucfirst($student->status) }}
                                         </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-1">
-                                                <div class="text-sm font-medium text-gray-900">85%</div>
-                                                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                                                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 85%"></div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $student->created_at->format('M d, Y') }}
@@ -228,13 +184,9 @@
                                                 class="text-blue-600 hover:text-blue-900 transition" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button onclick="openArchiveStudentModal({{ $student->id }}, '{{ $student->studentProfile ? $student->studentProfile->firstname . ' ' . $student->studentProfile->lastname : $student->username }}')"
-                                                class="text-yellow-600 hover:text-yellow-900 transition" title="Archive">
-                                                <i class="fas fa-archive"></i>
-                                            </button>
-                                            <button onclick="viewStudentDetails({{ $student->id }})"
-                                                class="text-gray-600 hover:text-gray-900 transition" title="View Details">
-                                                <i class="fas fa-eye"></i>
+                                            <button onclick="openArchiveStudentModal({{ $student->id }}, '{{ $student->studentProfile ? $student->studentProfile->firstname . ' ' . $student->studentProfile->lastname : $student->username }}', '{{ $student->status }}')"
+                                                class="text-yellow-600 hover:text-yellow-900 transition" title="{{ $student->status === 'active' ? 'Archive' : 'Activate' }}">
+                                                <i class="fas fa-{{ $student->status === 'active' ? 'archive' : 'check' }}"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -296,9 +248,52 @@
             document.body.style.overflow = 'auto';
         }
 
-        function openArchiveStudentModal(studentId, studentName) {
+        function openArchiveStudentModal(studentId, studentName, currentStatus) {
             document.getElementById('archiveStudentId').value = studentId;
+            document.getElementById('archiveStudentCurrentStatus').value = currentStatus;
             document.getElementById('archiveStudentName').textContent = studentName;
+            
+            // Update modal content based on current status
+            const isActive = currentStatus === 'active';
+            const title = document.getElementById('archiveStudentTitle');
+            const message = document.getElementById('archiveStudentMessage');
+            const button = document.getElementById('archiveStudentButton');
+            const icon = document.getElementById('archiveStudentIcon');
+            const info = document.getElementById('archiveStudentInfo');
+            const actions = document.getElementById('archiveStudentActions');
+            
+            if (isActive) {
+                // Archive mode
+                title.textContent = 'Inactivate Student';
+                message.innerHTML = `Are you sure you want to Inactivate <span class="font-semibold text-gray-900">${studentName}</span>?`;
+                button.innerHTML = '<i class="fas fa-archive mr-2"></i> Inactivate Student';
+                button.className = 'px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm font-medium hover:bg-yellow-700 transition';
+                icon.className = 'bg-yellow-100 rounded-full p-2';
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>';
+                info.className = 'bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4';
+                actions.innerHTML = `
+                    <li>Set the student status to "Inactive"</li>
+                    <li>Remove them from active class lists</li>
+                    <li>Preserve all their data and records</li>
+                    <li>Can be reversed by reactivating the student</li>
+                `;
+            } else {
+                // Activate mode
+                title.textContent = 'Activate Student';
+                message.innerHTML = `Are you sure you want to activate <span class="font-semibold text-gray-900">${studentName}</span>?`;
+                button.innerHTML = '<i class="fas fa-check mr-2"></i> Activate Student';
+                button.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition';
+                icon.className = 'bg-green-100 rounded-full p-2';
+                icon.innerHTML = '<i class="fas fa-check-circle text-green-600 text-xl"></i>';
+                info.className = 'bg-green-50 border border-green-200 rounded-lg p-4 mb-4';
+                actions.innerHTML = `
+                    <li>Set the student status to "Active"</li>
+                    <li>Add them back to active class lists</li>
+                    <li>Restore full access to the system</li>
+                    <li>Can be Inactivated again if needed</li>
+                `;
+            }
+            
             document.getElementById('archiveStudentModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
@@ -306,6 +301,73 @@
         function closeArchiveStudentModal() {
             document.getElementById('archiveStudentModal').classList.add('hidden');
             document.body.style.overflow = 'auto';
+        }
+
+        // Search functionality
+           document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.student-row');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.student-name')?.textContent.toLowerCase() || '';
+                const username = row.querySelector('.student-id')?.textContent.toLowerCase() || '';
+                const email = row.querySelector('.student-email')?.textContent.toLowerCase() || '';
+
+                if (name.includes(searchTerm) || username.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Archive Student Form Submit
+        document.getElementById('archiveStudentForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('archiveStudentId').value;
+            
+            fetch(`/admin/management/students/${studentId}/archive`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    closeArchiveStudentModal();
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+        });
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         // Close modals when clicking outside

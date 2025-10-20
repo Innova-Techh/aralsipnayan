@@ -26,8 +26,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Total Sections</p>
-                        <h3 class="text-2xl font-bold text-gray-900">18</h3>
-                        <p class="text-xs text-gray-500 mt-1">Across all grade levels</p>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ $totalSections }}</h3>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-3">
                         <i class="fas fa-book text-blue-600 text-xl"></i>
@@ -40,8 +39,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Total Students</p>
-                        <h3 class="text-2xl font-bold text-gray-900">1,950</h3>
-                        <p class="text-xs text-gray-500 mt-1">Average 30 per section</p>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ number_format($totalStudents) }}
+                        <span class="text-xs text-gray-500 mt-1 pl-2">Average: {{ $totalSections > 0 ? round($totalStudents / $totalSections) : 0 }} per section </span></h3>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-3">
                         <i class="fas fa-users text-blue-600 text-xl"></i>
@@ -54,8 +53,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Active Sections</p>
-                        <h3 class="text-2xl font-bold text-gray-900">18</h3>
-                        <p class="text-xs text-gray-500 mt-1">100% active</p>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ $activeSections }}</h3>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-3">
                         <i class="fas fa-check-circle text-blue-600 text-xl"></i>
@@ -68,8 +66,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Assigned Teachers</p>
-                        <h3 class="text-2xl font-bold text-gray-900">18</h3>
-                        <p class="text-xs text-gray-500 mt-1">One per section</p>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ $assignedTeachers }}</h3>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-3">
                         <i class="fas fa-chalkboard-teacher text-blue-600 text-xl"></i>
@@ -91,31 +88,22 @@
                     <div class="flex-1">
                         <div class="relative">
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" placeholder="Search sections..."
+                            <input type="text" id="searchInput" placeholder="Search sections..."
                                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
-                    </div>
-                    <div class="w-full sm:w-48">
-                        <select
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option selected>Grade Level</option>
-                            <option value="7">Grade 7</option>
-                            <option value="8">Grade 8</option>
-                            <option value="9">Grade 9</option>
-                        </select>
                     </div>
                 </div>
 
                 <!-- Sections Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Grade 7 - Section A -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                    @forelse($sectionsWithTeachers as $index => $section)
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition section-row">
                         <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 7 - Section A</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 1</p>
+                            <div class = "section-name">
+                                <h3 class="font-semibold text-gray-900 text-sm">{{ $section['section'] }}</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">Grade {{ $section['grade_level'] }}</p>
                             </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
+                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">{{ $section['status'] }}</span>
                         </div>
 
                         <div class="space-y-3 mb-4">
@@ -125,7 +113,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">32 enrolled</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ $section['student_count'] }} enrolled</p>
                                 </div>
                             </div>
 
@@ -135,242 +123,36 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Ms. Maria Santos</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ $section['teacher'] }}</p>
                                 </div>
                             </div>
                         </div>
 
+
                         <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 7 - Section A') }}"
+                            <a href="{{ route('admin.management.sections.students', $section['section']) }}"
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
                             </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
+                            <button onclick="archiveSection('{{ $section['section'] }}')"
+                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-red-50 transition">
                                 <i class="fas fa-archive text-xs"></i> Archive
+                            </button>
+                            <button onclick="deleteSection('{{ $section['section'] }}')"
+                                class="flex items-center justify-center gap-2 px-3 py-2 border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
+                                <i class="fas fa-trash text-xs"></i> Delete
                             </button>
                         </div>
                     </div>
-
-                    <!-- Grade 7 - Section B -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 7 - Section B</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 2</p>
-                            </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
+                    @empty
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-book text-4xl"></i>
                         </div>
-
-                        <div class="space-y-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-users text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">28 enrolled</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-user text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Mr. John Cruz</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 7 - Section B') }}"
-                                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                                <i class="fas fa-eye text-xs"></i> View
-                            </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No sections found</h3>
+                        <p class="text-gray-500">Start by adding your first section.</p>
                     </div>
-
-                    <!-- Grade 8 - Section A -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 8 - Section A</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 3</p>
-                            </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
-                        </div>
-
-                        <div class="space-y-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-users text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">30 enrolled</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-user text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Ms. Ana Reyes</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 8 - Section A') }}"
-                                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                                <i class="fas fa-eye text-xs"></i> View
-                            </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Grade 8 - Section B -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 8 - Section B</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 4</p>
-                            </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
-                        </div>
-
-                        <div class="space-y-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-users text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">29 enrolled</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-user text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Mr. Carlos Lopez</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 8 - Section B') }}"
-                                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                                <i class="fas fa-eye text-xs"></i> View
-                            </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Grade 9 - Section A -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 9 - Section A</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 5</p>
-                            </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
-                        </div>
-
-                        <div class="space-y-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-users text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">27 enrolled</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-user text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Ms. Linda Garcia</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 9 - Section A') }}"
-                                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                                <i class="fas fa-eye text-xs"></i> View
-                            </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Grade 9 - Section B -->
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Grade 9 - Section B</h3>
-                                <p class="text-xs text-gray-500 mt-0.5">ID: 6</p>
-                            </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">Active</span>
-                        </div>
-
-                        <div class="space-y-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-users text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Students</p>
-                                    <p class="text-sm font-medium text-gray-900">25 enrolled</p>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-50 rounded p-2">
-                                    <i class="fas fa-user text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500">Teacher</p>
-                                    <p class="text-sm font-medium text-gray-900">Mr. Robert Santos</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <a href="{{ route('admin.management.sections.students', 'Grade 9 - Section B') }}"
-                                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                                <i class="fas fa-eye text-xs"></i> View
-                            </a>
-                            <button
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -382,6 +164,22 @@
 
 @push('scripts')
     <script>
+         document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.section-row');
+
+            rows.forEach(row => {
+                const name = row.querySelector('.section-name')?.textContent.toLowerCase() || '';
+
+                if (name.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+
         function openAddSectionModal() {
             document.getElementById('addSectionModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -416,8 +214,6 @@
         function validateSectionForm() {
             let isValid = true;
             const sectionName = document.getElementById('section_name');
-            const gradeLevel = document.getElementById('grade_level');
-            const enrolledStudents = document.getElementById('enrolled_students');
             const assignedTeacher = document.getElementById('assigned_teacher');
 
             // Clear previous errors
@@ -431,23 +227,8 @@
             if (!sectionName.value.trim()) {
                 showError('section_name', 'Section name is required');
                 isValid = false;
-            }
-
-            // Validate grade level
-            if (!gradeLevel.value) {
-                showError('grade_level', 'Grade level is required');
-                isValid = false;
-            }
-
-            // Validate enrolled students
-            if (!enrolledStudents.value) {
-                showError('enrolled_students', 'Number of enrolled students is required');
-                isValid = false;
-            } else if (enrolledStudents.value < 0) {
-                showError('enrolled_students', 'Number of students cannot be negative');
-                isValid = false;
-            } else if (enrolledStudents.value > 100) {
-                showError('enrolled_students', 'Number of students cannot exceed 100');
+            } else if (sectionName.value.trim().length > 50) {
+                showError('section_name', 'Section name cannot exceed 50 characters');
                 isValid = false;
             }
 
@@ -471,6 +252,70 @@
 
             if (errorElement) {
                 errorElement.textContent = message;
+            }
+        }
+
+        // Form submission handler for add section
+        document.addEventListener('DOMContentLoaded', function() {
+            const addSectionForm = document.getElementById('addSectionForm');
+            if (addSectionForm) {
+                addSectionForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (!validateSectionForm()) {
+                        return;
+                    }
+                    
+                    const formData = new FormData(this);
+                    
+                    fetch('{{ route("admin.management.sections.store") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            closeAddSectionModal();
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while creating the section.');
+                    });
+                });
+            }
+        });
+
+        // Archive section function
+        function archiveSection(sectionName) {
+            if (confirm(`Are you sure you want to archive the section "${sectionName}"?`)) {
+                fetch(`/admin/management/sections/${encodeURIComponent(sectionName)}/archive`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while archiving the section.');
+                });
             }
         }
     </script>
