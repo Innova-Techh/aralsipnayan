@@ -64,13 +64,12 @@ class TeacherSeeder extends Seeder
                 continue;
             }
 
-            // Get section name from index
-            $sectionIndex = $teacherInfo['section_index'];
-            if (!isset($sections[$sectionIndex])) {
-                $this->command->warn("Section index {$sectionIndex} not found. Skipping teacher {$teacherInfo['username']}.");
+            // Get section name
+            $section = $teacherInfo['section'];
+            if (!in_array($section, $sections)) {
+                $this->command->warn("Section {$section} not found in sections table. Skipping teacher {$teacherInfo['username']}.");
                 continue;
             }
-            $section = $sections[$sectionIndex];
 
             // Create user account
             $user = User::create([
