@@ -32,38 +32,6 @@
                 <h1 class="text-3xl font-bold text-gray-900">{{ $section['name'] ?? 'Section Name' }}</h1>
                 <p class="text-gray-600 mt-1">Basic Mathematics and Arithmetic</p>
             </div>
-
-            <!-- Section Info Grid -->
-            <div class="grid grid-cols-4 gap-6 bg-gray-50 rounded-lg p-6">
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">person</span>
-                        <span>Teacher</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $teacher ?? 'Ms. Johnson' }}</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">schedule</span>
-                        <span>Schedule</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">MWF 9:00-10:00 AM</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">door_front</span>
-                        <span>Room</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $room ?? 'Room 201' }}</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">tag</span>
-                        <span>Section ID</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $sectionId ?? 'MATH101-A' }}</p>
-                </div>
-            </div>
         </div>
 
         <div class="px-8 py-6">
@@ -127,9 +95,9 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Rank</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Student</th>
+                                    LRN</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Overall Score</th>
+                                    Student</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Progress</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -160,29 +128,25 @@
                                                 <span class="material-symbols-outlined text-orange-600 text-2xl">emoji_events</span>
                                             </div>
                                         @else
-                                            <div class="text-center text-sm font-semibold text-gray-600">#{{ $index + 1 }}</div>
+                                            <div class="flex items-center justify-center w-8 h-8 font-semibold text-gray-600">#{{ $index + 1 }}</div>
                                         @endif
+                                    </td>
+
+                                     <!-- Student LRN -->
+                                     <td class="px-4 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div>
+                                                <div class="font-semibold text-gray-900">{{ $student['student_id'] }}</div>
+                                            </div>
+                                        </div>
                                     </td>
 
                                     <!-- Student Info -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                <span class="material-symbols-outlined text-gray-500">person</span>
-                                            </div>
                                             <div>
                                                 <div class="font-semibold text-gray-900">{{ $student['name'] }}</div>
                                                 <div class="text-sm text-gray-500">{{ $student['email'] }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Overall Score (with assessment count from josh-branch) -->
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                {{ $student['completed'] }}/{{ $student['total'] }} assessments
                                             </div>
                                         </div>
                                     </td>
@@ -229,12 +193,6 @@
                                     <!-- Actions (Combined: inline button + dropdown from josh-branch) -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <!-- Send Message Button (from josh-branch) -->
-                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors group relative"
-                                                onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')"
-                                                title="Send Message">
-                                                <span class="material-symbols-outlined text-gray-600 group-hover:text-orange-600">mail</span>
-                                            </button>
 
                                             <!-- More Actions Dropdown (from josh-branch with main-branch actions) -->
                                             <div class="relative" x-data="{ open: false }">
@@ -263,21 +221,13 @@
                                                         Edit Details
                                                     </button>
 
-                                                    <!-- Assign Assessment (from josh-branch) -->
+                                                    <!-- Assign Assessment (from josh-branch) 
                                                     <button
                                                         class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                                         onclick="assignAssessment('{{ $student['id'] }}', '{{ $student['name'] }}')">
                                                         <span class="material-symbols-outlined text-green-600 text-sm">assignment</span>
                                                         Assign Assessment
-                                                    </button>
-
-                                                    <!-- Send Message (from josh-branch) -->
-                                                    <button
-                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                                        onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')">
-                                                        <span class="material-symbols-outlined text-orange-600 text-sm">mail</span>
-                                                        Send Message
-                                                    </button>
+                                                    </button> -->
 
                                                     <!-- Divider -->
                                                     <div class="border-t border-gray-200 my-1"></div>
@@ -376,22 +326,6 @@
                         <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email (Should be Unique)</label>
                         <input type="email" id="studentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="mb-4">
-                        <label for="studentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
-                        <input type="text" id="studentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Grade 6 (Fixed)
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Student ID (LRN)</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Auto-generated 6-digit number
-                        </div>
-                    </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeAddStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
                             Cancel
@@ -436,15 +370,22 @@
                         <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <input type="email" id="editStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="mb-4">
-                        <label for="editStudentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
-                        <input type="text" id="editStudentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
+                    <div>
+                        <label for="edit_gender" class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="edit_gender" name="gender"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <p id="edit_gender_error" class="error-message text-red-500 text-xs mt-1"></p>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Grade 6 (Fixed)
-                        </div>
+                        <label for="editStudentPassword" class="block text-sm font-medium text-gray-700 mb-2">Password (Leave blank to keep current)</label>
+                        <input type="email" id="editStudentPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeEditStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -677,17 +618,12 @@
             window.location.href = "{{ route('teacher.students.profile', ['student' => '__STUDENT_ID__']) }}".replace('__STUDENT_ID__', studentId);
         }
 
-        window.assignAssessment = function(studentId, studentName) {
-            console.log('Assign assessment to:', studentName, studentId);
+       // window.assignAssessment = function(studentId, studentName) {
+           // console.log('Assign assessment to:', studentName, studentId);
             // Implement assign assessment logic
-            alert(`Assign assessment to ${studentName}`);
-        }
+           // alert(`Assign assessment to ${studentName}`);
+       // }
 
-        window.sendMessage = function(studentId, studentName) {
-            console.log('Send message to:', studentName, studentId);
-            // Implement send message logic
-            alert(`Send message to ${studentName}`);
-        }
 
         window.removeFromSection = function(studentId, studentName) {
             console.log('Remove from section:', studentName, studentId);

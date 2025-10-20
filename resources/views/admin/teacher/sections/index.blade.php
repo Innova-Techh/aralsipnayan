@@ -75,18 +75,6 @@
                         active students</p>
                 </div>
 
-                <!-- Average Score -->
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-medium text-gray-600">Average Score</span>
-                        <span class="material-symbols-outlined text-gray-400">target</span>
-                    </div>
-                    @php
-                        $avgPerf = count($sectionsData) > 0 ? round(array_sum(array_column($sectionsData, 'average_performance')) / count($sectionsData)) : 0;
-                    @endphp
-                    <div class="text-3xl font-bold text-gray-900">{{ $avgPerf }}%</div>
-                    <p class="text-xs text-gray-500 mt-1">Across all sections</p>
-                </div>
 
                 <!-- Active Assessments -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -110,18 +98,6 @@
                         <input type="text" id="searchSections" placeholder="Search sections..."
                             class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
-                    <select
-                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                        <option>Subject</option>
-                        <option>Mathematics</option>
-                        <option>Science</option>
-                    </select>
-                    <select
-                        class="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                        <option>Status</option>
-                        <option>Active</option>
-                        <option>Inactive</option>
-                    </select>
                 </div>
             </div>
 
@@ -161,20 +137,6 @@
 
                             <!-- Section Details -->
                             <div class="space-y-3 mb-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-gray-400 text-sm">person</span>
-                                        <span class="text-sm text-gray-600">Teacher</span>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-900">Ms. Teacher</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-gray-400 text-sm">door_front</span>
-                                        <span class="text-sm text-gray-600">Room</span>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-900">Room {{ 200 + $index }}</span>
-                                </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-gray-400 text-sm">group</span>
@@ -264,13 +226,6 @@
                                 Grade 6 (Fixed)
                             </div>
                         </div>
-                        <div class="mb-6">
-                            <label for="schoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year
-                                (Optional)</label>
-                            <input type="text" id="schoolYear" name="school_year"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="e.g., 2024-2025">
-                        </div>
                         <div class="flex justify-end space-x-3">
                             <button type="button" onclick="closeCreateSectionModal()"
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -285,7 +240,30 @@
                 </div>
             </div>
         </div>
-
+          <!-- Delete Confirmation Modal -->
+          <div id="deleteSectionModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3 text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                        <span class="material-symbols-outlined text-red-600">warning</span>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Section</h3>
+                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete section "<span
+                            id="deleteSectionName"></span>"? This action cannot be undone.</p>
+                    <div class="flex justify-center space-x-3">
+                        <button onclick="closeDeleteSectionModal()"
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmDeleteSection()"
+                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                            Delete Section
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Edit Section Modal -->
         <div id="editSectionModal"
             class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -314,12 +292,6 @@
                                 Grade 6 (Fixed)
                             </div>
                         </div>
-                        <div class="mb-6">
-                            <label for="editSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year
-                                (Optional)</label>
-                            <input type="text" id="editSchoolYear" name="school_year"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
                         <div class="flex justify-end space-x-3">
                             <button type="button" onclick="closeEditSectionModal()"
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -331,261 +303,6 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delete Confirmation Modal -->
-        <div id="deleteSectionModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3 text-center">
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                        <span class="material-symbols-outlined text-red-600">warning</span>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Section</h3>
-                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete section "<span
-                            id="deleteSectionName"></span>"? This action cannot be undone.</p>
-                    <div class="flex justify-center space-x-3">
-                        <button onclick="closeDeleteSectionModal()"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
-                            Cancel
-                        </button>
-                        <button onclick="confirmDeleteSection()"
-                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-                            Delete Section
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Student Management Modal -->
-        <div id="studentManagementModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-            <div class="relative top-5 mx-auto p-6 border w-11/12 max-w-7xl shadow-lg rounded-md bg-white min-h-[90vh]">
-                <div class="mt-3">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Manage Students - <span
-                                id="currentSectionName"></span></h3>
-                        <button onclick="closeStudentManagementModal()" class="text-gray-400 hover:text-gray-600">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-
-                    <!-- Add Student Button -->
-                    <div class="mb-4">
-                        <button onclick="openAddStudentModal()"
-                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
-                            <span class="material-symbols-outlined mr-2">person_add</span>
-                            Add New Student
-                        </button>
-                    </div>
-
-                    <!-- Students Table -->
-                    <div class="w-full">
-                        <table class="w-full bg-white border border-gray-200 table-fixed">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="w-24 px-3 py-4 text-left text-sm font-semibold text-gray-700 uppercase">LRN
-                                    </th>
-                                    <th class="w-32 px-3 py-4 text-left text-sm font-semibold text-gray-700 uppercase">Name
-                                    </th>
-                                    <th class="w-40 px-3 py-4 text-left text-sm font-semibold text-gray-700 uppercase">Email
-                                    </th>
-                                    <th class="w-16 px-3 py-4 text-center text-sm font-semibold text-gray-700 uppercase">Pts
-                                    </th>
-                                    <th class="w-16 px-3 py-4 text-center text-sm font-semibold text-gray-700 uppercase">
-                                        Streak</th>
-                                    <th class="w-24 px-3 py-4 text-left text-sm font-semibold text-gray-700 uppercase">
-                                        Activity</th>
-                                    <th class="w-28 px-3 py-4 text-center text-sm font-semibold text-gray-700 uppercase">
-                                        Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentsTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- Students will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Empty State for Students -->
-                    <div id="studentsEmptyState" class="text-center py-8 hidden">
-                        <div class="text-gray-500 mb-4">
-                            <span class="material-symbols-outlined text-4xl">group</span>
-                        </div>
-                        <h4 class="text-md font-medium text-gray-900 mb-2">No students in this section</h4>
-                        <p class="text-gray-500 mb-4">Add students to start managing this section</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add Student Modal -->
-        <div id="addStudentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Add New Student</h3>
-                        <button onclick="closeAddStudentModal()" class="text-gray-400 hover:text-gray-600">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <form id="addStudentForm">
-                        @csrf
-                        <input type="hidden" id="studentSection" name="section">
-                        <div class="mb-4">
-                            <label for="studentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First
-                                Name</label>
-                            <input type="text" id="studentFirstName" name="firstname"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="studentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name
-                                (Optional)</label>
-                            <input type="text" id="studentMiddleName" name="middlename"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="mb-4">
-                            <label for="studentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last
-                                Name</label>
-                            <input type="text" id="studentLastName" name="lastname"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email(Should be
-                                Unique)</label>
-                            <input type="email" id="studentEmail" name="email"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="studentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year
-                                (Optional)</label>
-                            <input type="text" id="studentSchoolYear" name="school_year"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="e.g., 2024-2025">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                            <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                                Grade 6 (Fixed)
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Student ID (LRN)</label>
-                            <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                                Auto-generated 6-digit number
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-3">
-                            <button type="button" onclick="closeAddStudentModal()"
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                                Add Student
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Student Modal -->
-        <div id="editStudentModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Edit Student</h3>
-                        <button onclick="closeEditStudentModal()" class="text-gray-400 hover:text-gray-600">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <form id="editStudentForm">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="editStudentId" name="student_id">
-                        <input type="hidden" id="editStudentSection" name="section">
-                        <div class="mb-4">
-                            <label for="editStudentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First
-                                Name</label>
-                            <input type="text" id="editStudentFirstName" name="firstname"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="editStudentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle
-                                Name (Optional)</label>
-                            <input type="text" id="editStudentMiddleName" name="middlename"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="mb-4">
-                            <label for="editStudentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last
-                                Name</label>
-                            <input type="text" id="editStudentLastName" name="lastname"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="editStudentEmail" name="email"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="editStudentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School
-                                Year (Optional)</label>
-                            <input type="text" id="editStudentSchoolYear" name="school_year"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="e.g., 2024-2025">
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                            <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                                Grade 6 (Fixed)
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-3">
-                            <button type="button" onclick="closeEditStudentModal()"
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                Update Student
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delete Student Confirmation Modal -->
-        <div id="deleteStudentModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3 text-center">
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                        <span class="material-symbols-outlined text-red-600">warning</span>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Student</h3>
-                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete "<span
-                            id="deleteStudentName"></span>"? This action cannot be undone.</p>
-                    <div class="flex justify-center space-x-3">
-                        <button onclick="closeDeleteStudentModal()"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
-                            Cancel
-                        </button>
-                        <button onclick="confirmDeleteStudent()"
-                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-                            Delete Student
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -680,6 +397,16 @@
                         if (data.success) {
                             showMessage(data.message, 'success');
                             closeCreateSectionModal();
+                            
+                            // Dispatch custom event for analytics refresh
+                            const event = new CustomEvent('sectionAdded', {
+                                detail: {
+                                    section: data.section,
+                                    message: data.message
+                                }
+                            });
+                            window.dispatchEvent(event);
+                            
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1500);
