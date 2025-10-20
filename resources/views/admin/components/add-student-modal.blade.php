@@ -18,58 +18,26 @@
                         Student ID <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="student_id" name="student_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., 2024-0001">
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <p id="student_id_error" class="error-message text-red-500 text-xs mt-1"></p>
                 </div>
 
-                <!-- Full Name -->
-                <div>
-                    <label for="full_name" class="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" id="full_name" name="full_name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., Juan Dela Cruz">
-                    <p id="full_name_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address <span class="text-red-500">*</span>
-                    </label>
-                    <input type="email" id="email" name="email"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., juan.delacruz@email.com">
-                    <p id="email_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Grade Level -->
-                <div>
-                    <label for="grade_level" class="block text-sm font-medium text-gray-700 mb-2">
-                        Grade Level <span class="text-red-500">*</span>
-                    </label>
-                    <select id="grade_level" name="grade_level"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select Grade Level</option>
-                        <option value="7">Grade 7</option>
-                        <option value="8">Grade 8</option>
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                    </select>
-                    <p id="grade_level_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Date of Birth -->
-                <div>
-                    <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">
-                        Date of Birth <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" id="date_of_birth" name="date_of_birth"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <p id="date_of_birth_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
+                    <div class="mb-4">
+                        <label for="editStudentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" id="editStudentFirstName" name="firstname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name (Optional)</label>
+                        <input type="text" id="editStudentMiddleName" name="middlename" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" id="editStudentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="editStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
 
                 <!-- Gender -->
                 <div>
@@ -85,65 +53,7 @@
                     </select>
                     <p id="gender_error" class="error-message text-red-500 text-xs mt-1"></p>
                 </div>
-
-                <!-- Contact Number -->
-                <div>
-                    <label for="contact_number" class="block text-sm font-medium text-gray-700 mb-2">
-                        Contact Number
-                    </label>
-                    <input type="tel" id="contact_number" name="contact_number"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., 09123456789">
-                    <p id="contact_number_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Guardian Name -->
-                <div>
-                    <label for="guardian_name" class="block text-sm font-medium text-gray-700 mb-2">
-                        Guardian Name
-                    </label>
-                    <input type="text" id="guardian_name" name="guardian_name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., Maria Dela Cruz">
-                    <p id="guardian_name_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Guardian Contact -->
-                <div>
-                    <label for="guardian_contact" class="block text-sm font-medium text-gray-700 mb-2">
-                        Guardian Contact
-                    </label>
-                    <input type="tel" id="guardian_contact" name="guardian_contact"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="e.g., 09123456789">
-                    <p id="guardian_contact_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
-                <!-- Status -->
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-                        Status <span class="text-red-500">*</span>
-                    </label>
-                    <select id="status" name="status"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="active" selected>Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <p id="status_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
             </div>
-
-            <!-- Address -->
-            <div class="mt-6">
-                <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-                    Address
-                </label>
-                <textarea id="address" name="address" rows="3"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Complete address"></textarea>
-                <p id="address_error" class="error-message text-red-500 text-xs mt-1"></p>
-            </div>
-
             <!-- Modal Footer -->
             <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                 <button type="button" onclick="closeAddStudentModal()"

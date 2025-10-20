@@ -14,8 +14,7 @@
         </div>
 
         <!-- Modal Body -->
-        <form id="addSectionForm" action="{{ route('admin.management.sections.store') }}" method="POST"
-            onsubmit="return validateSectionForm()">
+        <form id="addSectionForm" action="{{ route('admin.management.sections.store') }}" method="POST">
             @csrf
 
             <!-- Section Name -->
@@ -29,55 +28,15 @@
                 <p id="section_name_error" class="error-message text-red-500 text-xs mt-1"></p>
             </div>
 
-            <!-- Grade Level -->
-            <div class="mb-4">
-                <label for="grade_level" class="block text-sm font-medium text-gray-700 mb-2">
-                    Grade Level <span class="text-red-500">*</span>
-                </label>
-                <select id="grade_level" name="grade_level"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                    <option value="">Select grade level</option>
-                    <option value="Grade 1">Grade 1</option>
-                    <option value="Grade 2">Grade 2</option>
-                    <option value="Grade 3">Grade 3</option>
-                    <option value="Grade 4">Grade 4</option>
-                    <option value="Grade 5">Grade 5</option>
-                    <option value="Grade 6">Grade 6</option>
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                </select>
-                <p id="grade_level_error" class="error-message text-red-500 text-xs mt-1"></p>
-            </div>
-
-            <!-- Enrolled Students -->
-            <div class="mb-4">
-                <label for="enrolled_students" class="block text-sm font-medium text-gray-700 mb-2">
-                    Number of Enrolled Students <span class="text-red-500">*</span>
-                </label>
-                <input type="number" id="enrolled_students" name="enrolled_students" min="0" max="100"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    placeholder="Enter number of students">
-                <p id="enrolled_students_error" class="error-message text-red-500 text-xs mt-1"></p>
-            </div>
-
             <!-- Assigned Teacher -->
             <div class="mb-6">
                 <label for="assigned_teacher" class="block text-sm font-medium text-gray-700 mb-2">
-                    Assigned Teacher <span class="text-red-500">*</span>
+                    Assign Teacher <span class="text-red-500">*</span>
                 </label>
                 <select id="assigned_teacher" name="assigned_teacher"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <option value="">Select teacher</option>
-                    <option value="1">Ms. Maria Santos</option>
-                    <option value="2">Mr. John Cruz</option>
-                    <option value="3">Ms. Ana Reyes</option>
-                    <option value="4">Mr. Carlos Lopez</option>
-                    <option value="5">Ms. Linda Garcia</option>
-                    <option value="6">Mr. Robert Santos</option>
-                    <option value="7">Ms. Jennifer Dela Cruz</option>
-                    <option value="8">Mr. Michael Tan</option>
+                    <!-- Teachers will be loaded dynamically via JavaScript -->
                 </select>
                 <p id="assigned_teacher_error" class="error-message text-red-500 text-xs mt-1"></p>
             </div>
@@ -97,3 +56,50 @@
         </form>
     </div>
 </div>
+
+<script>
+// Load available teachers when modal opens
+function loadAvailableTeachers() {
+    fetch('{{ route("admin.management.sections.teachers") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('assigned_teacher');
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Select teacher</option>';
+                
+                // Add teachers to select
+                data.teachers.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.textContent = `${teacher.firstname} ${teacher.lastname}`;
+                    select.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading teachers:', error);
+        });
+}
+
+// Load teachers when modal is opened
+document.addEventListener('DOMContentLoaded', function() {
+    // Load teachers when the modal is shown
+    const modal = document.getElementById('addSectionModal');
+    if (modal) {
+        // Use MutationObserver to detect when modal becomes visible
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const target = mutation.target;
+                    if (!target.classList.contains('hidden')) {
+                        loadAvailableTeachers();
+                    }
+                }
+            });
+        });
+        
+        observer.observe(modal, { attributes: true });
+    }
+});
+</script>
