@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Student\OnboardingController;
 use App\Http\Controllers\Student\AssessmentController;
 use App\Http\Controllers\Student\QuizController as StudentQuizController;
 use App\Http\Controllers\Student\RegularAssessmentController;
+use App\Http\Controllers\TeacherSectionController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\LevelUpController;
@@ -186,28 +188,16 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
 // Teacher Routes - Using Admin Auth System
 Route::middleware(['admin.auth'])->prefix('teacher')->name('teacher.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', function () {
-        // Check if user is authenticated and has Teacher role
-        if (!Auth::guard('admin')->check()) {
-            return redirect()->route('login');
-        }
-        
-        if (Auth::guard('admin')->user()->role !== 'Teacher') {
-            Auth::guard('admin')->logout();
-            return redirect()->route('login')->withErrors(['access' => 'Teacher access required.']);
-        }
-        
-        return view('admin.teacher.index');
-    })->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\Teacher\TeacherDashboardController::class, 'index'])->name('dashboard');
     
     
     // Student Profile Route
-Route::get('/students/{student}/profile', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'showStudentProfile'])
+Route::get('/students/{student}/profile', [App\Http\Controllers\Teacher\TeacherReviewStudentController::class, 'showProfile'])
     ->name('students.profile');
 
 
     // Assessment Review Route
-Route::get('/assessments/review/{student}/{assessment}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'reviewAssessment'])
+Route::get('/assessments/review/{student}/{assessment}', [App\Http\Controllers\Teacher\TeacherReviewAssessmentController::class, 'reviewAssessment'])
     ->name('assessments.review');
 
 // Section Management
@@ -239,7 +229,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
     Route::post('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'store'])->name('sections.store');
     Route::put('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'update'])->name('sections.update');
-    Route::delete('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'destroy'])->name('sections.destroy');
+    Route::post('/sections/{section}/deactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'deactivate'])->name('teacher.sections.deactivate');
     // Student Overview Page (for assessment management)
     Route::get('/students', function () {
         if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
@@ -254,7 +244,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::delete('/sections/students/{student}', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'destroy'])->name('sections.students.destroy');
     Route::post('/sections/students/{student}/deactivate', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'deactivate'])->name('sections.students.deactivate');
     Route::post('/sections/students/{student}/activate', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'activate'])->name('sections.students.activate');
-    
+    //Remove Student From Section
+    Route::post('/sections/{studentId}/remove', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'removeFromSection'])->name('teacher.sections.students.remove');
+
     // Analytics
     Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/analytics/assessment/{assessmentId}', [App\Http\Controllers\Teacher\AnalyticsController::class, 'showAssessmentDetails'])->name('analytics.assessment.details');
@@ -283,70 +275,100 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 
-// Admin Management Routes
-Route::prefix('admin')->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.')->group(function () {
-    
-    // Admin Profile Routes - OUTSIDE management prefix
-    Route::get('/profile', [App\Http\Controllers\AdminController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [App\Http\Controllers\AdminController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [App\Http\Controllers\AdminController::class, 'updatePassword'])->name('profile.update-password');
-    Route::delete('/profile', [App\Http\Controllers\AdminController::class, 'destroy'])->name('profile.delete');
-    
-    Route::prefix('management')->name('management.')->group(function () {
-        
-        // Teacher Management
-        Route::get('/teachers', [App\Http\Controllers\Admin\AdminTeacherController::class, 'index'])->name('teachers');
-        Route::get('/teachers/sections', [App\Http\Controllers\Admin\AdminTeacherController::class, 'getSections'])->name('teachers.sections');
-        Route::get('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'show'])->name('teachers.show');
-        Route::post('/teachers', [App\Http\Controllers\Admin\AdminTeacherController::class, 'store'])->name('teachers.store');
-        Route::put('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'update'])->name('teachers.update');
-        Route::post('/teachers/{id}/archive', [App\Http\Controllers\Admin\AdminTeacherController::class, 'toggleStatus'])->name('teachers.archive');
-        Route::delete('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
-        
-        // Admin Management
-        Route::get('/admins', [App\Http\Controllers\AdminController::class, 'index'])->name('admins');
-        Route::post('/admins', [App\Http\Controllers\AdminController::class, 'store'])->name('admins.store');
-        Route::get('/admins/{user}/edit', [App\Http\Controllers\AdminController::class, 'edit'])->name('admins.edit');
-        Route::put('/admins/{user}', [App\Http\Controllers\AdminController::class, 'update'])->name('admins.update');
-        Route::delete('/admins/{user}', [App\Http\Controllers\AdminController::class, 'destroy'])->name('admins.destroy');
-        
-        // Student Management
-        Route::get('/students', function () {
-            return view('admin.admin.management.student-management');
-        })->name('students');
+Route::prefix('admin')
+    ->middleware(['admin.auth', 'admin.role:Admin'])
+    ->name('admin.')
+    ->group(function () {
 
-        // Student Management Routes for Sections
-    Route::get('/sections/{section}/students', [App\Http\Controllers\admin\StudentManagementController::class, 'index'])
-        ->name('sections.students');
-    Route::post('/sections/{section}/students', [App\Http\Controllers\admin\StudentManagementController::class, 'store'])
-        ->name('sections.students.store');
-    Route::get('/students/{student}/edit', [App\Http\Controllers\admin\StudentManagementController::class, 'edit'])
-        ->name('students.edit');
-    Route::put('/students/{student}', [App\Http\Controllers\admin\StudentManagementController::class, 'update'])
-        ->name('students.update');
-    Route::post('/students/{student}/archive', [App\Http\Controllers\admin\StudentManagementController::class, 'archive'])
-        ->name('students.archive');
-    Route::delete('/students/{student}', [App\Http\Controllers\admin\StudentManagementController::class, 'destroy'])
-        ->name('students.destroy');
-    Route::post('/students/{student}/restore', [App\Http\Controllers\admin\StudentManagementController::class, 'restore'])
-        ->name('students.restore');
+        /**
+         * ─── ADMIN PROFILE ROUTES ──────────────────────────────────────────────
+         */
+        Route::get('/profile', [App\Http\Controllers\dmin\AdminController::class, 'index'])->name('profile.index');
+        Route::put('/profile', [App\Http\Controllers\AdminController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [App\Http\Controllers\AdminController::class, 'updatePassword'])->name('profile.update-password');
+        Route::delete('/profile', [App\Http\Controllers\AdminController::class, 'destroy'])->name('profile.delete');
 
-        // Section Management
-        Route::get('/sections', [App\Http\Controllers\Admin\AdminSectionController::class, 'index'])->name('sections');
-        Route::get('/sections/admin', [App\Http\Controllers\Admin\AdminSectionController::class, 'getAvailableTeachers'])->name('sections.teachers');
-        Route::post('/sections', [App\Http\Controllers\Admin\AdminSectionController::class, 'store'])->name('sections.store');
-        Route::put('/sections/{section}', [App\Http\Controllers\Admin\AdminSectionController::class, 'update'])->name('sections.update');
-        Route::delete('/sections/{section}', [App\Http\Controllers\Admin\AdminSectionController::class, 'destroy'])->name('sections.destroy');
-        Route::post('/sections/{section}/archive', [App\Http\Controllers\Admin\AdminSectionController::class, 'archive'])->name('sections.archive');
+        /**
+         * ─── MANAGEMENT ROUTES ────────────────────────────────────────────────
+         */
+        Route::prefix('management')->name('management.')->group(function () {
 
-        // Questions Management
-        Route::get('/questions', [App\Http\Controllers\admin\QuestionController::class, 'index'])->name('questions');
-        Route::get('/questions/data', [App\Http\Controllers\admin\QuestionController::class, 'data'])->name('questions.data');
-        Route::post('/questions', [App\Http\Controllers\admin\QuestionController::class, 'store'])->name('questions.store');
-        Route::put('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'update'])->name('questions.update');
-        Route::delete('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'destroy'])->name('questions.destroy');
+            /**
+             * TEACHER MANAGEMENT
+             */
+            Route::get('/teachers', [App\Http\Controllers\Admin\AdminTeacherController::class, 'index'])->name('teachers');
+            Route::get('/teachers/sections', [App\Http\Controllers\Admin\AdminTeacherController::class, 'getSections'])->name('teachers.sections');
+            Route::get('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'show'])->name('teachers.show');
+            Route::post('/teachers', [App\Http\Controllers\Admin\AdminTeacherController::class, 'store'])->name('teachers.store');
+            Route::put('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'update'])->name('teachers.update');
+            Route::post('/teachers/{id}/archive', [App\Http\Controllers\Admin\AdminTeacherController::class, 'toggleStatus'])->name('teachers.archive');
+            Route::delete('/teachers/{id}', [App\Http\Controllers\Admin\AdminTeacherController::class, 'destroy'])->name('teachers.destroy');
+
+            /**
+             * ADMIN MANAGEMENT
+             */
+            Route::get('/admins', [App\Http\Controllers\admin\AdminManagementController::class, 'index'])->name('admins');
+            Route::post('/admins', [App\Http\Controllers\admin\AdminManagementController::class, 'store'])->name('admins.store');
+            Route::get('/admins/{id}/edit', [App\Http\Controllers\admin\AdminManagementController::class, 'edit'])->name('admins.edit');
+            Route::put('/admins/{id}', [App\Http\Controllers\admin\AdminManagementController::class, 'update'])->name('admins.update');
+            Route::put('/admins/{id}/status', [App\Http\Controllers\admin\AdminManagementController::class, 'archive'])->name('admins.archive');
+            Route::delete('/admins/{id}', [App\Http\Controllers\admin\AdminManagementController::class, 'destroy'])->name('admins.destroy');
+
+            /**
+             * STUDENT MANAGEMENT
+             */
+            // Main student management view
+            Route::get('/students', function () {
+                return view('admin.admin.management.student-management');
+            })->name('students');
+
+            // Section-based student routes
+            Route::get('/sections/{section}/students', [App\Http\Controllers\Admin\StudentManagementController::class, 'index'])
+                ->name('sections.students');
+            Route::post('/sections/{section}/students', [App\Http\Controllers\Admin\StudentManagementController::class, 'store'])
+                ->name('sections.students.store');
+
+            // Student-level actions
+            Route::get('/students/{student}/edit', [App\Http\Controllers\Admin\StudentManagementController::class, 'edit'])
+                ->name('students.edit');
+            Route::put('/students/{student}', [App\Http\Controllers\Admin\StudentManagementController::class, 'update'])
+                ->name('students.update');
+            Route::post('/students/{student}/archive', [App\Http\Controllers\Admin\StudentManagementController::class, 'archive'])
+                ->name('students.archive');
+            Route::post('/students/{student}/inactive', [App\Http\Controllers\Admin\StudentManagementController::class, 'inactive'])
+                ->name('students.inactive');
+            Route::delete('/students/{student}', [App\Http\Controllers\Admin\StudentManagementController::class, 'destroy'])
+                ->name('students.destroy');
+            Route::post('/students/{student}/restore', [App\Http\Controllers\Admin\StudentManagementController::class, 'restore'])
+                ->name('students.restore');
+
+            /**
+             * ALL STUDENTS (GLOBAL VIEW)
+             */
+            Route::get('/all-students', [App\Http\Controllers\Admin\StudentManagementController::class, 'allStudents'])
+                ->name('all-students');
+            Route::post('/all-students', [App\Http\Controllers\Admin\StudentManagementController::class, 'storeAllStudents'])
+                ->name('all-students.store');
+            Route::get('/all-students/{id}/edit', [App\Http\Controllers\Admin\StudentManagementController::class, 'editAllStudents'])
+                ->name('all-students.edit');
+            Route::put('/all-students/{id}', [App\Http\Controllers\Admin\StudentManagementController::class, 'updateAllStudents'])
+                ->name('all-students.update');
+            // Section Management
+            Route::get('/sections', [App\Http\Controllers\Admin\AdminSectionController::class, 'index'])->name('sections');
+            Route::get('/sections/admin', [App\Http\Controllers\Admin\AdminSectionController::class, 'getAvailableTeachers'])->name('sections.teachers');
+            Route::post('/sections', [App\Http\Controllers\Admin\AdminSectionController::class, 'store'])->name('sections.store');
+            Route::put('/sections/{section}', [App\Http\Controllers\Admin\AdminSectionController::class, 'update'])->name('sections.update');
+            Route::delete('/sections/{section}', [App\Http\Controllers\Admin\AdminSectionController::class, 'destroy'])->name('sections.destroy');
+            Route::post('/sections/{section}/archive', [App\Http\Controllers\Admin\AdminSectionController::class, 'archive'])->name('sections.archive');
+            Route::post('/sections/{section}/activate', [App\Http\Controllers\Admin\AdminSectionController::class, 'activate'])->name('sections.activate');
+            // Questions Management
+            Route::get('/questions', [App\Http\Controllers\admin\QuestionController::class, 'index'])->name('questions');
+            Route::get('/questions/data', [App\Http\Controllers\admin\QuestionController::class, 'data'])->name('questions.data');
+            Route::post('/questions', [App\Http\Controllers\admin\QuestionController::class, 'store'])->name('questions.store');
+            Route::put('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'update'])->name('questions.update');
+            Route::delete('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'destroy'])->name('questions.destroy');
+        });
     });
-});
 
 // Admin Dashboard (placeholder)
 Route::get('/admin/dashboard', function () {
