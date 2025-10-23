@@ -45,7 +45,7 @@ class AdminSectionController extends Controller
             ->distinct('teacher_id')
             ->count();
     
-        // Format sections with teachers - get teacher info separately to avoid duplicates
+       // Format sections with teachers - get teacher info separately to avoid duplicates
         $sectionsWithTeachers = $sections->map(function ($section) {
             // Get assigned teachers for this section
             $teachers = DB::table('teacher_sections')
@@ -65,7 +65,8 @@ class AdminSectionController extends Controller
                 'school_name' => $section->school_name ?? 'Not specified',
                 'student_count' => $section->student_count,
                 'teacher' => !empty($teacherNames) ? implode(', ', $teacherNames) : 'Unassigned',
-                'status' => $section->is_active ? 'Active' : 'Inactive'
+                'status' => $section->is_active ? 'Active' : 'Inactive',
+                'is_active' => (bool) $section->is_active // ✅ add this line
             ];
         });
     
@@ -401,20 +402,30 @@ class AdminSectionController extends Controller
             ], 500);
         }
     }
-
     /**
-     * Archive a section
+     * Archive a section (set is_active = false)
      */
     public function archive(Request $request, $section)
     {
         try {
-            // Archive all students in this section
-            DB::table('users')
-                ->join('student_profile', 'users.id', '=', 'student_profile.user_id')
-                ->where('student_profile.section', $section)
+            // Check if section exists
+            $sectionRecord = DB::table('sections')
+                ->where('name', $section)
+                ->first();
+
+            if (!$sectionRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Section not found.'
+                ], 404);
+            }
+
+            // Archive (deactivate) the section
+            DB::table('sections')
+                ->where('name', $section)
                 ->update([
-                    'users.status' => 'archive',
-                    'users.updated_at' => now()
+                    'is_active' => false,
+                    'updated_at' => now(),
                 ]);
 
             return response()->json([
@@ -424,7 +435,44 @@ class AdminSectionController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to archive section: ' . $e->getMessage()
+                'message' => 'Failed to archive section: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+        /**
+     * Reactivate (unarchive) a section
+     */
+    public function activate(Request $request, $section)
+    {
+        try {
+            // Check if section exists
+            $sectionRecord = DB::table('sections')
+                ->where('name', $section)
+                ->first();
+
+            if (!$sectionRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Section not found.'
+                ], 404);
+            }
+
+            // Activate the section
+            DB::table('sections')
+                ->where('name', $section)
+                ->update([
+                    'is_active' => true,
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Section reactivated successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reactivate section: ' . $e->getMessage(),
             ], 500);
         }
     }
