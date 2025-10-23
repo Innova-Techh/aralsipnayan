@@ -143,7 +143,7 @@
                             <tr>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Student ID
+                                    Student Username
                                 </th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -176,7 +176,7 @@
                                 <tr class="hover:bg-gray-50 transition student-row" data-section="{{ $student->studentProfile->section ?? 'unassigned' }}">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900 student-id">
-                                            {{ $student->studentProfile->student_id ?? 'N/A' }}
+                                            {{ $student->username ?? 'N/A' }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -522,6 +522,36 @@
 
 @push('scripts')
     <script>
+        function displayErrors(errors, prefix = '') {
+        // Clear all previous error messages
+        document.querySelectorAll('[id$="_error"]').forEach(el => {
+            el.textContent = '';
+        });
+
+        Object.keys(errors).forEach(key => {
+            // Generate all possible element IDs that might match
+            const variants = [];
+
+            if (prefix) {
+                variants.push(`${prefix}_${key}_error`); // edit_status_error
+                variants.push(`${prefix}${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // editStatus_error
+            }
+
+            variants.push(`${key}_error`); // status_error
+            variants.push(`${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // Status_error (edge camel case)
+
+            // Find any matching error element
+            const errorElement = variants
+                .map(id => document.getElementById(id))
+                .find(el => el !== null);
+
+            if (errorElement) {
+                errorElement.textContent = errors[key][0];
+            } else {
+                console.warn(`⚠️ No element found for error field: ${key} (${variants.join(', ')})`);
+            }
+        });
+        }
         // ===============================================
         // ADD STUDENT FORM SUBMISSION
         // ===============================================
