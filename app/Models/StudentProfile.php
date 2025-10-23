@@ -19,6 +19,7 @@ class StudentProfile extends Model
         'middlename',
         'section',
         'grade_level',
+        'gender',
         'school_name',
         'school_year',
         'avatar_url',
