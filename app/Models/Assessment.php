@@ -37,7 +37,7 @@ class Assessment extends Model
 
     public function assignments(): HasMany
     {
-        return $this->hasMany(AssessmentAssignment::class);
+        return $this->hasMany(AssessmentAssignment::class, 'assessment_id');
     }
 
     public function questions(): HasMany
