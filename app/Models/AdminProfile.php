@@ -15,6 +15,7 @@ class AdminProfile extends Model
         'grade_level_focus',
         'school_name',
         'profile_url',
+        'password',
     ];
 
     public function user()
