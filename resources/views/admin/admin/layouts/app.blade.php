@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin - @yield('title', 'Dashboard')</title>
+    <title>AralSipnayan</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -156,7 +156,7 @@
                 </a>
 
                 <!-- Student Management -->
-                {{-- <a href="{{ route('admin.management.students') }}"
+                 <a href="{{ route('admin.management.all-students') }}"
                     class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group {{ request()->routeIs('admin.management.students') ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' : '' }}">
                     <div class="flex items-center justify-center w-8">
                         <i class="fas fa-user-graduate text-lg"></i>
@@ -172,7 +172,7 @@
                         class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
                         Student Management
                     </div>
-                </a> --}}
+                </a> 
 
                 <!-- Questions Management -->
                 <a href="{{ route('admin.management.questions') }}"
