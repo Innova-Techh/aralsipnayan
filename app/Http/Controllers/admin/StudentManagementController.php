@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 class StudentManagementController extends Controller
@@ -22,12 +24,14 @@ class StudentManagementController extends Controller
             ->where('section', $sectionId)
             ->select('section', 'grade_level', 'school_name')
             ->first();
+        
         // Get students in this section
         $students = User::where('role', 'Student')
             ->with('studentProfile')
             ->whereHas('studentProfile', function($query) use ($sectionId) {
                 $query->where('section', $sectionId);
             })
+            ->orderByRaw("CASE WHEN users.status = 'active' THEN 1 ELSE 2 END ASC")
             ->orderBy('created_at', 'desc')
             ->get();
         
@@ -73,13 +77,11 @@ class StudentManagementController extends Controller
     public function store(Request $request, $sectionId)
     {
         $validator = Validator::make($request->all(), [
-            'student_id' => 'required|string|unique:student_profile,student_id',
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'grade_level' => 'required|integer|between:7,10',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'status' => 'required|in:active,inactive',
+            'firstname' => 'required|string|max:255',
+            'middlename' => 'nullable|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|email',
+            'gender' => 'required|string|max:10'
         ]);
 
         if ($validator->fails()) {
@@ -88,49 +90,104 @@ class StudentManagementController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
-        // Split full name
-        $nameParts = explode(' ', $request->full_name, 3);
-        $firstname = $nameParts[0] ?? '';
-        $middlename = isset($nameParts[2]) ? $nameParts[1] : '';
-        $lastname = isset($nameParts[2]) ? $nameParts[2] : ($nameParts[1] ?? '');
-
+        logger($request->all());
         DB::beginTransaction();
         try {
-            // Create user
-            $user = User::create([
-                'username' => strtolower(str_replace(' ', '', $request->full_name)) . rand(100, 999),
-                'email' => $request->email,
-                'password' => Hash::make('password123'),
-                'role' => 'Student',
-                'status' => $request->status,
-            ]);
+            // Check if user already exists by email
+            $existingUser = User::where('email', $request->email)->first();
+            
+            if ($existingUser) {
+                // User exists, check if they have a student profile
+                $existingProfile = StudentProfile::where('user_id', $existingUser->id)->first();
+                
+                if ($existingProfile) {
+                    // Student profile exists, check if already in this section
+                    if ($existingProfile->section === $sectionId) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'This student is already enrolled in this section.'
+                        ], 422);
+                    }
+                    
+                    // Update existing profile to move to new section
+                    $existingProfile->update([
+                        'section' => $sectionId,
+                        'firstname' => $request->firstname,
+                        'middlename' => $request->middlename,
+                        'lastname' => $request->lastname,
+                    ]);
+                    
+                    $user = $existingUser;
+                    $user->update(['status' => $request->status]);
+                    $lrn = $existingProfile->student_id;
+                } else {
+                    // User exists but no student profile, create profile with new LRN
+                    $lrn = $this->generateUniqueLRN();
+                    
+                    StudentProfile::create([
+                        'user_id' => $existingUser->id,
+                        'student_id' => $lrn,
+                        'firstname' => $request->firstname,
+                        'middlename' => $request->middlename,
+                        'lastname' => $request->lastname,
+                        'gender' => $request->gender,
+                        'section' => $sectionId,
+                        'grade_level' => $request->grade_level,
+                        'school_name' => $this->getSchoolName($sectionId),
+                        'has_completed_onboarding' => false,
+                        'is_first_login' => true,
+                    ]);
+                    
+                    $user = $existingUser;
+                    $user->update([
+                        'role' => 'Student',
+                        'status' => $request->status
+                    ]);
+                }
+            } else {
+                // Completely new user, generate username and LRN
+                $username = $this->generateSectionBasedUsername($sectionId);
+                $lrn = $this->generateUniqueLRN();
 
-            // Get school name from existing section data or use default
-            $schoolName = DB::table('student_profile')
-                ->where('section', $sectionId)
-                ->value('school_name') ?? 'Default School';
+                // Create user account
+                $user = User::create([
+                    'username' => $username,
+                    'email' => $request->email,
+                    'password' => Hash::make('123'), // Default password
+                    'role' => 'Student',
+                    'status' => 'Active',
+                ]);
 
-            // Create student profile
-            StudentProfile::create([
-                'user_id' => $user->id,
-                'student_id' => $request->student_id,
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'middlename' => $middlename,
-                'section' => $sectionId,
-                'grade_level' => $request->grade_level,
-                'school_name' => $schoolName,
-                'has_completed_onboarding' => false,
-                'is_first_login' => true,
-            ]);
+                // Create student profile
+                StudentProfile::create([
+                    'user_id' => $user->id,
+                    'student_id' => $lrn,
+                    'firstname' => $request->firstname,
+                    'middlename' => $request->middlename,
+                    'lastname' => $request->lastname,
+                    'gender' => $request->gender,
+                    'section' => $sectionId,
+                    'grade_level' => '6',
+                    'school_name' => $this->getSchoolName($sectionId),
+                    'has_completed_onboarding' => false,
+                    'is_first_login' => true,
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Student added successfully!',
-                'student' => $user->load('studentProfile')
+                'student' => [
+                    'user_id' => $user->id,
+                    'student_id' => $lrn,
+                    'name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                    'email' => $request->email,
+                    'section' => $sectionId,
+                    'status' => $user->status
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -142,34 +199,49 @@ class StudentManagementController extends Controller
     }
 
     /**
-     * Get student data for editing
+     * Get student data for editing (with auto-fill)
      */
     public function edit($studentId)
     {
-        $user = User::with('studentProfile')->findOrFail($studentId);
+        try {
+            $user = User::with('studentProfile')->findOrFail($studentId);
 
-        if ($user->role !== 'Student') {
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
+
+            $profile = $user->studentProfile;
+
+            if (!$profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Student profile not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'student' => [
+                    'id' => $user->id,
+                    'student_id' => $profile->student_id,
+                    'firstname' => $profile->firstname,
+                    'middlename' => $profile->middlename ?? '',
+                    'lastname' => $profile->lastname,
+                    'gender' => $profile->gender,
+                    'email' => $user->email,
+                    'section' => $profile->section,
+                    'status' => $user->status,
+                ]
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'User is not a student'
-            ], 404);
+                'message' => 'Failed to fetch student data: ' . $e->getMessage()
+            ], 500);
         }
-
-        $profile = $user->studentProfile;
-
-        return response()->json([
-            'success' => true,
-            'student' => [
-                'id' => $user->id,
-                'student_id' => $profile->student_id ?? '',
-                'name' => $profile ? $profile->firstname . ' ' . ($profile->middlename ? $profile->middlename . ' ' : '') . $profile->lastname : '',
-                'email' => $user->email,
-                'grade_level' => $profile->grade_level ?? '',
-                'date_of_birth' => null,
-                'gender' => null,
-                'status' => $user->status,
-            ]
-        ]);
     }
 
     /**
@@ -177,62 +249,68 @@ class StudentManagementController extends Controller
      */
     public function update(Request $request, $studentId)
     {
-        $user = User::with('studentProfile')->findOrFail($studentId);
-
-        if ($user->role !== 'Student') {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not a student'
-            ], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'student_id' => 'required|string|unique:student_profile,student_id,' . $user->studentProfile->id,
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'grade_level' => 'required|integer|between:7,10',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Split full name
-        $nameParts = explode(' ', $request->full_name, 3);
-        $firstname = $nameParts[0] ?? '';
-        $middlename = isset($nameParts[2]) ? $nameParts[1] : '';
-        $lastname = isset($nameParts[2]) ? $nameParts[2] : ($nameParts[1] ?? '');
-
-        DB::beginTransaction();
         try {
-            // Update user
-            $user->update([
-                'email' => $request->email,
-                'status' => $request->status,
+            $user = User::with('studentProfile')->findOrFail($studentId);
+
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'student_id' => 'required|string|unique:student_profile,student_id,' . $user->studentProfile->id,
+                'firstname' => 'required|string|max:255',
+                'middlename' => 'nullable|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'password' => 'nullable|string|min:3',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'gender' => 'nullable|string|max:10',
+                'status' => 'required|in:active,inactive',
             ]);
 
-            // Update student profile
-            $user->studentProfile->update([
-                'student_id' => $request->student_id,
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'middlename' => $middlename,
-                'grade_level' => $request->grade_level,
-            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
-            DB::commit();
+            DB::beginTransaction();
+            try {
+                // Update user
+                $user->update([
+                    'email' => $request->email,
+                    'status' => $request->status,
+                ]);
+                if ($request->filled('password')) {
+                    $user->password = Hash::make($request->password);
+                }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Student updated successfully!',
-                'student' => $user->load('studentProfile')
-            ]);
+                $user->save();
+
+                // Update student profile
+                $user->studentProfile->update([
+                    'student_id' => $request->student_id,
+                    'firstname' => $request->firstname,
+                    'lastname' => $request->lastname,
+                    'middlename' => $request->middlename,
+                    'gender' => $request->gender,
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Student updated successfully!',
+                    'student' => $user->load('studentProfile')
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update student: ' . $e->getMessage()
@@ -242,33 +320,84 @@ class StudentManagementController extends Controller
 
     /**
      * Archive/Activate a student
+     * When archived: student status set to 'inactive' and they cannot log in and they are removed from their section
      */
     public function archive(Request $request, $studentId)
     {
         try {
+            Log::info("Archive request received.", [
+                'student_id' => $studentId,
+                'requested_by' => auth()->user()->id ?? 'system'
+            ]);
+    
             $user = User::findOrFail($studentId);
-
+    
             if ($user->role !== 'Student') {
+                Log::warning("Archive aborted: User is not a student.", [
+                    'user_id' => $user->id,
+                    'role' => $user->role
+                ]);
+    
                 return response()->json([
                     'success' => false,
-                    'message' => 'User is not a student'
+                    'message' => 'User is not a student.'
                 ], 404);
             }
-
-            // Toggle status: active -> inactive, inactive -> active
-            $newStatus = $user->status === 'active' ? 'inactive' : 'active';
-            $action = $newStatus === 'active' ? 'activated' : 'archived';
-
-            $user->update([
-                'status' => $newStatus,
+    
+            Log::debug("Current status before toggle.", ['status' => $user->status]);
+    
+            // ✅ Toggle logic
+            if ($user->status === 'active') {
+                $newStatus = 'archive';
+                $action = 'archive';
+            } else {
+                $newStatus = 'active';
+                $action = 'activated';
+            }
+    
+            Log::debug("New status determined.", [
+                'old_status' => $user->status,
+                'new_status' => $newStatus,
+                'action' => $action
             ]);
-
+            Log::debug('Updating user status.', [
+                'user_id' => $user->id,
+                'new_status' => $newStatus,
+                'type' => gettype($newStatus)
+            ]);
+            // Update user status
+            $user->update(['status' => $newStatus]);
+            Log::info("User status updated.", [
+                'user_id' => $user->id,
+                'new_status' => $newStatus
+            ]);
+    
+            // Remove section only when archiving
+            if ($newStatus === 'archive') {
+                DB::table('student_profile')
+                    ->where('user_id', $studentId)
+                    ->update(['section' => null]);
+    
+                Log::info("Student removed from section.", ['user_id' => $user->id]);
+            }
+    
+            Log::info("Archive toggle completed successfully.", [
+                'user_id' => $user->id,
+                'final_status' => $newStatus
+            ]);
+    
             return response()->json([
                 'success' => true,
                 'message' => "Student {$action} successfully!",
                 'status' => $newStatus
             ]);
         } catch (\Exception $e) {
+            Log::error("Failed to update student status.", [
+                'student_id' => $studentId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+    
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update student status: ' . $e->getMessage()
@@ -281,28 +410,32 @@ class StudentManagementController extends Controller
      */
     public function destroy($studentId)
     {
-        $user = User::findOrFail($studentId);
-
-        if ($user->role !== 'Student') {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not a student'
-            ], 404);
-        }
-
-        DB::beginTransaction();
         try {
-            $user->studentProfile()->delete();
-            $user->delete();
+            $user = User::findOrFail($studentId);
 
-            DB::commit();
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Student deleted successfully!'
-            ]);
+            DB::beginTransaction();
+            try {
+                $user->studentProfile()->delete();
+                $user->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Student deleted successfully!'
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete student: ' . $e->getMessage()
@@ -311,27 +444,88 @@ class StudentManagementController extends Controller
     }
 
     /**
-     * Restore an archived student
+     * Restore an archived student (reactivate)
      */
     public function restore($studentId)
     {
-        $user = User::findOrFail($studentId);
+        try {
+            $user = User::findOrFail($studentId);
 
-        if ($user->role !== 'Student') {
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
+
+            $user->update([
+                'status' => 'active',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student restored successfully!'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'User is not a student'
-            ], 404);
+                'message' => 'Failed to restore student: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
-        $user->update([
-            'status' => 'active',
-        ]);
+    /**
+     * Generate section-based username (e.g., Section Einstein -> studenteinstein1, studenteinstein2, etc.)
+     */
+    private function generateSectionBasedUsername($section)
+    {
+        // Clean and normalize the section name (remove spaces and make lowercase)
+        $sectionName = strtolower(preg_replace('/\s+/', '', trim($section)));
+    
+        // If section name is empty, default to "sectiona"
+        if (empty($sectionName)) {
+            $sectionName = 'sectiona';
+        }
+    
+        $number = 1;
+    
+        while (true) {
+            $username = 'student' . $sectionName . $number;
+    
+            // Check if this username already exists
+            if (!User::where('username', $username)->exists()) {
+                return $username;
+            }
+    
+            $number++;
+        }
+    }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Student restored successfully!'
-        ]);
+    /**
+     * Generate unique LRN (Learner Reference Number) with LRN prefix
+     * Format: LRN followed by 6 random digits
+     */
+    private function generateUniqueLRN()
+    {
+        do {
+            // Generate a random 6-digit number (100000 to 999999)
+            $number = str_pad(mt_rand(100000, 999999), 6, '0', STR_PAD_LEFT);
+            $lrn = 'LRN' . $number;
+        } while (StudentProfile::where('student_id', $lrn)->exists());
+        
+        return $lrn;
+    }
+
+    /**
+     * Get school name for the section
+     */
+    private function getSchoolName($sectionId)
+    {
+        $schoolName = DB::table('student_profile')
+            ->where('section', $sectionId)
+            ->value('school_name');
+            
+        return $schoolName ?? 'Default School';
     }
 
     /**
@@ -371,5 +565,254 @@ class StudentManagementController extends Controller
         ];
 
         return $defaultTeachers[$section] ?? 'Unassigned';
+    }
+    /**
+     * Display all students management page
+     */
+    public function allStudents()
+    {
+        // Get all students regardless of section
+        $students = User::where('role', 'Student')
+            ->with('studentProfile')
+            ->orderByRaw("CASE 
+                WHEN users.status = 'active' THEN 1 
+                WHEN users.status = 'inactive' THEN 2 
+                ELSE 3 END ASC")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Get statistics
+        $totalStudents = $students->count();
+        $activeStudents = $students->where('status', 'active')->count();
+        $archivedStudents = $students->where('status', 'archive')->count();
+        
+        // Get all unique sections
+        $sections = DB::table('sections')
+        ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+        ->where('sections.is_active', true)
+        ->select('sections.name')
+        ->distinct()
+        ->pluck('sections.name');
+        
+        $totalSections = $sections->count();
+
+        return view('admin.admin.management.all-students', compact(
+            'students', 
+            'totalStudents', 
+            'activeStudents', 
+            'archivedStudents',
+            'sections',
+            'totalSections'
+        ));
+    }
+
+    /**
+     * Store a new student (from all-students page)
+     */
+    public function storeAllStudents(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required|string|max:255',
+            'middlename' => 'nullable|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'gender' => 'required|string|max:10',
+            'section' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Generate username based on section or default
+            $section = $request->section ?? 'default';
+            $username = $this->generateSectionBasedUsername($section);
+            $lrn = $this->generateUniqueLRN();
+
+            // Create user account
+            $user = User::create([
+                'username' => $username,
+                'email' => $request->email,
+                'password' => Hash::make('123'), // Default password
+                'role' => 'Student',
+                'status' => 'active',
+            ]);
+
+            // Get school name if section is provided
+            $schoolName = $request->section ? $this->getSchoolName($request->section) : 'Default School';
+
+            // Create student profile
+            StudentProfile::create([
+                'user_id' => $user->id,
+                'student_id' => $lrn,
+                'firstname' => $request->firstname,
+                'middlename' => $request->middlename,
+                'lastname' => $request->lastname,
+                'gender' => $request->gender,
+                'section' => $request->section,
+                'grade_level' => '6',
+                'school_name' => $schoolName,
+                'has_completed_onboarding' => false,
+                'is_first_login' => true,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student added successfully!',
+                'student' => [
+                    'user_id' => $user->id,
+                    'student_id' => $lrn,
+                    'name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                    'email' => $request->email,
+                    'section' => $request->section,
+                    'status' => $user->status
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create student: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get student data for editing (from all-students page)
+     */
+    public function editAllStudents($studentId)
+    {
+        try {
+            $user = User::with('studentProfile')->findOrFail($studentId);
+
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
+
+            $profile = $user->studentProfile;
+
+            if (!$profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Student profile not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'student' => [
+                    'id' => $user->id,
+                    'student_id' => $profile->student_id,
+                    'firstname' => $profile->firstname,
+                    'middlename' => $profile->middlename ?? '',
+                    'lastname' => $profile->lastname,
+                    'gender' => $profile->gender,
+                    'email' => $user->email,
+                    'section' => $profile->section,
+                    'status' => $user->status,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch student data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update student information (from all-students page)
+     */
+    public function updateAllStudents(Request $request, $studentId)
+    {
+        try {
+            $user = User::with('studentProfile')->findOrFail($studentId);
+
+            if ($user->role !== 'Student') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User is not a student'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'student_id' => 'required|string|unique:student_profile,student_id,' . $user->studentProfile->id,
+                'firstname' => 'required|string|max:255',
+                'middlename' => 'nullable|string|max:255',
+                'lastname' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'gender' => 'nullable|string|max:10',
+                'password' => 'nullable|string|min:3',
+                'section' => 'nullable|string',
+                'status' => 'required|in:active,inactive,archive',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+            try {
+                // Update user
+                $user->update([
+                    'email' => $request->email,
+                    'status' => $request->status,
+                ]);
+                if ($request->filled('password')) {
+                    $user->password = Hash::make($request->password);
+                }
+                // If student is archived → remove from section
+                if ($request->status === 'archive') {
+                    DB::table('student_profile')
+                        ->where('user_id', $studentId)
+                        ->update(['section' => null]); // or 'section' if that's your actual column
+
+                    Log::info("Archived student unassigned from section.", [
+                        'user_id' => $studentId
+                    ]);
+                }
+
+                $user->save();
+
+                // Update student profile
+                $user->studentProfile->update([
+                    'student_id' => $request->student_id,
+                    'firstname' => $request->firstname,
+                    'lastname' => $request->lastname,
+                    'middlename' => $request->middlename,
+                    'gender' => $request->gender,
+                    'section' => $request->section,
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Student updated successfully!',
+                    'student' => $user->load('studentProfile')
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update student: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
