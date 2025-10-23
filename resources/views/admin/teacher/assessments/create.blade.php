@@ -12,8 +12,8 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Create New Assessment</h1>
-                    <p class="text-gray-600 mt-1">Build a new assessment for your students</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Create New Quiz</h1>
+                    <p class="text-gray-600 mt-1">Build a new Quiz for your students</p>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Assessment Title</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Title</label>
                             <input type="text" name="title" placeholder="Enter assessment title" 
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('title') border-red-500 @enderror"
                                    value="{{ old('title') }}" required>
@@ -76,7 +76,7 @@
 
                 <!-- Assessment Settings -->
                 <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Assessment Settings</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Quiz Settings</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Number of Questions</label>
@@ -123,7 +123,7 @@
                 <!-- Section Assignment -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Assign to Sections (Optional)</h2>
-                    <p class="text-sm text-gray-600 mb-4">Leave unselected to save as draft. Select sections to immediately assign the assessment.</p>
+                    <p class="text-sm text-gray-600 mb-4">Leave unselected to save as draft. Select sections to immediately assign the quiz.</p>
                     <div class="space-y-3">
                         @if(!empty($teacherSections))
                             @foreach($teacherSections as $section)
@@ -383,7 +383,7 @@
                     </a>
                     <button type="submit" 
                             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        Create Assessment
+                        Create Quiz
                     </button>
                 </div>
             </form>
@@ -885,7 +885,7 @@ createForm.addEventListener('submit', function(e) {
     
     if (totalQuestions < requiredQuestions) {
         e.preventDefault();
-        alert(`You have selected/created ${totalQuestions} questions, but the assessment requires ${requiredQuestions} questions. Please add more questions or reduce the number of questions required.`);
+        alert(`You have selected/created ${totalQuestions} questions, but the quiz requires ${requiredQuestions} questions. Please add more questions or reduce the number of questions required.`);
         return;
     }
 });
