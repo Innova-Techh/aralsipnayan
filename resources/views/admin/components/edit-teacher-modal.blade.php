@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <!-- Password and School Name -->
+            <!-- Password -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="editPassword" class="block text-sm font-medium text-gray-700 mb-1">
@@ -67,15 +67,48 @@
                 </div>
             </div>
 
-
-            <!-- Sections -->
+            <!-- Sections - Improved Structure -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Assign Sections
+                    <span class="text-xs text-gray-500 font-normal ml-2">(Select sections this teacher will handle)</span>
                 </label>
-                <div id="editTeacherSections" class="flex flex-wrap gap-2">
-                    <!-- Sections will be loaded dynamically -->
+                
+                <!-- Container for sections with better layout -->
+                <div class="border border-gray-300 rounded-lg p-4 max-h-48 overflow-y-auto bg-gray-50">
+                    <div id="editTeacherSections" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Loading state -->
+                        <div class="col-span-full text-center py-4 text-gray-500 text-sm" id="editSectionsLoading">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>
+                            Loading sections...
+                        </div>
+                    </div>
+                    
+                    <!-- Empty state -->
+                    <div id="editSectionsEmpty" class="hidden text-center py-4 text-gray-500 text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No sections available
+                    </div>
                 </div>
+                
+                <!-- Selected sections display -->
+                <div id="editSelectedSectionsDisplay" class="mt-2 hidden">
+                    <p class="text-xs text-gray-600 mb-1">Selected sections:</p>
+                    <div id="editSelectedSectionsList" class="flex flex-wrap gap-1"></div>
+                </div>
+            </div>
+
+             <!-- Information Note -->
+             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-blue-600 mt-1"></i>
+                        <div class="text-sm text-blue-800">
+                            <p class="font-medium mb-1">Note:</p>
+                            <ul class="list-disc list-inside space-y-1 text-xs">
+                                <li>Changing the email, username, and password will update the teacher's login credentials</li>
+                            </ul>
+                        </div>
+                    </div>
             </div>
 
             <!-- Action Buttons -->
@@ -86,6 +119,7 @@
                 </button>
                 <button type="submit"
                     class="px-5 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition font-medium">
+                    <i class="fas fa-save mr-2"></i>
                     Update Teacher
                 </button>
             </div>

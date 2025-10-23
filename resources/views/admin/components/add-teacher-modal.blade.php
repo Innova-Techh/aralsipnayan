@@ -63,6 +63,19 @@
                 </div>
             </div>
 
+            <!-- Info Box -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-medium mb-1">Default Credentials</p>
+                        <ul class="list-disc list-inside space-y-1 text-xs">
+                            <li>Default password: <strong>123</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
                 <button type="button" onclick="closeAddTeacherModal()"
