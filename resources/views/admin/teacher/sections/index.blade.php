@@ -22,7 +22,7 @@
 @endphp
 
 @section('content')
-    <divclass="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50">
         <!-- Header -->
         <div class=" px-8 py-6">
             <div class="flex justify-between items-center">
@@ -59,7 +59,6 @@
                         <span class="material-symbols-outlined text-gray-400">book</span>
                     </div>
                     <div class="text-3xl font-bold text-gray-900">{{ count($sectionsData) }}</div>
-                    <p class="text-xs text-gray-500 mt-1">Active sections</p>
                 </div>
 
                 <!-- Total Students -->
@@ -71,21 +70,18 @@
                     <div class="text-3xl font-bold text-gray-900">
                         {{ array_sum(array_column($sectionsData, 'student_count')) }}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">{{ array_sum(array_column($sectionsData, 'student_count')) }}
-                        active students</p>
                 </div>
 
 
                 <!-- Active Assessments -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-medium text-gray-600">Active Assessments</span>
+                        <span class="text-sm font-medium text-gray-600">Active quizes</span>
                         <span class="material-symbols-outlined text-gray-400">assignment</span>
                     </div>
                     <div class="text-3xl font-bold text-gray-900">
                         {{ array_sum(array_column($sectionsData, 'active_assessments')) }}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Total assessments</p>
                 </div>
             </div>
 
@@ -127,8 +123,8 @@
                                         <span class="material-symbols-outlined text-xl">edit</span>
                                     </button>
                                     <button onclick="deleteSection('{{ $section['section'] }}')"
-                                        class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                        <span class="material-symbols-outlined text-xl">delete</span>
+                                        class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                                        <span class="material-symbols-outlined text-xl">archive</span>
                                     </button>
                                 </div>
                             </div>
@@ -143,7 +139,7 @@
                                         <span class="text-sm text-gray-600">Students</span>
                                     </div>
                                     <span class="text-sm font-medium text-gray-900">{{ $section['student_count'] }}
-                                        ({{ $section['student_count'] }} active)</span>
+                                        ({{ $section['student_active'] }} active)</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -248,9 +244,9 @@
                     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                         <span class="material-symbols-outlined text-red-600">warning</span>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Delete Section</h3>
-                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete section "<span
-                            id="deleteSectionName"></span>"? This action cannot be undone.</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Deactivate Section</h3>
+                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to deactivate section "<span
+                            id="deleteSectionName"></span>"? This action can only be reverted by admin.</p>
                     <div class="flex justify-center space-x-3">
                         <button onclick="closeDeleteSectionModal()"
                             class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -258,7 +254,7 @@
                         </button>
                         <button onclick="confirmDeleteSection()"
                             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-                            Delete Section
+                            Deactivate Section
                         </button>
                     </div>
                 </div>
@@ -333,7 +329,7 @@
                 document.getElementById('editSectionForm').reset();
             }
 
-            // Delete Section Modal Functions
+           // Section Deactivation Modal Functions
             function deleteSection(sectionName) {
                 sectionToDelete = sectionName;
                 document.getElementById('deleteSectionName').textContent = sectionName;
@@ -348,35 +344,33 @@
             function confirmDeleteSection() {
                 if (!sectionToDelete) return;
 
-                fetch(`/teacher/sections/${encodeURIComponent(sectionToDelete)}`, {
-                    method: 'DELETE',
+                fetch(`/teacher/sections/${encodeURIComponent(sectionToDelete)}/deactivate`, {
+                    method: 'POST', // changed from DELETE
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'Content-Type': 'application/json',
-                    }
+                        'Accept': 'application/json',
+                    },
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showMessage(data.message, 'success');
-                            const sectionCard = document.querySelector(`[data-section="${sectionToDelete}"]`);
-                            if (sectionCard) {
-                                sectionCard.remove();
-                            }
-                            const remainingSections = document.querySelectorAll('[data-section]');
-                            if (remainingSections.length === 0) {
-                                showEmptyState();
-                            }
-                        } else {
-                            showMessage(data.error || 'Failed to delete section', 'error');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage(data.message, 'success');
+
+                        const remainingSections = document.querySelectorAll('[data-section]');
+                        if (remainingSections.length === 0) {
+                            showEmptyState();
                         }
-                        closeDeleteSectionModal();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showMessage('An error occurred while deleting the section', 'error');
-                        closeDeleteSectionModal();
-                    });
+                    } else {
+                        showMessage(data.error || 'Failed to deactivate section', 'error');
+                    }
+                    closeDeleteSectionModal();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('An error occurred while deactivating the section', 'error');
+                    closeDeleteSectionModal();
+                });
             }
 
             // Form Submissions

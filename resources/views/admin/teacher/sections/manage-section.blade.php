@@ -2,7 +2,7 @@
 
 @section('title', 'AralSipnayan')
 
-@section('content')
+@section('content')   
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
         <div class="bg-white border-b border-gray-200 px-8 py-6">
@@ -53,18 +53,18 @@
                         <span class="text-sm font-medium text-gray-600">Average Score</span>
                         <span class="material-symbols-outlined text-gray-400">analytics</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $averageScore ?? 86 }}%</div>
+                    <div class="text-3xl font-bold text-gray-900">{{ $averageScore}}%</div>
                     <p class="text-xs text-gray-500 mt-1">Section average</p>
                 </div>
 
-                <!-- Completion Rate -->
+                <!-- Average Level -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-medium text-gray-600">Completion Rate</span>
-                        <span class="material-symbols-outlined text-gray-400">task_alt</span>
+                        <span class="text-sm font-medium text-gray-600">Average Level</span>
+                        <span class="material-symbols-outlined text-gray-400">trending_up</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $completionRate ?? 82 }}%</div>
-                    <p class="text-xs text-gray-500 mt-1">Assessment completion</p>
+                    <div class="text-3xl font-bold text-gray-900">{{ $averageLevel ?? 1 }}</div>
+                    <p class="text-xs text-gray-500 mt-1">Section average level</p>
                 </div>
 
                 <!-- Top Performer -->
@@ -73,8 +73,8 @@
                         <span class="text-sm font-medium text-gray-600">Top Performer</span>
                         <span class="material-symbols-outlined text-gray-400">emoji_events</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $topPerformerScore ?? 92 }}%</div>
-                    <p class="text-xs text-gray-500 mt-1">{{ $topPerformer ?? 'Maria Santos' }}</p>
+                    <div class="text-2xl font-bold text-gray-900">{{ $topPerformer ?? 'Maria Santos' }}</div>
+                    <p class="text-xs text-gray-500 mt-1">Rank 1 {{$section['raw_name']}} </p>
                 </div>
             </div>
 
@@ -99,7 +99,7 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Student</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Progress</th>
+                                    Level & Rank</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Points</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -151,17 +151,14 @@
                                         </div>
                                     </td>
 
-                                    <!-- Progress -->
+                                    <!-- Level & Rank -->
                                     <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-medium text-gray-700">{{ $student['progress'] }}</span>
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 w-24">
-                                                @php
-                                                    $progressPercent = $student['total'] > 0 ? ($student['completed'] / $student['total']) * 100 : 0;
-                                                @endphp
-                                                <div class="bg-blue-600 h-2 rounded-full"
-                                                    style="width: {{ $progressPercent }}%"></div>
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-semibold text-gray-900">Level {{ $student['current_level'] ?? 1 }}</span>
+                                                <span class="text-xs text-gray-500">({{ $student['points_in_current_level'] ?? 0 }}/60 pts)</span>
                                             </div>
+                                            <div class="text-xs text-gray-600">{{ $student['current_rank'] ?? 'Math Explorer' }}</div>
                                         </div>
                                     </td>
 
@@ -326,7 +323,35 @@
                         <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email (Should be Unique)</label>
                         <input type="email" id="studentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="flex justify-end space-x-3">
+                     <!-- Gender -->
+                     <div>
+                        <label for="addStudentGender" class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addStudentGender" name="gender" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Gender</option>
+                            <option value="male">male</option>
+                            <option value="female">female</option>
+                            <option value="other">other</option>
+                        </select>
+                        <p id="addGender_error" class="error-message text-red-500 text-xs mt-1"></p>
+                    </div>
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium mb-1">Default Credentials</p>
+                                <ul class="list-disc list-inside space-y-1 text-xs">
+                                    <li>Username will be auto-generated based on section</li>
+                                    <li>Default password: <strong>123</strong></li>
+                                    <li>Student ID (LRN) will be auto-generated</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-4">
                         <button type="button" onclick="closeAddStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
                             Cancel
                         </button>
@@ -385,7 +410,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="editStudentPassword" class="block text-sm font-medium text-gray-700 mb-2">Password (Leave blank to keep current)</label>
-                        <input type="email" id="editStudentPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="password" id="editStudentPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeEditStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -457,7 +482,7 @@
         // Edit Student Modal Functions (from main-branch)
         window.openEditStudentModal = function (studentId) {
             selectedStudentId = studentId || selectedStudentId;
-            
+            console.log('edit_gender element:', document.getElementById('edit_gender'));
             if (!selectedStudentId) {
                 showMessage('No student selected', 'error');
                 return;
@@ -486,7 +511,7 @@
                         document.getElementById('editStudentMiddleName').value = student.middlename || '';
                         document.getElementById('editStudentLastName').value = student.lastname || '';
                         document.getElementById('editStudentEmail').value = student.email || '';
-                        document.getElementById('editStudentSchoolYear').value = student.school_year || '';
+                        document.getElementById('edit_gender').value = student.gender || '';
                     }
                 }
             })
@@ -615,7 +640,7 @@
         // Action functions (from josh-branch)
         window.viewProfile = function(studentId) {
             console.log('View profile for student:', studentId);
-            window.location.href = "{{ route('teacher.students.profile', ['student' => '__STUDENT_ID__']) }}".replace('__STUDENT_ID__', studentId);
+            window.location.href = `/teacher/students/${studentId}/profile`;
         }
 
        // window.assignAssessment = function(studentId, studentName) {
@@ -629,7 +654,7 @@
             console.log('Remove from section:', studentName, studentId);
             if (confirm(`Are you sure you want to remove ${studentName} from this section?`)) {
                 // Implement actual removal via API
-                fetch(`/teacher/sections/students/${studentId}/remove`, {
+                fetch(`/teacher/sections/${studentId}/remove`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
