@@ -26,8 +26,8 @@
                     <div class="text-xs text-yellow-800">
                         <p class="font-medium mb-1">This action will:</p>
                         <ul id="archiveStudentActions" class="list-disc list-inside space-y-1">
-                            <li>Set the student status to "Inactive"</li>
-                            <li>Remove them from active class lists</li>
+                            <li>Set the student status to "Archive"</li>
+                            <li>Keep them from active class lists</li>
                             <li>Preserve all their data and records</li>
                             <li>Can be reversed by reactivating the student</li>
                         </ul>

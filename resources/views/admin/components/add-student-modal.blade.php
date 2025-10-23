@@ -12,46 +12,51 @@
         <!-- Modal Body -->
         <form id="addStudentForm" class="mt-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Student ID -->
-                <div>
-                    <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        Student ID <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" id="student_id" name="student_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <p id="student_id_error" class="error-message text-red-500 text-xs mt-1"></p>
-                </div>
-
                     <div class="mb-4">
-                        <label for="editStudentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                        <input type="text" id="editStudentFirstName" name="firstname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <label for="addStudentFirstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" id="addStudentFirstName" name="firstname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
-                        <label for="editStudentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name (Optional)</label>
-                        <input type="text" id="editStudentMiddleName" name="middlename" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label for="addStudentMiddleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name (Optional)</label>
+                        <input type="text" id="addStudentMiddleName" name="middlename" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="mb-4">
-                        <label for="editStudentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                        <input type="text" id="editStudentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <label for="addStudentLastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" id="addStudentLastName" name="lastname" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
                     <div class="mb-4">
-                        <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="editStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <label for="addStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="addStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
 
-                <!-- Gender -->
-                <div>
-                    <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
-                        Gender <span class="text-red-500">*</span>
-                    </label>
-                    <select id="gender" name="gender"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <p id="gender_error" class="error-message text-red-500 text-xs mt-1"></p>
+                    <!-- Gender -->
+                    <div>
+                        <label for="addStudentGender" class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addStudentGender" name="gender"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Gender</option>
+                            <option value="male">male</option>
+                            <option value="female">female</option>
+                            <option value="other">other</option>
+                        </select>
+                        <p id="addGender_error" class="error-message text-red-500 text-xs mt-1"></p>
+                    </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-medium mb-1">Default Credentials</p>
+                        <ul class="list-disc list-inside space-y-1 text-xs">
+                            <li>Username will be auto-generated based on section</li>
+                            <li>Default password: <strong>123</strong></li>
+                            <li>Student ID (LRN) will be auto-generated</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <!-- Modal Footer -->
