@@ -62,8 +62,6 @@
                             <option value="multiple_choice" {{ request('type') == 'multiple_choice' ? 'selected' : '' }}>Multiple Choice</option>
                             <option value="fill_blanks" {{ request('type') == 'fill_blanks' ? 'selected' : '' }}>Fill in the Blanks</option>
                             <option value="true_false" {{ request('type') == 'true_false' ? 'selected' : '' }}>True/False</option>
-                            <option value="drag_drop" {{ request('type') == 'drag_drop' ? 'selected' : '' }}>Drag & Drop</option>
-                            <option value="connect_dots" {{ request('type') == 'connect_dots' ? 'selected' : '' }}>Connect Dots</option>
                         </select>
                     </div>
 
@@ -523,6 +521,36 @@
 
 @push('scripts')
     <script>
+        function displayErrors(errors, prefix = '') {
+        // Clear all previous error messages
+        document.querySelectorAll('[id$="_error"]').forEach(el => {
+            el.textContent = '';
+        });
+
+        Object.keys(errors).forEach(key => {
+            // Generate all possible element IDs that might match
+            const variants = [];
+
+            if (prefix) {
+                variants.push(`${prefix}_${key}_error`); // edit_status_error
+                variants.push(`${prefix}${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // editStatus_error
+            }
+
+            variants.push(`${key}_error`); // status_error
+            variants.push(`${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // Status_error (edge camel case)
+
+            // Find any matching error element
+            const errorElement = variants
+                .map(id => document.getElementById(id))
+                .find(el => el !== null);
+
+            if (errorElement) {
+                errorElement.textContent = errors[key][0];
+            } else {
+                console.warn(`⚠️ No element found for error field: ${key} (${variants.join(', ')})`);
+            }
+        });
+        }
         let editingId = null;
         let questionCounter = {{ $nextQuestionNumber }};
         let currentViewQuestion = null;

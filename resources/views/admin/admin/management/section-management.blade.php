@@ -103,7 +103,15 @@
                                 <h3 class="font-semibold text-gray-900 text-sm">{{ $section['section'] }}</h3>
                                 <p class="text-xs text-gray-500 mt-0.5">Grade {{ $section['grade_level'] }}</p>
                             </div>
-                            <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">{{ $section['status'] }}</span>
+                            <span
+                                @class([
+                                    'px-2 py-1 text-xs font-medium rounded',
+                                    'bg-green-50 text-green-700' => $section['is_active'],
+                                    'bg-red-50 text-red-700'     => ! $section['is_active'],
+                                ])
+                                >
+                                {{ $section['is_active'] ? 'Active' : 'Inactive' }}
+                            </span>
                         </div>
 
                         <div class="space-y-3 mb-4">
@@ -134,13 +142,12 @@
                                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
                                 <i class="fas fa-eye text-xs"></i> View
                             </a>
-                            <button onclick="archiveSection('{{ $section['section'] }}')"
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-yellow-300 text-yellow-700 rounded-lg text-sm font-medium hover:bg-red-50 transition">
-                                <i class="fas fa-archive text-xs"></i> Archive
-                            </button>
-                            <button onclick="deleteSection('{{ $section['section'] }}')"
-                                class="flex items-center justify-center gap-2 px-3 py-2 border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-yellow-50 transition">
-                                <i class="fas fa-trash text-xs"></i> Delete
+                            <button onclick="toggleSectionStatus('{{ $section['section'] }}', {{ $section['is_active'] ? 'true' : 'false' }})"
+                                class="flex items-center justify-center gap-2 px-3 py-2 border 
+                                    {{ $section['is_active'] ? 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' : 'border-green-300 text-green-700 hover:bg-green-50' }}
+                                    rounded-lg text-sm font-medium transition">
+                                <i class="fas {{ $section['is_active'] ? 'fa-archive' : 'fa-undo' }} text-xs"></i>
+                                {{ $section['is_active'] ? 'Archive' : 'Activate' }}
                             </button>
                         </div>
                     </div>
@@ -164,6 +171,36 @@
 
 @push('scripts')
     <script>
+        function displayErrors(errors, prefix = '') {
+        // Clear all previous error messages
+        document.querySelectorAll('[id$="_error"]').forEach(el => {
+            el.textContent = '';
+        });
+
+        Object.keys(errors).forEach(key => {
+            // Generate all possible element IDs that might match
+            const variants = [];
+
+            if (prefix) {
+                variants.push(`${prefix}_${key}_error`); // edit_status_error
+                variants.push(`${prefix}${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // editStatus_error
+            }
+
+            variants.push(`${key}_error`); // status_error
+            variants.push(`${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // Status_error (edge camel case)
+
+            // Find any matching error element
+            const errorElement = variants
+                .map(id => document.getElementById(id))
+                .find(el => el !== null);
+
+            if (errorElement) {
+                errorElement.textContent = errors[key][0];
+            } else {
+                console.warn(`⚠️ No element found for error field: ${key} (${variants.join(', ')})`);
+            }
+        });
+        }
          document.getElementById('searchInput')?.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('.section-row');
@@ -293,10 +330,15 @@
             }
         });
 
-        // Archive section function
-        function archiveSection(sectionName) {
-            if (confirm(`Are you sure you want to archive the section "${sectionName}"?`)) {
-                fetch(`/admin/management/sections/${encodeURIComponent(sectionName)}/archive`, {
+         // Archive or Activate Section
+        function toggleSectionStatus(sectionName, isActive) {
+            const action = isActive ? 'archive' : 'activate';
+            const confirmMessage = isActive
+                ? `Are you sure you want to archive the section "${sectionName}"?`
+                : `Do you want to reactivate the section "${sectionName}"?`;
+
+            if (confirm(confirmMessage)) {
+                fetch(`/admin/management/sections/${encodeURIComponent(sectionName)}/${action}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -314,7 +356,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while archiving the section.');
+                    alert('An error occurred while processing your request.');
                 });
             }
         }

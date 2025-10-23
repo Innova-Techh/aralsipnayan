@@ -1,6 +1,5 @@
 @extends('admin.admin.layouts.app')
 
-@section('title', 'Student Management - ' . $section->name)
 
 @section('content')
     <div class="p-6 bg-gray-50 min-h-screen">
@@ -163,14 +162,14 @@
                                         <div class="text-sm text-gray-900 student-email">{{ $student->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusColors = [
-                                'active' => 'bg-green-100 text-green-800',
-                                'inactive' => 'bg-yellow-100 text-yellow-800',
-                                'archive' => 'bg-gray-100 text-gray-800',
-                            ];
-                            $statusColor = $statusColors[$student->status] ?? 'bg-gray-100 text-gray-800';
-                        @endphp
+                                        @php
+                                            $statusColors = [
+                                                'active' => 'bg-green-100 text-green-800',
+                                                'inactive' => 'bg-yellow-100 text-yellow-800',
+                                                'archive' => 'bg-gray-100 text-gray-800',
+                                            ];
+                                            $statusColor = $statusColors[$student->status] ?? 'bg-gray-100 text-gray-800';
+                                        @endphp
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
                                             {{ ucfirst($student->status) }}
                                         </span>
@@ -226,164 +225,429 @@
 
 @push('scripts')
     <script>
-        function openAddStudentModal() {
-            document.getElementById('addStudentModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+    function displayErrors(errors, prefix = '') {
+// Clear all previous error messages
+document.querySelectorAll('[id$="_error"]').forEach(el => {
+    el.textContent = '';
+});
 
-        function closeAddStudentModal() {
-            document.getElementById('addStudentModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            document.getElementById('addStudentForm').reset();
-        }
+Object.keys(errors).forEach(key => {
+    // Generate all possible element IDs that might match
+    const variants = [];
 
-        function openEditStudentModal(studentId) {
-            // Fetch student data and populate modal
-            document.getElementById('editStudentModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+    if (prefix) {
+        variants.push(`${prefix}_${key}_error`); // edit_status_error
+        variants.push(`${prefix}${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // editStatus_error
+    }
 
-        function closeEditStudentModal() {
-            document.getElementById('editStudentModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
+    variants.push(`${key}_error`); // status_error
+    variants.push(`${key.charAt(0).toUpperCase() + key.slice(1)}_error`); // Status_error (edge camel case)
 
-        function openArchiveStudentModal(studentId, studentName, currentStatus) {
-            document.getElementById('archiveStudentId').value = studentId;
-            document.getElementById('archiveStudentCurrentStatus').value = currentStatus;
-            document.getElementById('archiveStudentName').textContent = studentName;
-            
-            // Update modal content based on current status
-            const isActive = currentStatus === 'active';
-            const title = document.getElementById('archiveStudentTitle');
-            const message = document.getElementById('archiveStudentMessage');
-            const button = document.getElementById('archiveStudentButton');
-            const icon = document.getElementById('archiveStudentIcon');
-            const info = document.getElementById('archiveStudentInfo');
-            const actions = document.getElementById('archiveStudentActions');
-            
-            if (isActive) {
-                // Archive mode
-                title.textContent = 'Inactivate Student';
-                message.innerHTML = `Are you sure you want to Inactivate <span class="font-semibold text-gray-900">${studentName}</span>?`;
-                button.innerHTML = '<i class="fas fa-archive mr-2"></i> Inactivate Student';
-                button.className = 'px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm font-medium hover:bg-yellow-700 transition';
-                icon.className = 'bg-yellow-100 rounded-full p-2';
-                icon.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>';
-                info.className = 'bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4';
-                actions.innerHTML = `
-                    <li>Set the student status to "Inactive"</li>
-                    <li>Remove them from active class lists</li>
-                    <li>Preserve all their data and records</li>
-                    <li>Can be reversed by reactivating the student</li>
-                `;
+    // Find any matching error element
+    const errorElement = variants
+        .map(id => document.getElementById(id))
+        .find(el => el !== null);
+
+    if (errorElement) {
+        errorElement.textContent = errors[key][0];
+    } else {
+        console.warn(`⚠️ No element found for error field: ${key} (${variants.join(', ')})`);
+    }
+});
+}
+// ===============================================
+// EDIT STUDENT MODAL - AUTO-FILL FUNCTIONALITY
+// ===============================================
+
+/**
+ * Open edit modal and fetch student data to auto-fill the form
+ */
+function openEditStudentModal(studentId) {
+    // Show loading state
+    const modal = document.getElementById('editStudentModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // Fetch student data
+    fetch(`/admin/management/students/${studentId}/edit`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Populate form fields with student data
+            document.getElementById('editStudentId').value = data.student.id;
+            document.getElementById('editStudentLRN').value = data.student.student_id;
+            document.getElementById('editFirstname').value = data.student.firstname;
+            document.getElementById('editMiddlename').value = data.student.middlename || '';
+            document.getElementById('editLastname').value = data.student.lastname;
+            document.getElementById('editStudentGender').value = data.student.gender;
+            document.getElementById('editEmail').value = data.student.email;
+            document.getElementById('editStatus').value = data.student.status;
+        } else {
+            showNotification(data.message || 'Failed to load student data', 'error');
+            closeEditStudentModal();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while loading student data', 'error');
+        closeEditStudentModal();
+    });
+}
+
+/**
+ * Close edit modal
+ */
+function closeEditStudentModal() {
+    document.getElementById('editStudentModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    // Reset form
+    document.getElementById('editStudentForm').reset();
+}
+
+/**
+ * Handle edit student form submission
+ */
+document.getElementById('editStudentForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const studentId = document.getElementById('editStudentId').value;
+    const formData = {
+        student_id: document.getElementById('editStudentLRN').value,
+        firstname: document.getElementById('editFirstname').value,
+        middlename: document.getElementById('editMiddlename').value,
+        lastname: document.getElementById('editLastname').value,
+        email: document.getElementById('editEmail').value,
+        password:document.getElementById('editPassword').value,
+        gender: document.getElementById('editStudentGender').value,
+        status: document.getElementById('editStatus').value
+    };
+    
+    // Disable submit button
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
+    
+    fetch(`/admin/management/students/${studentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            closeEditStudentModal();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            if (data.errors) {
+                // Display validation errors
+                let errorMessage = 'Validation errors:\n';
+                Object.values(data.errors).forEach(error => {
+                    errorMessage += error[0] + '\n';
+                });
+                showNotification(errorMessage, 'error');
             } else {
-                // Activate mode
-                title.textContent = 'Activate Student';
-                message.innerHTML = `Are you sure you want to activate <span class="font-semibold text-gray-900">${studentName}</span>?`;
-                button.innerHTML = '<i class="fas fa-check mr-2"></i> Activate Student';
-                button.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition';
-                icon.className = 'bg-green-100 rounded-full p-2';
-                icon.innerHTML = '<i class="fas fa-check-circle text-green-600 text-xl"></i>';
-                info.className = 'bg-green-50 border border-green-200 rounded-lg p-4 mb-4';
-                actions.innerHTML = `
-                    <li>Set the student status to "Active"</li>
-                    <li>Add them back to active class lists</li>
-                    <li>Restore full access to the system</li>
-                    <li>Can be Inactivated again if needed</li>
-                `;
+                showNotification(data.message || 'Failed to update student', 'error');
             }
-            
-            document.getElementById('archiveStudentModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while updating student', 'error');
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
 
-        function closeArchiveStudentModal() {
-            document.getElementById('archiveStudentModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
+
+// ===============================================
+// ADD STUDENT FORM SUBMISSION
+// ===============================================
+
+document.getElementById('addStudentForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const sectionId = "{{ $section->id }}"; // This will be replaced by blade
+    const formData = {
+            firstname: document.getElementById('addStudentFirstName').value,
+            middlename: document.getElementById('addStudentMiddleName').value,
+            lastname: document.getElementById('addStudentLastName').value,
+            email: document.getElementById('addStudentEmail').value,
+            gender: document.getElementById('addStudentGender').value,
+    };
+
+    console.log(formData); // check what’s captured
+    // Disable submit button
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Adding...';
+    
+    fetch(`/admin/management/sections/${sectionId}/students`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            closeAddStudentModal();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            if (data.errors) {
+                // Display validation errors
+                let errorMessage = 'Validation errors:\n';
+                Object.values(data.errors).forEach(error => {
+                    errorMessage += error[0] + '\n';
+                });
+                showNotification(errorMessage, 'error');
+            } else {
+                showNotification(data.message || 'Failed to add student', 'error');
+            }
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while adding student', 'error');
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
 
-        // Search functionality
-           document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('.student-row');
 
-            rows.forEach(row => {
-                const name = row.querySelector('.student-name')?.textContent.toLowerCase() || '';
-                const username = row.querySelector('.student-id')?.textContent.toLowerCase() || '';
-                const email = row.querySelector('.student-email')?.textContent.toLowerCase() || '';
+// ===============================================
+// ARCHIVE/ACTIVATE STUDENT
+// ===============================================
 
-                if (name.includes(searchTerm) || username.includes(searchTerm) || email.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+/**
+ * Open archive modal with dynamic content based on student status
+ */
+function openArchiveStudentModal(studentId, studentName, currentStatus) {
+    document.getElementById('archiveStudentId').value = studentId;
+    document.getElementById('archiveStudentCurrentStatus').value = currentStatus;
+    
+    // Update modal content based on current status
+    const isActive = currentStatus === 'active';
+    const title = document.getElementById('archiveStudentTitle');
+    const message = document.getElementById('archiveStudentMessage');
+    const button = document.getElementById('archiveStudentButton');
+    const icon = document.getElementById('archiveStudentIcon');
+    const info = document.getElementById('archiveStudentInfo');
+    const actions = document.getElementById('archiveStudentActions');
+    
+    if (isActive) {
+        // Archive/Inactivate mode
+        title.textContent = 'Archive Student';
+        message.innerHTML = `Are you sure you want to archive <span class="font-semibold text-gray-900">${studentName}</span>?`;
+        button.innerHTML = '<i class="fas fa-archive mr-2"></i> Archive Student';
+        button.className = 'px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm font-medium hover:bg-yellow-700 transition';
+        icon.className = 'bg-yellow-100 rounded-full p-2';
+        icon.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>';
+        info.className = 'bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4';
+        actions.innerHTML = `
+            <li>Set ${studentName} status to "Inactive"</li>
+            <li>${studentName} will NOT be able to log in</li>
+            <li>${studentName} will be REMOVED from their section</li>
+            <li>All ${studentName}'s  data and records are preserved</li>
+            <li>Can be reversed by reactivating ${studentName}</li>
+        `;
+    } else {
+        // Activate mode
+        title.textContent = 'Activate Student';
+        message.innerHTML = `Are you sure you want to activate <span class="font-semibold text-gray-900">${studentName}</span>?`;
+        button.innerHTML = '<i class="fas fa-check mr-2"></i> Activate Student';
+        button.className = 'px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition';
+        icon.className = 'bg-green-100 rounded-full p-2';
+        icon.innerHTML = '<i class="fas fa-check-circle text-green-600 text-xl"></i>';
+        info.className = 'bg-green-50 border border-green-200 rounded-lg p-4 mb-4';
+        actions.innerHTML = `
+            <li>Set the student status to "Active"</li>
+            <li>Student will be able to log in again</li>
+            <li>Restore full access to the system</li>
+            <li>Can be inactivated again if needed</li>
+        `;
+    }
+    
+    document.getElementById('archiveStudentModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Close archive modal
+ */
+function closeArchiveStudentModal() {
+    document.getElementById('archiveStudentModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+/**
+ * Handle archive student form submission
+ */
+document.getElementById('archiveStudentForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const studentId = document.getElementById('archiveStudentId').value;
+    
+    // Disable submit button
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    
+    fetch(`/admin/management/students/${studentId}/archive`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            closeArchiveStudentModal();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification(data.message || 'Failed to update student status', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred', 'error');
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
+
+
+// ===============================================
+// UTILITY FUNCTIONS
+// ===============================================
+
+/**
+ * Show notification message
+ */
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white max-w-md`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span class="whitespace-pre-line">${message}</span>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+/**
+ * Open add student modal
+ */
+function openAddStudentModal() {
+    document.getElementById('addStudentModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Close add student modal
+ */
+function closeAddStudentModal() {
+    document.getElementById('addStudentModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    document.getElementById('addStudentForm').reset();
+}
+
+/**
+ * Search functionality
+ */
+document.getElementById('searchInput')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('.student-row');
+
+    rows.forEach(row => {
+        const name = row.querySelector('.student-name')?.textContent.toLowerCase() || '';
+        const studentId = row.querySelector('.student-id')?.textContent.toLowerCase() || '';
+        const email = row.querySelector('.student-email')?.textContent.toLowerCase() || '';
+
+        if (name.includes(searchTerm) || studentId.includes(searchTerm) || email.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+/**
+ * Status filter functionality
+ */
+document.getElementById('statusFilter')?.addEventListener('change', function(e) {
+    const filterValue = e.target.value;
+    const rows = document.querySelectorAll('.student-row');
+
+    rows.forEach(row => {
+        const statusBadge = row.querySelector('.status-badge');
+        const statusText = statusBadge?.textContent.toLowerCase().trim() || '';
+
+        if (filterValue === 'all') {
+            row.style.display = '';
+        } else if (filterValue === 'active' && statusText === 'active') {
+            row.style.display = '';
+        } else if (filterValue === 'inactive' && statusText === 'inactive') {
+            row.style.display = '';
+        } else if (filterValue === 'archive' && statusText === 'archived') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+/**
+ * Close modals when clicking outside
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const modals = ['addStudentModal', 'editStudentModal', 'archiveStudentModal'];
+    
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
                 }
             });
-        });
-
-        // Archive Student Form Submit
-        document.getElementById('archiveStudentForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const studentId = document.getElementById('archiveStudentId').value;
-            
-            fetch(`/admin/management/students/${studentId}/archive`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    closeArchiveStudentModal();
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred', 'error');
-            });
-        });
-
-        // Notification system
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-            notification.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
         }
-
-        // Close modals when clicking outside
-        document.addEventListener('DOMContentLoaded', function () {
-            const modals = ['addStudentModal', 'editStudentModal', 'archiveStudentModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.addEventListener('click', function (e) {
-                        if (e.target === this) {
-                            this.classList.add('hidden');
-                            document.body.style.overflow = 'auto';
-                        }
-                    });
-                }
-            });
-        });
+    });
+});
     </script>
 @endpush
