@@ -45,34 +45,64 @@
                         <p><span class="font-medium text-blue-600">🔴 Live Quiz</span></p>
                     @endif
                     <p><span class="font-medium">Assigned to:</span>            
-                        @if($assessment->assignments->count() > 0)
+                    @if($assessment->assignments->count() > 0)
+                    @php
+                        $specificStudents = $assessment->assignments->whereNotNull('student_id');
+                        $sectionAssignments = $assessment->assignments->whereNull('student_id');
+
+                        $allSameSection = false;
+                        $commonSection = null;
+
+                        if ($sectionAssignments->count() > 0) {
+                            // True section-wide assignment
+                            $commonSection = $sectionAssignments->pluck('section')->unique()->filter()->implode(', ');
+                            $allSameSection = true;
+                        } elseif ($specificStudents->count() > 0) {
+                            // Check if all specific students are from the same section
+                            $uniqueSections = $specificStudents->pluck('section')->unique()->filter();
+                            if ($uniqueSections->count() === 1) {
+                                $commonSection = $uniqueSections->first();
+
+                                // Verify if ALL students in that section were assigned
+                                $sectionStudentCount = \DB::table('student_profile')
+                                    ->where('section', $commonSection)
+                                    ->count();
+
+                                $assignedCount = $specificStudents->count();
+
+                                // Only call it a full "section assignment" if everyone in that section was assigned
+                                $allSameSection = ($assignedCount === $sectionStudentCount);
+                            }
+                        }
+                    @endphp
+
+                        @if($sectionAssignments->count() > 0)
+                            {{-- Show section assignments --}}
+                            Section {{ $sectionAssignments->pluck('section')->unique()->filter()->implode(', ') }}
+                        @elseif($allSameSection && $commonSection)
+                            {{-- Show as section when all students are from the same section --}}
+                            Section {{ $commonSection }}
+                        @elseif($specificStudents->count() > 0)
+                            {{-- Show individual student names --}}
                             @php
-                                $specificStudents = $assessment->assignments->where('student_id', '!=', null);
-                                $sectionAssignments = $assessment->assignments->where('student_id', null);
-                            @endphp
-                            @if($specificStudents->count() > 0)
-                                @php
-                                    $names = [];
-                                    foreach($specificStudents as $assignment) {
-                                        if ($assignment->student && $assignment->student->studentProfile) {
-                                            $firstname = $assignment->student->studentProfile->firstname ?? '';
-                                            $lastname = $assignment->student->studentProfile->lastname ?? '';
-                                            $fullName = trim($firstname . ' ' . $lastname);
-                                            $names[] = $fullName ?: 'Student ID: ' . $assignment->student_id;
-                                        } else {
-                                            $names[] = 'Student ID: ' . $assignment->student_id;
-                                        }
+                                $names = $specificStudents->map(function ($assignment) {
+                                    if ($assignment->student && $assignment->student->studentProfile) {
+                                        $firstname = $assignment->student->studentProfile->firstname ?? '';
+                                        $lastname = $assignment->student->studentProfile->lastname ?? '';
+                                        $fullName = trim($firstname . ' ' . $lastname);
+                                        return $fullName ?: 'Student ID: ' . $assignment->student_id;
                                     }
-                                @endphp
-                                {{ implode(', ', $names) }}
-                            @elseif($sectionAssignments->count() > 0)
-                                Section {{ $sectionAssignments->pluck('section')->unique()->filter()->implode(', ') }}
-                            @else
-                                Mixed assignments
-                            @endif
+                                    return 'Student ID: ' . $assignment->student_id;
+                                })->toArray();
+                            @endphp
+
+                            {{ implode(', ', $names) }}
                         @else
-                            Not assigned (Debug: {{ $assessment->assignments->count() }} assignments found)
+                            Mixed assignments
                         @endif
+                    @else
+                        Not assigned
+                    @endif
                     </p>
                     <p><span class="font-medium">Responses:</span> 
                         @php
