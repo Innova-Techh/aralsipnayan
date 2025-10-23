@@ -316,7 +316,16 @@ class SimpleQuestionBot:
     
     def _generate_smart_answer(self, question, accuracy_rate, speed_factor):
         """Generate a smart answer based on question content and desired accuracy"""
-        will_be_correct = random.random() < accuracy_rate
+        # Track per-user knowledge probability (simulate learning)
+        if not hasattr(self, "_user_knowledge"):
+            self._user_knowledge = {}
+
+        user_key = getattr(self, "current_user_id", self.current_username)
+        p_know = self._user_knowledge.get(user_key, accuracy_rate * 0.7)
+
+        # Simulate learning: chance of correct grows slightly with each question
+        will_be_correct = random.random() < p_know
+        self._user_knowledge[user_key] = min(0.98, p_know + 0.01) 
         
         # Calculate response time
         max_time = question['max_allowed_time']
