@@ -6,8 +6,13 @@ Focuses on essential metrics: AUC-ROC, Confusion Matrix, and BKT performance
 """
 
 import mysql.connector
-from sklearn.metrics import roc_auc_score, confusion_matrix
+from sklearn.metrics import roc_auc_score, confusion_matrix, roc_curve
 import sys
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from datetime import datetime
+import os
 
 class SimpleBKTAUCTest:
     def __init__(self):
@@ -128,7 +133,153 @@ class SimpleBKTAUCTest:
         print(f"Recall:    {metrics['recall']:.4f}")
         print(f"Specificity: {metrics['specificity']:.4f}")
         
-    def run_analysis(self, assessment_id=None, threshold=0.2):
+    def get_auc_interpretation(self, auc_score):
+        """Get detailed interpretation of AUC-ROC score"""
+        if auc_score >= 0.9:
+            interpretation = "EXCELLENT - Outstanding discriminative ability"
+            description = "The model has excellent discriminative power. It can distinguish between students who will answer correctly and incorrectly with very high accuracy."
+        elif auc_score >= 0.8:
+            interpretation = "GOOD - Excellent discriminative ability"
+            description = "The model shows good discriminative power. It is performing well at distinguishing between correct and incorrect student responses."
+        elif auc_score >= 0.7:
+            interpretation = "FAIR - Acceptable discriminative ability"
+            description = "The model demonstrates fair discriminative ability. While it performs better than random guessing, there is room for improvement."
+        elif auc_score >= 0.6:
+            interpretation = "POOR - Weak discriminative ability"
+            description = "The model shows weak discriminative ability. Performance is only slightly better than random guessing."
+        else:
+            interpretation = "FAIL - No discriminative ability"
+            description = "The model fails to discriminate between outcomes. Performance is no better than random guessing or worse."
+        
+        return {
+            'rating': interpretation,
+            'description': description,
+            'score': auc_score
+        }
+    
+    def visualize_roc_curve(self, responses, results, threshold=0.2):
+        """Create ROC curve visualization"""
+        bkt_predictions = [float(r['bkt_before']) for r in responses]
+        actual_outcomes = [1 if r['is_correct'] else 0 for r in responses]
+        
+        # Calculate ROC curve
+        fpr, tpr, thresholds = roc_curve(actual_outcomes, bkt_predictions)
+        auc_score = results['auc_roc']
+        
+        # Create figure with subplots
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        
+        # Plot 1: ROC Curve
+        ax1 = axes[0]
+        ax1.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {auc_score:.4f})')
+        ax1.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Classifier')
+        ax1.set_xlim([0.0, 1.0])
+        ax1.set_ylim([0.0, 1.05])
+        ax1.set_xlabel('False Positive Rate', fontsize=11)
+        ax1.set_ylabel('True Positive Rate', fontsize=11)
+        ax1.set_title('ROC Curve - BKT Predictive Performance', fontsize=12, fontweight='bold')
+        ax1.legend(loc="lower right", fontsize=10)
+        ax1.grid(alpha=0.3)
+        
+        # Plot 2: Confusion Matrix Heatmap
+        ax2 = axes[1]
+        cm_data = np.array([
+            [results['confusion_matrix']['tn'], results['confusion_matrix']['fp']],
+            [results['confusion_matrix']['fn'], results['confusion_matrix']['tp']]
+        ])
+        sns.heatmap(cm_data, annot=True, fmt='d', cmap='Blues', ax=ax2, 
+                    xticklabels=['Predicted Incorrect', 'Predicted Correct'],
+                    yticklabels=['Actual Incorrect', 'Actual Correct'],
+                    cbar_kws={'label': 'Count'})
+        ax2.set_title('Confusion Matrix', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Actual', fontsize=11)
+        ax2.set_xlabel('Predicted', fontsize=11)
+        
+        plt.tight_layout()
+        
+        # Save figure
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = os.path.join(os.path.dirname(__file__), 'visualizations')
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, f'auc_roc_analysis_{timestamp}.png')
+        plt.savefig(filepath, dpi=300, bbox_inches='tight')
+        print(f"\n✓ ROC Curve visualization saved to: {filepath}")
+        plt.show()
+        
+        return filepath
+    
+    def visualize_performance_metrics(self, results):
+        """Create performance metrics visualization"""
+        metrics = results['metrics']
+        metric_names = ['Accuracy', 'Precision', 'Recall', 'Specificity']
+        metric_values = [metrics['accuracy'], metrics['precision'], metrics['recall'], metrics['specificity']]
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        colors = ['#2ecc71' if v >= 0.7 else '#f39c12' if v >= 0.5 else '#e74c3c' for v in metric_values]
+        bars = ax.bar(metric_names, metric_values, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, metric_values):
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                   f'{value:.4f}',
+                   ha='center', va='bottom', fontsize=11, fontweight='bold')
+        
+        ax.set_ylim([0, 1.1])
+        ax.set_ylabel('Score', fontsize=12, fontweight='bold')
+        ax.set_xlabel('Metrics', fontsize=12, fontweight='bold')
+        ax.set_title(f"BKT Performance Metrics (AUC-ROC: {results['auc_roc']:.4f})", 
+                     fontsize=13, fontweight='bold')
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
+        ax.set_ylim([0, 1.1])
+        
+        plt.tight_layout()
+        
+        # Save figure
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = os.path.join(os.path.dirname(__file__), 'visualizations')
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, f'performance_metrics_{timestamp}.png')
+        plt.savefig(filepath, dpi=300, bbox_inches='tight')
+        print(f"✓ Performance metrics visualization saved to: {filepath}")
+        plt.show()
+        
+        return filepath
+        
+    def print_auc_interpretation(self, results):
+        """Print AUC-ROC interpretation"""
+        auc_score = results['auc_roc']
+        interpretation = self.get_auc_interpretation(auc_score)
+        
+        print("\n" + "="*60)
+        print("AUC-ROC INTERPRETATION")
+        print("="*60)
+        print(f"\nAUC-ROC Score: {auc_score:.4f}")
+        print(f"Rating: {interpretation['rating']}")
+        print(f"\nDescription:")
+        print(f"{interpretation['description']}")
+        
+        # Additional insights
+        print(f"\nKEY INSIGHTS:")
+        cm = results['confusion_matrix']
+        total_positive = cm['tp'] + cm['fn']
+        total_negative = cm['tn'] + cm['fp']
+        
+        if total_positive > 0:
+            sensitivity = cm['tp'] / total_positive
+            print(f"✓ Sensitivity (True Positive Rate): {sensitivity:.4f}")
+            print(f"  → Out of {total_positive} correct responses, BKT predicted {cm['tp']} correctly")
+        
+        if total_negative > 0:
+            specificity = cm['tn'] / total_negative
+            print(f"✓ Specificity (True Negative Rate): {specificity:.4f}")
+            print(f"  → Out of {total_negative} incorrect responses, BKT predicted {cm['tn']} correctly")
+        
+        print("\n" + "="*60)
+        
+    
+    def run_analysis(self, assessment_id=None, threshold=0.2, visualize=True):
         """Run the complete AUC-ROC analysis"""
         print("BKT AUC-ROC TESTING")
         print("Testing BKT predictive accuracy using real database data")
@@ -147,6 +298,19 @@ class SimpleBKTAUCTest:
         
         # Display results
         self.display_results(results)
+        
+        # Print AUC-ROC interpretation
+        self.print_auc_interpretation(results)
+        
+        # Create visualizations
+        if visualize:
+            try:
+                print("\n📊 Generating visualizations...")
+                self.visualize_roc_curve(responses, results, threshold)
+                self.visualize_performance_metrics(results)
+                print("✓ All visualizations generated successfully!")
+            except Exception as e:
+                print(f"⚠ Warning: Could not generate visualizations: {e}")
         
         return results
 
