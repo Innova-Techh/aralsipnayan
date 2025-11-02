@@ -356,6 +356,10 @@
                     <h2 class="text-gray-800 text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed">
                         {{ $currentQuestion }}. {{ $question->text }}
                     </h2>
+                    <!-- Remove when deploying just for testing -->
+                    @if(isset($question))
+                        <input type="hidden" name="question_id" value="{{ $question->question_id }}" data-question-id="{{ $question->question_id }}">
+                    @endif
                 </div>
 
                 <!-- Answer Section -->

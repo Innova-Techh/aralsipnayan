@@ -12,18 +12,41 @@ class StudentSectionsSeeder extends Seeder
 {
     public function run(): void
     {
-        $sections = ['Einstein', 'Newton', 'Curie'];
         $schoolYear = '2024-2025';
         $schoolName = 'Pembo Elementary School';
+
+        // Get sections from sections table
+        $sections = DB::table('sections')
+            ->where('school_year', $schoolYear)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name')
+            ->toArray();
+
+        if (empty($sections)) {
+            $this->command->warn('No sections found in sections table. Please run SectionsSeeder first.');
+            return;
+        }
 
         $firstNames = ['John', 'Jane', 'Carlos', 'Maria', 'Liam', 'Emma', 'Noah', 'Olivia', 'Ethan', 'Ava'];
         $middleNames = ['Michael', 'Grace', 'Santos', 'Reyes', 'Anne', 'David', 'Timothy', 'Rose', 'James', 'Mae'];
         $lastNames = ['Cruz', 'Santos', 'Reyes', 'Garcia', 'Dela Cruz', 'Bautista', 'Torres', 'Flores', 'Ramos', 'Aquino'];
 
+        $studentCount = 0;
+
         foreach ($sections as $sectionIndex => $section) {
+            $this->command->info("Creating students for section: {$section}");
+            
             for ($i = 1; $i <= 5; $i++) {
-                $username = 'student' . strtolower($section) . $i; // studenta1, studentb1, studentc1
+                $username = 'student' . strtolower($section) . $i;
                 $email = $username . '@example.com';
+
+                // Check if user already exists
+                $existingUser = User::where('username', $username)->first();
+                if ($existingUser) {
+                    $this->command->info("User {$username} already exists. Skipping.");
+                    continue;
+                }
 
                 $nameIndex = ($sectionIndex * 5) + ($i - 1);
                 $firstname = $firstNames[$nameIndex % count($firstNames)];
@@ -37,13 +60,6 @@ class StudentSectionsSeeder extends Seeder
                     'role' => 'Student',
                     'status' => 'active',
                 ]);
-
-                // Generate random points for testing leaderboard (higher points for first few students)
-                $totalPoints = rand(100, 2000);
-                // Make some students have higher points for testing
-                if ($i <= 3) {
-                    $totalPoints = rand(1000, 2500);
-                }
 
                 DB::table('student_profile')->insert([
                     'user_id' => $user->id,
@@ -69,14 +85,15 @@ class StudentSectionsSeeder extends Seeder
                     'current_streak' => rand(0, 10),
                     'longest_streak' => rand(0, 15),
                     'last_activity_date' => Carbon::now(),
-                    'total_points' => $totalPoints,
+                    'total_points' => 0,
 
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
+
+                $studentCount++;
             }
         }
+
     }
 }
-
-

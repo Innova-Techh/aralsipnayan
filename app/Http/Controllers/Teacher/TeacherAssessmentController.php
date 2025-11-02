@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class TeacherAssessmentController extends Controller
 {
@@ -183,11 +184,11 @@ class TeacherAssessmentController extends Controller
         }
 
         if (!empty($selectedStudents)) {
-            // If assigning to specific students, ensure no section-wide rows remain for this assessment
+            // Assign directly to specific students
             AssessmentAssignment::where('assessment_id', $assessment->id)
                 ->whereNull('student_id')
                 ->delete();
-
+        
             foreach ($selectedStudents as $studentId) {
                 AssessmentAssignment::create([
                     'assessment_id' => $assessment->id,
@@ -195,20 +196,61 @@ class TeacherAssessmentController extends Controller
                     'section' => null,
                     'accommodations' => $request->input('accommodations', false),
                     'assigned_at' => now(),
-                    'due_date' => $request->available_until
+                    'due_date' => $request->available_until,
+                    'status' => 'Assigned',
                 ]);
             }
+        
+        
         } elseif ($request->has('sections')) {
-            // Otherwise, assign to entire sections
+        
+            // Delete any existing individual student assignments for these sections
+            $deleteCount = AssessmentAssignment::where('assessment_id', $assessment->id)
+                ->whereIn('section', (array) $request->sections)
+                ->delete();
+                
+        
             foreach ((array) $request->sections as $section) {
-                AssessmentAssignment::create([
-                    'assessment_id' => $assessment->id,
-                    'section' => $section,
-                    'accommodations' => $request->input('accommodations', false),
-                    'assigned_at' => now(),
-                    'due_date' => $request->available_until
-                ]);
+                \Log::info('Processing section', ['section' => $section]);
+        
+                // Get all students in this section
+                $students = DB::table('student_profile')
+                    ->join('users', 'student_profile.user_id', '=', 'users.id')
+                    ->where('student_profile.section', $section)
+                    ->select('users.id as student_id')
+                    ->get();
+        
+        
+                if ($students->isEmpty()) {
+                    \Log::warning('No students found for section', [
+                        'section' => $section,
+                        'assessment_id' => $assessment->id,
+                    ]);
+                    continue;
+                }
+        
+                $createdCount = 0;
+                foreach ($students as $student) {
+                    AssessmentAssignment::create([
+                        'assessment_id' => $assessment->id,
+                        'student_id' => $student->student_id,
+                        'section' => $section,
+                        'accommodations' => $request->input('accommodations', false),
+                        'assigned_at' => now(),
+                        'due_date' => $request->available_until,
+                        'status' => 'Assigned',
+                    ]);
+                    $createdCount++;
+                }
+        
             }
+            
+        } else {
+            \Log::warning('No assignment conditions met', [
+                'has_selectedStudents' => !empty($selectedStudents),
+                'has_sections' => $request->has('sections'),
+                'assessment_id' => $assessment->id
+            ]);
         }
 
         return redirect()->route('teacher.assessments')->with('success', 'Assessment created successfully!');
@@ -522,63 +564,104 @@ class TeacherAssessmentController extends Controller
     public function assign(Request $request)
     {
         try {
-        $assessment = Assessment::findOrFail($request->assessment_id);
-        
-        // If section is provided, remove existing section-wide assignments
-        if ($request->section) {
-            AssessmentAssignment::where('assessment_id', $assessment->id)
-                ->whereNull('student_id')
-                ->where(function($q) use ($request) {
-                    $q->where('section', $request->section)
-                      ->orWhere('section', 'Section ' . $request->section);
-                })
-                ->delete();
-        }
-        
-        // If specific students are selected
-        if (!empty($request->student_ids)) {
-            // Assign only to specific students
-            foreach ($request->student_ids as $studentId) {
-                AssessmentAssignment::create([
+            $assessment = Assessment::findOrFail($request->assessment_id);
+    
+            Log::debug('Assign request payload', [
+                'assessment_id' => $assessment->id,
+                'student_ids' => $request->student_ids,
+                'section' => $request->section,
+                'sections' => $request->sections,
+            ]);
+    
+            // 🧩 If specific students are selected
+            if (!empty($request->student_ids)) {
+                foreach ($request->student_ids as $studentId) {
+                    AssessmentAssignment::updateOrCreate(
+                        [
+                            'assessment_id' => $assessment->id,
+                            'student_id' => $studentId,
+                        ],
+                        [
+                            'section' => null,
+                            'accommodations' => $request->boolean('accommodations'),
+                            'assigned_at' => now(),
+                            'due_date' => $assessment->available_until,
+                            'status' => 'Assigned',
+                        ]
+                    );
+                }
+            }
+    
+            // 🧩 If a section (or multiple) is selected
+            if ($request->has('sections') || $request->section) {
+                $sections = $request->has('sections')
+                    ? (array) $request->sections
+                    : [(string) $request->section];
+    
+                foreach ($sections as $section) {
+                    // 🧠 Get all students in this section
+                    $students = DB::table('student_profile')
+                        ->join('users', 'student_profile.user_id', '=', 'users.id')
+                        ->where('student_profile.section', $section)
+                        ->select('users.id as student_id')
+                        ->get();
+    
+                    if ($students->isEmpty()) {
+                        Log::warning('No students found for section', [
+                            'section' => $section,
+                            'assessment_id' => $assessment->id,
+                        ]);
+                        continue;
+                    }
+    
+                    foreach ($students as $student) {
+                        AssessmentAssignment::updateOrCreate(
+                            [
+                                'assessment_id' => $assessment->id,
+                                'student_id' => $student->student_id,
+                            ],
+                            [
+                                'section' => $section,
+                                'accommodations' => $request->boolean('accommodations'),
+                                'assigned_at' => now(),
+                                'due_date' => $assessment->available_until,
+                                'status' => 'Assigned',
+                            ]
+                        );
+                    }
+    
+                    Log::info('Section assigned successfully', [
+                        'section' => $section,
+                        'student_count' => $students->count(),
+                        'assessment_id' => $assessment->id,
+                    ]);
+                }
+            }
+    
+            // 🟢 No section or student selected
+            if (empty($request->student_ids) && !$request->has('sections') && !$request->section) {
+                Log::warning('No assignment conditions met', [
+                    'has_student_ids' => !empty($request->student_ids),
+                    'has_sections' => $request->has('sections'),
+                    'has_section' => $request->section,
                     'assessment_id' => $assessment->id,
-                    'student_id' => $studentId,
-                    // Ensure student-specific rows are never treated as section-wide
-                    'section' => null,
-                    'accommodations' => $request->input('accommodations', false),
-                    'assigned_at' => now(),
-                    'due_date' => $assessment->available_until
                 ]);
             }
-            // Ensure assessment becomes visible to students
+    
+            // ✅ Ensure assessment becomes visible
             if ($assessment->status !== 'Active') {
                 $assessment->status = 'Active';
                 $assessment->save();
             }
-        } elseif ($request->section) {
-            // Assign to entire section (no specific students selected)
-            AssessmentAssignment::create([
-                'assessment_id' => $assessment->id,
-                'student_id' => null,
-                'section' => $request->section,
-                'accommodations' => $request->boolean('accommodations'),
-                'assigned_at' => now(),
-                'due_date' => $assessment->available_until
-            ]);
-
-            // Ensure assessment becomes visible to students
-            if ($assessment->status !== 'Active') {
-                $assessment->status = 'Active';
-                $assessment->save();
-            }
-        }
-
-            \Log::info('Assignment completed successfully');
+    
+            Log::info('Assignment completed successfully');
             return response()->json(['success' => true, 'message' => 'Assessment assigned successfully!']);
+    
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation failed:', ['errors' => $e->errors()]);
+            Log::error('Validation failed:', ['errors' => $e->errors()]);
             return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            \Log::error('Assignment failed:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            Log::error('Assignment failed:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'Failed to assign assessment', 'error' => $e->getMessage()], 500);
         }
     }
@@ -728,7 +811,6 @@ class TeacherAssessmentController extends Controller
             'quiz_start_time' => now(),
             'quiz_answers' => []
         ]);
-
         return view('student.assessments.quiz', compact('assessment', 'assignment', 'questionDetails'));
     }
 
@@ -813,86 +895,101 @@ class TeacherAssessmentController extends Controller
     public function completeQuiz(Request $request, Assessment $assessment)
     {
         $student = Auth::guard('student')->user();
-        
+
         // Verify quiz session
         if (session('quiz_assessment_id') != $assessment->id) {
             return redirect()->route('teacher-assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Invalid quiz session.']);
         }
-        
-        // Debug: Log session data before processing
+
+        // --- Debug: Initial session state ---
         \Log::info('Quiz completion started', [
             'student_id' => $student->id,
             'assessment_id' => $assessment->id,
-            'session_quiz_id' => session('quiz_assessment_id'),
-            'session_answers' => session('quiz_answers', []),
-            'session_questions' => session('quiz_questions', [])
         ]);
 
         $answers = session('quiz_answers', []);
-        
-        // Calculate total time from individual question times
-        $totalTime = 0;
-        foreach ($answers as $answer) {
-            $totalTime += $answer['time_taken'] ?? 0;
-        }
-        
-        // Fallback to session time if no individual times recorded
-        if ($totalTime === 0) {
-            $startTime = session('quiz_start_time');
-            $totalTime = now()->diffInSeconds($startTime);
+
+        // Calculate total time
+        $totalTime = collect($answers)->sum('time_taken') ?? 0;
+        if ($totalTime === 0 && session('quiz_start_time')) {
+            $totalTime = now()->diffInSeconds(session('quiz_start_time'));
         }
 
         // Calculate results
-        $correctAnswers = array_filter($answers, function($answer) {
-            return $answer['is_correct'];
-        });
-
-        $score = count($correctAnswers);
+        $correctAnswers = collect($answers)->where('is_correct', true)->count();
         $totalQuestions = count($answers);
-        $percentage = $totalQuestions > 0 ? round(($score / $totalQuestions) * 100, 2) : 0;
-        
-        // Debug logging
-        \Log::info('Quiz completion debug', [
+        $percentage = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
+
+        // --- Debug: Quiz result summary ---
+        \Log::info('Quiz completion summary', [
             'student_id' => $student->id,
             'assessment_id' => $assessment->id,
-            'total_answers' => $totalQuestions,
-            'correct_answers' => $score,
+            'score' => $correctAnswers,
+            'total_questions' => $totalQuestions,
             'percentage' => $percentage,
-            'total_time' => $totalTime,
-            'answers_data' => $answers
+            'time_taken' => $totalTime,
         ]);
 
-        // Store quiz results in database
+        // Store results
         QuizResult::updateOrCreate(
             [
                 'student_id' => $student->id,
-                'assessment_id' => $assessment->id
+                'assessment_id' => $assessment->id,
             ],
             [
-                'score' => $score,
+                'score' => $correctAnswers,
                 'total_questions' => $totalQuestions,
                 'percentage' => $percentage,
                 'time_taken' => $totalTime,
                 'answers' => $answers,
-                'completed_at' => now()
+                'completed_at' => now(),
             ]
         );
 
-        // Update assignment status
+        // --- Update assignment status (handles student or section assignments) ---
+       // Get the student's section from their profile
+        $studentProfile = DB::table('student_profile')
+        ->where('user_id', $student->id)
+        ->first();
+
+        $studentSection = $studentProfile ? $studentProfile->section : null;
+
+        // ✅ Update assignment status (handles both student-specific and section-based assignments)
         $assignment = AssessmentAssignment::where('assessment_id', $assessment->id)
-            ->where('student_id', $student->id)
-            ->first();
-        
+        ->where(function ($query) use ($student, $studentSection) {
+            $query->where('student_id', $student->id)
+                  ->orWhere('section', $studentSection);
+        })
+        ->first();
+
         if ($assignment) {
+            Log::info('Assignment found before update', [
+                'assignment_id' => $assignment->id,
+                'student_id' => $student->id,
+                'student_section' => $studentSection,
+                'assignment_section' => $assignment->section,
+                'current_status' => $assignment->status
+            ]);
+        
             $assignment->update(['status' => 'Completed']);
+        } else {
+            Log::warning('Assignment not found for update', [
+                'assessment_id' => $assessment->id,
+                'student_id' => $student->id,
+                'student_section' => $studentSection
+            ]);
         }
 
         // Clear quiz session
-        session()->forget(['quiz_assessment_id', 'quiz_questions', 'current_question_index', 'quiz_start_time', 'quiz_answers']);
+        session()->forget([
+            'quiz_assessment_id', 'quiz_questions', 'current_question_index',
+            'quiz_start_time', 'quiz_answers'
+        ]);
 
+        // Redirect with success message
         return redirect()->route('teacher-assessments.show', $assessment->id)
-            ->with('success', "Quiz completed! Score: {$score}/{$totalQuestions} ({$percentage}%)");
+            ->with('success', "Quiz completed! Score: {$correctAnswers}/{$totalQuestions} ({$percentage}%)");
     }
 
     /**

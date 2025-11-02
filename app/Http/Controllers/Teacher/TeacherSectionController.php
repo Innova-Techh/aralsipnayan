@@ -10,138 +10,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TeacherSectionController extends Controller
 {
-    /**
-     * Show student profile with detailed information
-     */
-    public function showStudentProfile($studentId)
-    {
-        // Check authentication
-        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('admin.login');
-        }
-        
-        $teacher = Auth::guard('admin')->user();
-        
-        // Fetch the student data
-        $user = User::find($studentId);
-        
-        if (!$user || $user->role !== 'Student') {
-            return redirect()->back()->with('error', 'Student not found');
-        }
-        
-        // Get student profile
-        $studentProfile = DB::table('student_profile')
-            ->where('user_id', $studentId)
-            ->first();
-        
-        if (!$studentProfile) {
-            return redirect()->back()->with('error', 'Student profile not found');
-        }
-        
-        // Verify teacher has access to this student's section
-        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
-        
-        if (!$teacherProfile) {
-            return redirect()->back()->with('error', 'Teacher profile not found');
-        }
-        
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
-            ->toArray();
-        
-        if (!in_array($studentProfile->section, $teacherSections)) {
-            return redirect()->back()->with('error', 'Access denied to this student');
-        }
-        
-        // Get section details
-        $section = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->where('section', $studentProfile->section)
-            ->first();
-        
-        // Get student's assessment history
-        $assessmentResults = collect([]);
-        
-        try {
-            if (DB::getSchemaBuilder()->hasTable('teacher_assessment_results')) {
-                $assessmentResults = DB::table('teacher_assessment_results')
-                    ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
-                    ->join('teacher_assessments', 'teacher_assessment_assignments.assessment_id', '=', 'teacher_assessments.id')
-                    ->where('teacher_assessment_results.student_id', $studentId)
-                    ->where('teacher_assessment_results.status', 'completed')
-                    ->select([
-                        'teacher_assessments.title as name',
-                        'teacher_assessment_results.score',
-                        'teacher_assessment_results.completed_at as date',
-                        'teacher_assessment_results.time_spent as time',
-                        'teacher_assessments.assessment_type as type'
-                    ])
-                    ->orderByDesc('teacher_assessment_results.completed_at')
-                    ->limit(10)
-                    ->get()
-                    ->map(function($assessment) {
-                        return [
-                            'name' => $assessment->name,
-                            'score' => round($assessment->score) . '%',
-                            'date' => \Carbon\Carbon::parse($assessment->date)->format('Y-m-d'),
-                            'time' => round($assessment->time / 60, 1) . ' min',
-                            'type' => ucfirst($assessment->type)
-                        ];
-                    });
-            }
-        } catch (\Exception $e) {
-            $assessmentResults = collect([]);
-        }
-        
-        // Calculate statistics
-        $totalAssessments = $assessmentResults->count();
-        $avgScore = $assessmentResults->isNotEmpty() ? $assessmentResults->avg(function($item) {
-            return (float) str_replace('%', '', $item['score']);
-        }) : 0;
-        
-        // Build student object for the view
-        $student = (object)[
-            'id' => $user->id,
-            'name' => trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname),
-            'email' => $user->email,
-            'phone' => $studentProfile->phone ?? '+1 (555) 123-4567',
-            'grade_level' => $studentProfile->grade_level ?? '6',
-            'section_id' => $studentProfile->section,
-            'total_points' => $studentProfile->total_points ?? 0,
-            'assessment_count' => $totalAssessments,
-            'best_streak' => $studentProfile->longest_streak ?? 0,
-            'time_spent' => round(($studentProfile->total_points ?? 0) / 10, 1),
-            'avg_time_per_question' => '1.8',
-            'numerical_literacy_score' => 96,
-            'algebraic_thinking_score' => 89,
-            'geometric_reasoning_score' => 94,
-            'problem_solving_score' => 91,
-            'last_assessment_name' => $assessmentResults->first()['name'] ?? 'No assessments yet',
-            'last_assessment_score' => $assessmentResults->first()['score'] ?? '0%',
-            'last_assessment_date' => $assessmentResults->first()['date'] ?? 'N/A',
-            'last_assessment_time' => $assessmentResults->first()['time'] ?? '0 min',
-            'last_assessment_accuracy' => $assessmentResults->isNotEmpty() ? $assessmentResults->first()['score'] : '0%',
-            'assessments' => $assessmentResults->toArray(),
-            'struggling_areas' => [],
-            'achievements' => []
-        ];
-        
-        // Build section object
-        $sectionObj = (object)[
-            'id' => $section->id ?? null,
-            'name' => $studentProfile->section
-        ];
-        
-        // FIXED: Use the correct view path - teacher.sections.student-profile
-        return view('admin.teacher.sections.student-profile', [
-            'student' => $student,
-            'section' => $sectionObj
-        ]);
-    }
+    
 
     /**
      * Display the section management page with real data
@@ -156,42 +29,53 @@ class TeacherSectionController extends Controller
         if (!$teacherProfile) {
             $sectionsData = [];
         } else {
-            $teacherSections = DB::table('teacher_sections')
-                ->where('teacher_id', $teacherProfile->id)
-                ->pluck('section')
-                ->toArray();
+            // Get sections assigned to this teacher from sections table
+            $teacherSections = DB::table('sections')
+                ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+                ->where('teacher_sections.teacher_id', $teacherProfile->id)
+                ->where('sections.is_active', true)
+                ->select('sections.name', 'sections.grade_level', 'sections.school_year')
+                ->get();
 
             $sectionsData = [];
             
             foreach ($teacherSections as $section) {
+
+                // Get student active count for this section
+                $studentActiveCount = DB::table('student_profile')
+                    ->join('users', 'student_profile.user_id', '=', 'users.id')
+                    ->where('student_profile.section', $section->name)
+                    ->where('users.status', 'active')
+                    ->count();
                 // Get student count for this section
                 $studentCount = DB::table('student_profile')
                     ->join('users', 'student_profile.user_id', '=', 'users.id')
-                    ->where('student_profile.section', $section)
-                    ->where('users.status', 'active')
+                    ->where('student_profile.section', $section->name)
                     ->count();
 
                 // Get active assessments count for this section
                 $activeAssessmentsCount = DB::table('teacher_assessment_assignments')
                     ->join('teacher_assessments', 'teacher_assessment_assignments.assessment_id', '=', 'teacher_assessments.id')
-                    ->where('teacher_assessment_assignments.section', $section)
+                    ->where('teacher_assessment_assignments.section', $section->name)
                     ->where('teacher_assessments.status', 'Active')
                     ->where('teacher_assessments.created_by', $teacher->id)
                     ->count();
 
                 // Get average performance for this section
-                $averagePerformance = $this->getSectionAveragePerformance($section);
+                $averagePerformance = $this->getSectionAveragePerformance($section->name);
 
                 $sectionsData[] = [
-                    'section' => $section,
-                    'grade_level' => '6', // Fixed to Grade 6
+                    'section' => $section->name,
+                    'grade_level' => $section->grade_level,
                     'student_count' => $studentCount,
+                    'student_active' => $studentActiveCount,
                     'active_assessments' => $activeAssessmentsCount,
                     'average_performance' => $averagePerformance,
-                    'last_activity' => $this->getLastActivityForSection($section)
+                    'last_activity' => $this->getLastActivityForSection($section->name)
                 ];
             }
         }
+      
 
         return view('admin.teacher.sections.index', compact('sectionsData'));
     }
@@ -201,34 +85,36 @@ class TeacherSectionController extends Controller
      */
     public function show($section)
     {
+       
         $teacher = Auth::guard('admin')->user();
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
 
         if (!$teacherProfile) {
             abort(404, 'Teacher profile not found');
         }
-
         // Verify teacher has access to this section
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
+        $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->pluck('sections.name')
             ->toArray();
 
         if (!in_array($section, $teacherSections)) {
             abort(403, 'Access denied to this section');
         }
 
-        // Get section details
-        $sectionDetails = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->where('section', $section)
+        // Get section details from sections table
+        $sectionDetails = DB::table('sections')
+            ->where('name', $section)
+            ->where('is_active', true)
             ->first();
 
-        // Get students with detailed information
+        // Get students with detailed information from user_progress table
         $students = DB::table('student_profile')
             ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->leftJoin('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
             ->where('student_profile.section', $section)
-            // Include all users; status will be displayed in UI
             ->select([
                 'student_profile.user_id',
                 'student_profile.student_id',
@@ -236,53 +122,39 @@ class TeacherSectionController extends Controller
                 'student_profile.middlename',
                 'student_profile.lastname',
                 'student_profile.section',
-                'student_profile.total_points',
-                'student_profile.current_streak',
                 'student_profile.last_activity_date',
                 'users.email',
-                'users.status'
+                'users.status',
+                'user_progress.total_points',
+                'user_progress.current_level',
+                'user_progress.points_in_current_level',
+                'user_progress.current_rank',
+                'user_progress.current_streak',
+                'user_progress.last_assessment_date'
             ])
-            ->orderByDesc('student_profile.total_points')
+            ->orderByRaw("CASE WHEN users.status = 'active' THEN 1 ELSE 2 END ASC")
+            ->orderByDesc('user_progress.total_points')
             ->get()
             ->map(function ($student, $index) use ($section) {
-                // Check if teacher_assessment_assignments table exists
-                $totalAssessments = 0;
-                $completedAssessments = 0;
+                // Get assessment data for score calculation
                 $avgScore = 0;
 
                 try {
-                    // Get total assignments for this section
-                    $totalAssessments = DB::table('teacher_assessment_assignments')
-                        ->where('section', $section)
-                        ->count();
+                    // Get average score from assessments table (same as index page)
+                    $avgScore = DB::table('assessments')
+                        ->where('assessments.user_id', $student->user_id)
+                        ->where('assessments.status', 'completed')
+                        ->where('assessments.assessment_type', 'regular')
+                        ->avg('assessments.accuracy_percentage');
 
-                    // Try to get completed assessments (if table exists)
-                    if (DB::getSchemaBuilder()->hasTable('teacher_assessment_results')) {
-                        $completedAssessments = DB::table('teacher_assessment_results')
-                            ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
-                            ->where('teacher_assessment_results.student_id', $student->user_id)
-                            ->where('teacher_assessment_assignments.section', $section)
-                            ->where('teacher_assessment_results.status', 'completed')
-                            ->count();
-
-                        // Calculate average score
-                        $avgScore = DB::table('teacher_assessment_results')
-                            ->join('teacher_assessment_assignments', 'teacher_assessment_results.assignment_id', '=', 'teacher_assessment_assignments.id')
-                            ->where('teacher_assessment_results.student_id', $student->user_id)
-                            ->where('teacher_assessment_assignments.section', $section)
-                            ->where('teacher_assessment_results.status', 'completed')
-                            ->avg('teacher_assessment_results.score');
-                    }
                 } catch (\Exception $e) {
                     // If tables don't exist, use default values
-                    $totalAssessments = 0;
-                    $completedAssessments = 0;
                     $avgScore = 0;
                 }
 
-                // If no assessment data, use points-based score estimate
+                // If no assessment data, set score to 0 (will be excluded from average)
                 if (!$avgScore) {
-                    $avgScore = min(($student->total_points / 30), 100); // Estimate based on points
+                    $avgScore = 0; // Don't use fallback formula
                 }
 
                 return [
@@ -292,33 +164,51 @@ class TeacherSectionController extends Controller
                     'email' => $student->email,
                     'status' => $student->status,
                     'score' => round($avgScore),
-                    'progress' => $totalAssessments > 0 ? "$completedAssessments/$totalAssessments" : "0/0",
-                    'completed' => $completedAssessments,
-                    'total' => $totalAssessments,
-                    'points' => $student->total_points,
-                    'streak' => $student->current_streak,
+                    'current_level' => $student->current_level ?? 1,
+                    'points_in_current_level' => $student->points_in_current_level ?? 0,
+                    'current_rank' => $student->current_rank ?? 'Math Explorer',
+                    'points' => $student->total_points ?? 0,
+                    'streak' => $student->current_streak ?? 0,
                     'last_activity' => $student->last_activity_date ? 
                         \Carbon\Carbon::parse($student->last_activity_date)->diffForHumans() : 
                         'Never',
                     'rank' => $index + 1
                 ];
             });
+        // Get student active count for this section
+        $studentActiveCount = DB::table('student_profile')
+        ->join('users', 'student_profile.user_id', '=', 'users.id')
+        ->join('sections', 'student_profile.section', '=', 'sections.name')
+        ->where('sections.name', $section)
+        ->where('sections.is_active', true)
+        ->where('users.status', 'active')
+        ->count();
 
-        // Calculate section statistics
-        $totalStudents = $students->count();
-        $activeStudents = $students->count(); // All queried students are active
-        $averageScore = $students->avg('score');
+        // Get total student count for this section
+        $studentCount = DB::table('student_profile')
+        ->join('users', 'student_profile.user_id', '=', 'users.id')
+        ->join('sections', 'student_profile.section', '=', 'sections.name')
+        ->where('sections.name', $section)
+        ->where('sections.is_active', true)
+        ->count();
         
-        // Calculate completion rate
-        $totalPossibleCompletions = $students->sum('total');
-        $totalCompletions = $students->sum('completed');
-        $completionRate = $totalPossibleCompletions > 0 ? 
-            round(($totalCompletions / $totalPossibleCompletions) * 100) : 0;
+        $averageScore = $this->getSectionAveragePerformance($section);
+        
+        // After building $students collection
+        $activeStudents = $students->filter(fn($student) => $student['status'] === 'active');
 
-        // Get top performer
-        $topPerformer = $students->first();
+        // Sort active students by points
+        $sortedActive = $activeStudents->sortByDesc('points')->values();
+
+        // Recalculate top performer
+        $topPerformer = $sortedActive->first();
         $topPerformerName = $topPerformer ? $topPerformer['name'] : 'N/A';
         $topPerformerScore = $topPerformer ? $topPerformer['score'] : 0;
+
+        // Also recompute average level (active only)
+        $averageLevel = $activeStudents->isNotEmpty()
+            ? round($activeStudents->avg('current_level'))
+            : 1;
 
         // Get teacher name
         $teacherName = $teacher->firstname . ' ' . $teacher->lastname;
@@ -338,10 +228,10 @@ class TeacherSectionController extends Controller
         return view('admin.teacher.sections.manage-section', [
             'section' => $sectionData,
             'students' => $students,
-            'totalStudents' => $totalStudents,
-            'activeStudents' => $activeStudents,
-            'averageScore' => round($averageScore),
-            'completionRate' => $completionRate,
+            'totalStudents' => $studentCount,
+            'activeStudents' => $studentActiveCount,
+            'averageScore' => $averageScore,
+            'averageLevel' => $averageLevel,
             'topPerformer' => $topPerformerName,
             'topPerformerScore' => $topPerformerScore,
             'teacher' => $teacherName,
@@ -359,18 +249,21 @@ class TeacherSectionController extends Controller
         
         // Verify teacher has access to this section
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
-        $teacherSections = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->pluck('section')
+        $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->pluck('sections.name')
             ->toArray();
 
         if (!in_array($section, $teacherSections)) {
             return response()->json(['error' => 'Access denied to this section'], 403);
         }
 
-        // Get students from the section with their progress data
+        // Get students from the section with their progress data from user_progress table
         $students = DB::table('student_profile')
             ->join('users', 'student_profile.user_id', '=', 'users.id')
+            ->leftJoin('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
             ->where('student_profile.section', $section)
             ->where('users.status', 'active')
             ->select([
@@ -380,12 +273,14 @@ class TeacherSectionController extends Controller
                 'student_profile.middlename',
                 'student_profile.lastname',
                 'student_profile.section',
+                'student_profile.gender',
                 'student_profile.grade_level',
                 'student_profile.school_year',
-                'student_profile.total_points',
-                'student_profile.current_streak',
                 'student_profile.last_activity_date',
-                'users.email'
+                'users.email',
+                'user_progress.total_points',
+                'user_progress.current_streak',
+                'user_progress.last_assessment_date'
             ])
             ->get()
             ->map(function ($student) {
@@ -400,12 +295,13 @@ class TeacherSectionController extends Controller
                     'lastname' => $student->lastname,
                     'name' => trim($student->firstname . ' ' . ($student->middlename ? $student->middlename . ' ' : '') . $student->lastname),
                     'email' => $student->email,
+                    'gender' => $student->gender,
                     'section' => $student->section,
                     'grade_level' => $student->grade_level,
                     'school_year' => $student->school_year,
                     'progress' => round($progress, 1),
-                    'total_points' => $student->total_points,
-                    'current_streak' => $student->current_streak,
+                    'total_points' => $student->total_points ?? 0,
+                    'current_streak' => $student->current_streak ?? 0,
                     'last_activity' => $student->last_activity_date ? 
                         \Carbon\Carbon::parse($student->last_activity_date)->diffForHumans() : 
                         'Never'
@@ -435,10 +331,9 @@ class TeacherSectionController extends Controller
             return response()->json(['error' => 'Teacher profile not found'], 404);
         }
 
-        // Check if section already exists for this teacher
-        $existingSection = DB::table('teacher_sections')
-            ->where('teacher_id', $teacherProfile->id)
-            ->where('section', $request->section)
+        // Check if section already exists in sections table
+        $existingSection = DB::table('sections')
+            ->where('name', $request->section)
             ->where('school_year', $request->school_year)
             ->first();
 
@@ -447,18 +342,35 @@ class TeacherSectionController extends Controller
         }
 
         try {
-            DB::table('teacher_sections')->insert([
-                'teacher_id' => $teacherProfile->id,
-                'section' => $request->section,
+            DB::beginTransaction();
+
+            // First, create the section in sections table
+            DB::table('sections')->insert([
+                'name' => $request->section,
                 'grade_level' => '6', // Fixed to Grade 6
-                'school_year' => $request->school_year,
+                'school_year' => $request->school_year ?? '2024-2025',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
 
+            // Then, assign the teacher to the section
+            DB::table('teacher_sections')->insert([
+                'teacher_id' => $teacherProfile->id,
+                'section' => $request->section,
+                'grade_level' => '6', // Fixed to Grade 6
+                'school_year' => $request->school_year ?? '2024-2025',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            DB::commit();
+
+
             return response()->json([
                 'success' => true,
-                'message' => 'Section created successfully!'
+                'message' => 'Section created successfully!',
+                'section' => $request->section // Include section name for frontend
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create section: ' . $e->getMessage()], 500);
@@ -470,10 +382,6 @@ class TeacherSectionController extends Controller
      */
     public function update(Request $request, $section)
     {
-        $request->validate([
-            'section' => 'required|string|max:50',
-            'school_year' => 'nullable|string|max:20'
-        ]);
 
         $teacher = Auth::guard('admin')->user();
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
@@ -483,6 +391,18 @@ class TeacherSectionController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
+            // Update the section in sections table
+            DB::table('sections')
+                ->where('name', $section)
+                ->update([
+                    'name' => $request->section,
+                    'grade_level' => '6', // Fixed to Grade 6
+                    'updated_at' => now()
+                ]);
+
+            // Update the teacher_sections table
             DB::table('teacher_sections')
                 ->where('teacher_id', $teacherProfile->id)
                 ->where('section', $section)
@@ -492,6 +412,8 @@ class TeacherSectionController extends Controller
                     'school_year' => $request->school_year,
                     'updated_at' => now()
                 ]);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -503,9 +425,9 @@ class TeacherSectionController extends Controller
     }
 
     /**
-     * Delete a section
+     * Deactivate a section instead of deleting it
      */
-    public function destroy($section)
+    public function deactivate($section)
     {
         $teacher = Auth::guard('admin')->user();
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
@@ -515,266 +437,156 @@ class TeacherSectionController extends Controller
         }
 
         try {
-            // Check if there are students in this section
-            $studentCount = DB::table('student_profile')
-                ->where('section', $section)
-                ->count();
+            DB::beginTransaction();
 
-            if ($studentCount > 0) {
-                return response()->json([
-                    'error' => 'Cannot delete section with existing students. Please move students to another section first.'
-                ], 422);
-            }
-
-            DB::table('teacher_sections')
+            // Check if this teacher manages the section
+            $assignedSection = DB::table('teacher_sections')
                 ->where('teacher_id', $teacherProfile->id)
                 ->where('section', $section)
-                ->delete();
+                ->exists();
+
+            if (!$assignedSection) {
+                return response()->json([
+                    'error' => 'You are not authorized to modify this section.'
+                ], 403);
+            }
+
+            // Check if section exists
+            $sectionRecord = DB::table('sections')->where('name', $section)->first();
+            if (!$sectionRecord) {
+                return response()->json(['error' => 'Section not found'], 404);
+            }
+
+            // Deactivate the section
+            DB::table('sections')
+                ->where('name', $section)
+                ->update([
+                    'is_active' => false,
+                    'updated_at' => now()
+                ]);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Section deleted successfully!'
+                'message' => 'Section has been deactivated successfully.'
             ]);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to delete section: ' . $e->getMessage()], 500);
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to deactivate section: ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Get average performance for a section
+     * Get average performance for a section from user_progress table
      */
     private function getSectionAveragePerformance($section)
     {
-        // This is a simplified calculation - you can enhance this based on your performance metrics
-        $avgPoints = DB::table('student_profile')
-            ->where('section', $section)
-            ->avg('total_points');
+        
+        try {
+            // First, let's check what tables exist and what data is available
             
-        return $avgPoints ? round($avgPoints, 1) : 0;
+            // Check if assessments table exists and has data
+            $assessmentsCount = 0;
+            if (DB::getSchemaBuilder()->hasTable('assessments')) {
+                $assessmentsCount = DB::table('assessments')->count();
+                
+                // Check assessments for this section
+                $sectionAssessments = DB::table('assessments')
+                    ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                    ->where('student_profile.section', $section)
+                    ->count();
+                
+                // Check completed assessments
+                $completedAssessments = DB::table('assessments')
+                    ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
+                    ->where('student_profile.section', $section)
+                    ->where('assessments.status', 'completed')
+                    ->count();
+            } else {
+            }
+            
+            // Check user_progress table
+            $userProgressCount = 0;
+            if (DB::getSchemaBuilder()->hasTable('user_progress')) {
+                $userProgressCount = DB::table('user_progress')->count();
+                
+                // Check user_progress for this section
+                $sectionProgress = DB::table('student_profile')
+                    ->join('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+                    ->where('student_profile.section', $section)
+                    ->count();
+            } else {
+            }
+            
+            // Get students in this section
+            $students = DB::table('student_profile')
+                ->join('users', 'student_profile.user_id', '=', 'users.id')
+                ->where('student_profile.section', $section)
+                ->where('users.status', 'active')
+                ->pluck('student_profile.user_id');
+            
+            if ($students->isEmpty()) {
+                return 0;
+            }
+            
+            // Calculate average score per student, then average those
+            $studentAverages = [];
+            foreach ($students as $studentId) {
+                $avgScore = DB::table('assessments')
+                    ->join('users', 'assessments.user_id', '=', 'users.id')
+                    ->where('assessments.user_id', $studentId)
+                    ->where('users.status', 'active')
+                    ->where('assessments.status', 'completed')
+                    ->where('assessments.assessment_type', 'regular')
+                    ->avg('assessments.accuracy_percentage');
+                
+                if ($avgScore) {
+                    $studentAverages[] = $avgScore;
+                }
+            }
+            
+            $avgAccuracy = !empty($studentAverages) ? array_sum($studentAverages) / count($studentAverages) : 0;
+          
+            
+            $result = $avgAccuracy ? round($avgAccuracy, 1) : 0;
+            Log::warning('Average Score From Section Controller');
+            Log::warning($avgAccuracy);
+            Log::warning($result);
+            return $result;
+            
+        } catch (\Exception $e) {
+            
+            // Fallback to user_progress total_points if assessment data is not available
+            try {
+                $avgPoints = DB::table('student_profile')
+                    ->join('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+                    ->where('student_profile.section', $section)
+                    ->avg('user_progress.total_points');
+                    
+                $fallbackResult = $avgPoints ? round($avgPoints, 1) : 0;
+                
+                return $fallbackResult;
+            } catch (\Exception $fallbackError) {
+                return 0;
+            }
+        }
     }
 
     /**
-     * Get last activity for a section
+     * Get last activity for a section from user_progress table
      */
     private function getLastActivityForSection($section)
     {
         $lastActivity = DB::table('student_profile')
-            ->where('section', $section)
-            ->whereNotNull('last_activity_date')
-            ->max('last_activity_date');
+            ->join('user_progress', 'student_profile.user_id', '=', 'user_progress.user_id')
+            ->where('student_profile.section', $section)
+            ->whereNotNull('user_progress.last_assessment_date')
+            ->max('user_progress.last_assessment_date');
             
         return $lastActivity ? \Carbon\Carbon::parse($lastActivity)->diffForHumans() : 'No activity';
     }
-
-    /**
- * Show detailed assessment review for a student
- */
-public function reviewAssessment($studentId, $assessmentId)
-{
-    // Check authentication
-    if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-        return redirect()->route('login');
-    }
-    
-    $teacher = Auth::guard('admin')->user();
-    
-    // Fetch the student
-    $user = User::find($studentId);
-    
-    if (!$user || $user->role !== 'Student') {
-        return redirect()->back()->with('error', 'Student not found');
-    }
-    
-    // Get student profile
-    $studentProfile = DB::table('student_profile')
-        ->where('user_id', $studentId)
-        ->first();
-    
-    if (!$studentProfile) {
-        return redirect()->back()->with('error', 'Student profile not found');
-    }
-    
-    // Verify teacher has access to this student's section
-    $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
-    
-    if (!$teacherProfile) {
-        return redirect()->back()->with('error', 'Teacher profile not found');
-    }
-    
-    $teacherSections = DB::table('teacher_sections')
-        ->where('teacher_id', $teacherProfile->id)
-        ->pluck('section')
-        ->toArray();
-    
-    if (!in_array($studentProfile->section, $teacherSections)) {
-        return redirect()->back()->with('error', 'Access denied to this student');
-    }
-    
-    // Build student object
-    $student = (object)[
-        'id' => $user->id,
-        'name' => trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname),
-    ];
-    
-    // Try to fetch real assessment data
-    $assessment = null;
-    $result = null;
-    $questions = [];
-    
-    try {
-        // Check if this is a teacher-created assessment
-        if (DB::getSchemaBuilder()->hasTable('teacher_assessments')) {
-            $assessment = DB::table('teacher_assessments')
-                ->where('id', $assessmentId)
-                ->where('created_by', $teacher->id)
-                ->first();
-            
-            if ($assessment) {
-                // Get the assignment for this student
-                $assignment = DB::table('teacher_assessment_assignments')
-                    ->where('assessment_id', $assessmentId)
-                    ->where('section', $studentProfile->section)
-                    ->first();
-                
-                if ($assignment && DB::getSchemaBuilder()->hasTable('teacher_assessment_results')) {
-                    // Get the result
-                    $result = DB::table('teacher_assessment_results')
-                        ->where('assignment_id', $assignment->id)
-                        ->where('student_id', $studentId)
-                        ->where('status', 'completed')
-                        ->first();
-                    
-                    if ($result) {
-                        // Get the questions and answers
-                        if (DB::getSchemaBuilder()->hasTable('teacher_assessment_answers')) {
-                            $answers = DB::table('teacher_assessment_answers')
-                                ->where('result_id', $result->id)
-                                ->get();
-                            
-                            // Get questions from the assessment
-                            $assessmentQuestions = json_decode($assessment->questions, true);
-                            
-                            foreach ($assessmentQuestions as $index => $question) {
-                                $answer = $answers->firstWhere('question_index', $index);
-                                
-                                $questions[] = [
-                                    'is_correct' => $answer ? $answer->is_correct : false,
-                                    'category' => $question['competency'] ?? 'General',
-                                    'question_text' => $question['question'],
-                                    'options' => [
-                                        'A' => $question['options']['A'] ?? '',
-                                        'B' => $question['options']['B'] ?? '',
-                                        'C' => $question['options']['C'] ?? '',
-                                        'D' => $question['options']['D'] ?? ''
-                                    ],
-                                    'student_answer' => $answer ? $answer->student_answer : null,
-                                    'correct_answer' => $question['correct_answer'],
-                                    'explanation' => $question['explanation'] ?? null,
-                                    'time_spent' => $answer && $answer->time_spent ? round($answer->time_spent) . ' sec' : 'N/A'
-                                ];
-                            }
-                        }
-                        
-                        // Format result data
-                        $correctCount = $answers->where('is_correct', true)->count();
-                        $wrongCount = $answers->where('is_correct', false)->count();
-                        $totalQuestions = $answers->count();
-                        
-                        $result = (object)[
-                            'score' => round($result->score),
-                            'accuracy' => round($result->score),
-                            'correct_count' => $correctCount,
-                            'wrong_count' => $wrongCount,
-                            'total_questions' => $totalQuestions,
-                            'correct_rate' => $totalQuestions > 0 ? round(($correctCount / $totalQuestions) * 100) : 0,
-                            'wrong_rate' => $totalQuestions > 0 ? round(($wrongCount / $totalQuestions) * 100) : 0,
-                            'time_spent' => $this->formatTime($result->time_spent),
-                            'avg_time' => $totalQuestions > 0 ? round($result->time_spent / $totalQuestions) : 0,
-                            'completed_at' => \Carbon\Carbon::parse($result->completed_at)->format('Y-m-d'),
-                            'student_id' => $studentProfile->student_id ?? 'N/A'
-                        ];
-                        
-                        // Build assessment object
-                        $assessment = (object)[
-                            'title' => $assessment->title,
-                            'subject' => ucfirst($assessment->assessment_type)
-                        ];
-                        
-                        // Calculate performance summary
-                        $strongAreas = [];
-                        $improvementAreas = [];
-                        
-                        $competencyStats = [];
-                        foreach ($questions as $q) {
-                            $comp = $q['category'];
-                            if (!isset($competencyStats[$comp])) {
-                                $competencyStats[$comp] = ['correct' => 0, 'total' => 0];
-                            }
-                            $competencyStats[$comp]['total']++;
-                            if ($q['is_correct']) {
-                                $competencyStats[$comp]['correct']++;
-                            }
-                        }
-                        
-                        foreach ($competencyStats as $comp => $stats) {
-                            $percentage = $stats['total'] > 0 ? ($stats['correct'] / $stats['total']) * 100 : 0;
-                            if ($percentage >= 75) {
-                                $strongAreas[] = $comp;
-                            } else {
-                                $improvementAreas[] = $comp;
-                            }
-                        }
-                        
-                        $summary = (object)[
-                            'strong_areas' => implode(', ', $strongAreas) ?: 'N/A',
-                            'improvement_areas' => implode(', ', $improvementAreas) ?: 'N/A',
-                            'recommendation' => $this->generateRecommendation($student, $result, $improvementAreas)
-                        ];
-                    }
-                }
-            }
-        }
-    } catch (\Exception $e) {
-        // If there's any error, we'll use default data
-        \Log::error('Error fetching assessment data: ' . $e->getMessage());
-    }
-    
-    // If no real data found, use default sample data
-    if (!$assessment || !$result) {
-        $assessment = (object)[
-            'title' => 'Algebra Basics Quiz',
-            'subject' => 'Algebra'
-        ];
-        
-        $result = (object)[
-            'score' => 92,
-            'accuracy' => 92,
-            'correct_count' => 23,
-            'wrong_count' => 2,
-            'total_questions' => 25,
-            'correct_rate' => 92,
-            'wrong_rate' => 8,
-            'time_spent' => '14 min 30 sec',
-            'avg_time' => 34,
-            'completed_at' => '2024-01-18',
-            'student_id' => $studentProfile->student_id ?? '2024001'
-        ];
-        
-        $summary = (object)[
-            'strong_areas' => 'Linear Equations, Algebraic Expressions, Factoring, Radicals',
-            'improvement_areas' => 'Quadratic Equations, Exponents',
-            'recommendation' => $student->name . ' demonstrates excellent foundational skills in algebra with very fast solving times. However, they should review the concept of positive and negative roots in quadratic equations and the rules for multiplying exponents. Their quick pace suggests strong understanding, but attention to detail in these specific areas will help achieve perfect scores.'
-        ];
-    }
-    // admin.teacher.sections.student-profile
-    return view('admin.teacher.sections.review-assessment', compact(
-        'student',
-        'assessment',
-        'result',
-        'questions',
-        'summary'
-    ));
-}
 
 /**
  * Format time in seconds to readable format
@@ -788,40 +600,5 @@ private function formatTime($seconds)
         return $minutes . ' min ' . $secs . ' sec';
     }
     return $secs . ' sec';
-}
-
-/**
- * Generate personalized recommendation based on performance
- */
-private function generateRecommendation($student, $result, $improvementAreas)
-{
-    $score = $result->score;
-    $name = $student->name;
-    
-    if ($score >= 90) {
-        $performance = 'excellent foundational skills';
-    } elseif ($score >= 75) {
-        $performance = 'good understanding';
-    } else {
-        $performance = 'developing skills';
-    }
-    
-    $recommendation = $name . ' demonstrates ' . $performance . ' in this assessment';
-    
-    if ($score >= 90) {
-        $recommendation .= ' with very fast solving times';
-    }
-    
-    if (!empty($improvementAreas)) {
-        $recommendation .= '. However, they should review the concepts in: ' . implode(', ', $improvementAreas);
-    }
-    
-    if ($score >= 85) {
-        $recommendation .= '. Attention to detail in these specific areas will help achieve perfect scores.';
-    } else {
-        $recommendation .= '. Additional practice and review sessions are recommended to strengthen understanding.';
-    }
-    
-    return $recommendation;
 }
 }

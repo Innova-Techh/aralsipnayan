@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\Assessment;
+use App\Models\AssessmentAssignment;
 class SectionController extends Controller
 {
     /**
@@ -16,17 +18,23 @@ class SectionController extends Controller
         $user = Auth::guard('student')->user();
         
         // Get student's section from student_profile
-        $studentProfile = \Illuminate\Support\Facades\DB::table('student_profile')->where('user_id', $user->id)->first();
+        $studentProfile = DB::table('student_profile')->where('user_id', $user->id)->first();
         $studentSection = $studentProfile ? $studentProfile->section : null;
-        
-        // Get assessments assigned to this student
-        $assignments = \App\Models\AssessmentAssignment::where(function($query) use ($user, $studentSection) {
+    
+        $assignments = AssessmentAssignment::where(function($query) use ($user, $studentSection) {
             $query->where('student_id', $user->id)
-                  ->orWhere(function($q) use ($studentSection) {
-                      // Handle both "A" and "Section A" formats
-                      $q->where('section', $studentSection)
-                        ->orWhere('section', 'Section ' . $studentSection)
-                        ->whereNull('student_id');
+                  ->orWhere(function($q) use ($studentSection, $user) {
+                      $q->whereNull('student_id')
+                        ->where(function($subQ) use ($studentSection) {
+                            $subQ->where('section', $studentSection)
+                                 ->orWhere('section', 'Section ' . $studentSection);
+                        })
+                        ->whereNotExists(function($exists) use ($user) {
+                            $exists->select(DB::raw(1))
+                                   ->from('teacher_assessment_assignments as aa2')
+                                   ->whereColumn('aa2.assessment_id', 'teacher_assessment_assignments.assessment_id')
+                                   ->where('aa2.student_id', $user->id);
+                        });
                   });
         })
         ->with(['assessment' => function($query) {
@@ -35,9 +43,11 @@ class SectionController extends Controller
         ->whereHas('assessment', function($query) {
             $query->where('status', 'Active');
         })
+        ->selectRaw('MIN(id) as id, assessment_id, MAX(student_id) as student_id, MAX(section) as section, MAX(status) as status')
+        ->groupBy('assessment_id')
         ->get();
-
-        // Convert assignments to sections format for the view
+    
+        // Convert to sections format for the view
         $sections = $assignments->map(function($assignment) {
             if (!$assignment->assessment) return null;
             
@@ -52,7 +62,7 @@ class SectionController extends Controller
                 'id' => $assessment->id,
                 'title' => $assessment->title,
                 'description' => $assessment->description ?: 'Complete this assessment to earn XP',
-                'xp_reward' => 150, // Default XP reward
+                'xp_reward' => 150,
                 'time_limit' => $assessment->time_limit . ' mins',
                 'difficulty' => $assessment->difficulty,
                 'color' => $colors[$assessment->category] ?? 'from-gray-400 to-gray-600',
@@ -61,11 +71,9 @@ class SectionController extends Controller
                 'status' => $assignment->status
             ];
         })->filter()->values()->toArray();
-
-
+    
         return view('student.sections', compact('sections'));
     }
-
 
     /**
      * Get sections data for API calls

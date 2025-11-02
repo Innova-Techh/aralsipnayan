@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin - @yield('title', 'Dashboard')</title>
+    <title>AralSipnayan</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,6 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    @livewireStyles
     <style>
         /* Custom scrollbar for sidebar */
         .sidebar-scrollbar::-webkit-scrollbar {
@@ -45,7 +44,6 @@
 </head>
 
 <body class="bg-gray-100" x-data="{ sidebarOpen: true}">
-    @livewireScripts
 
     <div class="flex h-screen overflow-hidden">
 
@@ -158,7 +156,7 @@
                 </a>
 
                 <!-- Student Management -->
-                {{-- <a href="{{ route('admin.management.students') }}"
+                 <a href="{{ route('admin.management.all-students') }}"
                     class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group {{ request()->routeIs('admin.management.students') ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' : '' }}">
                     <div class="flex items-center justify-center w-8">
                         <i class="fas fa-user-graduate text-lg"></i>
@@ -174,11 +172,11 @@
                         class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
                         Student Management
                     </div>
-                </a> --}}
+                </a> 
 
-                <!-- Question Bank -->
-                <a href="#"
-                    class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
+                <!-- Questions Management -->
+                <a href="{{ route('admin.management.questions') }}"
+                    class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group {{ request()->routeIs('admin.management.questions') ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' : '' }}">
                     <div class="flex items-center justify-center w-8">
                         <i class="fas fa-question-circle text-lg"></i>
                     </div>
@@ -186,12 +184,12 @@
                         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                         x-transition:leave="transition-opacity ease-in duration-100"
                         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                        class="ml-3 font-medium whitespace-nowrap">Question Bank</span>
+                        class="ml-3 font-medium whitespace-nowrap">Questions Management</span>
 
                     <!-- Tooltip for collapsed state -->
                     <div x-show="!sidebarOpen"
                         class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
-                        Question Bank
+                        Questions Management
                     </div>
                 </a>
 

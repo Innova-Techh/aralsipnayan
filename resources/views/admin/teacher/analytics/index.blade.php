@@ -30,7 +30,7 @@
 
         <!-- Overview Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-blue-100 rounded-full">
                         <span class="material-symbols-outlined text-blue-600">trending_up</span>
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-green-100 rounded-full">
                         <span class="material-symbols-outlined text-green-600">assignment_turned_in</span>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-yellow-100 rounded-full">
                         <span class="material-symbols-outlined text-yellow-600">assessment</span>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white rounded-2xl shadow p-6">
                 <div class="flex items-center">
                     <div class="p-3 bg-purple-100 rounded-full">
                         <span class="material-symbols-outlined text-purple-600">people</span>
@@ -88,13 +88,6 @@
 
             <!-- Metric Selector -->
             <div class="mb-8 flex flex-wrap gap-3">
-                <button onclick="showChart('scores')" id="btn-scores"
-                    class="metric-btn active group px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md hover:shadow-xl">
-                    <span class="flex items-center">
-                        <span class="material-symbols-outlined mr-2 text-lg">workspace_premium</span>
-                        Average Scores
-                    </span>
-                </button>
                 <button onclick="showChart('accuracy')" id="btn-accuracy"
                     class="metric-btn group px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 bg-white text-gray-700 shadow-sm hover:shadow-md border border-gray-200">
                     <span class="flex items-center">
@@ -113,10 +106,6 @@
 
             <!-- Charts Container -->
             <div class="relative bg-white rounded-xl p-6 shadow-inner" style="height: 450px;">
-                <!-- Average Scores Chart -->
-                <div id="chart-scores" class="chart-container">
-                    <canvas id="scoresChart"></canvas>
-                </div>
 
                 <!-- Average Accuracy Chart -->
                 <div id="chart-accuracy" class="chart-container hidden">
@@ -127,6 +116,11 @@
                 <div id="chart-time" class="chart-container hidden">
                     <canvas id="timeChart"></canvas>
                 </div>
+
+                <!-- Performance by Category Chart -->
+                <div id="chart-category" class="chart-container hidden">
+                    <canvas id="categoryChart"></canvas>
+                </div>
             </div>
 
             <!-- Legend Info -->
@@ -136,57 +130,12 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Performance Chart -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance Trends</h3>
-                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                    <p class="text-gray-500">Chart placeholder</p>
-                </div>
-            </div>
-
-            <!-- Category Performance -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance by Category</h3>
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Number & Algebra</span>
-                            <span class="text-gray-900 font-medium">87%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: 87%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Measurement & Geometry</span>
-                            <span class="text-gray-900 font-medium">82%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-600 h-2 rounded-full" style="width: 82%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Data & Probability</span>
-                            <span class="text-gray-900 font-medium">79%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 79%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Recent Assessments -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-2xl shadow p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Assessment Results</h3>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead>
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Assessment Name</th>
@@ -267,7 +216,6 @@
         // Sample data - Replace with actual data from your controller
         const sectionData = {
             sections: @json($teacherSections ?? []),
-            avgScores: @json($sectionStats['avg_scores'] ?? []),
             avgAccuracy: @json($sectionStats['avg_accuracy'] ?? []),
             avgTime: @json($sectionStats['avg_time'] ?? [])
         };
@@ -291,7 +239,7 @@
             'rgb(239, 68, 68)'
         ];
 
-        let scoresChart, accuracyChart, timeChart;
+        let accuracyChart, timeChart;
 
         // Create gradient for each bar
         function createGradient(ctx, chartArea, colorSet) {
@@ -370,71 +318,6 @@
 
         // Initialize charts
         function initCharts() {
-            // Average Scores Chart
-            const scoresCtx = document.getElementById('scoresChart').getContext('2d');
-            scoresChart = new Chart(scoresCtx, {
-                type: 'bar',
-                data: {
-                    labels: sectionData.sections.map(s => `Section ${s}`),
-                    datasets: [{
-                        label: 'Average Score',
-                        data: sectionData.avgScores,
-                        backgroundColor: function (context) {
-                            const chart = context.chart;
-                            const { ctx, chartArea } = chart;
-                            if (!chartArea) return;
-                            return createGradient(ctx, chartArea, gradientColors[context.dataIndex % gradientColors.length]);
-                        },
-                        borderColor: borderColors,
-                        borderWidth: 2,
-                        borderRadius: 8,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    plugins: {
-                        ...commonOptions.plugins,
-                        tooltip: {
-                            ...commonOptions.plugins.tooltip,
-                            callbacks: {
-                                ...commonOptions.plugins.tooltip.callbacks,
-                                label: function (context) {
-                                    return 'Average Score: ' + context.parsed.y.toFixed(2) + ' points';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        ...commonOptions.scales,
-                        y: {
-                            ...commonOptions.scales.y,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Score (points)',
-                                font: {
-                                    size: 13,
-                                    weight: 'bold'
-                                },
-                                color: '#374151'
-                            }
-                        },
-                        x: {
-                            ...commonOptions.scales.x,
-                            title: {
-                                display: true,
-                                text: 'Section',
-                                font: {
-                                    size: 13,
-                                    weight: 'bold'
-                                },
-                                color: '#374151'
-                            }
-                        }
-                    }
-                }
-            });
 
             // Average Accuracy Chart
             const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');

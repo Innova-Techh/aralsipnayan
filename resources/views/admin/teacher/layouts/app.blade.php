@@ -159,14 +159,14 @@
                         <button @click="openSub = !openSub"
                             class="w-full group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 transition">
                             <span class="material-symbols-outlined mr-3">assignment</span>
-                            <span x-show="sidebarOpen">Assessment Management</span>
+                            <span x-show="sidebarOpen">Quiz Management</span>
                             <span x-show="sidebarOpen" class="material-symbols-outlined ml-auto"
                                 :class="openSub ? 'rotate-180' : ''">expand_more</span>
 
                             <!-- Tooltip for main button when collapsed -->
                             <div x-cloak x-show="!sidebarOpen"
                                 class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                Assessment Management
+                                Quiz Management
                             </div>
                         </button>
 
@@ -175,12 +175,12 @@
                                 <a href="{{ route('teacher.assessments.create') }}"
                                     class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">add_circle</span>
-                                    <span x-show="sidebarOpen">Create Assessment</span>
+                                    <span x-show="sidebarOpen">Create Quiz</span>
 
                                     <!-- Tooltip for submenu item when collapsed -->
                                     <div x-cloak x-show="!sidebarOpen"
                                         class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Create Assessment
+                                        Quiz Assessment
                                     </div>
                                 </a>
                             </li>
@@ -188,12 +188,12 @@
                                 <a href="{{ route('teacher.assessments') }}"
                                     class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">list</span>
-                                    <span x-show="sidebarOpen">Manage Assessments</span>
+                                    <span x-show="sidebarOpen">Manage Quizzes</span>
 
                                     <!-- Tooltip for submenu item when collapsed -->
                                     <div x-cloak x-show="!sidebarOpen"
                                         class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Manage Assessments
+                                        Manage Quizzes
                                     </div>
                                 </a>
                             </li>
@@ -201,12 +201,12 @@
                                 <a href="#"
                                     class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">quiz</span>
-                                    <span x-show="sidebarOpen">Assessment Templates</span>
+                                    <span x-show="sidebarOpen">Quiz Templates</span>
 
                                     <!-- Tooltip for submenu item when collapsed -->
                                     <div x-cloak x-show="!sidebarOpen"
                                         class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Assessment Templates
+                                        Quiz Templates
                                     </div>
                                 </a>
                             </li>
@@ -222,18 +222,6 @@
                             <div x-cloak x-show="!sidebarOpen"
                                 class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                 Section Management
-                            </div>
-                        </a>
-                    </li>
-
-                    <li class="tooltip-container">
-                        <a href="{{ route('teacher.students') }}"
-                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.students*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
-                            <span class="material-symbols-outlined mr-3">school</span>
-                            <span x-show="sidebarOpen">Student Management</span>
-                            <div x-cloak x-show="!sidebarOpen"
-                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                Student Management
                             </div>
                         </a>
                     </li>

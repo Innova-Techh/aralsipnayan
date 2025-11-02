@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('lastname', 100);
             $table->string('middlename', 100)->nullable();
             $table->string('gender', 10)->nullable();
-            $table->string('section', 50);
+            $table->string('section', 50)->nullable;
             $table->string('grade_level', 10)->default('6');
             $table->string('school_name', 150)->default('Pembo Elementary School');
             $table->string('school_year', 20)->nullable(); // e.g. 2024-2025

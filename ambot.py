@@ -292,27 +292,19 @@ class SimpleQuestionBot:
             conn.close()
 
     def _ensure_student_mastery_row(self, user_id, competency):
-        """Create student_mastery row if it does not exist yet, so counters can be updated by backend."""
+        """Safely ensure a student_mastery row exists (thread-safe)."""
         conn = self.connect_db()
         if not conn:
             return False
 
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM student_mastery WHERE user_id = %s AND competency = %s", (user_id, competency))
-            exists = cursor.fetchone()[0] > 0
-            if exists:
-                return True
-
-            # Insert minimal row; defaults in schema handle most fields
             mastery_id = f"MAST_{user_id}_{competency}_{int(time.time())}"
-            cursor.execute(
-                """
+            cursor.execute("""
                 INSERT INTO student_mastery (mastery_id, user_id, competency, current_difficulty, created_at, updated_at)
                 VALUES (%s, %s, %s, 'beginner', NOW(), NOW())
-                """,
-                (mastery_id, user_id, competency)
-            )
+                ON DUPLICATE KEY UPDATE updated_at = NOW()
+            """, (mastery_id, user_id, competency))
             conn.commit()
             print(f"✓ Ensured student_mastery row for user {user_id}, {competency}")
             return True
@@ -324,7 +316,16 @@ class SimpleQuestionBot:
     
     def _generate_smart_answer(self, question, accuracy_rate, speed_factor):
         """Generate a smart answer based on question content and desired accuracy"""
-        will_be_correct = random.random() < accuracy_rate
+        # Track per-user knowledge probability (simulate learning)
+        if not hasattr(self, "_user_knowledge"):
+            self._user_knowledge = {}
+
+        user_key = getattr(self, "current_user_id", self.current_username)
+        p_know = self._user_knowledge.get(user_key, accuracy_rate * 0.7)
+
+        # Simulate learning: chance of correct grows slightly with each question
+        will_be_correct = random.random() < p_know
+        self._user_knowledge[user_key] = min(0.98, p_know + 0.01) 
         
         # Calculate response time
         max_time = question['max_allowed_time']

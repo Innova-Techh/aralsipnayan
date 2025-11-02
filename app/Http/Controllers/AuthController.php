@@ -65,11 +65,25 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::guard('student')->user();
-            // Block inactive student accounts
+            // Block inactive or archived student accounts
             if (isset($user->status) && strtolower($user->status) !== 'active') {
+
+                // Determine message based on status
+                $status = strtolower($user->status);
+
+                if ($status === 'archive') {
+                    $message = 'This account has been archived. Please contact the administrator.';
+                } elseif ($status === 'inactive') {
+                    $message = 'This account is inactive. Please contact admin or your teacher.';
+                } else {
+                    // Catch-all for other non-active statuses
+                    $message = 'This account is not active. Please contact the administrator.';
+                }
+
                 Auth::guard('student')->logout();
+
                 return back()->withErrors([
-                    'username' => 'This account is inactive. Please contact admin or your teacher.',
+                    'username' => $message,
                 ])->withInput($request->only('username'));
             }
             if ($user->role === 'Student') {

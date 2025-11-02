@@ -2,7 +2,7 @@
 
 @section('title', 'AralSipnayan')
 
-@section('content')
+@section('content')   
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
         <div class="bg-white border-b border-gray-200 px-8 py-6">
@@ -32,38 +32,6 @@
                 <h1 class="text-3xl font-bold text-gray-900">{{ $section['name'] ?? 'Section Name' }}</h1>
                 <p class="text-gray-600 mt-1">Basic Mathematics and Arithmetic</p>
             </div>
-
-            <!-- Section Info Grid -->
-            <div class="grid grid-cols-4 gap-6 bg-gray-50 rounded-lg p-6">
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">person</span>
-                        <span>Teacher</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $teacher ?? 'Ms. Johnson' }}</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">schedule</span>
-                        <span>Schedule</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">MWF 9:00-10:00 AM</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">door_front</span>
-                        <span>Room</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $room ?? 'Room 201' }}</p>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                        <span class="material-symbols-outlined text-lg">tag</span>
-                        <span>Section ID</span>
-                    </div>
-                    <p class="font-semibold text-gray-900">{{ $sectionId ?? 'MATH101-A' }}</p>
-                </div>
-            </div>
         </div>
 
         <div class="px-8 py-6">
@@ -85,18 +53,18 @@
                         <span class="text-sm font-medium text-gray-600">Average Score</span>
                         <span class="material-symbols-outlined text-gray-400">analytics</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $averageScore ?? 86 }}%</div>
+                    <div class="text-3xl font-bold text-gray-900">{{ $averageScore}}%</div>
                     <p class="text-xs text-gray-500 mt-1">Section average</p>
                 </div>
 
-                <!-- Completion Rate -->
+                <!-- Average Level -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-medium text-gray-600">Completion Rate</span>
-                        <span class="material-symbols-outlined text-gray-400">task_alt</span>
+                        <span class="text-sm font-medium text-gray-600">Average Level</span>
+                        <span class="material-symbols-outlined text-gray-400">trending_up</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $completionRate ?? 82 }}%</div>
-                    <p class="text-xs text-gray-500 mt-1">Assessment completion</p>
+                    <div class="text-3xl font-bold text-gray-900">{{ $averageLevel ?? 1 }}</div>
+                    <p class="text-xs text-gray-500 mt-1">Section average level</p>
                 </div>
 
                 <!-- Top Performer -->
@@ -105,8 +73,8 @@
                         <span class="text-sm font-medium text-gray-600">Top Performer</span>
                         <span class="material-symbols-outlined text-gray-400">emoji_events</span>
                     </div>
-                    <div class="text-3xl font-bold text-gray-900">{{ $topPerformerScore ?? 92 }}%</div>
-                    <p class="text-xs text-gray-500 mt-1">{{ $topPerformer ?? 'Maria Santos' }}</p>
+                    <div class="text-2xl font-bold text-gray-900">{{ $topPerformer ?? 'Maria Santos' }}</div>
+                    <p class="text-xs text-gray-500 mt-1">Rank 1 {{$section['raw_name']}} </p>
                 </div>
             </div>
 
@@ -127,11 +95,11 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Rank</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    LRN</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Student</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Overall Score</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Progress</th>
+                                    Level & Rank</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                     Points</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -160,16 +128,22 @@
                                                 <span class="material-symbols-outlined text-orange-600 text-2xl">emoji_events</span>
                                             </div>
                                         @else
-                                            <div class="text-center text-sm font-semibold text-gray-600">#{{ $index + 1 }}</div>
+                                            <div class="flex items-center justify-center w-8 h-8 font-semibold text-gray-600">#{{ $index + 1 }}</div>
                                         @endif
+                                    </td>
+
+                                     <!-- Student LRN -->
+                                     <td class="px-4 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div>
+                                                <div class="font-semibold text-gray-900">{{ $student['student_id'] }}</div>
+                                            </div>
+                                        </div>
                                     </td>
 
                                     <!-- Student Info -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                                <span class="material-symbols-outlined text-gray-500">person</span>
-                                            </div>
                                             <div>
                                                 <div class="font-semibold text-gray-900">{{ $student['name'] }}</div>
                                                 <div class="text-sm text-gray-500">{{ $student['email'] }}</div>
@@ -177,27 +151,14 @@
                                         </div>
                                     </td>
 
-                                    <!-- Overall Score (with assessment count from josh-branch) -->
+                                    <!-- Level & Rank -->
                                     <td class="px-6 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-blue-600">{{ $student['score'] }}%</span>
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                {{ $student['completed'] }}/{{ $student['total'] }} assessments
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-semibold text-gray-900">Level {{ $student['current_level'] ?? 1 }}</span>
+                                                <span class="text-xs text-gray-500">({{ $student['points_in_current_level'] ?? 0 }}/60 pts)</span>
                                             </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Progress -->
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-medium text-gray-700">{{ $student['progress'] }}</span>
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 w-24">
-                                                @php
-                                                    $progressPercent = $student['total'] > 0 ? ($student['completed'] / $student['total']) * 100 : 0;
-                                                @endphp
-                                                <div class="bg-blue-600 h-2 rounded-full"
-                                                    style="width: {{ $progressPercent }}%"></div>
-                                            </div>
+                                            <div class="text-xs text-gray-600">{{ $student['current_rank'] ?? 'Math Explorer' }}</div>
                                         </div>
                                     </td>
 
@@ -229,12 +190,6 @@
                                     <!-- Actions (Combined: inline button + dropdown from josh-branch) -->
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <!-- Send Message Button (from josh-branch) -->
-                                            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors group relative"
-                                                onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')"
-                                                title="Send Message">
-                                                <span class="material-symbols-outlined text-gray-600 group-hover:text-orange-600">mail</span>
-                                            </button>
 
                                             <!-- More Actions Dropdown (from josh-branch with main-branch actions) -->
                                             <div class="relative" x-data="{ open: false }">
@@ -263,21 +218,13 @@
                                                         Edit Details
                                                     </button>
 
-                                                    <!-- Assign Assessment (from josh-branch) -->
+                                                    <!-- Assign Assessment (from josh-branch) 
                                                     <button
                                                         class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                                         onclick="assignAssessment('{{ $student['id'] }}', '{{ $student['name'] }}')">
                                                         <span class="material-symbols-outlined text-green-600 text-sm">assignment</span>
                                                         Assign Assessment
-                                                    </button>
-
-                                                    <!-- Send Message (from josh-branch) -->
-                                                    <button
-                                                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                                        onclick="sendMessage('{{ $student['id'] }}', '{{ $student['name'] }}')">
-                                                        <span class="material-symbols-outlined text-orange-600 text-sm">mail</span>
-                                                        Send Message
-                                                    </button>
+                                                    </button> -->
 
                                                     <!-- Divider -->
                                                     <div class="border-t border-gray-200 my-1"></div>
@@ -376,23 +323,35 @@
                         <label for="studentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email (Should be Unique)</label>
                         <input type="email" id="studentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="mb-4">
-                        <label for="studentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
-                        <input type="text" id="studentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
+                     <!-- Gender -->
+                     <div>
+                        <label for="addStudentGender" class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addStudentGender" name="gender" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Gender</option>
+                            <option value="male">male</option>
+                            <option value="female">female</option>
+                            <option value="other">other</option>
+                        </select>
+                        <p id="addGender_error" class="error-message text-red-500 text-xs mt-1"></p>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Grade 6 (Fixed)
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium mb-1">Default Credentials</p>
+                                <ul class="list-disc list-inside space-y-1 text-xs">
+                                    <li>Username will be auto-generated based on section</li>
+                                    <li>Default password: <strong>123</strong></li>
+                                    <li>Student ID (LRN) will be auto-generated</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Student ID (LRN)</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Auto-generated 6-digit number
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-3">
+                    <div class="flex justify-end space-x-3 mt-4">
                         <button type="button" onclick="closeAddStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
                             Cancel
                         </button>
@@ -436,15 +395,22 @@
                         <label for="editStudentEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <input type="email" id="editStudentEmail" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <div class="mb-4">
-                        <label for="editStudentSchoolYear" class="block text-sm font-medium text-gray-700 mb-2">School Year (Optional)</label>
-                        <input type="text" id="editStudentSchoolYear" name="school_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 2024-2025">
+                    <div>
+                        <label for="edit_gender" class="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="edit_gender" name="gender"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <p id="edit_gender_error" class="error-message text-red-500 text-xs mt-1"></p>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Grade Level</label>
-                        <div class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
-                            Grade 6 (Fixed)
-                        </div>
+                        <label for="editStudentPassword" class="block text-sm font-medium text-gray-700 mb-2">Password (Leave blank to keep current)</label>
+                        <input type="password" id="editStudentPassword" name="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeEditStudentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
@@ -516,7 +482,7 @@
         // Edit Student Modal Functions (from main-branch)
         window.openEditStudentModal = function (studentId) {
             selectedStudentId = studentId || selectedStudentId;
-            
+            console.log('edit_gender element:', document.getElementById('edit_gender'));
             if (!selectedStudentId) {
                 showMessage('No student selected', 'error');
                 return;
@@ -545,7 +511,7 @@
                         document.getElementById('editStudentMiddleName').value = student.middlename || '';
                         document.getElementById('editStudentLastName').value = student.lastname || '';
                         document.getElementById('editStudentEmail').value = student.email || '';
-                        document.getElementById('editStudentSchoolYear').value = student.school_year || '';
+                        document.getElementById('edit_gender').value = student.gender || '';
                     }
                 }
             })
@@ -674,26 +640,21 @@
         // Action functions (from josh-branch)
         window.viewProfile = function(studentId) {
             console.log('View profile for student:', studentId);
-            window.location.href = "{{ route('teacher.students.profile', ['student' => '__STUDENT_ID__']) }}".replace('__STUDENT_ID__', studentId);
+            window.location.href = `/teacher/students/${studentId}/profile`;
         }
 
-        window.assignAssessment = function(studentId, studentName) {
-            console.log('Assign assessment to:', studentName, studentId);
+       // window.assignAssessment = function(studentId, studentName) {
+           // console.log('Assign assessment to:', studentName, studentId);
             // Implement assign assessment logic
-            alert(`Assign assessment to ${studentName}`);
-        }
+           // alert(`Assign assessment to ${studentName}`);
+       // }
 
-        window.sendMessage = function(studentId, studentName) {
-            console.log('Send message to:', studentName, studentId);
-            // Implement send message logic
-            alert(`Send message to ${studentName}`);
-        }
 
         window.removeFromSection = function(studentId, studentName) {
             console.log('Remove from section:', studentName, studentId);
             if (confirm(`Are you sure you want to remove ${studentName} from this section?`)) {
                 // Implement actual removal via API
-                fetch(`/teacher/sections/students/${studentId}/remove`, {
+                fetch(`/teacher/sections/${studentId}/remove`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

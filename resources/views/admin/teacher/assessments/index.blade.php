@@ -7,13 +7,13 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Assessment Management</h1>
-            <p class="text-gray-600 mt-1">Create and manage assessments for your students</p>
+            <h1 class="text-3xl font-bold text-gray-900">Quiz Management</h1>
+            <p class="text-gray-600 mt-1">Create and manage Quizzes for your students</p>
         </div>
         <a href="{{ route('teacher.assessments.create') }}" 
            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
             <span class="material-symbols-outlined mr-2">add</span>
-            New Assessment
+            New Quiz
         </a>
     </div>
 
@@ -45,34 +45,64 @@
                         <p><span class="font-medium text-blue-600">🔴 Live Quiz</span></p>
                     @endif
                     <p><span class="font-medium">Assigned to:</span>            
-                        @if($assessment->assignments->count() > 0)
+                    @if($assessment->assignments->count() > 0)
+                    @php
+                        $specificStudents = $assessment->assignments->whereNotNull('student_id');
+                        $sectionAssignments = $assessment->assignments->whereNull('student_id');
+
+                        $allSameSection = false;
+                        $commonSection = null;
+
+                        if ($sectionAssignments->count() > 0) {
+                            // True section-wide assignment
+                            $commonSection = $sectionAssignments->pluck('section')->unique()->filter()->implode(', ');
+                            $allSameSection = true;
+                        } elseif ($specificStudents->count() > 0) {
+                            // Check if all specific students are from the same section
+                            $uniqueSections = $specificStudents->pluck('section')->unique()->filter();
+                            if ($uniqueSections->count() === 1) {
+                                $commonSection = $uniqueSections->first();
+
+                                // Verify if ALL students in that section were assigned
+                                $sectionStudentCount = \DB::table('student_profile')
+                                    ->where('section', $commonSection)
+                                    ->count();
+
+                                $assignedCount = $specificStudents->count();
+
+                                // Only call it a full "section assignment" if everyone in that section was assigned
+                                $allSameSection = ($assignedCount === $sectionStudentCount);
+                            }
+                        }
+                    @endphp
+
+                        @if($sectionAssignments->count() > 0)
+                            {{-- Show section assignments --}}
+                            Section {{ $sectionAssignments->pluck('section')->unique()->filter()->implode(', ') }}
+                        @elseif($allSameSection && $commonSection)
+                            {{-- Show as section when all students are from the same section --}}
+                            Section {{ $commonSection }}
+                        @elseif($specificStudents->count() > 0)
+                            {{-- Show individual student names --}}
                             @php
-                                $specificStudents = $assessment->assignments->where('student_id', '!=', null);
-                                $sectionAssignments = $assessment->assignments->where('student_id', null);
-                            @endphp
-                            @if($specificStudents->count() > 0)
-                                @php
-                                    $names = [];
-                                    foreach($specificStudents as $assignment) {
-                                        if ($assignment->student && $assignment->student->studentProfile) {
-                                            $firstname = $assignment->student->studentProfile->firstname ?? '';
-                                            $lastname = $assignment->student->studentProfile->lastname ?? '';
-                                            $fullName = trim($firstname . ' ' . $lastname);
-                                            $names[] = $fullName ?: 'Student ID: ' . $assignment->student_id;
-                                        } else {
-                                            $names[] = 'Student ID: ' . $assignment->student_id;
-                                        }
+                                $names = $specificStudents->map(function ($assignment) {
+                                    if ($assignment->student && $assignment->student->studentProfile) {
+                                        $firstname = $assignment->student->studentProfile->firstname ?? '';
+                                        $lastname = $assignment->student->studentProfile->lastname ?? '';
+                                        $fullName = trim($firstname . ' ' . $lastname);
+                                        return $fullName ?: 'Student ID: ' . $assignment->student_id;
                                     }
-                                @endphp
-                                {{ implode(', ', $names) }}
-                            @elseif($sectionAssignments->count() > 0)
-                                Section {{ $sectionAssignments->pluck('section')->unique()->filter()->implode(', ') }}
-                            @else
-                                Mixed assignments
-                            @endif
+                                    return 'Student ID: ' . $assignment->student_id;
+                                })->toArray();
+                            @endphp
+
+                            {{ implode(', ', $names) }}
                         @else
-                            Not assigned (Debug: {{ $assessment->assignments->count() }} assignments found)
+                            Mixed assignments
                         @endif
+                    @else
+                        Not assigned
+                    @endif
                     </p>
                     <p><span class="font-medium">Responses:</span> 
                         @php
@@ -113,7 +143,7 @@
                 <p class="text-gray-500 mb-4">Create your first assessment to get started</p>
                 <a href="{{ route('teacher.assessments.create') }}" 
                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    Create Assessment
+                    Create Quiz
                 </a>
             </div>
         @endforelse
@@ -127,7 +157,7 @@
         <div class="flex items-center justify-between p-4 bg-blue-50 border-b border-blue-200 rounded-t-lg">
             <div class="flex items-center">
                 <span class="material-symbols-outlined text-blue-600 mr-2">edit</span>
-                <h3 class="text-lg font-semibold text-gray-900">Edit Assessment</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Edit Quiz</h3>
             </div>
             <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
                 <span class="material-symbols-outlined">close</span>
@@ -145,7 +175,7 @@
                     <h4 class="text-md font-semibold text-gray-900 mb-4">Basic Information</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Assessment Title</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Title</label>
                             <input type="text" name="title" id="edit_title" placeholder="Enter assessment title" 
                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                         </div>
@@ -168,7 +198,7 @@
 
                 <!-- Assessment Settings -->
                 <div class="mb-6">
-                    <h4 class="text-md font-semibold text-gray-900 mb-4">Assessment Settings</h4>
+                    <h4 class="text-md font-semibold text-gray-900 mb-4">Quiz Settings</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Number of Questions</label>
@@ -287,14 +317,14 @@
         <!-- Modal Footer -->
         <div class="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
             <div class="text-sm text-gray-600">
-                <span class="font-medium">Note:</span> Assignment management is separate from assessment details
+                <span class="font-medium">Note:</span> Assignment management is separate from quiz details
             </div>
             <div class="flex space-x-3">
                 <button onclick="closeEditModal()" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Cancel
                 </button>
                 <button onclick="submitEditForm()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Update Assessment
+                    Update Quiz
                 </button>
             </div>
         </div>

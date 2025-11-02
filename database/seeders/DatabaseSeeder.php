@@ -24,13 +24,6 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        $teacher = User::create([
-            'username' => 'teacher1',
-            'email' => 'teacher1@example.com',
-            'password' => Hash::make('123'),
-            'role' => 'Teacher',
-            'status' => 'active',
-        ]);
 
         $admin = User::create([
             'username' => 'admin1',
@@ -72,44 +65,6 @@ class DatabaseSeeder extends Seeder
                         'updated_at' => Carbon::now(),
                     ]);
 
-        // Teacher profile
-        DB::table('teacher_profile')->insert([
-            'user_id' => $teacher->id,
-            'firstname' => 'Jane',
-            'lastname' => 'Smith',
-            'school_name' => 'Pembo Elementary School',
-            'profile_url' => '/profiles/teacher1.png',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Teacher sections - Jane Smith handles sections A, B, and C
-        DB::table('teacher_sections')->insert([
-            [
-                'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'Einstein',
-                'grade_level' => '6',
-                'school_year' => '2024-2025',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'Newton',
-                'grade_level' => '6',
-                'school_year' => '2024-2025',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'teacher_id' => DB::table('teacher_profile')->where('user_id', $teacher->id)->value('id'),
-                'section' => 'Curie',
-                'grade_level' => '6',
-                'school_year' => '2024-2025',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
 
         // Admin profile
         DB::table('admin_profile')->insert([
@@ -125,7 +80,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
         QuestionsTableSeeder::class,
+        SectionsSeeder::class,  
         StudentSectionsSeeder::class,
+        TeacherSeeder::class,
+       
         // add any other seeders you created
         ]);
 
