@@ -283,7 +283,7 @@ Route::prefix('admin')
         /**
          * ─── ADMIN PROFILE ROUTES ──────────────────────────────────────────────
          */
-        Route::get('/profile', [App\Http\Controllers\dmin\AdminController::class, 'index'])->name('profile.index');
+        Route::get('/profile', [App\Http\Controllers\AdminController::class, 'index'])->name('profile.index');
         Route::put('/profile', [App\Http\Controllers\AdminController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [App\Http\Controllers\AdminController::class, 'updatePassword'])->name('profile.update-password');
         Route::delete('/profile', [App\Http\Controllers\AdminController::class, 'destroy'])->name('profile.delete');
