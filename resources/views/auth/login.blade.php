@@ -26,34 +26,98 @@
         }
 
         @keyframes float-symbol {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0) rotate(0deg);
                 opacity: 0.15;
             }
+
             25% {
                 transform: translateY(-30px) rotate(5deg);
                 opacity: 0.25;
             }
+
             50% {
                 transform: translateY(-15px) rotate(-5deg);
                 opacity: 0.2;
             }
+
             75% {
                 transform: translateY(-40px) rotate(3deg);
                 opacity: 0.18;
             }
         }
 
-        .math-symbol:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; font-size: 3rem; }
-        .math-symbol:nth-child(2) { top: 25%; left: 75%; animation-delay: 2s; font-size: 2.5rem; }
-        .math-symbol:nth-child(3) { top: 45%; left: 25%; animation-delay: 4s; font-size: 2.8rem; }
-        .math-symbol:nth-child(4) { top: 65%; left: 70%; animation-delay: 6s; font-size: 2.3rem; }
-        .math-symbol:nth-child(5) { top: 80%; left: 30%; animation-delay: 8s; font-size: 3.2rem; }
-        .math-symbol:nth-child(6) { top: 35%; left: 85%; animation-delay: 10s; font-size: 2.6rem; }
-        .math-symbol:nth-child(7) { top: 55%; left: 10%; animation-delay: 12s; font-size: 2.9rem; }
-        .math-symbol:nth-child(8) { top: 15%; left: 50%; animation-delay: 14s; font-size: 2.4rem; }
-        .math-symbol:nth-child(9) { top: 75%; left: 60%; animation-delay: 16s; font-size: 3.1rem; }
-        .math-symbol:nth-child(10) { top: 90%; left: 80%; animation-delay: 18s; font-size: 2.7rem; }
+        .math-symbol:nth-child(1) {
+            top: 10%;
+            left: 15%;
+            animation-delay: 0s;
+            font-size: 3rem;
+        }
+
+        .math-symbol:nth-child(2) {
+            top: 25%;
+            left: 75%;
+            animation-delay: 2s;
+            font-size: 2.5rem;
+        }
+
+        .math-symbol:nth-child(3) {
+            top: 45%;
+            left: 25%;
+            animation-delay: 4s;
+            font-size: 2.8rem;
+        }
+
+        .math-symbol:nth-child(4) {
+            top: 65%;
+            left: 70%;
+            animation-delay: 6s;
+            font-size: 2.3rem;
+        }
+
+        .math-symbol:nth-child(5) {
+            top: 80%;
+            left: 30%;
+            animation-delay: 8s;
+            font-size: 3.2rem;
+        }
+
+        .math-symbol:nth-child(6) {
+            top: 35%;
+            left: 85%;
+            animation-delay: 10s;
+            font-size: 2.6rem;
+        }
+
+        .math-symbol:nth-child(7) {
+            top: 55%;
+            left: 10%;
+            animation-delay: 12s;
+            font-size: 2.9rem;
+        }
+
+        .math-symbol:nth-child(8) {
+            top: 15%;
+            left: 50%;
+            animation-delay: 14s;
+            font-size: 2.4rem;
+        }
+
+        .math-symbol:nth-child(9) {
+            top: 75%;
+            left: 60%;
+            animation-delay: 16s;
+            font-size: 3.1rem;
+        }
+
+        .math-symbol:nth-child(10) {
+            top: 90%;
+            left: 80%;
+            animation-delay: 18s;
+            font-size: 2.7rem;
+        }
 
         #vanta-bg {
             position: absolute;
@@ -185,7 +249,7 @@
                         </button>
                     </div>
                     <button type="submit" id="loginBtn"
-                        class="w-full bg-primary-yellow text-primary-blue font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-yellow-400 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-yellow-300 shadow-lg">
+                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg">
                         Login
                     </button>
                 </form>
@@ -234,7 +298,8 @@
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm">
                     @csrf
                     <div class="mb-6">
-                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Username or Email</label>
+                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Username or
+                            Email</label>
                         <input type="text"
                             class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
                             name="username" id="desktop-username" required>
@@ -247,7 +312,8 @@
                             name="password" id="desktop-password" required>
                     </div>
                     <div class="mb-8">
-                        <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security Code</label>
+                        <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
+                            Code</label>
                         <div class="flex gap-3 items-center">
                             <input type="text"
                                 class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
@@ -262,7 +328,7 @@
                         </button>
                     </div>
                     <button type="submit" id="desktopLoginBtn"
-                        class="w-full bg-primary-yellow text-primary-blue font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-yellow-400 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-yellow-300">
+                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300">
                         Login
                     </button>
                 </form>
