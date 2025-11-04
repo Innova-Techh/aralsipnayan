@@ -5,7 +5,7 @@
 @section('content')   
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
-        <div class="bg-white border-b border-gray-200 px-8 py-6">
+        <div class="bg-white border-b border-gray-200 rounded-2xl px-8 py-6">
             <div class="flex items-center justify-between mb-4">
                 <button onclick="window.location.href='{{ route('teacher.sections') }}'"
                     class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
@@ -278,7 +278,7 @@
          aria-live="polite">
         <!-- Success -->
         <div id="successMessage"
-            class="hidden flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 shadow">
+            class="invisible flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 shadow">
             <span class="material-symbols-outlined text-green-600">check_circle</span>
             <div class="text-sm text-green-800">
                 <span id="successText"></span>
@@ -286,7 +286,7 @@
         </div>
         <!-- Error -->
         <div id="errorMessage"
-            class="hidden flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 shadow">
+            class="invisible flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 shadow">
             <span class="material-symbols-outlined text-red-600">error</span>
             <div class="text-sm text-red-800">
                 <span id="errorText"></span>

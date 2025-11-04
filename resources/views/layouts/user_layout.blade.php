@@ -167,7 +167,7 @@
                         </div>
                         <h1
                             class="text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold text-gray-900 whitespace-nowrap">
-                            Aral<span class="text-red-600">Sipnayan</span>
+                            <span class="text-blue-600">Aral</span><span class="text-red-600">Sipnayan</span>
                         </h1>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
                             <span class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-20 sm:max-w-none">
                                 {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
                             </span>
-                
+
                             <div class="flex items-center space-x-1">
                                 <span class="text-lg">🔥</span>
                                 <span id="navStreakCounter"
@@ -249,7 +249,9 @@
                             <p class="text-sm font-medium text-gray-900">
                                 {{ Auth::guard('student')->user()?->studentProfile?->firstname }}
                             </p>
-                            <p class="text-xs text-gray-500">Streak: <span id="dropdownStreakCounter">{{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}</span></p>
+                            <p class="text-xs text-gray-500">Streak: <span
+                                    id="dropdownStreakCounter">{{ Auth::guard('student')->user()?->studentProfile?->current_streak ?? 0 }}</span>
+                            </p>
                         </div>
                         <a href="{{ route('student.profile') }}"
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
@@ -328,7 +330,7 @@
             // Handle logout form submission with fresh CSRF token
             const logoutForm = document.getElementById('logout-form');
             if (logoutForm) {
-                logoutForm.addEventListener('submit', function(e) {
+                logoutForm.addEventListener('submit', function (e) {
                     // Update CSRF token from meta tag before submitting
                     const csrfToken = document.querySelector('meta[name="csrf-token"]');
                     const csrfInput = this.querySelector('input[name="_token"]');
@@ -379,24 +381,24 @@
 
         // Global function for inline onclick (backup)
         function toggleDropdown() {
-                    const dropdown = document.getElementById('userDropdown');
-                    const button = document.getElementById('user-menu-button');
-                    if (dropdown && button) {
-                        const isHidden = dropdown.classList.contains('hidden');
-                        dropdown.classList.toggle('hidden');
-                        button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-                    }
-                }
+            const dropdown = document.getElementById('userDropdown');
+            const button = document.getElementById('user-menu-button');
+            if (dropdown && button) {
+                const isHidden = dropdown.classList.contains('hidden');
+                dropdown.classList.toggle('hidden');
+                button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            }
+        }
 
-                //Global button sound Effects
-                document.addEventListener("DOMContentLoaded", () => {
+        //Global button sound Effects
+        document.addEventListener("DOMContentLoaded", () => {
             const hoverSound = document.getElementById("hoverSound");
             const clickSound = document.getElementById("clickSound");
 
             // Function to safely play sound (handles autoplay restrictions)
             function playSound(sound) {
                 sound.currentTime = 0; // restart each time
-                sound.play().catch(() => {}); // ignore autoplay errors
+                sound.play().catch(() => { }); // ignore autoplay errors
             }
 
             // Select all links and buttons
