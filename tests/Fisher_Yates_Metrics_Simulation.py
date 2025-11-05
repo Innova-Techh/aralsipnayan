@@ -39,28 +39,156 @@ class FisherYatesMetricsSimulation:
             print(f"[ERROR] Failed to load questions data: {e}")
             sys.exit(1)
 
+    def calculate_shannon_entropy(self, position_counts, num_trials):
+        """Calculate Shannon entropy for each question's position distribution"""
+        entropies = {}
+        max_entropy = 0
+        
+        for qid, counts in position_counts.items():
+            # Convert counts to probabilities
+            probabilities = [count / num_trials for count in counts if count > 0]
+            
+            # Calculate Shannon entropy: H = -Σ(p * log2(p))
+            if probabilities:
+                entropy = -sum(p * np.log2(p) for p in probabilities)
+                entropies[qid] = entropy
+                
+                # Calculate maximum possible entropy (uniform distribution)
+                n = len(counts)
+                max_entropy = np.log2(n)
+            else:
+                entropies[qid] = 0
+                
+        return entropies, max_entropy
+    
+    def visualize_shannon_entropy(self, position_counts, num_trials, num_positions):
+        """Create Shannon entropy visualization to show unpredictability"""
+        question_ids = list(position_counts.keys())
+        
+        # Calculate Shannon entropy for each question
+        entropies, max_entropy = self.calculate_shannon_entropy(position_counts, num_trials)
+        
+        # Create figure with multiple entropy visualizations
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        
+        # Plot 1: Shannon Entropy by Question
+        entropy_values = [entropies[qid] for qid in question_ids]
+        normalized_entropies = [e / max_entropy * 100 for e in entropy_values]
+        
+        colors = ['#2ecc71' if ne > 95 else '#f39c12' if ne > 90 else '#e74c3c' for ne in normalized_entropies]
+        bars = ax1.bar(range(len(question_ids)), entropy_values, color=colors, alpha=0.7, edgecolor='black', linewidth=1.2)
+        ax1.axhline(y=max_entropy, color='red', linestyle='--', linewidth=2, label=f'Max Entropy ({max_entropy:.3f})', alpha=0.7)
+        ax1.axhline(y=max_entropy * 0.95, color='orange', linestyle=':', linewidth=1.5, label='95% of Max', alpha=0.5)
+        ax1.set_xlabel('Question ID', fontsize=11, fontweight='bold')
+        ax1.set_ylabel('Shannon Entropy (bits)', fontsize=11, fontweight='bold')
+        ax1.set_title('Shannon Entropy by Question\n(Higher = More Unpredictable)', fontsize=12, fontweight='bold')
+        ax1.set_xticks(range(len(question_ids)))
+        ax1.set_xticklabels(question_ids, rotation=45, fontsize=9)
+        ax1.legend()
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # Plot 2: Entropy Distribution Histogram
+        ax2.hist(entropy_values, bins=20, color='steelblue', alpha=0.7, edgecolor='black')
+        ax2.axvline(x=max_entropy, color='red', linestyle='--', linewidth=2, label=f'Max Entropy')
+        ax2.axvline(x=np.mean(entropy_values), color='green', linestyle='-', linewidth=2, label=f'Mean ({np.mean(entropy_values):.3f})')
+        ax2.set_xlabel('Entropy Value', fontsize=11, fontweight='bold')
+        ax2.set_ylabel('Frequency', fontsize=11, fontweight='bold')
+        ax2.set_title('Distribution of Entropy Values\n(Should cluster near maximum)', fontsize=12, fontweight='bold')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        
+        # Plot 3: Entropy Efficiency (% of maximum possible)
+        ax3.plot(range(len(question_ids)), normalized_entropies, marker='o', linewidth=2, markersize=8, color='steelblue', label='Actual Entropy %')
+        ax3.axhline(y=100, color='red', linestyle='--', linewidth=2, label='Perfect Randomness (100%)', alpha=0.7)
+        ax3.axhline(y=95, color='orange', linestyle=':', linewidth=1.5, label='Excellent Threshold (95%)', alpha=0.5)
+        ax3.fill_between(range(len(question_ids)), normalized_entropies, alpha=0.3, color='steelblue')
+        ax3.set_xlabel('Question ID', fontsize=11, fontweight='bold')
+        ax3.set_ylabel('Entropy Efficiency (%)', fontsize=11, fontweight='bold')
+        ax3.set_title('Entropy Efficiency Analysis\n(% of Maximum Possible Entropy)', fontsize=12, fontweight='bold')
+        ax3.set_xticks(range(len(question_ids)))
+        ax3.set_xticklabels(question_ids, rotation=45, fontsize=9)
+        ax3.set_ylim([80, 105])
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        
+        # Plot 4: Entropy Statistics Panel
+        ax4.axis('off')
+        
+        # Calculate comprehensive statistics
+        mean_entropy = np.mean(entropy_values)
+        std_entropy = np.std(entropy_values)
+        min_entropy = min(entropy_values)
+        max_entropy_actual = max(entropy_values)
+        mean_efficiency = np.mean(normalized_entropies)
+        
+        # Predictability score based on entropy
+        if mean_efficiency > 95:
+            predictability = "HIGHLY UNPREDICTABLE (Excellent)"
+        elif mean_efficiency > 90:
+            predictability = "UNPREDICTABLE (Good)"
+        elif mean_efficiency > 85:
+            predictability = "MODERATELY UNPREDICTABLE (Fair)"
+        else:
+            predictability = "PREDICTABLE (Poor)"
+        
+        stats_text = f"""
+SHANNON ENTROPY ANALYSIS RESULTS
+
+Theoretical Background:
+  • Shannon Entropy measures unpredictability
+  • Higher entropy = More random/unpredictable
+  • Maximum Entropy = log₂(positions) = {max_entropy:.3f} bits
+
+Entropy Statistics:
+  • Mean Entropy: {mean_entropy:.3f} bits
+  • Std Deviation: {std_entropy:.3f} bits
+  • Min Entropy: {min_entropy:.3f} bits
+  • Max Entropy: {max_entropy_actual:.3f} bits
+
+Efficiency Analysis:
+  • Mean Efficiency: {mean_efficiency:.2f}%
+  • Questions > 95%: {sum(1 for ne in normalized_entropies if ne > 95)}/{len(normalized_entropies)}
+  • Questions > 90%: {sum(1 for ne in normalized_entropies if ne > 90)}/{len(normalized_entropies)}
+
+Unpredictability Assessment:
+  • Status: {predictability}
+  • Information Loss: {(100 - mean_efficiency):.2f}%
+  • Entropy Deficit: {max_entropy - mean_entropy:.4f} bits
+
+Interpretation:
+  Perfect shuffle → Entropy ≈ {max_entropy:.3f} bits
+  Current shuffle → Entropy = {mean_entropy:.3f} bits
+  Efficiency: {mean_efficiency:.1f}% of theoretical maximum
+        """
+        
+        ax4.text(0.05, 0.95, stats_text, transform=ax4.transAxes, fontsize=10,
+                verticalalignment='top', fontfamily='monospace',
+                bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.3))
+        
+        plt.suptitle('Fisher-Yates Shuffle Unpredictability Analysis using Shannon Entropy', 
+                     fontsize=14, fontweight='bold', y=1.02)
+        plt.tight_layout()
+        
+        # Save figure
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_dir = os.path.join(os.path.dirname(__file__), 'visualizations')
+        os.makedirs(output_dir, exist_ok=True)
+        filepath = os.path.join(output_dir, f'fisher_yates_shannon_entropy_{timestamp}.png')
+        plt.savefig(filepath, dpi=300, bbox_inches='tight')
+        print(f"✓ Shannon entropy visualization saved to: {filepath}")
+        plt.close()
+        
+        return filepath, mean_efficiency
+    
     def visualize_chi_square_results(self, position_counts, num_trials, num_positions):
-        """Create visualization for Chi-Square test results"""
+        """Create visualization for Chi-Square test results - showing only the bar chart and statistics"""
         question_ids = list(position_counts.keys())
         expected_frequency = num_trials / num_positions
         
-        # Create figure with multiple subplots
-        fig = plt.figure(figsize=(16, 10))
+        # Create figure with two subplots side by side
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
         
-        # Subplot 1: Position Distribution Heatmap
-        ax1 = plt.subplot(2, 2, 1)
-        data_matrix = np.array([position_counts[qid] for qid in question_ids])
-        im = ax1.imshow(data_matrix, cmap='YlOrRd', aspect='auto')
-        ax1.set_xlabel('Position', fontsize=11, fontweight='bold')
-        ax1.set_ylabel('Question ID', fontsize=11, fontweight='bold')
-        ax1.set_title('Position Distribution Heatmap\n(Darker = More Frequent)', fontsize=12, fontweight='bold')
-        ax1.set_xticks(range(num_positions))
-        ax1.set_yticks(range(len(question_ids)))
-        ax1.set_yticklabels(question_ids, fontsize=8)
-        plt.colorbar(im, ax=ax1, label='Frequency Count')
-        
-        # Subplot 2: Chi-Square Values by Question
-        ax2 = plt.subplot(2, 2, 2)
+        # Subplot 1: Chi-Square Values by Question (Bar Chart)
         chi_square_values = []
         for qid in question_ids:
             chi_sq = sum((observed - expected_frequency) ** 2 / expected_frequency
@@ -68,30 +196,18 @@ class FisherYatesMetricsSimulation:
             chi_square_values.append(chi_sq)
         
         colors = ['#2ecc71' if cs < 15 else '#f39c12' if cs < 25 else '#e74c3c' for cs in chi_square_values]
-        bars = ax2.bar(range(len(question_ids)), chi_square_values, color=colors, alpha=0.7, edgecolor='black', linewidth=1.2)
-        ax2.axhline(y=15, color='orange', linestyle='--', linewidth=2, label='Threshold (15)', alpha=0.7)
-        ax2.set_xlabel('Question ID', fontsize=11, fontweight='bold')
-        ax2.set_ylabel('Chi-Square Value', fontsize=11, fontweight='bold')
-        ax2.set_title('Chi-Square Values by Question\n(Lower = More Random)', fontsize=12, fontweight='bold')
-        ax2.set_xticks(range(len(question_ids)))
-        ax2.set_xticklabels(question_ids, rotation=45, fontsize=9)
-        ax2.legend()
-        ax2.grid(axis='y', alpha=0.3)
+        bars = ax1.bar(range(len(question_ids)), chi_square_values, color=colors, alpha=0.7, edgecolor='black', linewidth=1.2)
+        ax1.axhline(y=15, color='orange', linestyle='--', linewidth=2, label='Threshold (15)', alpha=0.7)
+        ax1.set_xlabel('Question ID', fontsize=11, fontweight='bold')
+        ax1.set_ylabel('Chi-Square Value', fontsize=11, fontweight='bold')
+        ax1.set_title('Chi-Square Values by Question\n(Lower = More Random)', fontsize=12, fontweight='bold')
+        ax1.set_xticks(range(len(question_ids)))
+        ax1.set_xticklabels(question_ids, rotation=45, fontsize=9)
+        ax1.legend()
+        ax1.grid(axis='y', alpha=0.3)
         
-        # Subplot 3: Position Distribution Line Chart
-        ax3 = plt.subplot(2, 2, 3)
-        for i, qid in enumerate(question_ids):
-            ax3.plot(range(num_positions), position_counts[qid], marker='o', label=qid, linewidth=2, markersize=6)
-        ax3.axhline(y=expected_frequency, color='red', linestyle='--', linewidth=2, label=f'Expected ({expected_frequency:.1f})', alpha=0.8)
-        ax3.set_xlabel('Position', fontsize=11, fontweight='bold')
-        ax3.set_ylabel('Frequency', fontsize=11, fontweight='bold')
-        ax3.set_title('Position Frequency Distribution\n(Should be near expected line)', fontsize=12, fontweight='bold')
-        ax3.legend(loc='best', fontsize=9)
-        ax3.grid(True, alpha=0.3)
-        
-        # Subplot 4: Distribution Statistics
-        ax4 = plt.subplot(2, 2, 4)
-        ax4.axis('off')
+        # Subplot 2: Distribution Statistics (Text Panel)
+        ax2.axis('off')
         
         # Calculate statistics
         all_counts = [count for counts in position_counts.values() for count in counts]
@@ -126,7 +242,7 @@ Randomness Assessment:
   • Quality: {'EXCELLENT' if cv < 10 else 'GOOD' if cv < 15 else 'FAIR' if cv < 20 else 'POOR'}
         """
         
-        ax4.text(0.05, 0.95, stats_text, transform=ax4.transAxes, fontsize=10,
+        ax2.text(0.05, 0.95, stats_text, transform=ax2.transAxes, fontsize=10,
                 verticalalignment='top', fontfamily='monospace',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
         
@@ -142,89 +258,6 @@ Randomness Assessment:
         plt.close()
         
         return filepath
-    
-    def visualize_randomness_quality(self, position_counts, num_trials, num_positions):
-        """Create detailed randomness quality visualization"""
-        question_ids = list(position_counts.keys())
-        expected_frequency = num_trials / num_positions
-        
-        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-        
-        # Plot 1: Expected vs Actual Frequencies (Bar Chart)
-        ax1 = axes[0, 0]
-        all_actual_freqs = []
-        for qid in question_ids:
-            for pos in range(num_positions):
-                all_actual_freqs.append(position_counts[qid][pos])
-        
-        freq_bins = np.linspace(min(all_actual_freqs), max(all_actual_freqs), 15)
-        ax1.hist(all_actual_freqs, bins=freq_bins, color='steelblue', alpha=0.7, edgecolor='black')
-        ax1.axvline(x=expected_frequency, color='red', linestyle='--', linewidth=2, label=f'Expected ({expected_frequency:.1f})')
-        ax1.set_xlabel('Frequency Count', fontsize=11, fontweight='bold')
-        ax1.set_ylabel('Number of Occurrences', fontsize=11, fontweight='bold')
-        ax1.set_title('Frequency Distribution Histogram\n(Should be centered at expected line)', fontsize=12, fontweight='bold')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-        
-        # Plot 2: Q-Q Plot for Normality Check
-        ax2 = axes[0, 1]
-        sorted_freqs = sorted(all_actual_freqs)
-        theoretical_quantiles = np.sort(np.random.normal(expected_frequency, np.std(all_actual_freqs), len(sorted_freqs)))
-        ax2.scatter(theoretical_quantiles, sorted_freqs, alpha=0.6, s=50, color='steelblue', edgecolor='black')
-        ax2.plot([sorted_freqs[0], sorted_freqs[-1]], [sorted_freqs[0], sorted_freqs[-1]], 'r--', linewidth=2, label='Perfect Fit')
-        ax2.set_xlabel('Theoretical Quantiles', fontsize=11, fontweight='bold')
-        ax2.set_ylabel('Actual Quantiles', fontsize=11, fontweight='bold')
-        ax2.set_title('Q-Q Plot: Normality Assessment\n(Points close to line = more normal)', fontsize=12, fontweight='bold')
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-        
-        # Plot 3: Position Deviation from Expected
-        ax3 = axes[1, 0]
-        deviations = []
-        position_labels = []
-        for pos in range(num_positions):
-            pos_freqs = [position_counts[qid][pos] for qid in question_ids]
-            avg_pos_freq = np.mean(pos_freqs)
-            deviation = avg_pos_freq - expected_frequency
-            deviations.append(deviation)
-            position_labels.append(f'Pos {pos}')
-        
-        colors_dev = ['#2ecc71' if abs(d) < 5 else '#f39c12' if abs(d) < 10 else '#e74c3c' for d in deviations]
-        ax3.bar(position_labels, deviations, color=colors_dev, alpha=0.7, edgecolor='black')
-        ax3.axhline(y=0, color='black', linestyle='-', linewidth=1)
-        ax3.set_ylabel('Deviation from Expected', fontsize=11, fontweight='bold')
-        ax3.set_title('Position-wise Deviation Analysis\n(Ideally all should be near 0)', fontsize=12, fontweight='bold')
-        ax3.grid(axis='y', alpha=0.3)
-        
-        # Plot 4: Cumulative Chi-Square Distribution
-        ax4 = axes[1, 1]
-        chi_square_values = []
-        for qid in question_ids:
-            chi_sq = sum((observed - expected_frequency) ** 2 / expected_frequency
-                        for observed in position_counts[qid])
-            chi_square_values.append(chi_sq)
-        
-        chi_square_cumsum = np.cumsum(sorted(chi_square_values))
-        ax4.plot(range(len(chi_square_cumsum)), chi_square_cumsum, marker='o', linewidth=2, markersize=6, color='steelblue')
-        ax4.fill_between(range(len(chi_square_cumsum)), chi_square_cumsum, alpha=0.3, color='steelblue')
-        ax4.set_xlabel('Question Number (sorted by Chi-Square)', fontsize=11, fontweight='bold')
-        ax4.set_ylabel('Cumulative Chi-Square', fontsize=11, fontweight='bold')
-        ax4.set_title('Cumulative Chi-Square Distribution\n(Smoother curve = better randomness)', fontsize=12, fontweight='bold')
-        ax4.grid(True, alpha=0.3)
-        
-        plt.tight_layout()
-        
-        # Save figure
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_dir = os.path.join(os.path.dirname(__file__), 'visualizations')
-        os.makedirs(output_dir, exist_ok=True)
-        filepath = os.path.join(output_dir, f'fisher_yates_randomness_quality_{timestamp}.png')
-        plt.savefig(filepath, dpi=300, bbox_inches='tight')
-        print(f"✓ Randomness quality visualization saved to: {filepath}")
-        plt.close()
-        
-        return filepath
-
 
     def chi_square_test_fisher_yates(self, num_trials=1000, num_positions=10):
         """
@@ -331,11 +364,18 @@ Randomness Assessment:
         print(f"Coefficient of variation: {(uniformity_std / expected_frequency) * 100:.2f}%")
 
         # Generate visualizations
-        print(f"\n[VISUALIZING] Generating Chi-Square test visualizations...")
+        print(f"\n[VISUALIZING] Generating test visualizations...")
+        entropy_efficiency = None
         try:
+            # Generate Chi-Square visualization
             self.visualize_chi_square_results(position_counts, num_trials, num_positions)
-            self.visualize_randomness_quality(position_counts, num_trials, num_positions)
-            print("[SUCCESS] All visualizations generated successfully!")
+            print("[SUCCESS] Chi-Square visualization generated successfully!")
+            
+            # Generate Shannon Entropy visualization
+            print(f"\n[VISUALIZING] Generating Shannon Entropy analysis...")
+            _, entropy_efficiency = self.visualize_shannon_entropy(position_counts, num_trials, num_positions)
+            print("[SUCCESS] Shannon Entropy visualization generated successfully!")
+            print(f"[ENTROPY] Mean entropy efficiency: {entropy_efficiency:.2f}% of theoretical maximum")
         except Exception as e:
             print(f"[WARNING] Could not generate visualizations: {e}")
 
@@ -345,7 +385,8 @@ Randomness Assessment:
             'degrees_of_freedom': degrees_of_freedom,
             'randomness_score': randomness_score,
             'uniformity_variance': uniformity_variance,
-            'execution_time': end_time - start_time
+            'execution_time': end_time - start_time,
+            'entropy_efficiency': entropy_efficiency
         }
 
 def main():
