@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap');
@@ -461,7 +462,7 @@
     <header class="bg-white shadow-sm">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row justify-between items-center py-3 sm:py-4">
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-2 sm:gap-3 header-logo">
                     <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
                             class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl">
@@ -471,7 +472,7 @@
                     </h1>
                 </div>
                 <a href="{{ route('login') }}"
-                    class="bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">
+                    class="header-login bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">
                     Login
                 </a>
 
@@ -510,17 +511,18 @@
         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
 
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Master <span class="text-yellow-400">Advanced<br>Mathematics</span> with<br>
                 <span class="text-white">Interactive Learning</span>
             </h1>
-            <p class="text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed text-center">
+            <p
+                class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed text-center">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
                 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ut aliquip ex ea
                 commodo consequat mauris ut diam vitae
             </p>
             <button
-                class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto">
+                class="hero-button bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto">
                 <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                 </svg>
@@ -528,9 +530,9 @@
             </button>
 
             <!-- Quiz Section -->
-            <div class="glass-card rounded-2xl p-6 mt-12 max-w-md mx-auto">
-                <p class="text-white font-medium mb-4 text-lg">What is the quotient of 3/4 ÷ 1/2 = ?</p>
-                <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="quiz-card glass-card rounded-2xl p-6 mt-12 max-w-md mx-auto">
+                <p class="quiz-question text-white font-medium mb-4 text-lg">What is the quotient of 3/4 ÷ 1/2 = ?</p>
+                <div class="quiz-buttons grid grid-cols-2 gap-3 mb-4">
                     <button
                         class="bg-green-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-green-600 transition-colors hover-pop">1.2</button>
                     <button
@@ -540,12 +542,12 @@
                     <button
                         class="bg-purple-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-purple-600 transition-colors hover-pop">1.7</button>
                 </div>
-                <div class="flex justify-between items-center mb-2">
+                <div class="quiz-progress flex justify-between items-center mb-2">
                     <span class="text-white text-opacity-70 text-sm">Lessons Completed</span>
                     <span class="text-white font-bold">75%</span>
                 </div>
                 <div class="w-full bg-white bg-opacity-20 rounded-full h-2">
-                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 75%"></div>
+                    <div class="quiz-progress-bar bg-yellow-400 h-2 rounded-full" style="width: 0%"></div>
                 </div>
             </div>
         </div>
@@ -554,11 +556,12 @@
     <!-- Section 2 -->
     <section class="py-12 md:py-12 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-5xl font-bold text-center mb-8 md:mb-10 text-gray-900">
+            <h2 class="section2-title text-3xl md:text-5xl font-bold text-center mb-8 md:mb-10 text-gray-900">
                 How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms
                     learning</span>
             </h2>
-            <p class="text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
+            <p
+                class="section2-description text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
                 Experience the future of mathematics education with our innovative platform designed specifically for
                 Grade 6 students
             </p>
@@ -640,14 +643,14 @@
         <div class="block md:hidden relative z-10 py-4">
             <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="bg-blue-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl relative z-10">
-                    <div class="text-center pb-4">
+                    <div class="section3-header text-center pb-4">
                         <h2 class="text-2xl font-extrabold text-yellow-300">AralSipnayan</h2>
                         <p class="text-white/80 text-sm">Features Overview</p>
                     </div>
 
                     <!-- Card: Adaptive Learning -->
                     <div
-                        class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        class="feature-card-1 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
                             <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
@@ -664,7 +667,7 @@
 
                     <!-- Card: Achievements -->
                     <div
-                        class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        class="feature-card-2 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
                             <img src="{{ asset('images/features/features2.png') }}" alt="Achievements"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
@@ -681,7 +684,7 @@
 
                     <!-- Card: Progress Tracking -->
                     <div
-                        class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        class="feature-card-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
                             <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
@@ -701,7 +704,7 @@
 
                     <!-- Card: Leaderboard -->
                     <div
-                        class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
+                        class="feature-card-4 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
                         <div class="flex items-start gap-3">
                             <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
                                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
@@ -735,14 +738,14 @@
         <div class="hidden md:block relative z-10">
             <div class="max-w-7xl mx-auto px-8 lg:px-12">
                 <div class="p-12">
-                    <div class="text-center pb-6">
+                    <div class="section3-header-desktop text-center pb-6">
                         <h2 class="text-4xl font-extrabold text-yellow-300">AralSipnayan</h2>
                         <p class="text-white/80 text-lg">Features Overview</p>
                     </div>
                     <div class="grid grid-cols-2 gap-8">
                         <!-- Adaptive Learning -->
                         <div
-                            class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            class="feature-card-desktop-1 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
                                 <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
@@ -759,7 +762,7 @@
 
                         <!-- Achievements -->
                         <div
-                            class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            class="feature-card-desktop-2 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
                                 <img src="{{ asset('images/features/features2.png') }}" alt="Achievements"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
@@ -776,7 +779,7 @@
 
                         <!-- Progress Tracking -->
                         <div
-                            class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            class="feature-card-desktop-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
                                 <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
@@ -796,7 +799,7 @@
 
                         <!-- Leaderboard -->
                         <div
-                            class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
+                            class="feature-card-desktop-4 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
                             <div class="flex items-start gap-4">
                                 <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
                                     class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
@@ -838,7 +841,268 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Swiper
+            // Register GSAP ScrollTrigger plugin
+            gsap.registerPlugin(ScrollTrigger);
+
+            // ===========================
+            // HEADER ANIMATIONS
+            // ===========================
+            gsap.from('.header-logo', {
+                x: -100,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.header-login', {
+                x: 100,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            });
+
+            // ===========================
+            // SECTION 1 - HERO ANIMATIONS
+            // ===========================
+
+            // Hero Title - Slide in from left with stagger
+            gsap.from('.hero-title', {
+                x: -100,
+                opacity: 0,
+                duration: 1.2,
+                delay: 0.3,
+                ease: 'power3.out'
+            });
+
+            // Hero Description - Fade in from bottom
+            gsap.from('.hero-description', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                delay: 0.6,
+                ease: 'power2.out'
+            });
+
+            // Hero Button - Scale up and fade in
+            gsap.from('.hero-button', {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.9,
+                ease: 'back.out(1.7)'
+            });
+
+            // Quiz Card - Slide in from right
+            gsap.from('.quiz-card', {
+                x: 100,
+                opacity: 0,
+                duration: 1,
+                delay: 1.2,
+                ease: 'power3.out'
+            });
+
+            // Quiz Question - Fade in
+            gsap.from('.quiz-question', {
+                opacity: 0,
+                y: 20,
+                duration: 0.6,
+                delay: 1.5,
+                ease: 'power2.out'
+            });
+
+            // Quiz Buttons - Stagger animation
+            gsap.from('.quiz-buttons button', {
+                scale: 0,
+                opacity: 0,
+                duration: 0.5,
+                delay: 1.7,
+                stagger: 0.1,
+                ease: 'back.out(1.7)'
+            });
+
+            // Quiz Progress - Slide in
+            gsap.from('.quiz-progress', {
+                opacity: 0,
+                x: -20,
+                duration: 0.6,
+                delay: 2.1,
+                ease: 'power2.out'
+            });
+
+            // Animate progress bar width
+            gsap.to('.quiz-progress-bar', {
+                width: '75%',
+                duration: 1.5,
+                delay: 2.3,
+                ease: 'power2.inOut'
+            });
+
+            // ===========================
+            // SECTION 2 - FEATURES SECTION
+            // ===========================
+
+            // Section 2 Title - Slide in from top
+            gsap.from('.section2-title', {
+                scrollTrigger: {
+                    trigger: '.section2-title',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                y: -50,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            });
+
+            // Section 2 Description - Fade in
+            gsap.from('.section2-description', {
+                scrollTrigger: {
+                    trigger: '.section2-description',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: 0.2,
+                ease: 'power2.out'
+            });
+
+            // ===========================
+            // SECTION 3 - FEATURE CARDS
+            // ===========================
+
+            // Mobile Feature Cards
+            gsap.from('.section3-header', {
+                scrollTrigger: {
+                    trigger: '.section3-header',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 0,
+                y: -30,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+
+            gsap.from('.feature-card-1', {
+                scrollTrigger: {
+                    trigger: '.feature-card-1',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: -100,
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-2', {
+                scrollTrigger: {
+                    trigger: '.feature-card-2',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: 100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.1,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-3', {
+                scrollTrigger: {
+                    trigger: '.feature-card-3',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: -100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.2,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-4', {
+                scrollTrigger: {
+                    trigger: '.feature-card-4',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: 100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.3,
+                ease: 'power3.out'
+            });
+
+            // Desktop Feature Cards
+            gsap.from('.section3-header-desktop', {
+                scrollTrigger: {
+                    trigger: '.section3-header-desktop',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 0,
+                y: -30,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+
+            gsap.from('.feature-card-desktop-1', {
+                scrollTrigger: {
+                    trigger: '.feature-card-desktop-1',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: -100,
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-desktop-2', {
+                scrollTrigger: {
+                    trigger: '.feature-card-desktop-2',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: 100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.1,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-desktop-3', {
+                scrollTrigger: {
+                    trigger: '.feature-card-desktop-3',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: -100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.2,
+                ease: 'power3.out'
+            });
+
+            gsap.from('.feature-card-desktop-4', {
+                scrollTrigger: {
+                    trigger: '.feature-card-desktop-4',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                x: 100,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.3,
+                ease: 'power3.out'
+            });
+
+            // ===========================
+            // SWIPER INITIALIZATION
+            // ===========================
             function initSwiper() {
                 const screenWidth = window.innerWidth;
                 let slideWidth = screenWidth < 768 ? 280 : 550;
@@ -944,7 +1208,9 @@
 
             initSwiper();
 
-            // GSAP Animations for moving circles with varying sizes
+            // ===========================
+            // BACKGROUND CIRCLE ANIMATIONS
+            // ===========================
             gsap.set('#circle1', {
                 width: '200px',
                 height: '200px',
@@ -1026,7 +1292,9 @@
                 ease: 'sine.inOut'
             });
 
-            // Position and animate math symbols
+            // ===========================
+            // MATH SYMBOLS ANIMATIONS
+            // ===========================
             gsap.set('#math1', {
                 top: '20%',
                 left: '25%',
