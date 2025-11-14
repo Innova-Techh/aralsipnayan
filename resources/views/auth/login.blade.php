@@ -215,7 +215,7 @@
 
             <!-- Glassmorphism Login Card (from josh-branch) -->
             <div class="glass-card rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-                <h2 class="text-white text-xl font-semibold text-center mb-6">Login</h2>
+                <h2 class="text-white text-xl font-bold text-center mb-6">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
                     @csrf
                     <div class="mb-5">
@@ -294,7 +294,7 @@
         <!-- Right Section (from main-branch with all functionality intact) -->
         <div class="flex-1 bg-gray-100 flex items-center justify-center">
             <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
-                <h2 class="text-gray-800 text-2xl xl:text-3xl font-semibold text-center mb-8">Login</h2>
+                <h2 class="text-gray-800 text-2xl xl:text-3xl font-bold text-center mb-8">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm">
                     @csrf
                     <div class="mb-6">

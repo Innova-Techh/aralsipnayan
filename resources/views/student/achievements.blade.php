@@ -99,11 +99,14 @@
 
                     {{-- Custom Progress Bar with Handle --}}
                     <div class="relative mb-2 xs:mb-3 sm:mb-4 md:mb-5">
-                        <div class="progress-track rounded-full h-3 xs:h-4 sm:h-4 md:h-5 lg:h-5 relative overflow-visible">
+                        <div class="progress-track rounded-full h-3 xs:h-4 sm:h-4 md:h-5 lg:h-5 relative overflow-visible"
+                            style="background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);">
                             <div class="progress-fill h-3 xs:h-4 sm:h-4 md:h-5 lg:h-5 rounded-full transition-all duration-500 ease-out relative overflow-visible"
-                                style="width: {{ $progress }}%">
+                                style="width: {{ $progress }}%; background: linear-gradient(90deg, #FCD34D, #F59E0B, #FBBF24); box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6);">
                                 {{-- Progress Handle/Thumb --}}
-                                <div class="progress-handle"></div>
+                                <div
+                                    class="progress-handle-achievement absolute -right-1 top-1/2 -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6 rounded-full">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -228,13 +231,14 @@
                                                 <!-- Rarity Section -->
                                                 <div class="flex-2 flex-col items-center">
                                                     <span class="text-xs sm:text-sm font-medium">Rarity</span>
-                                                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                                                                                    @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
-                                                                                    @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
-                                                                                    @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
-                                                                                    @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
-                                                                                    @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
-                                                                                    @endif">
+                                                    <span
+                                                        class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
+                                                                                                                                                @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
+                                                                                                                                                @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
+                                                                                                                                                @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
+                                                                                                                                                @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
+                                                                                                                                                @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
+                                                                                                                                                @endif">
                                                         {{ $achievement['rarity'] }}
                                                     </span>
                                                 </div>
