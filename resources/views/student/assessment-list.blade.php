@@ -3,14 +3,15 @@
 @section('title', 'Assessment List')
 
 @section('content')
-
+    <link rel="stylesheet" href="{{ asset('css/assessment-list.css') }}">
     <div class="space-y-8 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-8">
         <!-- My Assessments Header -->
         <div class="relative overflow-hidden mt-4 lg:mt-8">
-            <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center" style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
-                                                                                background-size: 95% clamp(120px, 10vw + 60px, 200px);
-                                                                                min-height: clamp(120px, 10vw + 60px, 200px);
-                                                                                padding-left: clamp(2rem, 8vw, 18rem);">
+            <div class="mx-auto max-w-10xl text-white bg-center bg-no-repeat rounded-2xl flex items-center"
+                style="background-image: url('{{ asset('images/assessments/bg.png') }}'); 
+                                                                                        background-size: 95% clamp(120px, 10vw + 60px, 200px);
+                                                                                        min-height: clamp(120px, 10vw + 60px, 200px);
+                                                                                        padding-left: clamp(2rem, 8vw, 18rem);">
                 <div class="relative z-10 pr-6">
                     <!-- Title -->
                     <h1 class="text-lg sm:text-xl md:text-5xl lg:text-5xl leading-tight font-baloo font-extrabold">
@@ -50,7 +51,7 @@
         <!-- Category Card -->
         <div class="relative overflow-hidden">
             <div class="mx-auto max-w-10xl rounded-2xl text-white transition-all duration-300 
-                                                                                        border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
+                                                                                                border-t-2 border-l-2 border-r-2 border-b-4 border-[#FFA500]"
                 style="background: linear-gradient(to bottom, #4338CA, #9333EA); min-height: clamp(70px, 5vw + 30px, 100px);">
 
                 <!-- Mobile Layout: Vertical Stack -->
@@ -162,22 +163,22 @@
                 @if(count($assessmentOptions) > 0)
                     <div
                         class="grid
-                                                                                                                                                                                                                            grid-cols-1          <!-- all mobile: 1 column -->
-                                                                                                                                                                                                                            md:grid-cols-2       <!-- tablet: 2 columns -->
-                                                                                                                                                                                                                            lg:grid-cols-2       <!-- laptop: 3 columns -->
-                                                                                                                                                                                                                            xl:grid-cols-3       <!-- desktop: 3 columns -->
-                                                                                                                                                                                                                            2xl:grid-cols-4      <!-- large desktop: 5 columns -->
-                                                                                                                                                                                                                            gap-4 sm:gap-5 lg:gap-6 font-baloo">
+                                                                                                                                                                                                                                                    grid-cols-1          <!-- all mobile: 1 column -->
+                                                                                                                                                                                                                                                    md:grid-cols-2       <!-- tablet: 2 columns -->
+                                                                                                                                                                                                                                                    lg:grid-cols-2       <!-- laptop: 3 columns -->
+                                                                                                                                                                                                                                                    xl:grid-cols-3       <!-- desktop: 3 columns -->
+                                                                                                                                                                                                                                                    2xl:grid-cols-4      <!-- large desktop: 5 columns -->
+                                                                                                                                                                                                                                                    gap-4 sm:gap-5 lg:gap-6 font-baloo">
 
                         @foreach($assessmentOptions as $index => $assessment)
                             <div
                                 class="w-full 
-                                                                                                                                                                                                                                                                                            bg-gradient-to-br from-[#2077AF] to-[#4720AF] 
-                                                                                                                                                                                                                                                                                            rounded-xl border-b-4 border-[#0b1d30] 
-                                                                                                                                                                                                                                                                                            shadow-lg transition-all 
-                                                                                                                                                                                                                                                                                            p-3 sm:p-4 md:p-5 
-                                                                                                                                                                                                                                                                                            flex flex-col justify-between 
-                                                                                                                                                                                                                                                                                            h-auto">
+                                                                                                                                                                                                                                                                                                                            bg-gradient-to-br from-[#2077AF] to-[#4720AF] 
+                                                                                                                                                                                                                                                                                                                            rounded-xl border-b-4 border-[#0b1d30] 
+                                                                                                                                                                                                                                                                                                                            shadow-lg transition-all 
+                                                                                                                                                                                                                                                                                                                            p-3 sm:p-4 md:p-5 
+                                                                                                                                                                                                                                                                                                                            flex flex-col justify-between 
+                                                                                                                                                                                                                                                                                                                            h-auto">
 
                                 <!-- Title + Time -->
                                 <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
@@ -490,38 +491,7 @@
     </div>
 
     <style>
-        .text-shadow-lg {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
 
-        #assessmentModal:not(.hidden) {
-            display: flex !important;
-        }
-
-        #activeAssessmentModal {
-            display: none;
-        }
-
-        #activeAssessmentModal.show {
-            display: flex !important;
-        }
-
-        #activeAssessmentModal.show #activeAssessmentModalContent {
-            transform: scale(1);
-        }
-
-        .shadow-3d {
-            box-shadow:
-                0 1px 3px rgba(0, 0, 0, 0.12),
-                0 1px 2px rgba(0, 0, 0, 0.24),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .shadow-3d-pressed {
-            box-shadow:
-                inset 0 2px 4px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(0, 0, 0, 0.1);
-        }
     </style>
 
     <script>
@@ -675,11 +645,11 @@
                     }
 
                     infoDiv.innerHTML = `
-                                                                                    <div class="font-medium text-gray-800">${activeAssessment.title || 'Assessment'}</div>
-                                                                                    <div class="text-sm mt-2">
-                                                                                        ${timeDisplay}
-                                                                                    </div>
-                                                                                `;
+                                                                                            <div class="font-medium text-gray-800">${activeAssessment.title || 'Assessment'}</div>
+                                                                                            <div class="text-sm mt-2">
+                                                                                                ${timeDisplay}
+                                                                                            </div>
+                                                                                        `;
                 }
             }
 
@@ -921,213 +891,7 @@
     </div>
 
     <style>
-        /* Assessment Loader Styles */
-        .pl {
-            width: 6em;
-            height: 6em;
-        }
 
-        @media (max-width: 480px) {
-            .pl {
-                width: 4em;
-                height: 4em;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .pl {
-                width: 7em;
-                height: 7em;
-            }
-        }
-
-        .pl__ring {
-            animation: ringA 2s linear infinite;
-            stroke-width: 20;
-            stroke-linecap: round;
-        }
-
-        .pl__ring--a {
-            stroke: #f42f25;
-        }
-
-        .pl__ring--b {
-            animation-name: ringB;
-            stroke: #f49725;
-        }
-
-        .pl__ring--c {
-            animation-name: ringC;
-            stroke: #255ff4;
-        }
-
-        .pl__ring--d {
-            animation-name: ringD;
-            stroke: #f42582;
-        }
-
-        /* Spinner Animations */
-        @keyframes ringA {
-
-            from,
-            4% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -330;
-            }
-
-            12% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -335;
-            }
-
-            32% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -595;
-            }
-
-            40%,
-            54% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -660;
-            }
-
-            62% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -665;
-            }
-
-            82% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -925;
-            }
-
-            90%,
-            to {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -990;
-            }
-        }
-
-        @keyframes ringB {
-
-            from,
-            12% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -110;
-            }
-
-            20% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -115;
-            }
-
-            40% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -195;
-            }
-
-            48%,
-            62% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -220;
-            }
-
-            70% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -225;
-            }
-
-            90% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -305;
-            }
-
-            98%,
-            to {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -330;
-            }
-        }
-
-        @keyframes ringC {
-            from {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            8% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            28% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            36%,
-            58% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            66% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            86% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            94%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
-
-        @keyframes ringD {
-
-            from,
-            8% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            16% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            36% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            44%,
-            50% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            58% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            78% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            86%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
     </style>
 
 @endsection

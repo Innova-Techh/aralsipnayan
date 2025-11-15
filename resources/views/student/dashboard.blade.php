@@ -6,9 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <href rel="stylesheet" href="css/dashboard.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-        <script src="{{ asset('js/dashboard-animations.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="{{ asset('js/dashboard-animations.js') }}" defer></script>
 </head>
 
 <body>
@@ -96,271 +96,6 @@
                 ->where('status', 'completed')
                 ->count();
         @endphp
-        <style>
-            .welcome-header {
-                background: linear-gradient(135deg, #4338CA, #1E40AF, #3B82F6);
-                background-size: 200% 200%;
-                animation: gradientBG 15s ease infinite;
-                position: relative;
-                overflow: hidden;
-            }
-
-
-            .welcome-header::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: radial-gradient(circle at 20% 150%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
-            }
-
-            .welcome-header::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: radial-gradient(circle at 80% -50%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
-            }
-
-            .floating-circles div {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.1);
-                animation: float 20s infinite;
-            }
-
-            .floating-circles div:nth-child(1) {
-                width: 200px;
-                height: 200px;
-                left: -100px;
-                top: -100px;
-                animation-delay: -3s;
-            }
-
-
-            .floating-circles div:nth-child(2) {
-                width: 180px;
-                height: 180px;
-                right: -90px;
-                bottom: -90px;
-                animation-delay: -5s;
-            }
-
-
-            .floating-circles div:nth-child(3) {
-                width: 150px;
-                height: 150px;
-                left: 40%;
-                bottom: -75px;
-                animation-delay: -7s;
-            }
-
-
-            @media (min-width: 640px) {
-                .floating-circles div:nth-child(1) {
-                    width: 250px;
-                    height: 250px;
-                    left: -125px;
-                    top: -125px;
-                }
-
-
-                .floating-circles div:nth-child(2) {
-                    width: 220px;
-                    height: 220px;
-                    right: -110px;
-                    bottom: -110px;
-                }
-
-
-                .floating-circles div:nth-child(3) {
-                    width: 180px;
-                    height: 180px;
-                    left: 40%;
-                    bottom: -90px;
-                }
-            }
-
-
-            @media (min-width: 1024px) {
-                .floating-circles div:nth-child(1) {
-                    width: 300px;
-                    height: 300px;
-                    left: -150px;
-                    top: -150px;
-                }
-
-
-                .floating-circles div:nth-child(2) {
-                    width: 250px;
-                    height: 250px;
-                    right: -125px;
-                    bottom: -125px;
-                }
-
-
-                .floating-circles div:nth-child(3) {
-                    width: 200px;
-                    height: 200px;
-                    left: 40%;
-                    bottom: -100px;
-                }
-            }
-
-
-            @keyframes gradientBG {
-                0% {
-                    background-position: 0% 50%;
-                }
-
-                50% {
-                    background-position: 100% 50%;
-                }
-
-                100% {
-                    background-position: 0% 50%;
-                }
-            }
-
-
-            @keyframes float {
-
-
-                0%,
-                100% {
-                    transform: translate(0, 0);
-                }
-
-
-                25% {
-                    transform: translate(10px, -10px);
-                }
-
-                50% {
-                    transform: translate(-5px, 5px);
-                }
-
-                75% {
-                    transform: translate(-10px, 10px);
-                }
-            }
-
-
-            /* Login Streak Modal Styles */
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                }
-
-
-                to {
-                    opacity: 1;
-                }
-            }
-
-
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translate(-50%, -60%) scale(0.9);
-                }
-
-
-                to {
-                    opacity: 1;
-                    transform: translate(-50%, -50%) scale(1);
-                }
-            }
-
-
-            @keyframes flame {
-
-                0%,
-                100% {
-                    transform: scale(1) rotate(-1deg);
-                }
-
-                25% {
-                    transform: scale(1.05) rotate(1deg);
-                }
-
-                50% {
-                    transform: scale(1.02) rotate(-0.5deg);
-                }
-
-                75% {
-                    transform: scale(1.03) rotate(0.5deg);
-                }
-            }
-
-            .modal-overlay {
-                animation: fadeIn 0.3s ease-out;
-                backdrop-filter: blur(4px);
-            }
-
-            .modal-content {
-                animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            }
-
-
-            .flame-icon {
-                animation: flame 3s ease-in-out infinite;
-                filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3));
-            }
-
-
-            /* Custom button hover effect */
-            #continueButton:hover {
-                box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
-            }
-
-            /* Skeleton Loading Animations */
-            @keyframes shimmer {
-                0% {
-                    background-position: -200px 0;
-                }
-
-                100% {
-                    background-position: calc(200px + 100%) 0;
-                }
-            }
-
-            .skeleton {
-                background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-                background-size: 200px 100%;
-                animation: shimmer 1.5s infinite;
-            }
-
-            .skeleton-dark {
-                background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
-                background-size: 200px 100%;
-                animation: shimmer 1.5s infinite;
-            }
-
-            .skeleton-text {
-                height: 1rem;
-                border-radius: 0.25rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .skeleton-title {
-                height: 1.5rem;
-                border-radius: 0.25rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .skeleton-circle {
-                border-radius: 50%;
-            }
-
-            .content-loaded {
-                animation: fadeIn 0.5s ease-in-out;
-            }
-        </style>
         <href rel="stylesheet" href="css/dashboard.css">
 
             <!-- Welcome Header (Hero) - Fixed margins and width -->
@@ -553,10 +288,10 @@
                             <div class="flex flex-col justify-center h-full">
                                 <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-5xl font-baloo font-extrabold leading-tight tracking-tight"
                                     style="text-shadow: -1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   1px -1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   -1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   1px 1px 0 #18337e,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0 4px 0 #18337e;">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px -1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           -1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           1px 1px 0 #18337e,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           0 4px 0 #18337e;">
                                     Welcome back, {{ Auth::guard('student')->user()?->studentProfile?->fullname }}! 👋
                                 </h1>
                                 <p class="text-base sm:text-lg md:text-xl lg:text-xl text-blue-100 mt-3 sm:mt-4 lg:mt-5"
@@ -918,7 +653,7 @@
                                             <a href="{{ route('achievements.index') }}"
                                                 class="ml-3 px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 rounded-xl text-white text-xs sm:text-sm font-medium flex-shrink-0"
                                                 style="background: linear-gradient(180deg, #F6510C 0%, #F5D70B 100%); 
-                                                                                                                                                                                                                                                                            box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                                                                                                                                                                                                                                                    box-shadow: 0 4px 0 #7A4305; text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
                                                 View All
                                             </a>
                                         </div>

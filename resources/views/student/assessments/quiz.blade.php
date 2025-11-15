@@ -9,7 +9,7 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    <link rel="stylesheet" href="{{ asset('css/quiz.css') }}">
     <!-- Vite Assets (includes SweetAlert2) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -18,225 +18,7 @@
         rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Baloo 2', cursive;
-        }
-
-        .font-baloo {
-            font-family: 'Baloo 2', cursive;
-        }
-
-        .border-b-6 {
-            border-bottom-width: 6px;
-        }
-
-        /* Assessment Loader Styles */
-        .pl {
-            width: 6em;
-            height: 6em;
-        }
-
-        @media (max-width: 480px) {
-            .pl {
-                width: 4em;
-                height: 4em;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .pl {
-                width: 7em;
-                height: 7em;
-            }
-        }
-
-        .pl__ring {
-            animation: ringA 2s linear infinite;
-            stroke-width: 20;
-            stroke-linecap: round;
-        }
-
-        .pl__ring--a {
-            stroke: #f42f25;
-        }
-
-        .pl__ring--b {
-            animation-name: ringB;
-            stroke: #f49725;
-        }
-
-        .pl__ring--c {
-            animation-name: ringC;
-            stroke: #255ff4;
-        }
-
-        .pl__ring--d {
-            animation-name: ringD;
-            stroke: #f42582;
-        }
-
-        /* Spinner Animations */
-        @keyframes ringA {
-
-            from,
-            4% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -330;
-            }
-
-            12% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -335;
-            }
-
-            32% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -595;
-            }
-
-            40%,
-            54% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -660;
-            }
-
-            62% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -665;
-            }
-
-            82% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -925;
-            }
-
-            90%,
-            to {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -990;
-            }
-        }
-
-        @keyframes ringB {
-
-            from,
-            12% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -110;
-            }
-
-            20% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -115;
-            }
-
-            40% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -195;
-            }
-
-            48%,
-            62% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -220;
-            }
-
-            70% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -225;
-            }
-
-            90% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -305;
-            }
-
-            98%,
-            to {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -330;
-            }
-        }
-
-        @keyframes ringC {
-            from {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            8% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            28% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            36%,
-            58% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            66% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            86% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            94%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
-
-        @keyframes ringD {
-
-            from,
-            8% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            16% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            36% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            44%,
-            50% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            58% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            78% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            86%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
+       
     </style>
 </head>
 
@@ -249,14 +31,16 @@
         @if(isset($assignment) && $assignment->status === 'Completed')
             <div class="min-h-screen flex items-center justify-center px-4">
                 <div class="max-w-2xl w-full">
-                    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-12 text-center shadow-xl">
+                    <div
+                        class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-12 text-center shadow-xl">
                         <div class="bg-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="material-symbols-outlined text-emerald-600 text-5xl">check_circle</span>
                         </div>
                         <h1 class="text-3xl font-bold text-emerald-900 mb-3">Assessment Completed!</h1>
-                        <p class="text-emerald-700 text-lg mb-8">You've already finished this assessment. Ready to see how you did?</p>
-                        <a href="{{ route('teacher-assessments.show', $assessment->id) }}" 
-                           class="inline-block bg-emerald-600 text-white px-8 py-4 rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
+                        <p class="text-emerald-700 text-lg mb-8">You've already finished this assessment. Ready to see how you
+                            did?</p>
+                        <a href="{{ route('teacher-assessments.show', $assessment->id) }}"
+                            class="inline-block bg-emerald-600 text-white px-8 py-4 rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
                             View Your Results
                         </a>
                     </div>
@@ -269,7 +53,8 @@
                 <div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
 
                     <!-- Question Counter with Progress -->
-                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 border-b-6 border-indigo-800" style="box-shadow: 0 6px 0 #4c1d95;">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 border-b-6 border-indigo-800"
+                        style="box-shadow: 0 6px 0 #4c1d95;">
                         <span class="text-white font-semibold text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
                             Question <span id="current-question">1</span> / {{ count($questionDetails) }}
                         </span>
@@ -301,7 +86,9 @@
                         </div>
                     </div>
                     <div class="relative w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                        <div id="progress-bar" class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-lg" style="width: 0%"></div>
+                        <div id="progress-bar"
+                            class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-lg"
+                            style="width: 0%"></div>
                     </div>
                 </div>
 
@@ -336,13 +123,15 @@
 
                 <!-- Complete Quiz Section -->
                 <div id="complete-section" class="invisible text-center mt-6 hidden">
-                    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8 shadow-2xl border-b-6 border-emerald-800" style="box-shadow: 0 6px 0 #047857;">
+                    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8 shadow-2xl border-b-6 border-emerald-800"
+                        style="box-shadow: 0 6px 0 #047857;">
                         <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span class="material-symbols-outlined text-emerald-600 text-4xl">flag</span>
                         </div>
                         <h3 class="text-white text-2xl font-bold mb-3">Ready to Finish?</h3>
                         <p class="text-emerald-100 mb-6">You've reached the final question!</p>
-                        <button id="complete-btn" class="bg-white text-emerald-700 px-10 py-4 rounded-xl hover:bg-emerald-50 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:scale-105">
+                        <button id="complete-btn"
+                            class="bg-white text-emerald-700 px-10 py-4 rounded-xl hover:bg-emerald-50 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:scale-105">
                             Complete Quiz
                         </button>
                     </div>
@@ -350,7 +139,8 @@
             </div>
 
             <!-- Loading Overlay -->
-            <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+            <div id="loading-overlay"
+                class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 hidden">
                 <div class="text-center">
                     <!-- Spinner -->
                     <svg class="pl mx-auto mb-6" width="200" height="200" viewBox="0 0 240 240">
@@ -369,346 +159,346 @@
             </div>
 
             <script>
-            let currentQuestionIndex = 0;
-            let questions = @json($questionDetails);
-            let timeLimit = {{ $assessment->time_limit }}; // in minutes
-            let timeRemaining = timeLimit * 60; // in seconds
-            let timerInterval;
-            let questionStartTime;
+                let currentQuestionIndex = 0;
+                let questions = @json($questionDetails);
+                let timeLimit = {{ $assessment->time_limit }}; // in minutes
+                let timeRemaining = timeLimit * 60; // in seconds
+                let timerInterval;
+                let questionStartTime;
 
-            // Initialize quiz
-            document.addEventListener('DOMContentLoaded', function() {
-                loadQuestion(0);
-                startTimer();
-            });
+                // Initialize quiz
+                document.addEventListener('DOMContentLoaded', function () {
+                    loadQuestion(0);
+                    startTimer();
+                });
 
-            function startTimer() {
-                timerInterval = setInterval(function() {
-                    timeRemaining--;
+                function startTimer() {
+                    timerInterval = setInterval(function () {
+                        timeRemaining--;
 
-                    const minutes = Math.floor(timeRemaining / 60);
-                    const seconds = timeRemaining % 60;
-                    document.getElementById('timer').textContent = 
-                        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                        const minutes = Math.floor(timeRemaining / 60);
+                        const seconds = timeRemaining % 60;
+                        document.getElementById('timer').textContent =
+                            `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-                    if (timeRemaining <= 0) {
-                        clearInterval(timerInterval);
-                        alert('Time\'s up! The quiz will be submitted automatically.');
-                        completeQuiz();
-                    }
-                }, 1000);
-            }
-
-            function loadQuestion(index) {
-                if (index < 0 || index >= questions.length) return;
-
-                currentQuestionIndex = index;
-                const question = questions[index];
-                questionStartTime = Date.now();
-
-                // Update progress
-                document.getElementById('current-question').textContent = index + 1;
-                const progressPercentage = Math.round(((index + 1) / questions.length) * 100);
-                document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
-                document.getElementById('progress-percentage').textContent = progressPercentage;
-
-                // Update navigation buttons
-                document.getElementById('next-btn').disabled = index === questions.length - 1;
-
-                // Show/hide complete button
-                if (index === questions.length - 1) {
-                    document.getElementById('complete-section').classList.remove('hidden');
-                    document.getElementById('complete-section').classList.remove('invisible');
-                    document.getElementById('next-btn').classList.add('hidden');
-                } else {
-                    document.getElementById('complete-section').classList.add('hidden');
-                    document.getElementById('complete-section').classList.add('invisible');
-                    document.getElementById('next-btn').classList.remove('hidden');
-                }
-
-                // Load question content
-                const container = document.getElementById('question-container');
-                container.innerHTML = generateQuestionHTML(question);
-
-                // Clear any previous selections
-                clearSelections();
-
-                // Add event listeners for option selection
-                addOptionListeners();
-            }
-
-            function generateQuestionHTML(question) {
-                let html = `
-                    <div class="mb-6">
-                        <div class="flex items-start gap-3 mb-6">
-                            <div class="bg-indigo-100 text-indigo-700 font-bold text-sm px-3 py-1 rounded-lg flex-shrink-0">
-                                Q${currentQuestionIndex + 1}
-                            </div>
-                            <h2 class="text-gray-800 text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed flex-1">
-                                ${question.question_text}
-                            </h2>
-                        </div>
-                `;
-
-                if (question.question_type === 'multiple_choice') {
-                    html += '<div class="space-y-3">';
-                    const choices = [
-                        { letter: 'A', text: question.choice_a },
-                        { letter: 'B', text: question.choice_b },
-                        { letter: 'C', text: question.choice_c },
-                        { letter: 'D', text: question.choice_d }
-                    ];
-
-                    choices.forEach(choice => {
-                        if (choice.text) {
-                            html += `
-                                <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
-                                    style="border-color: #E2E8F0;">
-                                    <input type="radio" name="answer" value="${choice.letter}" class="hidden">
-                                    <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
-                                        style="background-color: #1E293B; color: white;">
-                                        ${choice.letter}
-                                    </div>
-                                    <span class="text-gray-700 font-normal text-base option-text">
-                                        ${choice.text}
-                                    </span>
-                                </label>
-                            `;
+                        if (timeRemaining <= 0) {
+                            clearInterval(timerInterval);
+                            alert('Time\'s up! The quiz will be submitted automatically.');
+                            completeQuiz();
                         }
-                    });
-                    html += '</div>';
-                } else if (question.question_type === 'true_false') {
-                    html += `
-                        <div class="space-y-3">
-                            <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
-                                style="border-color: #E2E8F0;">
-                                <input type="radio" name="answer" value="True" class="hidden">
-                                <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
-                                    style="background-color: #1E293B; color: white;">
-                                    T
-                                </div>
-                                <span class="text-gray-700 font-normal text-base option-text">True</span>
-                            </label>
-                            <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
-                                style="border-color: #E2E8F0;">
-                                <input type="radio" name="answer" value="False" class="hidden">
-                                <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
-                                    style="background-color: #1E293B; color: white;">
-                                    F
-                                </div>
-                                <span class="text-gray-700 font-normal text-base option-text">False</span>
-                            </label>
-                        </div>
-                    `;
-                } else if (question.question_type === 'fill_blanks') {
-                    html += `
-                        <div class="space-y-3">
-                            <div class="relative">
-                                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">edit</span>
-                                <input type="text" name="answer" placeholder="Type your answer here..." 
-                                       class="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg">
-                            </div>
-                        </div>
-                    `;
+                    }, 1000);
                 }
 
-                html += `
-                    </div>
-                    ${question.hint_text ? `
-                        <div class="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-400 rounded-xl">
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-amber-600 text-2xl">lightbulb</span>
-                                <div>
-                                    <div class="font-semibold text-amber-800 mb-1">Hint</div>
-                                    <span class="text-amber-700">${question.hint_text}</span>
+                function loadQuestion(index) {
+                    if (index < 0 || index >= questions.length) return;
+
+                    currentQuestionIndex = index;
+                    const question = questions[index];
+                    questionStartTime = Date.now();
+
+                    // Update progress
+                    document.getElementById('current-question').textContent = index + 1;
+                    const progressPercentage = Math.round(((index + 1) / questions.length) * 100);
+                    document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+                    document.getElementById('progress-percentage').textContent = progressPercentage;
+
+                    // Update navigation buttons
+                    document.getElementById('next-btn').disabled = index === questions.length - 1;
+
+                    // Show/hide complete button
+                    if (index === questions.length - 1) {
+                        document.getElementById('complete-section').classList.remove('hidden');
+                        document.getElementById('complete-section').classList.remove('invisible');
+                        document.getElementById('next-btn').classList.add('hidden');
+                    } else {
+                        document.getElementById('complete-section').classList.add('hidden');
+                        document.getElementById('complete-section').classList.add('invisible');
+                        document.getElementById('next-btn').classList.remove('hidden');
+                    }
+
+                    // Load question content
+                    const container = document.getElementById('question-container');
+                    container.innerHTML = generateQuestionHTML(question);
+
+                    // Clear any previous selections
+                    clearSelections();
+
+                    // Add event listeners for option selection
+                    addOptionListeners();
+                }
+
+                function generateQuestionHTML(question) {
+                    let html = `
+                            <div class="mb-6">
+                                <div class="flex items-start gap-3 mb-6">
+                                    <div class="bg-indigo-100 text-indigo-700 font-bold text-sm px-3 py-1 rounded-lg flex-shrink-0">
+                                        Q${currentQuestionIndex + 1}
+                                    </div>
+                                    <h2 class="text-gray-800 text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed flex-1">
+                                        ${question.question_text}
+                                    </h2>
                                 </div>
-                            </div>
-                        </div>
-                    ` : ''}
-                `;
+                        `;
 
-                return html;
-            }
+                    if (question.question_type === 'multiple_choice') {
+                        html += '<div class="space-y-3">';
+                        const choices = [
+                            { letter: 'A', text: question.choice_a },
+                            { letter: 'B', text: question.choice_b },
+                            { letter: 'C', text: question.choice_c },
+                            { letter: 'D', text: question.choice_d }
+                        ];
 
-            function addOptionListeners() {
-                const labels = document.querySelectorAll('.option-label');
-                labels.forEach(label => {
-                    label.addEventListener('click', function() {
-                        // Remove selection from all labels
-                        document.querySelectorAll('.option-label').forEach(l => {
-                            l.style.borderColor = '#E2E8F0';
-                            l.style.backgroundColor = 'white';
-                            const circle = l.querySelector('.option-circle');
-                            if (circle) {
-                                circle.style.backgroundColor = '#1E293B';
+                        choices.forEach(choice => {
+                            if (choice.text) {
+                                html += `
+                                        <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
+                                            style="border-color: #E2E8F0;">
+                                            <input type="radio" name="answer" value="${choice.letter}" class="hidden">
+                                            <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
+                                                style="background-color: #1E293B; color: white;">
+                                                ${choice.letter}
+                                            </div>
+                                            <span class="text-gray-700 font-normal text-base option-text">
+                                                ${choice.text}
+                                            </span>
+                                        </label>
+                                    `;
                             }
                         });
+                        html += '</div>';
+                    } else if (question.question_type === 'true_false') {
+                        html += `
+                                <div class="space-y-3">
+                                    <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
+                                        style="border-color: #E2E8F0;">
+                                        <input type="radio" name="answer" value="True" class="hidden">
+                                        <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
+                                            style="background-color: #1E293B; color: white;">
+                                            T
+                                        </div>
+                                        <span class="text-gray-700 font-normal text-base option-text">True</span>
+                                    </label>
+                                    <label class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label hover:border-indigo-300"
+                                        style="border-color: #E2E8F0;">
+                                        <input type="radio" name="answer" value="False" class="hidden">
+                                        <div class="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
+                                            style="background-color: #1E293B; color: white;">
+                                            F
+                                        </div>
+                                        <span class="text-gray-700 font-normal text-base option-text">False</span>
+                                    </label>
+                                </div>
+                            `;
+                    } else if (question.question_type === 'fill_blanks') {
+                        html += `
+                                <div class="space-y-3">
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">edit</span>
+                                        <input type="text" name="answer" placeholder="Type your answer here..." 
+                                               class="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg">
+                                    </div>
+                                </div>
+                            `;
+                    }
 
-                        // Apply selection to clicked label
-                        this.style.borderColor = '#6366F1';
-                        this.style.backgroundColor = '#EEF2FF';
-                        const circle = this.querySelector('.option-circle');
-                        if (circle) {
-                            circle.style.backgroundColor = '#6366F1';
-                        }
+                    html += `
+                            </div>
+                            ${question.hint_text ? `
+                                <div class="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-400 rounded-xl">
+                                    <div class="flex items-start gap-3">
+                                        <span class="material-symbols-outlined text-amber-600 text-2xl">lightbulb</span>
+                                        <div>
+                                            <div class="font-semibold text-amber-800 mb-1">Hint</div>
+                                            <span class="text-amber-700">${question.hint_text}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        `;
 
-                        // Check the radio button
-                        const radio = this.querySelector('input[type="radio"]');
-                        if (radio) {
-                            radio.checked = true;
-                        }
+                    return html;
+                }
+
+                function addOptionListeners() {
+                    const labels = document.querySelectorAll('.option-label');
+                    labels.forEach(label => {
+                        label.addEventListener('click', function () {
+                            // Remove selection from all labels
+                            document.querySelectorAll('.option-label').forEach(l => {
+                                l.style.borderColor = '#E2E8F0';
+                                l.style.backgroundColor = 'white';
+                                const circle = l.querySelector('.option-circle');
+                                if (circle) {
+                                    circle.style.backgroundColor = '#1E293B';
+                                }
+                            });
+
+                            // Apply selection to clicked label
+                            this.style.borderColor = '#6366F1';
+                            this.style.backgroundColor = '#EEF2FF';
+                            const circle = this.querySelector('.option-circle');
+                            if (circle) {
+                                circle.style.backgroundColor = '#6366F1';
+                            }
+
+                            // Check the radio button
+                            const radio = this.querySelector('input[type="radio"]');
+                            if (radio) {
+                                radio.checked = true;
+                            }
+                        });
                     });
+                }
+
+                function clearSelections() {
+                    const radioButtons = document.querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach(radio => radio.checked = false);
+
+                    const textInputs = document.querySelectorAll('input[type="text"]');
+                    textInputs.forEach(input => input.value = '');
+                }
+
+                function getSelectedAnswer() {
+                    const radioButtons = document.querySelectorAll('input[name="answer"]:checked');
+                    if (radioButtons.length > 0) {
+                        return radioButtons[0].value;
+                    }
+
+                    const textInput = document.querySelector('input[name="answer"]');
+                    if (textInput) {
+                        return textInput.value.trim();
+                    }
+
+                    return null;
+                }
+
+                // Event Listeners
+
+                document.getElementById('next-btn').addEventListener('click', function () {
+                    if (currentQuestionIndex < questions.length - 1) {
+                        loadQuestion(currentQuestionIndex + 1);
+                    }
                 });
-            }
 
-            function clearSelections() {
-                const radioButtons = document.querySelectorAll('input[type="radio"]');
-                radioButtons.forEach(radio => radio.checked = false);
+                document.getElementById('submit-btn').addEventListener('click', function () {
+                    const answer = getSelectedAnswer();
+                    if (!answer) {
+                        alert('Please select an answer before submitting.');
+                        return;
+                    }
 
-                const textInputs = document.querySelectorAll('input[type="text"]');
-                textInputs.forEach(input => input.value = '');
-            }
+                    submitAnswer(answer);
+                });
 
-            function getSelectedAnswer() {
-                const radioButtons = document.querySelectorAll('input[name="answer"]:checked');
-                if (radioButtons.length > 0) {
-                    return radioButtons[0].value;
-                }
+                document.getElementById('complete-btn').addEventListener('click', function () {
+                    const answer = getSelectedAnswer();
+                    if (answer) {
+                        submitAnswer(answer, true);
+                    } else {
+                        completeQuiz();
+                    }
+                });
 
-                const textInput = document.querySelector('input[name="answer"]');
-                if (textInput) {
-                    return textInput.value.trim();
-                }
+                function submitAnswer(answer, isLastQuestion = false) {
+                    const question = questions[currentQuestionIndex];
+                    const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
-                return null;
-            }
+                    // Show loading overlay
+                    document.getElementById('loading-overlay').classList.remove('hidden');
 
-            // Event Listeners
-
-            document.getElementById('next-btn').addEventListener('click', function() {
-                if (currentQuestionIndex < questions.length - 1) {
-                    loadQuestion(currentQuestionIndex + 1);
-                }
-            });
-
-            document.getElementById('submit-btn').addEventListener('click', function() {
-                const answer = getSelectedAnswer();
-                if (!answer) {
-                    alert('Please select an answer before submitting.');
-                    return;
-                }
-
-                submitAnswer(answer);
-            });
-
-            document.getElementById('complete-btn').addEventListener('click', function() {
-                const answer = getSelectedAnswer();
-                if (answer) {
-                    submitAnswer(answer, true);
-                } else {
-                    completeQuiz();
-                }
-            });
-
-            function submitAnswer(answer, isLastQuestion = false) {
-                const question = questions[currentQuestionIndex];
-                const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
-
-                // Show loading overlay
-                document.getElementById('loading-overlay').classList.remove('hidden');
-
-                fetch(`{{ route('teacher-assessments.submit-answer', $assessment->id) }}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        question_id: question.question_id,
-                        answer: answer,
-                        time_taken: timeTaken
+                    fetch(`{{ route('teacher-assessments.submit-answer', $assessment->id) }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            question_id: question.question_id,
+                            answer: answer,
+                            time_taken: timeTaken
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('loading-overlay').classList.add('hidden');
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('loading-overlay').classList.add('hidden');
 
-                    if (data.success) {
-                        // Track answered questions
-                        const answeredQuestions = sessionStorage.getItem('answeredQuestions') ? 
-                            JSON.parse(sessionStorage.getItem('answeredQuestions')) : [];
-                        if (!answeredQuestions.includes(question.question_id)) {
-                            answeredQuestions.push(question.question_id);
-                            sessionStorage.setItem('answeredQuestions', JSON.stringify(answeredQuestions));
-                        }
+                            if (data.success) {
+                                // Track answered questions
+                                const answeredQuestions = sessionStorage.getItem('answeredQuestions') ?
+                                    JSON.parse(sessionStorage.getItem('answeredQuestions')) : [];
+                                if (!answeredQuestions.includes(question.question_id)) {
+                                    answeredQuestions.push(question.question_id);
+                                    sessionStorage.setItem('answeredQuestions', JSON.stringify(answeredQuestions));
+                                }
 
-                        if (isLastQuestion || data.is_last_question) {
-                            completeQuiz();
-                        } else {
-                            loadQuestion(currentQuestionIndex + 1);
-                        }
-                    } else {
-                        alert('Error submitting answer: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('loading-overlay').classList.add('hidden');
-                    console.error('Error:', error);
-                    alert('An error occurred while submitting your answer.');
-                });
-            }
-
-            function completeQuiz() {
-                // Check if all questions have been answered
-                const answeredQuestions = sessionStorage.getItem('answeredQuestions') ? 
-                    JSON.parse(sessionStorage.getItem('answeredQuestions')) : [];
-
-                if (answeredQuestions.length < questions.length) {
-                    const unanswered = questions.length - answeredQuestions.length;
-                    if (!confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to complete the quiz? This action cannot be undone.`)) {
-                        return;
-                    }
-                } else {
-                    if (!confirm('Are you sure you want to complete the quiz? This action cannot be undone.')) {
-                        return;
-                    }
+                                if (isLastQuestion || data.is_last_question) {
+                                    completeQuiz();
+                                } else {
+                                    loadQuestion(currentQuestionIndex + 1);
+                                }
+                            } else {
+                                alert('Error submitting answer: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            document.getElementById('loading-overlay').classList.add('hidden');
+                            console.error('Error:', error);
+                            alert('An error occurred while submitting your answer.');
+                        });
                 }
 
-                // Clear timer and remove beforeunload warning
-                clearInterval(timerInterval);
-                window.removeEventListener('beforeunload', preventUnload);
+                function completeQuiz() {
+                    // Check if all questions have been answered
+                    const answeredQuestions = sessionStorage.getItem('answeredQuestions') ?
+                        JSON.parse(sessionStorage.getItem('answeredQuestions')) : [];
 
-                // Clear session storage
-                sessionStorage.removeItem('answeredQuestions');
-
-                fetch(`{{ route('teacher-assessments.complete', $assessment->id) }}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Force redirect to results page
-                        window.location.replace(`{{ route('teacher-assessments.show', $assessment->id) }}`);
+                    if (answeredQuestions.length < questions.length) {
+                        const unanswered = questions.length - answeredQuestions.length;
+                        if (!confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to complete the quiz? This action cannot be undone.`)) {
+                            return;
+                        }
                     } else {
-                        alert('Error completing quiz. Please try again.');
+                        if (!confirm('Are you sure you want to complete the quiz? This action cannot be undone.')) {
+                            return;
+                        }
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while completing the quiz.');
-                });
-            }
 
-            // Prevent page refresh during quiz
-            function preventUnload(e) {
-                e.preventDefault();
-                e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
-            }
+                    // Clear timer and remove beforeunload warning
+                    clearInterval(timerInterval);
+                    window.removeEventListener('beforeunload', preventUnload);
 
-            window.addEventListener('beforeunload', preventUnload);
+                    // Clear session storage
+                    sessionStorage.removeItem('answeredQuestions');
+
+                    fetch(`{{ route('teacher-assessments.complete', $assessment->id) }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                // Force redirect to results page
+                                window.location.replace(`{{ route('teacher-assessments.show', $assessment->id) }}`);
+                            } else {
+                                alert('Error completing quiz. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while completing the quiz.');
+                        });
+                }
+
+                // Prevent page refresh during quiz
+                function preventUnload(e) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+                }
+
+                window.addEventListener('beforeunload', preventUnload);
             </script>
         @endif
     @endsection
