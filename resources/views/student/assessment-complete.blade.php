@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Quiz - AralSipnayan')
+@section('title', 'AralSipnayan')
 
 @section('content')
 @include('components.level-up-modal')

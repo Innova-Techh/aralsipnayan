@@ -1,6 +1,6 @@
 @extends('admin.admin.layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'AralSipnayan')
 
 
 @section('breadcrumb', 'Dashboard')
