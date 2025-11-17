@@ -185,17 +185,21 @@ class AchievementController extends Controller
         };
     }
 
-    private function getLeaderboardBadgeImage($badgeKey)
-    {
-        // Map leaderboard badges to images
-        if (str_contains($badgeKey, '_1')) {
-            return 'a/gradechampion.png'; // Gold/Champion image
-        } elseif (str_contains($badgeKey, '_2') || str_contains($badgeKey, '_3')) {
-            return 'a/mathwhiz.png'; // Purple/Epic image
-        } else {
-            return 'a/onfire.png'; // Orange/Fire image for top 5-10
-        }
+   private function getLeaderboardBadgeImage($badgeKey)
+{
+    // Map leaderboard badges to images
+    if (str_contains($badgeKey, '_1')) {
+        return 'a/gradechampion.png'; // Gold/Champion image
+    } elseif (str_contains($badgeKey, '_2') || str_contains($badgeKey, '_3')) {
+        return 'a/mathwhiz.png'; // Purple/Epic image
+    } elseif (str_contains($badgeKey, 'school_monthly_top10')) {
+        return 'a/school-top-10.png'; // School Top 10 image
+    } elseif (str_contains($badgeKey, 'school_monthly_top5')) {
+        return 'a/school-top-5-2.png'; // School Top 5 image
+    } else {
+        return 'a/onfire.png'; // Orange/Fire image for top 5-10
     }
+}
 
     public function index()
     {
