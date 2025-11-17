@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Section')
+@section('title', 'AralSipnayan')
 
 @section('content')
     <style>

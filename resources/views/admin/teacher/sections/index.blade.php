@@ -1,6 +1,6 @@
 @extends('admin.teacher.layouts.app')
 
-@section('title', 'Aralsipnayan')
+@section('title', 'AralSipnayan')
 
 @php
     // Helper function for border colors

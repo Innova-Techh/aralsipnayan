@@ -1,6 +1,6 @@
 @extends('admin.admin.layouts.app')
 
-@section('title', 'Questions Management')
+@section('title', 'AralSipnayan')
 
 @section('content')
     <div class="max-w-7xl mx-auto px-6 py-8">

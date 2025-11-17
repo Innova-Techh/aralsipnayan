@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Welcome')
+@section('title', 'AralSipnayan')
 
 @section('content')
 <!DOCTYPE html>

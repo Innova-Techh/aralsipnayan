@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Assessment List')
+@section('title', 'AralSipnayan')
 
 @section('content')
     <link rel="stylesheet" href="{{ asset('css/assessment-list.css') }}">

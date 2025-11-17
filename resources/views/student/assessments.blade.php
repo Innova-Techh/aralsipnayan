@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Assessments')
+@section('title', 'AralSipnayan')
 
 @section('content')
     <!-- GSAP Library -->

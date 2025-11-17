@@ -1,6 +1,6 @@
 @extends('admin.teacher.layouts.app')
 
-@section('title', 'Student Profile - Aralsipnayan')
+@section('title', 'AralSipnayan')
 @section('content')
     <div class="min-h-screen bg-gray-50">
         <!-- Header Section -->
