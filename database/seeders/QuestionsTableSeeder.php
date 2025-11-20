@@ -13,16 +13,21 @@ class QuestionsTableSeeder extends Seeder
     {
         // Path to your JSON files
         $files = [
-            database_path('data/number_algebra/number_algebra_beginner.json'),
-            database_path('data/number_algebra/number_algebra_intermediate.json'),
-            database_path('data/number_algebra/number_algebra_advanced.json'),
-            database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
-            database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
-            database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
-            database_path('data/data_probability/data_probability_beginner.json'),
-            database_path('data/data_probability/data_probability_intermediate.json'),
-            database_path('data/data_probability/data_probability_advanced.json'),
+            database_path('expertdata/number_algebra/number_algebra_beginner.json'),
         ];
+
+        // // Path to your JSON files
+        // $files = [
+        //     database_path('data/number_algebra/number_algebra_beginner.json'),
+        //     database_path('data/number_algebra/number_algebra_intermediate.json'),
+        //     database_path('data/number_algebra/number_algebra_advanced.json'),
+        //     database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
+        //     database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
+        //     database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
+        //     database_path('data/data_probability/data_probability_beginner.json'),
+        //     database_path('data/data_probability/data_probability_intermediate.json'),
+        //     database_path('data/data_probability/data_probability_advanced.json'),
+        // ];
 
         foreach ($files as $file) {
             $json = File::get($file);
@@ -55,6 +60,7 @@ class QuestionsTableSeeder extends Seeder
                     'competency' => $competency,
                     'difficulty_level' => $difficulty,
                     'topic_tag' => $q['topic_tag'],
+                    'blooms_taxonomy_level' => $q['blooms_taxonomy_level'] ?? null,
                     'question_type' => $questionType,
                     'question_text' => $q['question_text'],
                     'choice_a' => $q['choice_a'] ?? null,

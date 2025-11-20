@@ -16,6 +16,7 @@ return new class extends Migration
             $table->enum('competency', ['number_algebra', 'measurement_geometry', 'data_probability']);
             $table->enum('difficulty_level', ['beginner', 'intermediate', 'advanced']);
             $table->string('topic_tag', 100);
+            $table->enum('blooms_taxonomy_level', ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'])->nullable();
 
             // Question content
             $table->text('question_text');
@@ -49,6 +50,7 @@ return new class extends Migration
             $table->index(['competency', 'difficulty_level'], 'idx_competency_difficulty');
             $table->index(['topic_tag', 'is_active'], 'idx_topic_active');
             $table->index(['difficulty_level', 'usage_count'], 'idx_difficulty_usage');
+            $table->index('blooms_taxonomy_level', 'idx_blooms_taxonomy');
         });
     }
 
