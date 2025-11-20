@@ -9,7 +9,7 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    <link rel="stylesheet" href="{{ asset('css/quiz.css') }}">
     <!-- Vite Assets (includes SweetAlert2) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -17,229 +17,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <style>
-        body {
-            font-family: 'Baloo 2', cursive;
-        }
-
-        .font-baloo {
-            font-family: 'Baloo 2', cursive;
-        }
-
-        .border-b-6 {
-            border-bottom-width: 6px;
-        }
-
-        <style>
-
-        /* Assessment Loader Styles */
-        .pl {
-            width: 6em;
-            height: 6em;
-        }
-
-        @media (max-width: 480px) {
-            .pl {
-                width: 4em;
-                height: 4em;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .pl {
-                width: 7em;
-                height: 7em;
-            }
-        }
-
-        .pl__ring {
-            animation: ringA 2s linear infinite;
-            stroke-width: 20;
-            stroke-linecap: round;
-        }
-
-        .pl__ring--a {
-            stroke: #f42f25;
-        }
-
-        .pl__ring--b {
-            animation-name: ringB;
-            stroke: #f49725;
-        }
-
-        .pl__ring--c {
-            animation-name: ringC;
-            stroke: #255ff4;
-        }
-
-        .pl__ring--d {
-            animation-name: ringD;
-            stroke: #f42582;
-        }
-
-        /* Spinner Animations */
-        @keyframes ringA {
-
-            from,
-            4% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -330;
-            }
-
-            12% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -335;
-            }
-
-            32% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -595;
-            }
-
-            40%,
-            54% {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -660;
-            }
-
-            62% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -665;
-            }
-
-            82% {
-                stroke-dasharray: 60 600;
-                stroke-dashoffset: -925;
-            }
-
-            90%,
-            to {
-                stroke-dasharray: 0 660;
-                stroke-dashoffset: -990;
-            }
-        }
-
-        @keyframes ringB {
-
-            from,
-            12% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -110;
-            }
-
-            20% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -115;
-            }
-
-            40% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -195;
-            }
-
-            48%,
-            62% {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -220;
-            }
-
-            70% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -225;
-            }
-
-            90% {
-                stroke-dasharray: 20 200;
-                stroke-dashoffset: -305;
-            }
-
-            98%,
-            to {
-                stroke-dasharray: 0 220;
-                stroke-dashoffset: -330;
-            }
-        }
-
-        @keyframes ringC {
-            from {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            8% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            28% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            36%,
-            58% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            66% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            86% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            94%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
-
-        @keyframes ringD {
-
-            from,
-            8% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: 0;
-            }
-
-            16% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -5;
-            }
-
-            36% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -175;
-            }
-
-            44%,
-            50% {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -220;
-            }
-
-            58% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -225;
-            }
-
-            78% {
-                stroke-dasharray: 40 400;
-                stroke-dashoffset: -395;
-            }
-
-            86%,
-            to {
-                stroke-dasharray: 0 440;
-                stroke-dashoffset: -440;
-            }
-        }
-    </style>
 </head>
 
 <body class="bg-[#C2DAFF]">
@@ -249,192 +26,202 @@
 
     @section('content')
 
-        <div class="space-y-8 font-baloo mt-8 px-4 xs:px-4 sm:px-4 md:px-8 lg:px-12 pb-24 sm:pb-20 md:pb-16 lg:pb-20">
+        <!-- Add these classes to your quiz card container div -->
+        <!-- Replace the existing quiz card div with this structure -->
 
-            <!-- Diagnostic Mode Banner (if applicable) -->
-            @if(isset($diagnosticMode) && $diagnosticMode)
-                <div class="rounded-2xl pb-4 py-4  text-left">
-                    <h3 class="font-bold text-2xl sm:text-3xl md:text-2xl lg:text-4xl text-[#F8FAFC] drop-shadow-diagnostic-banner mb-2"
-                        style="text-shadow: -1px -1px 0 #1E3A8A, 1px -1px 0 #1E3A8A,-1px 1px 0 #1E3A8A, 1px 1px 0 #1E3A8A, 0 1px 0 #1E3A8A;">
-                        @if(session('resumed_session'))
-                            Diagnostic Assessment Resumed
-                        @else
-                            Diagnostic Assessment
+        <div class="font-baloo py-3 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-6 md:px-8 lg:px-16 xl:px-24">
+            <div class="w-full max-w-5xl mx-auto space-y-3 sm:space-y-6 md:space-y-8">
+                <!-- Space for header elements above card -->
+                <div class="space-y-2 sm:space-y-4 md:space-y-6">
+
+                    <!-- Diagnostic Mode Banner (if applicable) -->
+                    @if(isset($diagnosticMode) && $diagnosticMode)
+                        <div class="rounded-2xl pb-4 py-4 text-left">
+                            <h3 class="font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#F8FAFC] drop-shadow-diagnostic-banner mb-2"
+                                style="text-shadow: -1px -1px 0 #1E3A8A, 1px -1px 0 #1E3A8A,-1px 1px 0 #1E3A8A, 1px 1px 0 #1E3A8A, 0 1px 0 #1E3A8A;">
+                                @if(session('resumed_session'))
+                                    Diagnostic Assessment Resumed
+                                @else
+                                    Diagnostic Assessment
+                                @endif
+                            </h3>
+
+                            @if(session('resumed_session'))
+                                <p class="text-sm sm:text-base md:text-lg text-slate-100">
+                                    Welcome back! You can continue from where you left off.
+                                </p>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Header Section -->
+                    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
+
+                        <!-- Question Counter -->
+                        <div
+                            class="bg-phase-counter drop-shadow-phase-counter backdrop-blur-sm rounded-full px-4 py-2 sm:px-6 sm:py-3 md:px-9 md:py-4 text-center sm:text-left flex-1 sm:flex-initial">
+                            <span
+                                class="text-white font-semibold text-sm sm:text-base md:text-lg lg:text-xl whitespace-nowrap">
+                                @if(isset($diagnosticMode) && $diagnosticMode)
+                                    Phase {{ $diagnosticPhase ?? 1 }} - Question {{ $currentQuestion }} of {{ $totalQuestions }}
+                                @else
+                                    Question {{ $currentQuestion }} of {{ $totalQuestions }}
+                                @endif
+                            </span>
+                        </div>
+
+                        <!-- Timer (only show for non-diagnostic quizzes) -->
+                        @if(!isset($diagnosticMode) || !$diagnosticMode)
+                            <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-4 py-2 sm:px-6 sm:py-3 md:px-9 md:py-4 flex items-center justify-center gap-2 sm:gap-3 border-b-4 sm:border-b-6 border-[#cc4713] flex-1 sm:flex-initial"
+                                style="box-shadow: 0 4px 0 #cc4713;">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-white" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-white font-bold text-sm sm:text-base md:text-lg"
+                                    id="timer-display">30:00</span>
+                            </div>
                         @endif
-                    </h3>
-
-                    @if(session('resumed_session'))
-                        <p class="text-sm sm:text-base md:text-lg text-slate-100">
-                            Welcome back! You can continue from where you left off.
-                        </p>
-                    @endif
+                    </div>
                 </div>
-            @endif
 
-            <!-- Header Section -->
-            <div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
+                <!-- Quiz Card - Centered and Responsive with More Padding -->
+                <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 lg:p-14 xl:p-16 shadow-xl w-full mx-auto">
 
-                <!-- Question Counter -->
-                <div
-                    class="bg-phase-counter drop-shadow-phase-counter backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4">
-                    <span class="text-white font-semibold text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                        @if(isset($diagnosticMode) && $diagnosticMode)
-                            Phase {{ $diagnosticPhase ?? 1 }} - Question {{ $currentQuestion }} of {{ $totalQuestions }}
-                        @else
-                            Question {{ $currentQuestion }} of {{ $totalQuestions }}
+                    <!-- Hint Button (if not diagnostic) -->
+                    @if(!isset($diagnosticMode) || !$diagnosticMode)
+                        <div class="flex justify-between items-center mb-3 sm:mb-4 md:mb-6">
+                            <button id="hint-btn"
+                                class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-full font-semibold text-xs sm:text-sm md:text-base hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#cc4713] shadow-lg">
+                                💡 HINT
+                            </button>
+
+                            <!-- Settings Button -->
+                            <button id="settings-btn"
+                                class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 flex items-center gap-2 hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span
+                                    class="text-white font-semibold text-xs sm:text-sm md:text-base hidden sm:inline">Settings</span>
+                            </button>
+                        </div>
+                    @else
+                        <div class="flex justify-end mb-3 sm:mb-4 md:mb-6">
+                            <!-- Settings Button for Diagnostic -->
+                            <button id="settings-btn"
+                                class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 flex items-center gap-2 hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span
+                                    class="text-white font-semibold text-xs sm:text-sm md:text-base hidden sm:inline">Settings</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    <!-- Question -->
+                    <div class="mb-4 sm:mb-6 md:mb-8 lg:mb-10">
+                        <h2
+                            class="text-gray-800 text-base sm:text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed break-words">
+                            {{ $currentQuestion }}. {{ $question->text }}
+                        </h2>
+                        @if(isset($question))
+                            <input type="hidden" name="question_id" value="{{ $question->question_id }}"
+                                data-question-id="{{ $question->question_id }}">
                         @endif
-                    </span>
-                </div>
-
-                <!-- Timer (only show for non-diagnostic quizzes) -->
-                @if(!isset($diagnosticMode) || !$diagnosticMode)
-                    <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2 sm:gap-3 md:gap-4
-                                                                                                                                                                                                                                                                                                                                                                                                         border-b-6 border-[#cc4713]"
-                        style="box-shadow: 0 6px 0 #cc4713;">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-white"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-white font-bold text-xs sm:text-sm md:text-base lg:text-lg xl:text-lg"
-                            id="timer-display">30:00</span>
                     </div>
-                @endif
-            </div>
 
-            @include('components.music-setting-modal')
+                    <!-- Answer Section -->
+                    <div class="mb-4 sm:mb-6 md:mb-8 lg:mb-10" id="answer-section">
+                        @if($question->type === 'multiple_choice' || $question->type === 'true_false')
+                            <!-- Multiple Choice / True False Options -->
+                            <div class="space-y-2 sm:space-y-3" id="multiple-choice-container">
+                                @foreach($question->options as $index => $option)
+                                    <label
+                                        class="flex items-start sm:items-center p-3 sm:p-4 bg-white border-2 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 option-label"
+                                        style="border-color: #E2E8F0; background-color: white;">
+                                        <input type="radio" name="answer" value="{{ chr(65 + (int) $index) }}" class="hidden"
+                                            autocomplete="off">
+                                        <div class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm mr-2 sm:mr-3 option-circle flex-shrink-0"
+                                            style="background-color: #1E293B; color: white;">
+                                            {{ chr(65 + (int) $index) }}
+                                        </div>
+                                        <span class="text-gray-700 font-normal text-sm sm:text-base option-text break-words flex-1">
+                                            {{ $option }}
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @elseif($question->type === 'fill_blanks')
+                            <!-- Fill in the Blanks -->
+                            <div class="space-y-4">
+                                <input type="text" name="answer" id="fill-answer"
+                                    class="w-full p-3 sm:p-4 md:p-5 bg-white border-2 rounded-lg sm:rounded-xl text-gray-700 font-medium text-sm sm:text-base md:text-lg focus:border-blue-400 focus:bg-blue-50 focus:outline-none transition-all duration-200"
+                                    style="border-color: #E2E8F0;" placeholder="Type your answer here..." autocomplete="off">
+                            </div>
+                        @endif
+                    </div>
 
+                    <!-- Hint Display Section (initially hidden) -->
+                    <div id="hint-section"
+                        class="hidden mt-3 sm:mt-4 md:mt-6 p-3 sm:p-4 rounded-lg bg-blue-50 border border-blue-200">
+                        <div class="flex items-start gap-2 sm:gap-3">
+                            <div
+                                class="bg-blue-500 text-white rounded-full p-1.5 sm:p-2 flex-shrink-0 text-sm sm:text-base">
+                                💡
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-blue-800 mb-1 sm:mb-2 text-sm sm:text-base">Hint:</h4>
+                                <p id="hint-text" class="text-blue-700 text-xs sm:text-sm md:text-base break-words"></p>
+                            </div>
+                        </div>
+                    </div>
 
-
-
-            <!-- Quiz Card -->
-            <div class="bg-white rounded-2xl md:rounded-3xl p-6 md:p-5 lg:p-10 shadow-2xl">
-
-                <!-- Hint Button (if not diagnostic) -->
-                @if(!isset($diagnosticMode) || !$diagnosticMode)
-                    <div class="flex justify-between items-center mb-6">
-                        <button id="hint-btn"
-                            class="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold text-sm md:text-base hover:from-orange-500 hover:to-orange-600 transition-all duration-200 transform hover:scale-105 border-b-4 border-[#cc4713] shadow-lg">
-                            💡 HINT
+                    <!-- Buttons Row -->
+                    <div
+                        class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-3 md:gap-4 mt-3 sm:mt-4 md:mt-6">
+                        <!-- Submit Button -->
+                        <button id="submit-btn"
+                            class="bg-submit-answer drop-shadow-submit-answer text-white px-6 py-2.5 sm:px-8 sm:py-3 md:px-12 md:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg transition-all duration-200 transform hover:scale-105 order-2 sm:order-1"
+                            style="text-shadow: -1px -1px 0 #094724, 1px -1px 0 #094724,-1px 1px 0 #094724, 1px 1px 0 #094724, 0 2px 0 #094724;">
+                            Submit Answer
                         </button>
 
-                        <!-- Settings Button -->
-                        <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
-                                        hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
+                        <!-- Next Button -->
+                        <button id="next-btn"
+                            class="hidden bg-next-question drop-shadow-next-question text-white px-6 py-2.5 sm:px-8 sm:py-3 md:px-12 md:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 order-1 sm:order-2"
+                            style="text-shadow: -1px -1px 0 #0E3AB1, 1px -1px 0 #0E3AB1,-1px 1px 0 #0E3AB1, 1px 1px 0 #0E3AB1, 0 2px 0 #0E3AB1;">
+                            Next Question
                         </button>
                     </div>
-                @else
-                    <div class="flex justify-end mb-6">
-                        <!-- Settings Button for Diagnostic -->
-                        <button id="settings-btn" class="bg-phase-counter drop-shadow-phase-counter rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4 flex items-center gap-2
-                                        hover:bg-purple-800 transition-all duration-200 transform hover:scale-105">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span class="text-white font-semibold text-xs sm:text-sm md:text-base">Settings</span>
-                        </button>
-                    </div>
-                @endif
 
-                <!-- Question -->
-                <div class="mb-8 md:mb-10">
-                    <h2 class="text-gray-800 text-lg md:text-xl lg:text-2xl font-semibold leading-relaxed">
-                        {{ $currentQuestion }}. {{ $question->text }}
-                    </h2>
-                    <!-- Remove when deploying just for testing -->
-                    @if(isset($question))
-                        <input type="hidden" name="question_id" value="{{ $question->question_id }}" data-question-id="{{ $question->question_id }}">
-                    @endif
-                </div>
-
-                <!-- Answer Section -->
-                <div class="mb-8 md:mb-10" id="answer-section">
-                    @if($question->type === 'multiple_choice' || $question->type === 'true_false')
-                        <!-- Multiple Choice / True False Options -->
-                        <div class="space-y-3" id="multiple-choice-container">
-                            @foreach($question->options as $index => $option)
-                                <label
-                                    class="flex items-center p-4 bg-white border-2 rounded-xl cursor-pointer transition-all duration-200 option-label"
-                                    style="border-color: #E2E8F0; background-color: white;">
-                                    <input type="radio" name="answer" value="{{ chr(65 + (int) $index) }}" class="hidden" autocomplete="off">
-                                    <div class="flex items-center justify-center w-9 h-9 text-white rounded-xl font-bold text-sm mr-3 option-circle flex-shrink-0"
-                                        style="background-color: #1E293B; color: white;">
-                                        {{ chr(65 + (int) $index) }}
-                                    </div>
-                                    <span class="text-gray-700 font-normal text-base option-text">
-                                        {{ $option }}
-                                    </span>
-                                </label>
-                            @endforeach
+                    <!-- Feedback Section (initially hidden) -->
+                    <div id="feedback-section" class="hidden mt-4 sm:mt-6 p-4 sm:p-5 md:p-6 rounded-xl">
+                        <div class="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <div id="feedback-icon"
+                                class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-lg sm:text-xl">
+                            </div>
+                            <div id="feedback-message"
+                                class="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl break-words flex-1 min-w-0">
+                            </div>
                         </div>
-                    @elseif($question->type === 'fill_blanks')
-                        <!-- Fill in the Blanks -->
-                        <div class="space-y-4">
-                            <input type="text" name="answer" id="fill-answer"
-                                class="w-full p-4 md:p-5 bg-white border-2 rounded-xl text-gray-700 font-medium text-base md:text-lg focus:border-blue-400 focus:bg-blue-50 focus:outline-none transition-all duration-200"
-                                style="border-color: #E2E8F0;" placeholder="Type your answer here..." autocomplete="off">
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Hint Display Section (initially hidden) -->
-                <div id="hint-section" class="hidden mt-6 p-4 rounded-lg bg-blue-50 border border-blue-200">
-                    <div class="flex items-start gap-3">
-                        <div class="bg-blue-500 text-white rounded-full p-2 flex-shrink-0">
-                            💡
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-800 mb-2">Hint:</h4>
-                            <p id="hint-text" class="text-blue-700"></p>
-                        </div>
+                        <div id="explanation-text"
+                            class="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed break-words"></div>
                     </div>
                 </div>
-
-                <!-- Buttons Row -->
-                <div class="flex justify-between items-center gap-2 sm:gap-4 mt-6">
-                    <!-- Submit Button -->
-                    <button id="submit-btn"
-                        class="bg-submit-answer drop-shadow-submit-answer text-white px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg transition-all duration-200 transform hover:scale-105"
-                        style="text-shadow: -1px -1px 0 #094724, 1px -1px 0 #094724,-1px 1px 0 #094724, 1px 1px 0 #094724, 0 2px 0 #094724;">
-                        Submit Answer
-                    </button>
-
-                    <!-- Next Button -->
-                    <button id="next-btn"
-                        class="hidden bg-next-question drop-shadow-next-question text-white px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 lg:px-12 lg:py-4 rounded-2xl font-bold text-xs sm:text-sm md:text-base lg:text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
-                        style="text-shadow: -1px -1px 0 #0E3AB1, 1px -1px 0 #0E3AB1,-1px 1px 0 #0E3AB1, 1px 1px 0 #0E3AB1, 0 2px 0 #0E3AB1;">
-                        Next Question
-                    </button>
-                </div>
-
-
-                <!-- Feedback Section (initially hidden) -->
-                <div id="feedback-section" class="hidden mt-6 p-5 md:p-6 rounded-xl">
-                    <div class="flex items-start gap-3 mb-3">
-                        <div id="feedback-icon"
-                            class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xl">
-                        </div>
-                        <div id="feedback-message" class="font-bold text-xl sm:text-2xl md:text-3xl"></div>
-                    </div>
-                    <div id="explanation-text" class="text-sm sm:text-base md:text-lg leading-relaxed"></div>
-                </div>
-
-
             </div>
         </div>
 
@@ -593,8 +380,8 @@
                             }
                         @endif
 
-                                                                                                                                                                                                                                                                                                                                        // Fall back to localStorage
-                                                                                                                                                                                                                                                                                                                                        const storageKey = `quiz_progress_${quizState.sessionId}`;
+                                                                                                                                                                                                                                                                                                                                                                                                                            // Fall back to localStorage
+                                                                                                                                                                                                                                                                                                                                                                                                                            const storageKey = `quiz_progress_${quizState.sessionId}`;
                         const savedProgress = localStorage.getItem(storageKey);
 
                         if (savedProgress) {
@@ -645,7 +432,7 @@
                             quizState.currentAnswer = answer;
                         }
                     @else
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const option = document.querySelector(`input[name="answer"][value="${answer}"]`);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const option = document.querySelector(`input[name="answer"][value="${answer}"]`);
                         if (option) {
                             option.checked = true;
                             const label = option.closest('.option-label');
@@ -655,7 +442,7 @@
                             quizState.currentAnswer = answer;
                         }
                     @endif
-                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                                    }
 
                 function addProgressSaveListeners() {
                     @if($question->type === 'fill_blanks')
@@ -667,7 +454,7 @@
                             });
                         }
                     @else
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const labels = document.querySelectorAll('.option-label');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const labels = document.querySelectorAll('.option-label');
                         labels.forEach(label => {
                             label.addEventListener('click', function () {
                                 const radio = this.querySelector('input[type="radio"]');
@@ -678,7 +465,7 @@
                             });
                         });
                     @endif
-                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                                                                    }
 
                 function addDiagnosticCleanupHandlers() {
                     // Handle page unload/navigation for diagnostic sessions
@@ -851,20 +638,20 @@
                             // Play and pause all sounds to enable them
                             if (window.correctSounds && window.correctSounds.length > 0) {
                                 window.correctSounds.forEach(sound => {
-                                    sound.play().then(() => sound.pause()).catch(() => {});
+                                    sound.play().then(() => sound.pause()).catch(() => { });
                                     sound.currentTime = 0;
                                 });
                             }
 
                             if (window.incorrectSounds && window.incorrectSounds.length > 0) {
                                 window.incorrectSounds.forEach(sound => {
-                                    sound.play().then(() => sound.pause()).catch(() => {});
+                                    sound.play().then(() => sound.pause()).catch(() => { });
                                     sound.currentTime = 0;
                                 });
                             }
 
                             if (window.levelUpAudio) {
-                                window.levelUpAudio.play().then(() => window.levelUpAudio.pause()).catch(() => {});
+                                window.levelUpAudio.play().then(() => window.levelUpAudio.pause()).catch(() => { });
                                 window.levelUpAudio.currentTime = 0;
                             }
 
@@ -1076,13 +863,13 @@
                             answerValue = fillAnswer.value.trim();
                         }
                     @else
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const selectedAnswer = document.querySelector('input[name="answer"]:checked');
                         if (selectedAnswer) {
                             answerValue = selectedAnswer.value;
                         }
                     @endif
 
-                                                                                                                                                                                                                                                                                                                                    const actualTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
+                                                                                                                                                                                                                                                                                                                                                                                                                        const actualTimeElapsed = Math.floor((Date.now() - questionStartTime) / 1000);
                     const timeoutTimeTaken = Math.max(1, actualTimeElapsed);
 
                     const requestData = {
@@ -1172,7 +959,7 @@
                         }
                         answerValue = fillAnswer.value.trim();
                     @else
-                        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+                                                                                                                                                                                        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
                         if (!selectedAnswer) {
                             showNoAnswerToast('Please select your choice before submitting!');
                             return;
@@ -1274,7 +1061,7 @@
                             body: JSON.stringify(requestData)
                         })
                     @endif
-                                                                                                                                                                                                                                                                                                                                    .then(response => response.json())
+                                                                                                                                                                                                                                                                                                                                                                                                                        .then(response => response.json())
                         .then(data => {
                             setTimeout(() => {
                                 hideAssessmentLoader();
@@ -1336,7 +1123,7 @@
 
                     // Add event listener to reload button
                     const reloadBtn = document.getElementById('reload-page-btn');
-                    reloadBtn.onclick = function() {
+                    reloadBtn.onclick = function () {
                         window.location.reload();
                     };
                 }
