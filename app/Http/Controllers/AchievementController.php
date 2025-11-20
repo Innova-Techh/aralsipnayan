@@ -65,7 +65,7 @@ class AchievementController extends Controller
             'icon' => 'compass',
             'rarity' => 'Epic',
             'rarity_color' => 'purple',
-            'front_image' => 'a/firststep.png',
+            'front_image' => 'a/math-explorer.png',
             'reward' => '+200 XP',
             'background_light' => '#165A9A'
         ],
@@ -188,14 +188,38 @@ class AchievementController extends Controller
     private function getLeaderboardBadgeImage($badgeKey)
     {
         // Map leaderboard badges to images
-        if (str_contains($badgeKey, '_1')) {
+        if (str_contains($badgeKey, 'grade_champion')) {
             return 'a/gradechampion.png'; // Gold/Champion image
+
         } elseif (str_contains($badgeKey, '_2') || str_contains($badgeKey, '_3')) {
             return 'a/mathwhiz.png'; // Purple/Epic image
+
+        } elseif (str_contains($badgeKey, 'school_monthly_top10')) {
+            return 'a/school-top-10.png'; // School Top 10 image
+
+        } elseif (str_contains($badgeKey, 'section_weekly_1')) {
+            // Gender-based image selection
+            $user = Auth::guard('student')->user();
+            if ($user && isset($user->gender)) {
+                $gender = strtolower($user->gender);
+                if ($gender === 'female' || $gender === 'girl') {
+                    return 'a/section-champion-girl.png';
+                } else {
+                    return 'a/section-champion-boy.png';
+                }
+            } else {
+                // Default to girl if gender is not set
+                return 'a/section-champion-girl.png';
+            }
+
+        } elseif (str_contains($badgeKey, 'school_monthly_top5')) {
+            return 'a/school-top-5-2.png'; // School Top 5 image
+
         } else {
             return 'a/onfire.png'; // Orange/Fire image for top 5-10
         }
     }
+
 
     public function index()
     {

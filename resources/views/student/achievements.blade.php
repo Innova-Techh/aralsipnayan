@@ -163,10 +163,10 @@
 
                 <!-- Achievements Grid -->
                 <div
-                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 py-4">
+                    class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6 px-6 sm:px-2 md:px-12 lg:px-16 py-6">
                     @forelse($filteredAchievements as $achievement)
                         <div class="flip-card-container" style="perspective: 1000px;">
-                            <div class="flip-card relative w-full aspect-[4/5] rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['rarity'] === 'Legendary' ? 'shadow-lg shadow-yellow-400' : '' }}"
+                            <div class="flip-card relative w-full aspect-[2.5/3] rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 {{ $achievement['rarity'] === 'Legendary' ? 'shadow-lg shadow-yellow-400' : '' }}"
                                 data-achievement-id="{{ $loop->index }}"
                                 data-earned="{{ $achievement['is_earned'] ? 'true' : 'false' }}"
                                 title="{{ $achievement['is_earned'] ? 'Click to flip' : 'Achievement locked' }}">
@@ -204,13 +204,14 @@
 
 
                                     <!-- Card Footer -->
-                                    <div class="absolute bottom-2 left-2 right-0 to-transparent p-3 text-white">
-
-                                        <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">
+                                    <div
+                                        class="relative h-full text-left p-2 sm:p-3 text-white bg-gradient-to-t from-black/50 via-black/10 to-transparent">
+                                        <h3
+                                            class="text-xs sm:text-sm md:text-base lg:text-lg font-bold leading-tight break-words">
                                             {{ $achievement['title'] }}
                                         </h3>
-
-                                        <p class="text-[9px] sm:text-sm md:text-sm lg:text-md opacity-80 truncate">
+                                        <p
+                                            class="text-[10px] sm:text-xs md:text-sm lg:text-base opacity-90 leading-snug break-words whitespace-normal hidden lg:block">
                                             {{ $achievement['description'] }}
                                         </p>
                                     </div>
@@ -233,12 +234,12 @@
                                                     <span class="text-xs sm:text-sm font-medium">Rarity</span>
                                                     <span
                                                         class="inline-block px-2 py-1 text-xs font-semibold rounded-full 
-                                                                                                                                                @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
-                                                                                                                                                @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
-                                                                                                                                                @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
-                                                                                                                                                @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
-                                                                                                                                                @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
-                                                                                                                                                @endif">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @if($achievement['rarity'] === 'Common') bg-gray-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @elseif($achievement['rarity'] === 'Uncommon') bg-green-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @elseif($achievement['rarity'] === 'Rare') bg-red-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @elseif($achievement['rarity'] === 'Epic') bg-purple-500 text-white
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @elseif($achievement['rarity'] === 'Legendary') bg-yellow-500 text-black
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @endif">
                                                         {{ $achievement['rarity'] }}
                                                     </span>
                                                 </div>

@@ -4,6 +4,22 @@
 
 @section('content')   
     <div class="min-h-screen bg-gray-50">
+        <!-- Breadcrumb/Stepper Navigation -->
+        <div class="px-8 py-3">
+            <nav class="flex items-center space-x-2 text-sm">
+                <a href="{{ route('teacher.dashboard') }}" class="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+                    <span class="material-symbols-outlined text-lg mr-1">home</span>
+                    <span>Dashboard</span>
+                </a>
+                <span class="material-symbols-outlined text-gray-400 text-lg">chevron_right</span>
+                <a href="{{ route('teacher.sections') }}" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    Sections
+                </a>
+                <span class="material-symbols-outlined text-gray-400 text-lg">chevron_right</span>
+                <span class="text-gray-900 font-medium">{{ $section['name'] ?? 'Section Management' }}</span>
+            </nav>
+        </div>
+
         <!-- Header Section -->
         <div class="bg-white border-b border-gray-200 rounded-2xl px-8 py-6">
             <div class="flex items-center justify-between mb-4">
@@ -642,13 +658,6 @@
             console.log('View profile for student:', studentId);
             window.location.href = `/teacher/students/${studentId}/profile`;
         }
-
-       // window.assignAssessment = function(studentId, studentName) {
-           // console.log('Assign assessment to:', studentName, studentId);
-            // Implement assign assessment logic
-           // alert(`Assign assessment to ${studentName}`);
-       // }
-
 
         window.removeFromSection = function(studentId, studentName) {
             console.log('Remove from section:', studentName, studentId);
