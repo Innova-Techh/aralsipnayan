@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentAssignment;
 use App\Models\QuizResult;
+use App\Models\TeacherAssessmentSession;
+use App\Models\TeacherQuizResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,9 +119,8 @@ class TeacherAssessmentController extends Controller
             // Accept either an array (selected_students[]) or a CSV string in selected_students
             'selected_students' => 'nullable',
             'accommodations' => 'boolean',
-            'question_source' => 'required|in:question_bank,create_custom,mixed',
+            'question_source' => 'required|in:question_bank',
             'selected_bank_questions' => 'nullable|string',
-            'custom_questions' => 'nullable|string'
         ]);
 
         // Debug authentication
@@ -141,15 +142,6 @@ class TeacherAssessmentController extends Controller
             'created_by' => $teacherId,
             'status' => ($request->has('sections') || $request->has('selected_students')) ? 'Active' : 'Draft'
         ]);
-
-        // Handle custom questions
-        if ($request->custom_questions) {
-            $customQuestions = json_decode($request->custom_questions, true);
-            if ($customQuestions) {
-                $this->storeCustomQuestions($customQuestions, $teacherId);
-                $this->assignQuestionsToAssessment($assessment->id, array_column($customQuestions, 'id'));
-            }
-        }
 
         // Handle selected bank questions
         if ($request->selected_bank_questions) {
@@ -386,83 +378,25 @@ class TeacherAssessmentController extends Controller
         return $availableTopics;
     }
 
-    /**
-     * Store custom questions in the database
-     */
-    private function storeCustomQuestions($customQuestions, $teacherId)
-    {
-        foreach ($customQuestions as $question) {
-            // Map category to competency
-            $competencyMap = [
-                'Number & Algebra' => 'number_algebra',
-                'Measurement & Geometry' => 'measurement_geometry',
-                'Data & Probability' => 'data_probability'
-            ];
-
-            $category = request('category');
-            $competency = $competencyMap[$category] ?? 'number_algebra';
-
-            // Determine difficulty level based on points or set default
-            $difficultyLevel = 'intermediate'; // Default
-            if ($question['base_points'] <= 5) {
-                $difficultyLevel = 'beginner';
-            } elseif ($question['base_points'] >= 15) {
-                $difficultyLevel = 'advanced';
-            }
-
-            $questionData = [
-                'question_id' => $question['id'],
-                'competency' => $competency,
-                'difficulty_level' => $difficultyLevel,
-                'topic_tag' => $question['topic_tag'],
-                'question_text' => $question['question_text'],
-                'question_type' => $question['question_type'],
-                'correct_answer' => $question['correct_answer'],
-                'hint_text' => $question['hint_text'] ?? null,
-                'explanation' => $question['explanation'] ?? null,
-                'max_allowed_time' => 60, // Default 60 seconds
-                'estimated_difficulty_weight' => 1.0,
-                'question_source' => 'custom',
-                'is_active' => true,
-                'usage_count' => 0,
-                'success_rate' => 0.0000,
-                'base_points' => $question['base_points'],
-                'created_by' => $teacherId,
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-
-            // Add multiple choice options if applicable
-            if ($question['question_type'] === 'multiple_choice' && isset($question['choices'])) {
-                $questionData['choice_a'] = $question['choices']['A'] ?? null;
-                $questionData['choice_b'] = $question['choices']['B'] ?? null;
-                $questionData['choice_c'] = $question['choices']['C'] ?? null;
-                $questionData['choice_d'] = $question['choices']['D'] ?? null;
-            }
-
-            // Insert or update the question
-            DB::table('questions')->updateOrInsert(
-                ['question_id' => $question['id']],
-                $questionData
-            );
-        }
-    }
 
     /**
      * Assign questions to a teacher assessment
+     * All questions in the same assessment share the same pool_id
      */
     private function assignQuestionsToAssessment($assessmentId, $questionIds)
     {
         $teacherId = Auth::guard('admin')->id();
         
+        // Generate ONE pool_id for all questions in this assessment
+        $poolId = Str::uuid()->toString();
+        
         foreach ($questionIds as $index => $questionId) {
-            $poolId = Str::uuid()->toString();
-            
             DB::table('teacher_assessment_questions')->insert([
                 'pool_id' => $poolId,
                 'teacher_assessment_id' => $assessmentId,
                 'question_id' => $questionId,
                 'question_order' => $index + 1,
+                'shuffled_order' => null, // Will be set during quiz start
                 'is_answered' => false,
                 'is_current' => false,
                 'created_by' => $teacherId,
@@ -471,6 +405,22 @@ class TeacherAssessmentController extends Controller
                 'updated_at' => now()
             ]);
         }
+    }
+
+    /**
+     * Fisher-Yates shuffle algorithm for randomizing questions
+     */
+    private function fisherYatesShuffle($array)
+    {
+        $count = count($array);
+        for ($i = $count - 1; $i > 0; $i--) {
+            $j = rand(0, $i);
+            // Swap elements
+            $temp = $array[$i];
+            $array[$i] = $array[$j];
+            $array[$j] = $temp;
+        }
+        return $array;
     }
 
     public function show(Assessment $assessment)
@@ -697,6 +647,17 @@ class TeacherAssessmentController extends Controller
         })
         ->get();
 
+        // Check for completed assessments and update status in memory
+        $completedAssessmentIds = QuizResult::where('student_id', $student->id)
+            ->pluck('assessment_id')
+            ->toArray();
+
+        foreach ($assignments as $assignment) {
+            if (in_array($assignment->assessment_id, $completedAssessmentIds)) {
+                $assignment->status = 'Completed';
+            }
+        }
+
         return view('student.assessments.index', compact('assignments'));
     }
 
@@ -729,12 +690,14 @@ class TeacherAssessmentController extends Controller
             abort(403, 'You do not have access to this assessment.');
         }
 
-        // Get quiz results if assessment is completed
-        $quizResult = null;
-        if ($assignment->status === 'Completed') {
-            $quizResult = QuizResult::where('student_id', $student->id)
-                ->where('assessment_id', $assessment->id)
-                ->first();
+        // Check if student has already completed this assessment
+        $quizResult = QuizResult::where('student_id', $student->id)
+            ->where('assessment_id', $assessment->id)
+            ->first();
+
+        // If quiz result exists, mark assignment as completed for this view
+        if ($quizResult) {
+            $assignment->status = 'Completed';
         }
 
         return view('student.assessments.show', compact('assessment', 'assignment', 'quizResult'));
@@ -774,9 +737,42 @@ class TeacherAssessmentController extends Controller
                 ->with('info', 'This assessment has already been completed.');
         }
         
-        // Check if there's an active quiz session for a different assessment
-        if (session('quiz_assessment_id') && session('quiz_assessment_id') != $assessment->id) {
-            session()->forget(['quiz_assessment_id', 'quiz_questions', 'current_question_index', 'quiz_start_time', 'quiz_answers']);
+        // Check for existing active session
+        $existingSession = TeacherAssessmentSession::where('teacher_assessment_id', $assessment->id)
+            ->where('user_id', $student->id)
+            ->where('status', 'in_progress')
+            ->first();
+
+        if ($existingSession) {
+            // Resume session
+            $shuffledQuestions = $existingSession->questions_json;
+            $sessionId = $existingSession->session_id;
+            
+            // Store quiz session data in Laravel session
+            session([
+                'quiz_assessment_id' => $assessment->id,
+                'quiz_session_id' => $sessionId,
+                'quiz_questions' => $shuffledQuestions,
+                'current_question_index' => $existingSession->current_question_index,
+                'quiz_start_time' => $existingSession->started_at,
+                'current_bkt_probability' => $existingSession->final_bkt_probability ?? 0.5 // Use stored probability if available
+            ]);
+            
+            // Re-populate answered questions for frontend
+            // We need to pass this to the view so the frontend knows which questions are answered
+            // The frontend uses sessionStorage 'answeredQuestions', we might need to seed it
+            
+            // Populate questionDetails from saved questions
+            $questionDetails = $shuffledQuestions;
+            
+            // Get answered question IDs to restore frontend state
+            $answeredQuestionIds = TeacherQuizResponse::where('session_id', $sessionId)
+                ->pluck('question_id')
+                ->toArray();
+            
+            $currentQuestionIndex = $existingSession->current_question_index;
+            
+            return view('student.assessments.quiz', compact('assessment', 'assignment', 'questionDetails', 'answeredQuestionIds', 'currentQuestionIndex'));
         }
 
         // Get questions for this assessment
@@ -803,15 +799,63 @@ class TeacherAssessmentController extends Controller
             }
         }
 
-        // Store quiz session data
+        // Apply Fisher-Yates shuffle to randomize questions
+        $shuffledQuestions = $this->fisherYatesShuffle($questionDetails);
+
+        // Create teacher assessment session
+        $sessionId = 'TAS-' . $student->id . '-' . $assessment->id . '-' . time();
+        
+        // Determine competency from assessment category
+        $competencyMap = [
+            'Number & Algebra' => 'number_algebra',
+            'Measurement & Geometry' => 'measurement_geometry',
+            'Data & Probability' => 'data_probability'
+        ];
+        $competency = $competencyMap[$assessment->category] ?? 'mixed';
+        
+        // Determine difficulty level
+        $difficultyMap = [
+            'Easy' => 'beginner',
+            'Medium' => 'intermediate',
+            'Hard' => 'advanced',
+            'Mixed' => 'mixed'
+        ];
+        $difficultyLevel = $difficultyMap[$assessment->difficulty] ?? 'mixed';
+
+        $session = TeacherAssessmentSession::create([
+            'session_id' => $sessionId,
+            'user_id' => $student->id,
+            'teacher_assessment_id' => $assessment->id,
+            'session_type' => 'teacher_created',
+            'competency' => $competency,
+            'difficulty_level' => $difficultyLevel,
+            'total_questions' => count($shuffledQuestions),
+            'questions_json' => $shuffledQuestions,
+            'current_question_index' => 0,
+            'time_limit_minutes' => $assessment->time_limit,
+            'total_time_allowed_seconds' => $assessment->time_limit * 60,
+            'countdown_started_at' => now(),
+            'countdown_expires_at' => now()->addMinutes($assessment->time_limit),
+            'time_remaining_seconds' => $assessment->time_limit * 60,
+            'initial_bkt_probability' => 0.5, // Starting probability
+            'status' => 'in_progress',
+            'started_at' => now()
+        ]);
+
+        // Store quiz session data in Laravel session
         session([
             'quiz_assessment_id' => $assessment->id,
-            'quiz_questions' => $questionDetails,
+            'quiz_session_id' => $sessionId,
+            'quiz_questions' => $shuffledQuestions,
             'current_question_index' => 0,
             'quiz_start_time' => now(),
-            'quiz_answers' => []
+            'current_bkt_probability' => 0.5
         ]);
-        return view('student.assessments.quiz', compact('assessment', 'assignment', 'questionDetails'));
+        
+        $answeredQuestionIds = [];
+        $currentQuestionIndex = 0;
+        
+        return view('student.assessments.quiz', compact('assessment', 'assignment', 'questionDetails', 'answeredQuestionIds', 'currentQuestionIndex'));
     }
 
     /**
@@ -828,13 +872,19 @@ class TeacherAssessmentController extends Controller
         $student = Auth::guard('student')->user();
         
         // Verify quiz session
-        if (session('quiz_assessment_id') != $assessment->id) {
+        $sessionId = session('quiz_session_id');
+        if (!$sessionId || session('quiz_assessment_id') != $assessment->id) {
             return response()->json(['success' => false, 'message' => 'Invalid quiz session.']);
+        }
+
+        // Get session from database
+        $session = TeacherAssessmentSession::where('session_id', $sessionId)->first();
+        if (!$session) {
+            return response()->json(['success' => false, 'message' => 'Session not found.']);
         }
 
         $questions = session('quiz_questions', []);
         $currentIndex = session('current_question_index', 0);
-        $answers = session('quiz_answers', []);
 
         // Find the question
         $question = null;
@@ -852,32 +902,82 @@ class TeacherAssessmentController extends Controller
         // Check if answer is correct
         $isCorrect = $request->answer === $question['correct_answer'];
 
-        // Store the answer
-        $answers[] = [
-            'question_id' => $request->question_id,
-            'answer' => $request->answer,
-            'is_correct' => $isCorrect,
-            'time_taken' => $request->time_taken,
-            'submitted_at' => now()
+        // Get current BKT probability
+        $currentBKT = session('current_bkt_probability', 0.5);
+        
+        // Calculate new BKT probability
+        $newBKT = $session->updateBKTProbability($isCorrect, $currentBKT);
+        
+        // Determine difficulty level from question_id
+        $difficultyMap = [
+            'B' => 'beginner',
+            'I' => 'intermediate',
+            'A' => 'advanced'
         ];
+        preg_match('/^(NA|MG|DP)-(B|I|A)-(\d{3})$/', $question['question_id'], $matches);
+        $difficultyLevel = $difficultyMap[$matches[2]] ?? 'intermediate';
+        
+        // Calculate time limit for this difficulty
+        $timeLimits = [
+            'beginner' => 30,
+            'intermediate' => 45,
+            'advanced' => 60
+        ];
+        $timeLimit = $timeLimits[$difficultyLevel];
+        
+        // Calculate points
+        $responseModel = new TeacherQuizResponse();
+        $points = $responseModel->calculatePoints($isCorrect, $request->time_taken, $timeLimit, $difficultyLevel);
+
+        // Save response to database
+        TeacherQuizResponse::create([
+            'session_id' => $sessionId,
+            'pool_id' => $question['pool_id'],
+            'question_id' => $request->question_id,
+            'student_id' => $student->id,
+            'student_answer' => $request->answer,
+            'correct_answer' => $question['correct_answer'],
+            'is_correct' => $isCorrect,
+            'points_earned' => $points,
+            'time_taken' => $request->time_taken,
+            'bkt_probability_before' => $currentBKT,
+            'bkt_probability_after' => $newBKT,
+            'difficulty_level' => $difficultyLevel,
+            'competency' => $session->competency,
+            'topic_tag' => $question['topic_tag'] ?? null,
+            'answered_at' => now()
+        ]);
 
         // Update session
-        session(['quiz_answers' => $answers]);
+        $session->increment('questions_answered');
+        if ($isCorrect) {
+            $session->increment('correct_answers');
+            $session->increment('total_points_earned', $points);
+        } else {
+            $session->increment('incorrect_answers');
+        }
+        $session->current_question_index = $currentIndex + 1;
+        $session->save();
+
+        // Update Laravel session
+        session([
+            'current_question_index' => $currentIndex + 1,
+            'current_bkt_probability' => $newBKT
+        ]);
         
-        // Debug logging for each answer submission
+        // Debug logging
         \Log::info('Answer submitted', [
             'student_id' => $student->id,
             'assessment_id' => $assessment->id,
             'question_id' => $request->question_id,
-            'answer' => $request->answer,
             'is_correct' => $isCorrect,
-            'time_taken' => $request->time_taken,
-            'total_answers_so_far' => count($answers)
+            'points' => $points,
+            'bkt_before' => $currentBKT,
+            'bkt_after' => $newBKT
         ]);
 
         // Move to next question
         $nextIndex = $currentIndex + 1;
-        session(['current_question_index' => $nextIndex]);
 
         $isLastQuestion = $nextIndex >= count($questions);
 
@@ -897,99 +997,311 @@ class TeacherAssessmentController extends Controller
         $student = Auth::guard('student')->user();
 
         // Verify quiz session
-        if (session('quiz_assessment_id') != $assessment->id) {
+        $sessionId = session('quiz_session_id');
+        if (!$sessionId || session('quiz_assessment_id') != $assessment->id) {
             return redirect()->route('teacher-assessments.show', $assessment->id)
                 ->withErrors(['error' => 'Invalid quiz session.']);
         }
 
-        // --- Debug: Initial session state ---
-        \Log::info('Quiz completion started', [
-            'student_id' => $student->id,
-            'assessment_id' => $assessment->id,
-        ]);
-
-        $answers = session('quiz_answers', []);
-
-        // Calculate total time
-        $totalTime = collect($answers)->sum('time_taken') ?? 0;
-        if ($totalTime === 0 && session('quiz_start_time')) {
-            $totalTime = now()->diffInSeconds(session('quiz_start_time'));
+        // Get session from database
+        $session = TeacherAssessmentSession::where('session_id', $sessionId)->first();
+        if (!$session) {
+            return redirect()->route('teacher-assessments.show', $assessment->id)
+                ->withErrors(['error' => 'Session not found.']);
         }
 
-        // Calculate results
-        $correctAnswers = collect($answers)->where('is_correct', true)->count();
-        $totalQuestions = count($answers);
-        $percentage = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
+        // Calculate total time from sum of response times (active time)
+        $totalTime = now()->diffInSeconds($session->started_at);
 
-        // --- Debug: Quiz result summary ---
-        \Log::info('Quiz completion summary', [
-            'student_id' => $student->id,
-            'assessment_id' => $assessment->id,
-            'score' => $correctAnswers,
-            'total_questions' => $totalQuestions,
-            'percentage' => $percentage,
-            'time_taken' => $totalTime,
+        // Calculate accuracy percentage
+        $accuracyPercentage = $session->total_questions > 0 
+            ? round(($session->correct_answers / $session->total_questions) * 100, 2) 
+            : 0;
+
+        // Calculate average response time
+        $avgResponseTime = $session->questions_answered > 0
+            ? round($totalTime / $session->questions_answered, 3)
+            : 0;
+
+        // Get final BKT probability from session
+        $finalBKT = session('current_bkt_probability', 0.5);
+
+        // Calculate final mastery score
+        $finalMasteryScore = $session->calculateFinalMasteryScore();
+
+        // Update session with final metrics
+        $session->update([
+            'accuracy_percentage' => $accuracyPercentage,
+            'average_response_time' => $avgResponseTime,
+            'final_bkt_probability' => $finalBKT,
+            'final_mastery_score' => $finalMasteryScore,
+            'status' => 'completed',
+            'completed_at' => now()
         ]);
 
-        // Store results
+        // Store results in quiz_results table (without answers)
         QuizResult::updateOrCreate(
             [
                 'student_id' => $student->id,
                 'assessment_id' => $assessment->id,
             ],
             [
-                'score' => $correctAnswers,
-                'total_questions' => $totalQuestions,
-                'percentage' => $percentage,
+                'session_id' => $sessionId,
+                'score' => $session->correct_answers,
+                'total_questions' => $session->total_questions,
+                'percentage' => $accuracyPercentage,
                 'time_taken' => $totalTime,
-                'answers' => $answers,
                 'completed_at' => now(),
             ]
         );
 
-        // --- Update assignment status (handles student or section assignments) ---
-       // Get the student's section from their profile
+        // Update assignment status
         $studentProfile = DB::table('student_profile')
-        ->where('user_id', $student->id)
-        ->first();
+            ->where('user_id', $student->id)
+            ->first();
 
         $studentSection = $studentProfile ? $studentProfile->section : null;
 
-        // ✅ Update assignment status (handles both student-specific and section-based assignments)
+        // IN COMPLETION METHOD - Replace your current query:
         $assignment = AssessmentAssignment::where('assessment_id', $assessment->id)
         ->where(function ($query) use ($student, $studentSection) {
             $query->where('student_id', $student->id)
-                  ->orWhere('section', $studentSection);
+                ->orWhere(function ($sectionQuery) use ($studentSection) {
+                    $sectionQuery->where(function ($nameQuery) use ($studentSection) {
+                        $nameQuery->where('section', $studentSection)
+                                    ->orWhere('section', 'Section ' . $studentSection);
+                    })
+                    ->whereNull('student_id');
+                });
         })
-        ->first();
+        ->orderByRaw('CASE WHEN student_id IS NOT NULL THEN 0 ELSE 1 END') // Student-specific first
+        ->first(); // Use first() instead of get()
 
         if ($assignment) {
-            Log::info('Assignment found before update', [
+            Log::info('Updating assignment status after quiz completion', [
                 'assignment_id' => $assignment->id,
-                'student_id' => $student->id,
-                'student_section' => $studentSection,
-                'assignment_section' => $assignment->section,
-                'current_status' => $assignment->status
+                'student_id' => $assignment->student_id,
+                'section' => $assignment->section,
+                'from_status' => $assignment->status,
             ]);
-        
             $assignment->update(['status' => 'Completed']);
-        } else {
-            Log::warning('Assignment not found for update', [
-                'assessment_id' => $assessment->id,
+        }
+
+        if (!$assignment) {
+            Log::warning('No assignment record matched for completion update', [
                 'student_id' => $student->id,
-                'student_section' => $studentSection
+                'section' => $studentSection,
+                'assessment_id' => $assessment->id,
             ]);
+        } else {
+            Log::info('Updating assignment status after quiz completion', [
+                'assignment_id' => $assignment->id,
+                'student_id' => $assignment->student_id,
+                'section' => $assignment->section,
+                'from_status' => $assignment->status,
+                'assessment_id' => $assessment->id,
+            ]);
+            $assignment->update(['status' => 'Completed']);
         }
 
         // Clear quiz session
         session()->forget([
-            'quiz_assessment_id', 'quiz_questions', 'current_question_index',
-            'quiz_start_time', 'quiz_answers'
+            'quiz_assessment_id', 'quiz_session_id', 'quiz_questions', 'current_question_index',
+            'quiz_start_time', 'current_bkt_probability'
         ]);
 
         // Redirect with success message
         return redirect()->route('teacher-assessments.show', $assessment->id)
-            ->with('success', "Quiz completed! Score: {$correctAnswers}/{$totalQuestions} ({$percentage}%)");
+            ->with('success', "Quiz completed! Score: {$session->correct_answers}/{$session->total_questions} ({$accuracyPercentage}%) | Points: {$session->total_points_earned}");
+    }
+
+    /**
+     * Show all questions for a teacher assessment
+     */
+    public function showQuestions(Assessment $assessment)
+    {
+        $teacher = Auth::guard('admin')->user();
+        
+        // Verify teacher owns this assessment
+        if ($assessment->created_by !== $teacher->id) {
+            abort(403, 'You do not have permission to view these questions.');
+        }
+
+        // Get questions for this assessment
+        $questions = DB::table('teacher_assessment_questions')
+            ->where('teacher_assessment_id', $assessment->id)
+            ->orderBy('question_order')
+            ->get();
+
+        // Load question details from JSON files
+        $questionDetails = [];
+        foreach ($questions as $question) {
+            $questionDetail = $this->getQuestionDetails($question->question_id);
+            if ($questionDetail) {
+                $questionDetails[] = array_merge($questionDetail, [
+                    'pool_id' => $question->pool_id,
+                    'question_order' => $question->question_order,
+                    'created_at' => $question->created_at
+                ]);
+            }
+        }
+
+        return view('admin.teacher.assessments.questions', compact('assessment', 'questionDetails'));
+    }
+
+    /**
+     * Allow student to retake a completed assessment
+     */
+    public function retakeQuiz(Assessment $assessment)
+    {
+        $student = Auth::guard('student')->user();
+        Log::info('Retake requested', [
+            'student_id' => $student ? $student->id : null,
+            'assessment_id' => $assessment->id,
+        ]);
+
+        // Verify student access
+        $studentProfile = DB::table('student_profile')->where('user_id', $student->id)->first();
+        $studentSection = $studentProfile ? $studentProfile->section : null;
+
+        // IN RETAKE METHOD - Replace your current query:
+        $assignment = AssessmentAssignment::where('assessment_id', $assessment->id)
+        ->where(function($query) use ($student, $studentSection) {
+            $query->where('student_id', $student->id)
+                ->orWhere(function($q) use ($studentSection) {
+                    $q->where(function($subQ) use ($studentSection) {
+                        $subQ->where('section', $studentSection)
+                            ->orWhere('section', 'Section ' . $studentSection);
+                    })
+                    ->whereNull('student_id');
+                });
+        })
+        ->orderByRaw('CASE WHEN student_id IS NOT NULL THEN 0 ELSE 1 END') // Student-specific first
+        ->first();
+
+        if (!$assignment) {
+            Log::warning('Retake blocked: no assignment record', [
+                'student_id' => $student->id,
+                'assessment_id' => $assessment->id,
+                'section' => $studentSection,
+            ]);
+            abort(403, 'You do not have access to this assessment.');
+        }
+
+        if ($assignment->status !== 'Completed') {
+            Log::info('Retake blocked: assignment not completed', [
+                'assignment_id' => $assignment->id,
+                'current_status' => $assignment->status,
+            ]);
+            return redirect()->route('teacher-assessments.show', $assessment->id)
+                ->with('info', 'This assessment has not been completed yet.');
+        }
+
+        // Archive the old completed session
+        $oldSession = TeacherAssessmentSession::where('teacher_assessment_id', $assessment->id)
+            ->where('user_id', $student->id)
+            ->where('status', 'completed')
+            ->latest()
+            ->first();
+
+        if ($oldSession) {
+            Log::info('Archiving old session before retake', [
+                'session_id' => $oldSession->session_id,
+                'status' => $oldSession->status,
+            ]);
+            $oldSession->update([
+                'status' => 'abandoned',
+                'session_notes' => 'Archived for retake on ' . now()->toDateTimeString(),
+            ]);
+        } else {
+            Log::warning('No previous session found to archive for retake', [
+                'student_id' => $student->id,
+                'assessment_id' => $assessment->id,
+            ]);
+        }
+
+        // Reset assignment status to allow a new attempt
+        $assignment->status = 'Assigned';
+        $assignment->save();
+        Log::info('Assignment reopened for retake', [
+            'assignment_id' => $assignment->id,
+            'student_id' => $student->id,
+        ]);
+
+        // Delete previous quiz result so the student can start fresh
+        QuizResult::where('student_id', $student->id)
+            ->where('assessment_id', $assessment->id)
+            ->delete();
+
+        // Clear any stored quiz session data
+        session()->forget([
+            'quiz_assessment_id',
+            'quiz_session_id',
+            'quiz_questions',
+            'current_question_index',
+            'quiz_start_time',
+            'current_bkt_probability',
+            'quiz_answers',
+        ]);
+
+        Log::info('Retake flow completed, redirecting to quiz start', [
+            'student_id' => $student->id,
+            'assessment_id' => $assessment->id,
+        ]);
+
+        return redirect()->route('teacher-assessments.start', $assessment->id)
+            ->with('success', 'Assessment reset! You can now retake the quiz.');
+    }
+
+    /**
+     * Show detailed results for a completed assessment
+     */
+    public function results(Assessment $assessment)
+    {
+        $student = Auth::guard('student')->user();
+
+        // Get the latest completed session
+        $session = TeacherAssessmentSession::where('teacher_assessment_id', $assessment->id)
+            ->where('user_id', $student->id)
+            ->where('status', 'completed')
+            ->latest()
+            ->first();
+
+        if (!$session) {
+            return redirect()->route('teacher-assessments.show', $assessment->id)
+                ->with('error', 'No completed session found for this assessment.');
+        }
+
+        // Get quiz result
+        $quizResult = QuizResult::where('student_id', $student->id)
+            ->where('assessment_id', $assessment->id)
+            ->first();
+
+        // Get detailed responses with question text
+        $responses = TeacherQuizResponse::where('session_id', $session->session_id)
+            ->orderBy('created_at')
+            ->get();
+
+        // Fetch question details for each response
+        $detailedResponses = [];
+        foreach ($responses as $response) {
+            $questionDetail = $this->getQuestionDetails($response->question_id);
+            if ($questionDetail) {
+                $detailedResponses[] = array_merge($response->toArray(), [
+                    'question_text' => $questionDetail['question_text'], // Corrected key from 'question' to 'question_text'
+                    'choices' => [ // Assuming choices are structured like this in getQuestionDetails
+                        'a' => $questionDetail['choice_a'] ?? null,
+                        'b' => $questionDetail['choice_b'] ?? null,
+                        'c' => $questionDetail['choice_c'] ?? null,
+                        'd' => $questionDetail['choice_d'] ?? null,
+                    ],
+                    'correct_answer_text' => $questionDetail['correct_answer'],
+                    'explanation' => $questionDetail['explanation'] ?? null
+                ]);
+            }
+        }
+
+        return view('student.assessments.results', compact('assessment', 'session', 'quizResult', 'detailedResponses'));
     }
 
     /**
@@ -997,24 +1309,6 @@ class TeacherAssessmentController extends Controller
      */
     private function getQuestionDetails($questionId)
     {
-        // Check if it's a custom question (stored in database)
-        if (strpos($questionId, 'custom_') === 0) {
-            $question = DB::table('questions')->where('question_id', $questionId)->first();
-            if ($question) {
-                return [
-                    'question_id' => $question->question_id,
-                    'question_text' => $question->question_text,
-                    'question_type' => $question->question_type,
-                    'choice_a' => $question->choice_a,
-                    'choice_b' => $question->choice_b,
-                    'choice_c' => $question->choice_c,
-                    'choice_d' => $question->choice_d,
-                    'correct_answer' => $question->correct_answer,
-                    'hint_text' => $question->hint_text,
-                    'explanation' => $question->explanation
-                ];
-            }
-        }
 
         // Check JSON files for bank questions
         $categoryMap = [
