@@ -19,7 +19,7 @@ class SimpleQuestionBot:
         self.db_config = {
             'host': '127.0.0.1',
             'user': 'root',
-            'password': '',
+            'password': 'root',
             'database': 'aralsipnayandb',
             'charset': 'utf8mb4'
         }
@@ -430,7 +430,8 @@ class SimpleQuestionBot:
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json, text/javascript, */*; q=0.01'
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-CSRF-TOKEN': csrf_token
         }
         
         response = self.session.post(submit_url, data=payload, headers=headers)
