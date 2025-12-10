@@ -9,7 +9,7 @@ def cleanup_simulation_data():
     conn = mysql.connector.connect(
         host='localhost', 
         user='root', 
-        password='', 
+        password='root', 
         database='aralsipnayandb'
     )
     cursor = conn.cursor()
