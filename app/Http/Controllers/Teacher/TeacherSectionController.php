@@ -315,69 +315,6 @@ class TeacherSectionController extends Controller
     }
 
     /**
-     * Create a new section
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'section' => 'required|string|max:50',
-            'school_year' => 'nullable|string|max:20'
-        ]);
-
-        $teacher = Auth::guard('admin')->user();
-        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
-
-        if (!$teacherProfile) {
-            return response()->json(['error' => 'Teacher profile not found'], 404);
-        }
-
-        // Check if section already exists in sections table
-        $existingSection = DB::table('sections')
-            ->where('name', $request->section)
-            ->where('school_year', $request->school_year)
-            ->first();
-
-        if ($existingSection) {
-            return response()->json(['error' => 'Section already exists for this school year'], 422);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            // First, create the section in sections table
-            DB::table('sections')->insert([
-                'name' => $request->section,
-                'grade_level' => '6', // Fixed to Grade 6
-                'school_year' => $request->school_year ?? '2024-2025',
-                'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            // Then, assign the teacher to the section
-            DB::table('teacher_sections')->insert([
-                'teacher_id' => $teacherProfile->id,
-                'section' => $request->section,
-                'grade_level' => '6', // Fixed to Grade 6
-                'school_year' => $request->school_year ?? '2024-2025',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            DB::commit();
-
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Section created successfully!',
-                'section' => $request->section // Include section name for frontend
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create section: ' . $e->getMessage()], 500);
-        }
-    }
-
-    /**
      * Update a section
      */
     public function update(Request $request, $section)
@@ -402,16 +339,16 @@ class TeacherSectionController extends Controller
                     'updated_at' => now()
                 ]);
 
-            // Update the teacher_sections table
+            // Update all teacher_sections records with the old section name
             DB::table('teacher_sections')
-                ->where('teacher_id', $teacherProfile->id)
                 ->where('section', $section)
                 ->update([
                     'section' => $request->section,
                     'grade_level' => '6', // Fixed to Grade 6
-                    'school_year' => $request->school_year,
+                    'school_year' => '2024-2025',
                     'updated_at' => now()
                 ]);
+            
 
             DB::commit();
 
