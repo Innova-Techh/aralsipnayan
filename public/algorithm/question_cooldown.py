@@ -8,13 +8,18 @@ import sys
 import json
 import mysql.connector
 from datetime import datetime, timedelta
+import os
 
 class QuestionCooldown:
     def __init__(self):
+        # When running locally (XAMPP), set DB_HOST=localhost
+        # When running in Docker, it defaults to laravel_db (the MySQL service name)
+        db_host = os.environ.get('DB_HOST', 'laravel_db')
+        
         self.db_config = {
-            'host': 'localhost',
+            'host': db_host,
             'user': 'root',
-            'password': '',
+            'password': 'root',
             'database': 'aralsipnayandb',
             'charset': 'utf8mb4'
         }
