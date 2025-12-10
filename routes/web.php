@@ -20,11 +20,6 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\LevelUpController;
 
-// Debug route - remove after fixing
-Route::get('/debug-achievements', function () {
-    return view('debug-achievements');
-});
-
 // Homepage
 Route::get('/', function () {
     return view('homepage');
