@@ -17,6 +17,31 @@
 
         <!-- Content -->
         <div class="p-6 overflow-y-auto">
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Success!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Whoops!</strong>
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <!-- Description -->
             <p class="text-gray-700 mb-4">{{ $assessment->description }}</p>
 
@@ -132,11 +157,22 @@
                         </div>
                     @endif
 
-                    <button onclick="viewResults()"
-                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                        <span class="material-symbols-outlined text-sm mr-1">visibility</span>
-                        View Detailed Results
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button onclick="window.location.href='{{ route('teacher-assessments.results', $assessment->id) }}'"
+                            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition shadow-sm flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm mr-2">visibility</span>
+                            View Detailed Results
+                        </button>
+                        
+                        <form action="{{ route('teacher-assessments.retake', $assessment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to retake this quiz? Your previous progress will be archived.');" class="inline-block">
+                            @csrf
+                            <button type="submit" 
+                                class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center justify-center">
+                                <span class="material-symbols-outlined text-sm mr-2">refresh</span>
+                                Retake Quiz
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @endif
 
@@ -151,10 +187,10 @@
 
 <script>
 function startAssessment() {
-    window.location.href = "{{ route('teacher-assessments.quiz', $assessment->id) }}";
+    window.location.href = "{{ route('teacher-assessments.start', $assessment->id) }}";
 }
 function continueAssessment() {
-    window.location.href = "{{ route('teacher-assessments.quiz', $assessment->id) }}";
+    window.location.href = "{{ route('teacher-assessments.start', $assessment->id) }}";
 }
 function viewResults() {
     @if($quizResult)
