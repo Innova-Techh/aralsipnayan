@@ -31,7 +31,7 @@ class StudentSectionsSeeder extends Seeder
         $firstNames = ['John', 'Jane', 'Carlos', 'Maria', 'Liam', 'Emma', 'Noah', 'Olivia', 'Ethan', 'Ava'];
         $middleNames = ['Michael', 'Grace', 'Santos', 'Reyes', 'Anne', 'David', 'Timothy', 'Rose', 'James', 'Mae'];
         $lastNames = ['Cruz', 'Santos', 'Reyes', 'Garcia', 'Dela Cruz', 'Bautista', 'Torres', 'Flores', 'Ramos', 'Aquino'];
-
+        $genders = ['Male', 'Female']; 
         $studentCount = 0;
 
         foreach ($sections as $sectionIndex => $section) {
@@ -52,6 +52,7 @@ class StudentSectionsSeeder extends Seeder
                 $firstname = $firstNames[$nameIndex % count($firstNames)];
                 $middlename = $middleNames[$nameIndex % count($middleNames)];
                 $lastname = $lastNames[$nameIndex % count($lastNames)];
+                $gender = $genders[$nameIndex % count($genders)]; 
 
                 $user = User::create([
                     'username' => $username,
@@ -71,7 +72,7 @@ class StudentSectionsSeeder extends Seeder
                     'grade_level' => '6',
                     'school_name' => $schoolName,
                     'school_year' => $schoolYear,
-
+                    'gender' => $gender,
                     // Onboarding
                     'has_completed_onboarding' => true,
                     'onboarding_completed_at' => Carbon::now(),
