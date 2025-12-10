@@ -10,6 +10,55 @@ use Illuminate\Support\Facades\Log;
 class AssessmentGenerationController extends Controller
 {
     /**
+     * Get the correct Python command for the environment
+     */
+    private function getPythonCommand()
+    {
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        
+        if ($isWindows) {
+            // On Windows, try python first, then python3
+            $testOutput = shell_exec('python --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python';
+            }
+            
+            $testOutput = shell_exec('python3 --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python3';
+            }
+            
+            // Default for Windows
+            return 'python';
+        } else {
+            // On Linux/Unix, try python3 first, then python
+            $python3 = shell_exec('which python3 2>&1');
+            if ($python3 && trim($python3) !== '' && file_exists(trim($python3))) {
+                return 'python3';
+            }
+            
+            $python = shell_exec('which python 2>&1');
+            if ($python && trim($python) !== '' && file_exists(trim($python))) {
+                return 'python';
+            }
+            
+            // Fallback: try direct execution
+            $testOutput = shell_exec('python3 --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python3';
+            }
+            
+            $testOutput = shell_exec('python --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python';
+            }
+            
+            // Default fallback for Linux
+            return 'python3';
+        }
+    }
+    
+    /**
      * Generate dynamic assessments based on student's mastery level
      */
     public function generateAssessments($competency, $currentDifficulty, $userId)
@@ -571,15 +620,51 @@ class AssessmentGenerationController extends Controller
     private function checkQuestionAvailability($userId, $competency, $difficulty)
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" get_available {$userId} {$competency} {$difficulty} 100";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' get_available ' . escapeshellarg($userId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($difficulty) . ' 100 2>&1';
             
             $output = shell_exec($command);
-            $result = json_decode($output, true);
+            
+            if ($output === null || trim($output) === '') {
+                Log::warning("Fisher-Yates availability check returned no output, using fallback");
+                return $this->fallbackAvailabilityCheck($userId, $competency, $difficulty);
+            }
+            
+            // Filter out ERROR and DEBUG lines
+            $lines = explode("\n", $output);
+            $jsonLines = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
+                }
+                if (strpos($line, 'ERROR:') !== 0 && strpos($line, 'DEBUG:') !== 0) {
+                    $jsonLines[] = $line;
+                }
+            }
+            
+            $jsonOutput = implode("\n", $jsonLines);
+            if (empty($jsonOutput)) {
+                $jsonOutput = $output;
+            }
+            
+            // Extract JSON
+            $lastOpenBrace = strrpos($jsonOutput, '{');
+            $lastCloseBrace = strrpos($jsonOutput, '}');
+            if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                $testDecode = json_decode($potentialJson, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $jsonOutput = $potentialJson;
+                }
+            }
+            
+            $result = json_decode($jsonOutput, true);
             
             if ($result && $result['success']) {
                 return [
-                    'availableCount' => $result['total_found'] ?? count($result['available_questions']),
+                    'availableCount' => $result['total_found'] ?? count($result['available_questions'] ?? []),
                     'cooldownCount' => $result['excluded_cooldown'] ?? 0,
                     'recentCount' => $result['excluded_recent'] ?? 0
                 ];
@@ -627,8 +712,12 @@ class AssessmentGenerationController extends Controller
     private function createAssessmentPoolWithFisherYates($assessmentId, $userId, $competency, $difficulty, $questionCount)
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" create_pool \"{$assessmentId}\" {$userId} \"{$competency}\" \"{$difficulty}\" {$questionCount}";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' create_pool ' . escapeshellarg($assessmentId) . ' ' . escapeshellarg($userId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($difficulty) . ' ' . escapeshellarg($questionCount);
+            
+            // Capture both stdout and stderr
+            $command .= ' 2>&1';
             
             Log::info("Creating assessment pool", [
                 'command' => $command,
@@ -636,7 +725,75 @@ class AssessmentGenerationController extends Controller
             ]);
             
             $output = shell_exec($command);
-            $result = json_decode($output, true);
+            
+            if ($output === null || trim($output) === '') {
+                Log::error("Fisher-Yates script returned no output", [
+                    'command' => $command,
+                    'assessment_id' => $assessmentId
+                ]);
+                return ['success' => false, 'message' => 'Script returned no output'];
+            }
+            
+            // Filter out ERROR and DEBUG lines that are printed to stderr
+            $lines = explode("\n", $output);
+            $jsonLines = [];
+            $errorLines = [];
+            
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
+                }
+                // Check if line starts with "ERROR:" or "DEBUG:" (from Python's stderr output)
+                if (strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                    $errorLines[] = $line;
+                    // Log the error/debug but don't include it in JSON parsing
+                    if (strpos($line, 'ERROR:') === 0) {
+                        Log::warning("Fisher-Yates script error output", [
+                            'error' => $line,
+                            'assessment_id' => $assessmentId
+                        ]);
+                    }
+                } else {
+                    // Keep non-error/debug lines for JSON parsing
+                    $jsonLines[] = $line;
+                }
+            }
+            
+            // Try to find JSON in the output
+            $jsonOutput = implode("\n", $jsonLines);
+            
+            // If no JSON lines found, try the original output
+            if (empty($jsonOutput)) {
+                $jsonOutput = $output;
+            }
+            
+            // Try to extract JSON from the output (look for JSON object boundaries)
+            $lastOpenBrace = strrpos($jsonOutput, '{');
+            $lastCloseBrace = strrpos($jsonOutput, '}');
+            
+            if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                // Verify it's valid JSON before using it
+                $testDecode = json_decode($potentialJson, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $jsonOutput = $potentialJson;
+                }
+            }
+            
+            $result = json_decode($jsonOutput, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error("Invalid JSON from Fisher-Yates script", [
+                    'command' => $command,
+                    'raw_output' => $output,
+                    'filtered_output' => $jsonOutput,
+                    'error_lines' => $errorLines,
+                    'json_error' => json_last_error_msg(),
+                    'assessment_id' => $assessmentId
+                ]);
+                return ['success' => false, 'message' => 'Invalid JSON response: ' . json_last_error_msg()];
+            }
             
             if ($result && $result['success']) {
                 Log::info("Assessment pool created successfully", [
@@ -655,9 +812,10 @@ class AssessmentGenerationController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Fisher-Yates pool creation error: ' . $e->getMessage(), [
-                'assessment_id' => $assessmentId
+                'assessment_id' => $assessmentId,
+                'trace' => $e->getTraceAsString()
             ]);
-            return ['success' => false, 'message' => 'Pool creation error'];
+            return ['success' => false, 'message' => 'Pool creation error: ' . $e->getMessage()];
         }
     }
     
@@ -779,14 +937,55 @@ class AssessmentGenerationController extends Controller
     private function cleanupExpiredCooldowns()
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" cleanup_cooldowns";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' cleanup_cooldowns 2>&1';
             
             $output = shell_exec($command);
-            $result = json_decode($output, true);
+            
+            if ($output === null || trim($output) === '') {
+                Log::warning("Fisher-Yates cleanup script returned no output");
+                return;
+            }
+            
+            // Filter out ERROR and DEBUG lines
+            $lines = explode("\n", $output);
+            $jsonLines = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
+                }
+                if (strpos($line, 'ERROR:') !== 0 && strpos($line, 'DEBUG:') !== 0) {
+                    $jsonLines[] = $line;
+                }
+            }
+            
+            $jsonOutput = implode("\n", $jsonLines);
+            if (empty($jsonOutput)) {
+                $jsonOutput = $output;
+            }
+            
+            // Extract JSON
+            $lastOpenBrace = strrpos($jsonOutput, '{');
+            $lastCloseBrace = strrpos($jsonOutput, '}');
+            if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                $testDecode = json_decode($potentialJson, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $jsonOutput = $potentialJson;
+                }
+            }
+            
+            $result = json_decode($jsonOutput, true);
             
             if ($result && $result['success']) {
                 Log::info("Cooldowns cleaned up successfully");
+            } else {
+                Log::warning("Cooldown cleanup may have failed", [
+                    'output' => $output,
+                    'result' => $result
+                ]);
             }
         } catch (\Exception $e) {
             Log::error('Cooldown cleanup failed: ' . $e->getMessage());

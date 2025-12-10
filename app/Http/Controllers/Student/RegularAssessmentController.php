@@ -29,6 +29,55 @@ class RegularAssessmentController extends Controller
     }
 
     /**
+     * Get the correct Python command for the environment
+     */
+    private function getPythonCommand()
+    {
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        
+        if ($isWindows) {
+            // On Windows, try python first, then python3
+            $testOutput = shell_exec('python --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python';
+            }
+            
+            $testOutput = shell_exec('python3 --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python3';
+            }
+            
+            // Default for Windows
+            return 'python';
+        } else {
+            // On Linux/Unix, try python3 first, then python
+            $python3 = shell_exec('which python3 2>&1');
+            if ($python3 && trim($python3) !== '' && file_exists(trim($python3))) {
+                return 'python3';
+            }
+            
+            $python = shell_exec('which python 2>&1');
+            if ($python && trim($python) !== '' && file_exists(trim($python))) {
+                return 'python';
+            }
+            
+            // Fallback: try direct execution
+            $testOutput = shell_exec('python3 --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python3';
+            }
+            
+            $testOutput = shell_exec('python --version 2>&1');
+            if ($testOutput && strpos($testOutput, 'Python') !== false) {
+                return 'python';
+            }
+            
+            // Default fallback for Linux
+            return 'python3';
+        }
+    }
+
+    /**
      * Start a regular assessment session
      */
    public function startAssessment(Request $request)
@@ -163,8 +212,9 @@ class RegularAssessmentController extends Controller
             $questionCount = $questionCounts[$difficulty] ?? 15;
             
             // Call Fisher-Yates Python script to create assessment pool
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" create_pool \"{$assessmentId}\" {$userId} \"{$competency}\" \"{$difficulty}\" {$questionCount}";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' create_pool ' . escapeshellarg($assessmentId) . ' ' . escapeshellarg($userId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($difficulty) . ' ' . escapeshellarg($questionCount) . ' 2>&1';
             
             Log::info("Creating assessment with Fisher-Yates", [
                 'command' => $command,
@@ -172,6 +222,33 @@ class RegularAssessmentController extends Controller
             ]);
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if ($result && $result['success']) {
@@ -271,10 +348,38 @@ class RegularAssessmentController extends Controller
         
         try {
             // Get next question using Fisher-Yates algorithm
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" next_question \"{$assessmentId}\"";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' next_question ' . escapeshellarg($assessmentId) . ' 2>&1';
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if ($result && $result['success'] && isset($result['question'])) {
@@ -681,10 +786,38 @@ class RegularAssessmentController extends Controller
     private function getAssessmentProgress($assessmentId)
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" progress \"{$assessmentId}\"";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' progress ' . escapeshellarg($assessmentId) . ' 2>&1';
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if ($result && $result['success']) {
@@ -717,10 +850,38 @@ class RegularAssessmentController extends Controller
     private function markQuestionAnswered($assessmentId, $questionId)
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" mark_answered \"{$assessmentId}\" \"{$questionId}\"";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' mark_answered ' . escapeshellarg($assessmentId) . ' ' . escapeshellarg($questionId) . ' 2>&1';
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if (!$result || !$result['success']) {
@@ -741,10 +902,38 @@ class RegularAssessmentController extends Controller
     private function createCooldownEntry($userId, $questionId, $competency, $wasCorrect, $responseTime)
     {
         try {
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" create_cooldown {$userId} \"{$questionId}\" \"{$competency}\" " . ($wasCorrect ? 'true' : 'false') . " {$responseTime}";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' create_cooldown ' . escapeshellarg($userId) . ' ' . escapeshellarg($questionId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($wasCorrect ? 'true' : 'false') . ' ' . escapeshellarg($responseTime) . ' 2>&1';
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if (!$result || !$result['success']) {
@@ -1647,8 +1836,9 @@ class RegularAssessmentController extends Controller
             
             // Clean up Fisher-Yates assessment data
             try {
+                $python = $this->getPythonCommand();
                 $scriptPath = base_path('public/algorithm/fisher_yates.py');
-                $command = "python \"{$scriptPath}\" cleanup_assessment \"{$assessmentId}\"";
+                $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' cleanup_assessment ' . escapeshellarg($assessmentId) . ' 2>&1';
                 shell_exec($command);
             } catch (\Exception $e) {
                 Log::warning('Failed to cleanup Fisher-Yates data for abandoned assessment: ' . $e->getMessage());
@@ -1774,10 +1964,38 @@ class RegularAssessmentController extends Controller
             $currentDifficulty = $mastery->current_difficulty;
             
             // Check question availability using Fisher-Yates
+            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = "python \"{$scriptPath}\" get_available {$user->id} \"{$dbCompetency}\" \"{$currentDifficulty}\" 100";
+            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' get_available ' . escapeshellarg($user->id) . ' ' . escapeshellarg($dbCompetency) . ' ' . escapeshellarg($currentDifficulty) . ' 100 2>&1';
             
             $output = shell_exec($command);
+            
+            // Filter out ERROR and DEBUG lines
+            if ($output) {
+                $lines = explode("\n", $output);
+                $jsonLines = [];
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                        continue;
+                    }
+                    $jsonLines[] = $line;
+                }
+                $jsonOutput = implode("\n", $jsonLines);
+                if (!empty($jsonOutput)) {
+                    // Extract JSON
+                    $lastOpenBrace = strrpos($jsonOutput, '{');
+                    $lastCloseBrace = strrpos($jsonOutput, '}');
+                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                        $testDecode = json_decode($potentialJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $output = $potentialJson;
+                        }
+                    }
+                }
+            }
+            
             $result = json_decode($output, true);
             
             if (!$result || !$result['success']) {
@@ -1968,10 +2186,38 @@ class RegularAssessmentController extends Controller
                 
                 if ($session && $session->status === 'in_progress') {
                     // Check if assessment has questions in Fisher-Yates pool
+                    $python = $this->getPythonCommand();
                     $scriptPath = base_path('public/algorithm/fisher_yates.py');
-                    $command = "python \"{$scriptPath}\" check_pool {$assessment->assessment_id}";
+                    $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' check_pool ' . escapeshellarg($assessment->assessment_id) . ' 2>&1';
                     
                     $output = shell_exec($command);
+                    
+                    // Filter out ERROR and DEBUG lines
+                    if ($output) {
+                        $lines = explode("\n", $output);
+                        $jsonLines = [];
+                        foreach ($lines as $line) {
+                            $line = trim($line);
+                            if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
+                                continue;
+                            }
+                            $jsonLines[] = $line;
+                        }
+                        $jsonOutput = implode("\n", $jsonLines);
+                        if (!empty($jsonOutput)) {
+                            // Extract JSON
+                            $lastOpenBrace = strrpos($jsonOutput, '{');
+                            $lastCloseBrace = strrpos($jsonOutput, '}');
+                            if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
+                                $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
+                                $testDecode = json_decode($potentialJson, true);
+                                if (json_last_error() === JSON_ERROR_NONE) {
+                                    $output = $potentialJson;
+                                }
+                            }
+                        }
+                    }
+                    
                     $result = json_decode($output, true);
                     
                     if ($result && $result['success'] && isset($result['total_questions'])) {
