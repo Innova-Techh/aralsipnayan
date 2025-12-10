@@ -20,6 +20,11 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\LevelUpController;
 
+// Debug route - remove after fixing
+Route::get('/debug-achievements', function () {
+    return view('debug-achievements');
+});
+
 // Homepage
 Route::get('/', function () {
     return view('homepage');
@@ -431,9 +436,11 @@ Route::middleware(['student.auth'])->group(function () {
     // Teacher-created assessments
     Route::get('/teacher-assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentIndex'])->name('teacher-assessments.index');
     Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
-    Route::get('/teacher-assessments/{assessment}/quiz', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'startQuiz'])->name('teacher-assessments.quiz');
+    Route::get('/teacher-assessments/{assessment}/quiz', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'startQuiz'])->name('teacher-assessments.start');
     Route::post('/teacher-assessments/{assessment}/submit-answer', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'submitAnswer'])->name('teacher-assessments.submit-answer');
     Route::post('/teacher-assessments/{assessment}/complete', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'completeQuiz'])->name('teacher-assessments.complete');
+    Route::post('/teacher-assessments/{assessment}/retake', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'retakeQuiz'])->name('teacher-assessments.retake');
+    Route::get('/teacher-assessments/{assessment}/results', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'results'])->name('teacher-assessments.results');
     
     // Profile routes
    // Profile routes
