@@ -23,7 +23,10 @@ class TeacherDashboardController extends Controller
         
         // Get teacher profile
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacherId)->first();
-        
+        \Log::info('DEBUG teacherProfile:', [
+            'value' => $teacherProfile,
+            'type' => gettype($teacherProfile)
+        ]);
         if (!$teacherProfile) {
             return redirect()->route('login')->withErrors(['error' => 'Teacher profile not found.']);
         }
@@ -33,28 +36,17 @@ class TeacherDashboardController extends Controller
         
         // First try: teacher_sections table
         try {
-            $teacherSections = DB::table('teacher_sections')
-                ->where('teacher_id', $teacherProfile->id)
-                ->pluck('section')
-                ->toArray();
+            $teacherSections = DB::table('sections')
+            ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
+            ->where('teacher_sections.teacher_id', $teacherProfile->id)
+            ->where('sections.is_active', true)
+            ->select('sections.name')
+            ->pluck('sections.name'); 
         } catch (\Exception $e) {
             \Log::error('Error accessing teacher_sections table: ' . $e->getMessage());
         }
         
-        // If no sections found, try to get all sections (fallback)
-        if (empty($teacherSections)) {
-            try {
-                $teacherSections = DB::table('student_profile')
-                    ->distinct()
-                    ->pluck('section')
-                    ->toArray();
-            } catch (\Exception $e) {
-                \Log::error('Error accessing student_profile table: ' . $e->getMessage());
-            }
-        }
 
-        // Debug: Log the sections found
-        \Log::info('Teacher sections found:', $teacherSections);
 
         // Get dashboard data with error handling
         try {
