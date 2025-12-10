@@ -10,16 +10,15 @@ class QuizResult extends Model
     protected $fillable = [
         'student_id',
         'assessment_id',
+        'session_id',
         'score',
         'total_questions',
         'percentage',
         'time_taken',
-        'answers',
         'completed_at'
     ];
 
     protected $casts = [
-        'answers' => 'array',
         'completed_at' => 'datetime',
     ];
 
@@ -31,5 +30,10 @@ class QuizResult extends Model
     public function assessment(): BelongsTo
     {
         return $this->belongsTo(Assessment::class, 'assessment_id');
+    }
+
+    public function session(): BelongsTo
+    {
+        return $this->belongsTo(TeacherAssessmentSession::class, 'session_id', 'session_id');
     }
 }
