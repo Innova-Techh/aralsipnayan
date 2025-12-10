@@ -39,10 +39,23 @@
                         <h1 class="text-3xl font-bold text-emerald-900 mb-3">Assessment Completed!</h1>
                         <p class="text-emerald-700 text-lg mb-8">You've already finished this assessment. Ready to see how you
                             did?</p>
-                        <a href="{{ route('teacher-assessments.show', $assessment->id) }}"
-                            class="inline-block bg-emerald-600 text-white px-8 py-4 rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
-                            View Your Results
-                        </a>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="{{ route('teacher-assessments.show', $assessment->id) }}"
+                                class="inline-block bg-emerald-600 text-white px-8 py-4 rounded-xl hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
+                                View Your Results
+                            </a>
+                            
+                            <form action="{{ route('teacher-assessments.retake', $assessment->id) }}" method="POST" class="inline-block">
+                                @csrf
+                                <button type="submit"
+                                    onclick="return confirm('Are you sure you want to retake this assessment? Your previous score will be replaced with your new score.')"
+                                    class="w-full bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold">
+                                    <span class="material-symbols-outlined text-xl inline-block mr-2 align-middle">refresh</span>
+                                    Retake Quiz
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,16 +172,22 @@
             </div>
 
             <script>
-                let currentQuestionIndex = 0;
+                let currentQuestionIndex = {{ $currentQuestionIndex ?? 0 }};
                 let questions = @json($questionDetails);
                 let timeLimit = {{ $assessment->time_limit }}; // in minutes
                 let timeRemaining = timeLimit * 60; // in seconds
                 let timerInterval;
                 let questionStartTime;
+                
+                // Initialize answered questions from server if available
+                const serverAnsweredQuestions = @json($answeredQuestionIds ?? []);
+                if (serverAnsweredQuestions.length > 0) {
+                    sessionStorage.setItem('answeredQuestions', JSON.stringify(serverAnsweredQuestions));
+                }
 
                 // Initialize quiz
                 document.addEventListener('DOMContentLoaded', function () {
-                    loadQuestion(0);
+                    loadQuestion(currentQuestionIndex);
                     startTimer();
                 });
 
@@ -205,11 +224,13 @@
                     // Update navigation buttons
                     document.getElementById('next-btn').disabled = index === questions.length - 1;
 
-                    // Show/hide complete button
-                    if (index === questions.length - 1) {
-                        document.getElementById('complete-section').classList.remove('hidden');
-                        document.getElementById('complete-section').classList.remove('invisible');
+                    // Show/hide complete button and next button
+                    const isLastQuestion = index === questions.length - 1;
+                    if (isLastQuestion) {
                         document.getElementById('next-btn').classList.add('hidden');
+                        // Don't show complete section yet - wait for answer submission
+                        document.getElementById('complete-section').classList.add('hidden');
+                        document.getElementById('complete-section').classList.add('invisible');
                     } else {
                         document.getElementById('complete-section').classList.add('hidden');
                         document.getElementById('complete-section').classList.add('invisible');
@@ -219,6 +240,11 @@
                     // Load question content
                     const container = document.getElementById('question-container');
                     container.innerHTML = generateQuestionHTML(question);
+
+                    // Re-enable submit button for new question
+                    const submitBtn = document.getElementById('submit-btn');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
                     // Clear any previous selections
                     clearSelections();
@@ -377,6 +403,9 @@
 
                 document.getElementById('next-btn').addEventListener('click', function () {
                     if (currentQuestionIndex < questions.length - 1) {
+                        // Hide next button after clicking
+                        this.classList.add('invisible');
+                        this.classList.remove('visible');
                         loadQuestion(currentQuestionIndex + 1);
                     }
                 });
@@ -392,12 +421,8 @@
                 });
 
                 document.getElementById('complete-btn').addEventListener('click', function () {
-                    const answer = getSelectedAnswer();
-                    if (answer) {
-                        submitAnswer(answer, true);
-                    } else {
-                        completeQuiz();
-                    }
+                    // Last answer should already be submitted, just complete the quiz
+                    completeQuiz();
                 });
 
                 function submitAnswer(answer, isLastQuestion = false) {
@@ -432,10 +457,24 @@
                                     sessionStorage.setItem('answeredQuestions', JSON.stringify(answeredQuestions));
                                 }
 
-                                if (isLastQuestion || data.is_last_question) {
-                                    completeQuiz();
+                                // Disable submit button after submission
+                                const submitBtn = document.getElementById('submit-btn');
+                                submitBtn.disabled = true;
+                                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                                // Check if this is the last question
+                                const isCurrentlyLastQuestion = currentQuestionIndex === questions.length - 1;
+
+                                if (isCurrentlyLastQuestion || data.is_last_question) {
+                                    // On last question, show complete section instead of auto-completing
+                                    console.log('Showing complete section - last question detected');
+                                    const completeSection = document.getElementById('complete-section');
+                                    completeSection.classList.remove('hidden');
+                                    completeSection.classList.remove('invisible');
                                 } else {
-                                    loadQuestion(currentQuestionIndex + 1);
+                                    // Show next button for non-last questions
+                                    document.getElementById('next-btn').classList.remove('invisible');
+                                    document.getElementById('next-btn').classList.add('visible');
                                 }
                             } else {
                                 alert('Error submitting answer: ' + data.message);
@@ -464,6 +503,9 @@
                         }
                     }
 
+                    // Show loading overlay
+                    document.getElementById('loading-overlay').classList.remove('hidden');
+
                     // Clear timer and remove beforeunload warning
                     clearInterval(timerInterval);
                     window.removeEventListener('beforeunload', preventUnload);
@@ -471,25 +513,21 @@
                     // Clear session storage
                     sessionStorage.removeItem('answeredQuestions');
 
-                    fetch(`{{ route('teacher-assessments.complete', $assessment->id) }}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                // Force redirect to results page
-                                window.location.replace(`{{ route('teacher-assessments.show', $assessment->id) }}`);
-                            } else {
-                                alert('Error completing quiz. Please try again.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while completing the quiz.');
-                        });
+                    // Create and submit form to complete quiz
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `{{ route('teacher-assessments.complete', $assessment->id) }}`;
+                    
+                    // Add CSRF token
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    form.appendChild(csrfInput);
+                    
+                    // Append form to body and submit
+                    document.body.appendChild(form);
+                    form.submit();
                 }
 
                 // Prevent page refresh during quiz
