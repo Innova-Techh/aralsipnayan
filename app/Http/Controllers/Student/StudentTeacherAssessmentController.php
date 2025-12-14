@@ -539,7 +539,7 @@ class StudentTeacherAssessmentController extends Controller
 
         // Redirect with success message
         return redirect()->route('teacher-assessments.show', $assessment->id)
-            ->with('success', "Quiz completed! Score: {$session->correct_answers}/{$session->total_questions} ({$accuracyPercentage}%) | Points: {$session->total_points_earned}");
+            ->with('success', "Quiz completed! Score: {$session->correct_answers}/{$session->total_questions} ({$accuracyPercentage}%)");
     }
 
     /**
