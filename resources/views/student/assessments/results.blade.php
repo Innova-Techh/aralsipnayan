@@ -1,6 +1,6 @@
 @extends('layouts.user_layout')
 
-@section('title', 'Assessment Results - AralSipnayan')
+@section('title', 'AralSipnayan')
 
 @section('content')
 <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center px-4 sm:px-0 z-50">
