@@ -44,7 +44,7 @@ class StudentTeacherAssessmentController extends Controller
             $query->where('status', 'Active');
         }])
         ->whereHas('assessment', function($query) {
-            $query->where('status', 'Active');
+              $query->whereIn('status', ['Active', 'Completed']);
         })
         ->get();
 
@@ -179,15 +179,15 @@ class StudentTeacherAssessmentController extends Controller
             ->first();
 
         if ($existingSession) {
-            // Resume session
-            $shuffledQuestions = $existingSession->questions_json;
+            // Resume session - get shuffled questions from saved session
+            $questionDetails = $existingSession->questions_json;
             $sessionId = $existingSession->session_id;
             
             // Store quiz session data in Laravel session
             session([
                 'quiz_assessment_id' => $assessment->id,
                 'quiz_session_id' => $sessionId,
-                'quiz_questions' => $shuffledQuestions,
+                'quiz_questions' => $questionDetails,
                 'current_question_index' => $existingSession->current_question_index,
                 'quiz_start_time' => $existingSession->started_at,
                 'current_bkt_probability' => $existingSession->final_bkt_probability ?? 0.5 // Use stored probability if available
@@ -196,9 +196,6 @@ class StudentTeacherAssessmentController extends Controller
             // Re-populate answered questions for frontend
             // We need to pass this to the view so the frontend knows which questions are answered
             // The frontend uses sessionStorage 'answeredQuestions', we might need to seed it
-            
-            // Populate questionDetails from saved questions
-            $questionDetails = $shuffledQuestions;
             
             // Get answered question IDs to restore frontend state
             $answeredQuestionIds = TeacherQuizResponse::where('session_id', $sessionId)
@@ -222,11 +219,11 @@ class StudentTeacherAssessmentController extends Controller
         }
 
         // Load question details from JSON files or database
-        $questionDetails = [];
+        $unshuffledQuestions = [];
         foreach ($questions as $question) {
             $questionDetail = $this->getQuestionDetails($question->question_id);
             if ($questionDetail) {
-                $questionDetails[] = array_merge($questionDetail, [
+                $unshuffledQuestions[] = array_merge($questionDetail, [
                     'pool_id' => $question->pool_id,
                     'question_order' => $question->question_order,
                     'is_answered' => $question->is_answered
@@ -235,7 +232,7 @@ class StudentTeacherAssessmentController extends Controller
         }
 
         // Apply Fisher-Yates shuffle to randomize questions
-        $shuffledQuestions = $this->fisherYatesShuffle($questionDetails);
+        $questionDetails = $this->fisherYatesShuffle($unshuffledQuestions);
 
         // Create teacher assessment session
         $sessionId = 'TAS-' . $student->id . '-' . $assessment->id . '-' . time();
@@ -264,8 +261,8 @@ class StudentTeacherAssessmentController extends Controller
             'session_type' => 'teacher_created',
             'competency' => $competency,
             'difficulty_level' => $difficultyLevel,
-            'total_questions' => count($shuffledQuestions),
-            'questions_json' => $shuffledQuestions,
+            'total_questions' => count($questionDetails),
+            'questions_json' => $questionDetails,
             'current_question_index' => 0,
             'time_limit_minutes' => $assessment->time_limit,
             'total_time_allowed_seconds' => $assessment->time_limit * 60,
@@ -281,7 +278,7 @@ class StudentTeacherAssessmentController extends Controller
         session([
             'quiz_assessment_id' => $assessment->id,
             'quiz_session_id' => $sessionId,
-            'quiz_questions' => $shuffledQuestions,
+            'quiz_questions' => $questionDetails,
             'current_question_index' => 0,
             'quiz_start_time' => now(),
             'current_bkt_probability' => 0.5
