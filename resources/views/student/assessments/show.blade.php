@@ -127,7 +127,7 @@
                     Continue Assessment
                 </button>
             @elseif($assignment->status === 'Completed')
-                <div class="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+                <div class="bg-green-50 border border-green-200 rounded-xl p-5 text-center mb-6">
                     <span class="material-symbols-outlined text-green-600 text-5xl mb-2">check_circle</span>
                     <h3 class="text-xl font-semibold text-green-800 mb-2">Assessment Completed</h3>
                     <p class="text-green-700 mb-4">You have successfully completed this assessment.</p>
@@ -145,11 +145,15 @@
                                 </div>
                                 <div>
                                     <div class="text-2xl font-bold text-purple-600">
-                                        @if($quizResult->time_taken >= 3600)
+                                    <div class="text-2xl font-bold text-purple-600">
+                                        @if(isset($quizResult->formatted_time))
+                                            {{ $quizResult->formatted_time }}
+                                        @elseif($quizResult->time_taken >= 3600)
                                             {{ gmdate('H:i:s', $quizResult->time_taken) }}
                                         @else
                                             {{ gmdate('i:s', $quizResult->time_taken) }}
                                         @endif
+                                    </div>
                                     </div>
                                     <div class="text-sm text-gray-600">Time Taken</div>
                                 </div>
@@ -174,6 +178,54 @@
                         </form>
                     </div>
                 </div>
+
+                @if(isset($history) && $history->count() > 0)
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gray-500">history</span>
+                            Attempt History
+                        </h3>
+                        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                            <table class="min-w-full bg-white">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Date Taken</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Score</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Percentage</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Time</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    @foreach($history as $attempt)
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-4 py-3 text-sm text-gray-700">
+                                                {{ $attempt->completed_at ? \Carbon\Carbon::parse($attempt->completed_at)->format('M d, Y • h:i A') : 'N/A' }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-700 font-bold text-center">
+                                                {{ $attempt->score }}/{{ $attempt->total_questions }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm font-bold text-center">
+                                                <span class="px-2 py-1 rounded-full {{ $attempt->percentage >= 75 ? 'bg-green-100 text-green-700' : ($attempt->percentage >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                                    {{ $attempt->percentage }}%
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-500 text-center">
+                                                {{ $attempt->time_taken }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-center">
+                                                <a href="{{ route('teacher-assessments.results', ['assessment' => $assessment->id, 'session_id' => $attempt->id]) }}" 
+                                                   class="inline-flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded-full text-xs font-semibold transition-colors">
+                                                    <span class="material-symbols-outlined text-xs mr-1">visibility</span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             @endif
 
             <!-- Cancel -->
