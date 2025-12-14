@@ -512,12 +512,12 @@
                                                     <span class="text-red-600 text-xl">🎯</span>
                                                 </div>
                                                 <div>
-                                                    <h2 class="text-lg font-baloo font-bold">Assigned Assessments</h2>
+                                                    <h2 class="text-lg font-baloo font-bold">Assigned Quizzes</h2>
                                                     <p class="text-sm opacity-90">Complete your assigned tasks</p>
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                <div class="text-2xl text-center font-extrabold">2</div>
+                                                <div class="text-2xl text-center font-extrabold">{{ $pendingAssessments->count() }}</div>
                                                 <div class="text-sm opacity-90">Pending</div>
                                             </div>
                                         </div>
@@ -525,107 +525,61 @@
 
                                         <!-- Body -->
                                         <div class="p-6 space-y-4 bg-red-50">
-                                            <!-- Assessment Item 1 -->
-                                            <div
-                                                class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
-                                                <div class="flex-1">
-                                                    <div class="flex items-center gap-2 mb-2">
-                                                        <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents
-                                                        </h3>
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Individual</span>
+                                            @forelse($pendingAssessments as $assignment)
+                                                @php
+                                                    $assessment = $assignment->assessment;
+                                                    $difficultyColor = match(strtolower($assessment->difficulty)) {
+                                                        'easy' => 'text-green-700',
+                                                        'medium' => 'text-yellow-700',
+                                                        'hard' => 'text-pink-700',
+                                                        default => 'text-gray-700'
+                                                    };
+                                                    $difficultyIconColor = match(strtolower($assessment->difficulty)) {
+                                                        'easy' => 'text-green-500',
+                                                        'medium' => 'text-yellow-500',
+                                                        'hard' => 'text-pink-500',
+                                                        default => 'text-gray-500'
+                                                    };
+                                                @endphp
+                                                <!-- Assessment Item -->
+                                                <div
+                                                    class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative bg-white">
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center gap-2 mb-2">
+                                                            <h3 class="font-semibold text-gray-900 text-base">{{ $assessment->title }}</h3>
+                                                        </div>
+                                                        <p class="text-sm text-gray-600 mb-3">
+                                                            {{ Str::limit($assessment->description, 100) }}
+                                                        </p>
+                                                        <div class="flex items-center gap-2">
+                                                            <span
+                                                                class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
+                                                                {{ $assessment->number_of_questions }} Questions
+                                                            </span>
+                                                            <span
+                                                                class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">
+                                                                {{ $assessment->time_limit }} Mins
+                                                            </span>
+                                                            <span
+                                                                class="text-xs px-2 py-1 {{ $difficultyColor }} font-medium flex items-center gap-1 capitalize">
+                                                                <span class="{{ $difficultyIconColor }} font-bold">ⓘ</span> {{ $assessment->difficulty }}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <p class="text-sm text-gray-600 mb-3">
-                                                        Learn how to calculate and evaluate expressions with exponents
-                                                    </p>
-                                                    <div class="flex items-center gap-2">
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
-                                                            120 points
-                                                        </span>
-                                                        <span
-                                                            class="text-xs px-2 py-1 text-pink-700 font-medium flex items-center gap-1">
-                                                            <span class="text-pink-500 font-bold">ⓘ</span> Hard
-                                                        </span>
-                                                    </div>
-                                                </div>
 
-                                                <!-- Button container with responsive positioning -->
-                                                <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
-                                                    <button
-                                                        class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
-                                                        Start Assessment
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Assessment Item 2 -->
-                                            <div
-                                                class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
-                                                <div class="flex-1">
-                                                    <div class="flex items-center gap-2 mb-2">
-                                                        <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents
-                                                        </h3>
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">Class</span>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mb-3">
-                                                        Learn how to calculate and evaluate expressions with exponents
-                                                    </p>
-                                                    <div class="flex items-center gap-2">
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
-                                                            120 points
-                                                        </span>
-                                                        <span
-                                                            class="text-xs px-2 py-1 text-green-700 font-medium flex items-center gap-1">
-                                                            <span class="text-green-500 font-bold">ⓘ</span> Easy
-                                                        </span>
+                                                    <!-- Button container with responsive positioning -->
+                                                    <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
+                                                        <a href="{{ route('teacher-assessments.show', $assessment->id) }}"
+                                                            class="inline-block w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md text-center">
+                                                            Start Assessment
+                                                        </a>
                                                     </div>
                                                 </div>
-
-                                                <!-- Button container with responsive positioning -->
-                                                <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
-                                                    <button
-                                                        class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
-                                                        Start Assessment
-                                                    </button>
+                                            @empty
+                                                <div class="text-center py-6">
+                                                    <p class="text-gray-600">No pending assessments at the moment! Great job! 🎉</p>
                                                 </div>
-                                            </div>
-
-                                            <!-- Assessment Item 3 -->
-                                            <div
-                                                class="flex flex-col lg:flex-row lg:items-center lg:justify-between rounded-lg p-4 shadow relative">
-                                                <div class="flex-1">
-                                                    <div class="flex items-center gap-2 mb-2">
-                                                        <h3 class="font-semibold text-gray-900 text-base">Evaluate Exponents
-                                                        </h3>
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">Individual</span>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mb-3">
-                                                        Learn how to calculate and evaluate expressions with exponents
-                                                    </p>
-                                                    <div class="flex items-center gap-2">
-                                                        <span
-                                                            class="text-xs px-2 py-1 rounded-full bg-yellow-400 text-white font-medium">
-                                                            120 points
-                                                        </span>
-                                                        <span
-                                                            class="text-xs px-2 py-1 text-pink-700 font-medium flex items-center gap-1">
-                                                            <span class="text-pink-500 font-bold">ⓘ</span> Hard
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Button container with responsive positioning -->
-                                                <div class="mt-4 lg:mt-0 lg:ml-6 lg:flex-shrink-0">
-                                                    <button
-                                                        class="w-full lg:w-auto px-8 lg:px-10 py-3 lg:py-3.5 rounded-xl text-sm text-white font-semibold bg-gradient-primary drop-shadow-gradient-primary shadow-inner-y-4-[#AF68FF] transition-all hover:shadow-md">
-                                                        Start Assessment
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            @endforelse
 
                                         </div>
                                     </div>
