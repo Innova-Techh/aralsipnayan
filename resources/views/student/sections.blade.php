@@ -137,6 +137,59 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Completed Assessments Section -->
+                    @if(isset($completedSections) && count($completedSections) > 0)
+                        <div class="rounded-xl px-3 sm:px-6 lg:px-12 mt-6">
+                            <div class="space-y-3 sm:space-y-4">
+                                <!-- Completed Header -->
+                                <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-t-xl lg:rounded-t-2xl p-4 sm:p-5 lg:p-6 text-white">
+                                    <div class="flex items-center">
+                                        <h2 class="text-xl xs:text-3xl sm:text-2xl lg:text-3xl font-baloo font-bold mr-3">Completed Quests ✅</h2>
+                                    </div>
+                                    <p class="text-green-100 text-xs sm:text-sm mt-1">Review your achievements or challenge yourself again</p>
+                                </div>
+
+                                <!-- Completed Cards Container -->
+                                <div>
+                                    <div class="shadow-lg px-2 xs:px-4 sm:px-3 lg:px-12 pb-2 rounded-xl space-y-3 sm:space-y-4">
+                                        @foreach($completedSections as $section)
+                                            <div class="bg-gradient-to-r {{ $section['color'] }} rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:px-8 lg:p-6 text-white shadow-xl hover:shadow-2xl transition-shadow opacity-90">
+                                                <div class="flex items-start justify-between mb-2">
+                                                    <h3 class="text-lg sm:text-xl lg:text-2xl font-baloo font-bold">{{ $section['title'] }}</h3>
+                                                    <span class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold">COMPLETED</span>
+                                                </div>
+                                                <p class="text-white/90 text-xs sm:text-sm mb-4 sm:mb-6">{{ $section['description'] }}</p>
+
+                                                <!-- Stats Row -->
+                                                <div class="grid grid-cols-3 gap-2 sm:gap-4 rounded-xl py-3 sm:py-4 bg-gray-100/50 mb-4 sm:mb-6">
+                                                    <div class="text-center">
+                                                        <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['xp_reward'] }}</div>
+                                                        <div class="text-xs lg:text-sm font-medium opacity-90">XP Earned</div>
+                                                    </div>
+                                                    <div class="text-center">
+                                                        <div class="text-lg sm:text-xl lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['time_limit'] }}</div>
+                                                        <div class="text-xs lg:text-sm font-medium opacity-90">Time Limit</div>
+                                                    </div>
+                                                    <div class="text-center">
+                                                        <div class="text-lg sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1">{{ $section['difficulty'] }}</div>
+                                                        <div class="text-xs lg:text-lg font-medium opacity-90">Difficulty</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Review/Retake Button -->
+                                                <a href="{{ route('teacher-assessments.show', $section['id']) }}"
+                                                class="w-full bg-green-500 text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors block text-center border-b-4 border-green-700 hover:bg-green-600"
+                                                style="text-shadow: -1px -1px 0 #013220, 1px -1px 0 #013220, -1px 1px 0 #013220, 1px 1px 0 #013220, 0 0 1px #013220;">
+                                                    📊 Review / Retake
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Right Column - Teacher's Board -->
