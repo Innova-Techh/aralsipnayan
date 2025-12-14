@@ -44,7 +44,7 @@ class StudentTeacherAssessmentController extends Controller
             $query->where('status', 'Active');
         }])
         ->whereHas('assessment', function($query) {
-              $query->whereIn('status', ['Active', 'Completed']);
+            $query->where('status', 'Active');
         })
         ->get();
 
