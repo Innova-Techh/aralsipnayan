@@ -175,6 +175,12 @@ class AnalyticsController extends Controller
             return redirect()->route('login');
         }
 
+        // Handle Quiz IDs (format: quiz_{id})
+        if (str_starts_with($assessmentId, 'quiz_')) {
+            $quizId = substr($assessmentId, 5);
+            return $this->showQuizDetails($request, $quizId);
+        }
+
         // Parse the assessment ID (format: competency_assessmenttype)
         $parts = explode('_', $assessmentId);
         if (count($parts) < 2) {
@@ -241,46 +247,296 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Show detailed analytics for a specific quiz (Teacher Assessment)
+     */
+    private function showQuizDetails(Request $request, $quizId)
+    {
+        $teacherId = Auth::guard('admin')->user()->id;
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacherId)->first();
+        $teacherSections = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->pluck('section')
+            ->toArray();
+
+        $selectedSection = $request->get('section', 'all');
+        $sortBy = $request->get('sort', 'accuracy');
+
+        // Get Quiz Details
+        $quiz = DB::table('teacher_assessments')
+            ->where('id', $quizId)
+            ->first();
+
+        if (!$quiz) {
+            return redirect()->route('teacher.analytics')->with('error', 'Quiz not found.');
+        }
+
+        // Build base query for sessions
+        $sessionsQuery = DB::table('teacher_assessment_sessions')
+            ->join('student_profile', 'teacher_assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('teacher_assessment_sessions.teacher_assessment_id', $quizId)
+            ->where('teacher_assessment_sessions.status', 'completed');
+
+        if ($selectedSection !== 'all' && in_array($selectedSection, $teacherSections)) {
+            $sessionsQuery->where('student_profile.section', $selectedSection);
+        } else {
+             $sessionsQuery->whereIn('student_profile.section', $teacherSections);
+        }
+
+        // Get Summary Stats
+        $assessmentSummary = (clone $sessionsQuery)
+            ->selectRaw('
+                COUNT(*) as total_completed,
+                MAX(teacher_assessment_sessions.completed_at) as latest_completed_at,
+                AVG(teacher_assessment_sessions.questions_answered) as avg_questions,
+                AVG(teacher_assessment_sessions.accuracy_percentage) as avg_accuracy
+            ')
+            ->first();
+            
+        // Map fields for view compatibility
+        $assessmentSummary->competency = $quiz->category;
+        $assessmentSummary->difficulty_level = $quiz->difficulty;
+
+        // Get Question Statistics
+        // We need to join teacher_quiz_responses linked to these sessions
+        // And teacher_assessment_questions for text
+        $questionStatsQuery = DB::table('teacher_quiz_responses')
+            ->join('teacher_assessment_sessions', 'teacher_quiz_responses.session_id', '=', 'teacher_assessment_sessions.session_id')
+            ->join('student_profile', 'teacher_assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->join('teacher_assessment_questions', function($join) {
+                // Determine join logic. Responses have pool_id/question_id but might not map directly to teacher_assessment_questions ID if they are from a pool.
+                // Actually teacher_assessment_questions has questions from the bank.
+                // We typically need to join back to the question bank or use the data stored in teacher_responses.
+                // However, teacher_quiz_responses SHOULD store question_id.
+                // Let's check getQuestionDetails logic in student controller. It fetches from JSON.
+                // But specifically for this view, we need the question text.
+                // teacher_assessment_questions links assessment to questions.
+                $join->on('teacher_quiz_responses.question_id', '=', 'teacher_assessment_questions.question_id')
+                     ->where('teacher_assessment_questions.teacher_assessment_id', '=', DB::raw('teacher_assessment_sessions.teacher_assessment_id'));
+            })
+             ->where('teacher_assessment_sessions.teacher_assessment_id', $quizId)
+             ->where('teacher_assessment_sessions.status', 'completed');
+
+        if ($selectedSection !== 'all' && in_array($selectedSection, $teacherSections)) {
+            $questionStatsQuery->where('student_profile.section', $selectedSection);
+        } else {
+             $questionStatsQuery->whereIn('student_profile.section', $teacherSections);
+        }
+
+        $questionStats = $questionStatsQuery
+            ->select([
+                'teacher_quiz_responses.question_id',
+                'teacher_quiz_responses.topic_tag', // Assuming this was added to schema or available
+                'teacher_quiz_responses.difficulty_level',
+                DB::raw('COUNT(*) as total_attempts'),
+                DB::raw('SUM(teacher_quiz_responses.is_correct) as correct_answers'),
+                DB::raw('AVG(teacher_quiz_responses.time_taken) as avg_response_time'),
+                DB::raw('COUNT(DISTINCT teacher_quiz_responses.student_id) as unique_students'),
+                DB::raw('AVG(teacher_quiz_responses.bkt_probability_before) as avg_bkt_before'),
+                DB::raw('AVG(teacher_quiz_responses.bkt_probability_after) as avg_bkt_after'),
+                // We need question text. teacher_quiz_responses doesn't have it.
+                // We might need to fetch it separately or rely on a helper.
+                // For now, let's try to get it from the JSON via helper, loop after query.
+            ])
+            ->groupBy('teacher_quiz_responses.question_id', 'teacher_quiz_responses.topic_tag', 'teacher_quiz_responses.difficulty_level')
+            ->get();
+            
+        // Post-process question stats to add text and format
+        $questionDetails = [];
+        $controller = new \App\Http\Controllers\Student\StudentTeacherAssessmentController(); // Re-use helper logic if private methods allow or duplicate
+        // Actually, we can reuse the helper logic if we duplicate getQuestionDetails here or move it to a trait/service.
+        // For expediency, I'll implement a simple fetcher here similar to StudentTeacherAssessmentController.
+        
+        foreach ($questionStats as $stat) {
+             // Mock the question object structure expected by the view
+             $qDetails = $this->getQuestionDetails($stat->question_id); // Need to implement this in this controller
+             if (!$qDetails) {
+                 $qDetails = [
+                     'question_text' => 'Question ID: ' . $stat->question_id,
+                     'question_type' => 'unknown',
+                     'choice_a' => null, 'choice_b' => null, 'choice_c' => null, 'choice_d' => null,
+                     'correct_answer' => null, 'explanation' => null, 'topic_tag' => $stat->topic_tag
+                 ];
+             }
+             
+             // Wrap as object for view
+             $questionObj = (object) array_merge($qDetails, [
+                 'question_id' => $stat->question_id,
+                 'difficulty_level' => $stat->difficulty_level, // or from JSON
+                 'topic_tag' => $qDetails['topic_tag'] ?? $stat->topic_tag
+             ]);
+
+             $questionDetails[$stat->question_id] = [
+                'question' => $questionObj,
+                'total_attempts' => $stat->total_attempts,
+                'correct_answers' => $stat->correct_answers,
+                'wrong_answers' => $stat->total_attempts - $stat->correct_answers,
+                'accuracy_rate' => $stat->total_attempts > 0 ? round(($stat->correct_answers / $stat->total_attempts) * 100, 1) : 0,
+                'avg_response_time' => round($stat->avg_response_time, 2),
+                'unique_students' => $stat->unique_students,
+                'avg_bkt_before' => round($stat->avg_bkt_before, 4),
+                'avg_bkt_after' => round($stat->avg_bkt_after, 4),
+                'bkt_improvement' => round($stat->avg_bkt_after - $stat->avg_bkt_before, 4),
+                'avg_time_score' => 0, // Not tracking this for quizzes yet explicitly
+             ];
+        }
+        
+        // Sort
+        $questionDetails = $this->sortQuestionDetails($questionDetails, $sortBy);
+
+        // Assessment Stats (Overall)
+        $totalSessions = (clone $sessionsQuery)->count();
+        $avgAccuracy = (clone $sessionsQuery)->avg('accuracy_percentage');
+        
+        // Avg Response Time (Avg of all question responses)
+        $avgResponseTime = $questionStats->avg('avg_response_time');
+        
+        // Difficulty Breakdown
+        $difficultyBreakdown = $questionStats->groupBy('difficulty_level')->map(function($group) {
+            $total = $group->sum('total_attempts');
+            $correct = $group->sum('correct_answers');
+            return (object)[
+                'total' => $total,
+                'correct' => $correct,
+                'avg_time' => $group->avg('avg_response_time')
+            ];
+        });
+
+        $assessmentStats = [
+            'total_assessments' => $totalSessions,
+            'total_questions' => $assessmentSummary->avg_questions, // Approximate
+            'correct_answers' => 0, // Not really needed for overall view summary
+            'accuracy' => round($avgAccuracy, 1),
+            'total_time' => 0,
+            'avg_time_per_question' => round($avgResponseTime, 2),
+            'difficulty_breakdown' => $difficultyBreakdown,
+            'competency' => $quiz->category,
+            'difficulty_level' => $quiz->difficulty
+        ];
+
+        return view('admin.teacher.analytics.assessment-details', [
+            'assessment' => $assessmentSummary,
+            'questionDetails' => $questionDetails,
+            'assessmentStats' => $assessmentStats,
+            'competency' => $quiz->category,
+            'assessmentType' => 'quiz', // To denote it's a quiz type display
+            'teacherSections' => $teacherSections,
+            'selectedSection' => $selectedSection,
+            'sortBy' => $sortBy
+        ]);
+    }
+    
+    /**
+     * Helper to get question details (Duplicate from Student Controller for independence)
+     */
+    private function getQuestionDetails($questionId)
+    {
+        $categoryMap = ['NA' => 'number_algebra', 'MG' => 'measurement_geometry', 'DP' => 'data_probability'];
+        $difficultyMap = ['B' => 'beginner', 'I' => 'intermediate', 'A' => 'advanced'];
+
+        if (preg_match('/^(NA|MG|DP)-(B|I|A)-(\d{3})$/', $questionId, $matches)) {
+            $categoryPrefix = $categoryMap[$matches[1]] ?? null;
+            $difficulty = $difficultyMap[$matches[2]] ?? null;
+            
+            if ($categoryPrefix && $difficulty) {
+                $filePath = base_path("database/data/{$categoryPrefix}/{$categoryPrefix}_{$difficulty}.json");
+                if (file_exists($filePath)) {
+                    $json = json_decode(file_get_contents($filePath), true);
+                    foreach ($json ?? [] as $q) {
+                        if ($q['question_id'] === $questionId) {
+                            return [
+                                'question_text' => $q['question_text'],
+                                'question_type' => $q['question_type'],
+                                'choice_a' => $q['choice_a'] ?? null,
+                                'choice_b' => $q['choice_b'] ?? null,
+                                'choice_c' => $q['choice_c'] ?? null,
+                                'choice_d' => $q['choice_d'] ?? null,
+                                'correct_answer' => $q['correct_answer'],
+                                'explanation' => $q['explanation'] ?? null,
+                                'topic_tag' => $q['topic_tag'] ?? null
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get recent assessments with real data
      */
     private function getRecentAssessments($teacherSections = [])
     {
         try {
-            // Get unique assessment types (competency + difficulty combinations) with their latest completion date
-            // Only include regular assessments, exclude diagnostics, filtered by teacher sections
-            $results = DB::table('assessments')
+            // 1. Regular Assessments
+            $regularAssessments = DB::table('assessments')
                 ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
                 ->select([
                     'assessments.competency',
                     'assessments.difficulty_level',
+                    'assessments.assessment_type',
                     DB::raw('MAX(assessments.completed_at) as latest_completed_at'),
                     DB::raw('COUNT(*) as total_completed'),
-                    DB::raw('SUM(assessments.questions_answered) as total_questions_answered')
+                    DB::raw('SUM(assessments.questions_answered) as total_questions_answered'),
+                    DB::raw('NULL as title') // Regular assessments use competency/difficulty
                 ])
                 ->where('assessments.status', 'completed')
-                ->where('assessments.assessment_type', 'regular') // Only regular assessments
+                ->where('assessments.assessment_type', 'regular')
                 ->whereNotNull('assessments.completed_at')
                 ->where('assessments.questions_answered', '>', 0)
-                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
-                ->groupBy('assessments.competency', 'assessments.difficulty_level')
-                ->orderBy('latest_completed_at', 'desc')
-                ->limit(10)
+                ->whereIn('student_profile.section', $teacherSections)
+                ->groupBy('assessments.competency', 'assessments.difficulty_level', 'assessments.assessment_type')
                 ->get();
+
+            // 2. Quiz Assessments (Teacher Created)
+            $quizAssessments = DB::table('teacher_assessment_sessions')
+                ->join('teacher_assessments', 'teacher_assessment_sessions.teacher_assessment_id', '=', 'teacher_assessments.id')
+                ->join('student_profile', 'teacher_assessment_sessions.user_id', '=', 'student_profile.user_id')
+                ->select([
+                    'teacher_assessments.id', // Add ID for link generation
+                    'teacher_assessments.category as competency',
+                    'teacher_assessments.difficulty as difficulty_level',
+                    DB::raw('"quiz" as assessment_type'),
+                    DB::raw('MAX(teacher_assessment_sessions.completed_at) as latest_completed_at'),
+                    DB::raw('COUNT(*) as total_completed'),
+                    DB::raw('SUM(teacher_assessment_sessions.questions_answered) as total_questions_answered'),
+                    'teacher_assessments.title'
+                ])
+                ->where('teacher_assessment_sessions.status', 'completed')
+                ->whereNotNull('teacher_assessment_sessions.completed_at')
+                ->where('teacher_assessment_sessions.questions_answered', '>', 0)
+                ->whereIn('student_profile.section', $teacherSections)
+                ->groupBy('teacher_assessments.id', 'teacher_assessments.title', 'teacher_assessments.category', 'teacher_assessments.difficulty')
+                ->get();
+
+            // Merge collections
+            $allAssessments = $regularAssessments->concat($quizAssessments);
+
+            // Sort by latest completed date descending
+            $sortedAssessments = $allAssessments->sortByDesc('latest_completed_at')->values();
             
-            $mapped = $results->map(function ($assessment) {
+            $mapped = $sortedAssessments->map(function ($assessment) {
                 // Format competency name for display
                 $competencyNames = [
                     'number_algebra' => 'Number and Algebra',
                     'measurement_geometry' => 'Measurement and Geometry', 
-                    'data_probability' => 'Data and Probability'
+                    'data_probability' => 'Data and Probability',
+                    'Number & Algebra' => 'Number and Algebra',
+                    'Measurement & Geometry' => 'Measurement and Geometry',
+                    'Data & Probability' => 'Data and Probability'
                 ];
                 
-                $assessment->competency_display = $competencyNames[$assessment->competency] ?? ucfirst(str_replace('_', ' ', $assessment->competency));
-                $assessment->assessment_name = $assessment->competency_display . ' ' . ucfirst($assessment->difficulty_level ?? 'Unknown');
+                $competencyDisplay = $competencyNames[$assessment->competency] ?? ucfirst(str_replace('_', ' ', $assessment->competency));
+                $assessment->competency_display = $competencyDisplay;
                 $assessment->formatted_date = Carbon::parse($assessment->latest_completed_at)->format('M d, Y');
                 
-                // Create a unique identifier for this assessment type
-                $assessment->assessment_id = $assessment->competency . '_' . ($assessment->difficulty_level ?? 'unknown');
+                if ($assessment->assessment_type === 'quiz') {
+                    $assessment->assessment_name = $assessment->title . ' - quiz';
+                    $assessment->assessment_id = 'quiz_' . ($assessment->id ?? uniqid()); // Ensure unique ID for link
+                } else {
+                     $assessment->assessment_name = $competencyDisplay . ' ' . ucfirst($assessment->difficulty_level ?? 'Unknown');
+                     $assessment->assessment_id = $assessment->competency . '_' . ($assessment->difficulty_level ?? 'unknown');
+                }
                 
                 return $assessment;
             });
@@ -297,41 +553,81 @@ class AnalyticsController extends Controller
     private function getOverallStatistics($teacherSections = [])
     {
         try {
-            $totalAssessments = DB::table('assessments')
+            // 1. Regular Stats
+            $regularStats = DB::table('assessments')
                 ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
                 ->where('assessments.status', 'completed')
-                ->where('assessments.assessment_type', 'regular') // Only regular assessments
-                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
-                ->count();
+                ->where('assessments.assessment_type', 'regular')
+                ->whereIn('student_profile.section', $teacherSections)
+                ->selectRaw('
+                    COUNT(*) as total_assessments,
+                    AVG(assessments.accuracy_percentage) as avg_accuracy
+                ')
+                ->first();
+
+            // 2. Quiz Stats
+            $quizStats = DB::table('teacher_assessment_sessions')
+                ->join('student_profile', 'teacher_assessment_sessions.user_id', '=', 'student_profile.user_id')
+                ->where('teacher_assessment_sessions.status', 'completed')
+                ->whereIn('student_profile.section', $teacherSections)
+                ->selectRaw('
+                    COUNT(*) as total_assessments,
+                    AVG(teacher_assessment_sessions.accuracy_percentage) as avg_accuracy
+                ')
+                ->first();
+
+            // Combine
+            $totalAssessments = ($regularStats->total_assessments ?? 0) + ($quizStats->total_assessments ?? 0);
+            
+            // Weighted average for accuracy
+            $totalRegularAccuracy = ($regularStats->total_assessments ?? 0) * ($regularStats->avg_accuracy ?? 0);
+            $totalQuizAccuracy = ($quizStats->total_assessments ?? 0) * ($quizStats->avg_accuracy ?? 0);
+            
+            $avgAccuracy = $totalAssessments > 0 ? ($totalRegularAccuracy + $totalQuizAccuracy) / $totalAssessments : 0;
 
             $totalStudents = DB::table('student_profile')
-                ->whereIn('section', $teacherSections) // Only students in teacher's sections
+                ->whereIn('section', $teacherSections)
                 ->count();
 
-            $avgAccuracy = DB::table('assessments')
-                ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
-                ->where('assessments.status', 'completed')
-                ->where('assessments.assessment_type', 'regular') // Only regular assessments
-                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
-                ->whereNotNull('assessments.accuracy_percentage')
-                ->avg('assessments.accuracy_percentage');
+            // Completion Rate (Simplified: Total completed / (Total Students * Assumed Assignments))
+            // For now, let's keep it based on active assignments or just raw completed count vs total possible if trackable.
+            // Since we don't have a rigid "assigned total" easily available without querying all assignments:
+            // We will stick to the previous completion logic but apply it across both types roughly,
+            // or just use the raw count of completed assessments vs some metric.
+            
+            // Let's stick to the previous simplistic "Completion Rate" logic but extended.
+            // Actually the previous logic was: count(completed) / count(all rows in assessments table for that section).
+            // For quizzes, rows are only created on start? No, teacher_assessment_sessions are created on start.
+            // So for quizzes, "completion rate" of STARTED sessions is:
+            
+            $quizCompletion = DB::table('teacher_assessment_sessions')
+                ->join('student_profile', 'teacher_assessment_sessions.user_id', '=', 'student_profile.user_id')
+                ->whereIn('student_profile.section', $teacherSections)
+                ->selectRaw('
+                     COUNT(CASE WHEN teacher_assessment_sessions.status = "completed" THEN 1 END) as completed,
+                     COUNT(*) as total
+                ')
+                ->first();
 
-            $completionRate = DB::table('assessments')
+             $regularCompletion = DB::table('assessments')
                 ->join('student_profile', 'assessments.user_id', '=', 'student_profile.user_id')
-                ->where('assessments.assessment_type', 'regular') // Only regular assessments
-                ->whereIn('student_profile.section', $teacherSections) // Filter by teacher sections
+                ->where('assessments.assessment_type', 'regular')
+                ->whereIn('student_profile.section', $teacherSections)
                 ->selectRaw('
                     COUNT(CASE WHEN assessments.status = "completed" THEN 1 END) as completed,
                     COUNT(*) as total
                 ')
                 ->first();
 
+            $totalCompleted = ($regularCompletion->completed ?? 0) + ($quizCompletion->completed ?? 0);
+            $totalAttempts = ($regularCompletion->total ?? 0) + ($quizCompletion->total ?? 0);
+
             return [
                 'total_assessments' => $totalAssessments,
                 'total_students' => $totalStudents,
                 'avg_accuracy' => round($avgAccuracy, 1),
-                'completion_rate' => $completionRate->total > 0 ? 
-                    round(($completionRate->completed / $completionRate->total) * 100, 1) : 0
+                'completion_rate' => $totalAttempts > 0 ? 
+                    round(($totalCompleted / $totalAttempts) * 100, 1) : 0
             ];
         } catch (\Exception $e) {
             return [
