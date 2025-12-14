@@ -102,15 +102,23 @@
 
                                             <!-- Start Assessment Button - Responsive -->
                                             @if(isset($section['assignment_id']))
-                                                <a href="{{ route('teacher-assessments.show', $section['id']) }}"
-                                                class="w-full bg-gradient-secondary drop-shadow-gradient-secondary text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors block text-center"
-                                                style="text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
-                                                    @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
-                                                        🔴 Live Quiz
-                                                    @else
-                                                        Start Assessment
-                                                    @endif
-                                                </a>
+                                                @if(isset($section['status']) && $section['status'] === 'Completed')
+                                                    <a href="{{ route('teacher-assessments.show', $section['id']) }}"
+                                                    class="w-full bg-green-500 text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors block text-center border-b-4 border-green-700"
+                                                    style="text-shadow: -1px -1px 0 #013220, 1px -1px 0 #013220, -1px 1px 0 #013220, 1px 1px 0 #013220, 0 0 1px #013220;">
+                                                        Review / Retake
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('teacher-assessments.show', $section['id']) }}"
+                                                    class="w-full bg-gradient-secondary drop-shadow-gradient-secondary text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors block text-center"
+                                                    style="text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
+                                                        @if(isset($section['is_live_quiz']) && $section['is_live_quiz'])
+                                                            🔴 Live Quiz
+                                                        @else
+                                                            Start Assessment
+                                                        @endif
+                                                    </a>
+                                                @endif
                                             @else
                                                 <button class="w-full bg-gradient-secondary drop-shadow-gradient-secondary text-white font-baloo font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl shadow-lg text-sm sm:text-base lg:text-xl transition-colors"
                                                         style="text-shadow: -1px -1px 0 #7A4305, 1px -1px 0 #7A4305, -1px 1px 0 #7A4305, 1px 1px 0 #7A4305, 0 0 1px #7A4305;">
@@ -132,7 +140,10 @@
                 </div>
 
                 <!-- Right Column - Teacher's Board -->
-                <div x-data="{ activeIndex: 0, total: 3 }" class="lg:col-span-1 lg:order-2 space-y-4 px-8">
+                @php
+                    $announcementCount = $announcements->count();
+                @endphp
+                <div x-data="{ activeIndex: 0, total: {{ $announcementCount > 0 ? $announcementCount : 1 }} }" class="lg:col-span-1 lg:order-2 space-y-4 px-8">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
                         <!-- Teacher's Board Header - Responsive -->
@@ -151,7 +162,7 @@
                                 </div>
 
                                 <!-- Mobile/Tablet Carousel Controls -->
-                                <div class="flex items-center space-x-1 sm:space-x-2 lg:hidden">
+                                <div class="flex items-center space-x-1 sm:space-x-2 lg:hidden" x-show="total > 1">
                                     <button @click="activeIndex = (activeIndex === 0 ? total - 1 : activeIndex - 1)"
                                         class="text-white/70 hover:text-white p-1">
                                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
@@ -179,126 +190,77 @@
 
                             <!-- Desktop (all stacked) -->
                             <div class="hidden lg:block space-y-4">
-                                <!-- Announcement 1 -->
-                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-red-400">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Upcoming Math
-                                            Competition</h4>
-                                        <span
-                                            class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium">high</span>
+                                @forelse($announcements as $announcement)
+                                    @php
+                                        $priorityColor = match($announcement->priority) {
+                                            'high' => 'red',
+                                            'medium' => 'yellow',
+                                            'low' => 'blue',
+                                            default => 'blue'
+                                        };
+                                        $borderColor = "border-{$priorityColor}-400";
+                                        $badgeBg = "bg-{$priorityColor}-100";
+                                        $badgeText = "text-{$priorityColor}-600";
+                                    @endphp
+                                    <div class="bg-gray-50 rounded-lg p-4 border-l-4 {{ $borderColor }}">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <h4 class="font-semibold text-gray-800 text-sm sm:text-base">{{ $announcement->title }}</h4>
+                                            <span class="{{ $badgeBg }} {{ $badgeText }} text-xs px-2 py-1 rounded-full font-medium">{{ $announcement->priority }}</span>
+                                        </div>
+                                        <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                                            {{ $announcement->content }}
+                                        </p>
+                                        <div class="flex items-center justify-between text-xs text-gray-500">
+                                            <span class="font-medium">
+                                                {{ $announcement->creator->teacherProfile->firstname ?? 'Teacher' }} {{ $announcement->creator->teacherProfile->lastname ?? '' }}
+                                            </span>
+                                            <span>{{ $announcement->created_at->format('d/m/Y') }}</span>
+                                        </div>
                                     </div>
-                                    <p class="text-gray-600 text-sm leading-relaxed mb-3">
-                                        Students who are interested in joining the inter-school math competition should
-                                        submit
-                                        their names by Friday. This is a great opportunity to showcase your mathematical
-                                        skills!
-                                    </p>
-                                    <div class="flex items-center justify-between text-xs text-gray-500">
-                                        <span class="font-medium">Ms. Rodriguez</span>
-                                        <span>18/01/2024</span>
+                                @empty
+                                    <div class="text-center py-6 text-gray-500">
+                                        No announcements yet.
                                     </div>
-                                </div>
-
-                                <!-- Announcement 2 -->
-                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-yellow-400">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Study Group Session
-                                        </h4>
-                                        <span
-                                            class="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full font-medium">medium</span>
-                                    </div>
-                                    <p class="text-gray-600 text-sm leading-relaxed mb-3">
-                                        Extra study session for Geometry will be held this Saturday at 2:00 PM in Room 205.
-                                        Bring your notebooks and calculators.
-                                    </p>
-                                    <div class="flex items-center justify-between text-xs text-gray-500">
-                                        <span class="font-medium">Ms. Rodriguez</span>
-                                        <span>17/01/2024</span>
-                                    </div>
-                                </div>
-
-                                <!-- Announcement 3 -->
-                                <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-400">
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h4 class="font-semibold text-gray-800 text-sm sm:text-base">Assignment Reminder
-                                        </h4>
-                                        <span
-                                            class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">low</span>
-                                    </div>
-                                    <p class="text-gray-600 text-sm leading-relaxed mb-3">
-                                        Don't forget to complete your fraction worksheets. They are due next Monday.
-                                        If you need help, please don't hesitate to ask during office hours.
-                                    </p>
-                                    <div class="flex items-center justify-between text-xs text-gray-500">
-                                        <span class="font-medium">Ms. Rodriguez</span>
-                                        <span>16/01/2024</span>
-                                    </div>
-                                </div>
+                                @endforelse
                             </div>
 
 
                             <!-- Mobile/Tablet Version (carousel) -->
                             <div class="lg:hidden">
-                                <!-- Announcement 1 -->
-                                <template x-if="activeIndex === 0">
-                                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-red-400">
-                                        <div class="flex items-start justify-between mb-2 sm:mb-3">
-                                            <h4 class="font-semibold text-gray-800 text-sm sm:text-base leading-tight">
-                                                Upcoming Math Competition</h4>
-                                            <span
-                                                class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium ml-2 whitespace-nowrap">high</span>
+                                @forelse($announcements as $index => $announcement)
+                                    @php
+                                        $priorityColor = match($announcement->priority) {
+                                            'high' => 'red',
+                                            'medium' => 'yellow',
+                                            'low' => 'blue',
+                                            default => 'blue'
+                                        };
+                                        $borderColor = "border-{$priorityColor}-400";
+                                        $badgeBg = "bg-{$priorityColor}-100";
+                                        $badgeText = "text-{$priorityColor}-600";
+                                    @endphp
+                                    <template x-if="activeIndex === {{ $index }}">
+                                        <div class="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 {{ $borderColor }}">
+                                            <div class="flex items-start justify-between mb-2 sm:mb-3">
+                                                <h4 class="font-semibold text-gray-800 text-sm sm:text-base leading-tight">
+                                                    {{ $announcement->title }}</h4>
+                                                <span
+                                                    class="{{ $badgeBg }} {{ $badgeText }} text-xs px-2 py-1 rounded-full font-medium ml-2 whitespace-nowrap">{{ $announcement->priority }}</span>
+                                            </div>
+                                            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3">
+                                                {{ $announcement->content }}
+                                            </p>
+                                            <div class="flex items-center justify-between text-xs text-gray-500">
+                                                <span class="font-medium">Ms. Rodriguez</span>
+                                                <span>{{ $announcement->created_at->format('d/m/Y') }}</span>
+                                            </div>
                                         </div>
-                                        <p class="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3">
-                                            Students who are interested in joining the inter-school math competition should
-                                            submit their names by Friday. This is a great opportunity to showcase your
-                                            mathematical skills!
-                                        </p>
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
-                                            <span class="font-medium">Ms. Rodriguez</span>
-                                            <span>18/01/2024</span>
-                                        </div>
+                                    </template>
+                                @empty
+                                    <div class="text-center py-6 text-gray-500">
+                                        No announcements yet.
                                     </div>
-                                </template>
-
-                                <!-- Announcement 2 -->
-                                <template x-if="activeIndex === 1">
-                                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-yellow-400">
-                                        <div class="flex items-start justify-between mb-2 sm:mb-3">
-                                            <h4 class="font-semibold text-gray-800 text-sm sm:text-base leading-tight">Study
-                                                Group Session</h4>
-                                            <span
-                                                class="bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full font-medium ml-2 whitespace-nowrap">medium</span>
-                                        </div>
-                                        <p class="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3">
-                                            Extra study session for Geometry will be held this Saturday at 2:00 PM in Room
-                                            205. Bring your notebooks and calculators.
-                                        </p>
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
-                                            <span class="font-medium">Ms. Rodriguez</span>
-                                            <span>17/01/2024</span>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- Announcement 3 -->
-                                <template x-if="activeIndex === 2">
-                                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-blue-400">
-                                        <div class="flex items-start justify-between mb-2 sm:mb-3">
-                                            <h4 class="font-semibold text-gray-800 text-sm sm:text-base leading-tight">
-                                                Assignment Reminder</h4>
-                                            <span
-                                                class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium ml-2 whitespace-nowrap">low</span>
-                                        </div>
-                                        <p class="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3">
-                                            Don't forget to complete your fraction worksheets. They are due next Monday. If
-                                            you need help, please don't hesitate to ask during office hours.
-                                        </p>
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
-                                            <span class="font-medium">Ms. Rodriguez</span>
-                                            <span>16/01/2024</span>
-                                        </div>
-                                    </div>
-                                </template>
+                                @endforelse
                             </div>
                         </div>
                     </div>
@@ -307,5 +269,56 @@
         </div>
     </div>
 
+    <div id="assessment-modal-container" class="relative z-50"></div>
+
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script>
+        function closeAssessmentModal() {
+            const container = document.getElementById('assessment-modal-container');
+            container.innerHTML = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Attach event listeners to all assessment links (Start, Continue, Review)
+            // We use event delegation since these might be dynamic or just easier to manage
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a[href*="/teacher-assessments/"][href*="show"]');
+                
+                if (link) {
+                    e.preventDefault();
+                    const url = link.href;
+
+                    fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const container = document.getElementById('assessment-modal-container');
+                        container.innerHTML = html;
+                        
+                        // Execute scripts found in the injected HTML (if any need to run immediately)
+                        // Note: The simple script tags in the injected HTML might not execute automatically via innerHTML
+                        // so we manually extract and run them if needed, or rely on inline event handlers which do work.
+                        // For this specific view, the functions are global definitions which is fine, 
+                        // but ideally we should ensure they don't conflict. 
+                        // The view defines startAssessment, continueAssessment, etc. 
+                        // Since they are defined in global scope, repeatedly injecting might redefine them, which is OK.
+                        const scripts = container.querySelectorAll('script');
+                        scripts.forEach(script => {
+                            const newScript = document.createElement('script');
+                            Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.appendChild(document.createTextNode(script.innerHTML));
+                            script.parentNode.replaceChild(newScript, script);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading assessment:', error);
+                        window.location.href = url; // Fallback to normal navigation
+                    });
+                }
+            });
+        });
+    </script>
 @endsection
