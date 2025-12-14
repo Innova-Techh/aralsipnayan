@@ -215,6 +215,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/assessments/{assessment}/edit', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'edit'])->name('assessments.edit');
     Route::put('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'update'])->name('assessments.update');
     Route::delete('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'destroy'])->name('assessments.destroy');
+    Route::get('/assessments/{assessment}/results', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'results'])->name('assessments.results');
+    Route::get('/assessments/{assessment}/student/{student}/attempts', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudentAttempts'])->name('assessments.student.attempts');
+    Route::get('/assessments/review-session/{session}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'reviewSession'])->name('assessments.review-session');
     
     // Assessment Assignment API
     Route::get('/assessments/students/{section}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
@@ -246,6 +249,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/sections/students/{student}/activate', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'activate'])->name('sections.students.activate');
     //Remove Student From Section
     Route::post('/sections/{studentId}/remove', [App\Http\Controllers\Teacher\TeacherStudentController::class, 'removeFromSection'])->name('teacher.sections.students.remove');
+
+    // Announcement Management
+    Route::resource('announcements', \App\Http\Controllers\Teacher\AnnouncementController::class)->only(['index', 'store', 'destroy']);
 
     // Analytics
     Route::get('/analytics', [App\Http\Controllers\Teacher\AnalyticsController::class, 'index'])->name('analytics');
@@ -429,16 +435,15 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/sections/data', [SectionController::class, 'getSectionsData'])->name('sections.data');
     
     // Teacher-created assessments
-    Route::get('/teacher-assessments', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentIndex'])->name('teacher-assessments.index');
-    Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'studentShow'])->name('teacher-assessments.show');
-    Route::get('/teacher-assessments/{assessment}/quiz', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'startQuiz'])->name('teacher-assessments.start');
-    Route::post('/teacher-assessments/{assessment}/submit-answer', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'submitAnswer'])->name('teacher-assessments.submit-answer');
-    Route::post('/teacher-assessments/{assessment}/complete', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'completeQuiz'])->name('teacher-assessments.complete');
-    Route::post('/teacher-assessments/{assessment}/retake', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'retakeQuiz'])->name('teacher-assessments.retake');
-    Route::get('/teacher-assessments/{assessment}/results', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'results'])->name('teacher-assessments.results');
+    Route::get('/teacher-assessments', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'index'])->name('teacher-assessments.index');
+    Route::get('/teacher-assessments/{assessment}', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'show'])->name('teacher-assessments.show');
+    Route::get('/teacher-assessments/{assessment}/quiz', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'startQuiz'])->name('teacher-assessments.start');
+    Route::post('/teacher-assessments/{assessment}/submit-answer', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'submitAnswer'])->name('teacher-assessments.submit-answer');
+    Route::post('/teacher-assessments/{assessment}/complete', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'completeQuiz'])->name('teacher-assessments.complete');
+    Route::post('/teacher-assessments/{assessment}/retake', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'retakeQuiz'])->name('teacher-assessments.retake');
+    Route::get('/teacher-assessments/{assessment}/results', [App\Http\Controllers\Student\StudentTeacherAssessmentController::class, 'results'])->name('teacher-assessments.results');
     
     // Profile routes
-   // Profile routes
 Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.update.avatar');
 Route::get('/profile/avatar', [ProfileController::class, 'getCurrentAvatar'])->name('profile.get.avatar');
