@@ -228,6 +228,19 @@
                             </div>
                         </a>
                     </li>
+                    
+                    <li class="tooltip-container">
+                        <a href="{{ route('teacher.announcements.index') }}"
+                            class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('teacher.announcements*') ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <span class="material-symbols-outlined mr-3">announcement</span>
+                            <span x-show="sidebarOpen">Announcements</span>
+
+                            <div x-cloak x-show="!sidebarOpen"
+                                class="tooltip px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                Announcements
+                            </div>
+                        </a>
+                    </li>
 
                     <li class="tooltip-container">
                         <a href="{{ route('teacher.analytics') }}"
