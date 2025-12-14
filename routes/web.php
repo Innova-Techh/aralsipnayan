@@ -218,6 +218,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/assessments/{assessment}/results', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'results'])->name('assessments.results');
     Route::get('/assessments/{assessment}/student/{student}/attempts', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudentAttempts'])->name('assessments.student.attempts');
     Route::get('/assessments/review-session/{session}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'reviewSession'])->name('assessments.review-session');
+    Route::post('/assessments/{assessment}/archive', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'archive'])->name('assessments.archive');
+    Route::post('/assessments/{assessment}/unarchive', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'unarchive'])->name('assessments.unarchive');
     
     // Assessment Assignment API
     Route::get('/assessments/students/{section}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudents'])->name('assessments.students');
