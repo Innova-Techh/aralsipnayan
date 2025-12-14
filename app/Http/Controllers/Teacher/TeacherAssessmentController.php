@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class TeacherAssessmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $teacher = Auth::guard('admin')->user();
         
@@ -52,13 +52,43 @@ class TeacherAssessmentController extends Controller
             }
         }
         
-        // Get assessments created by this teacher
-        $assessments = Assessment::where('created_by', $teacher->id)
-            ->with(['assignments.student.studentProfile'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Get filter parameters
+        $statusFilter = $request->input('status');
+        $categoryFilter = $request->input('category');
+        $difficultyFilter = $request->input('difficulty');
         
-        return view('admin.teacher.assessments.index', compact('assessments', 'teacherSections', 'studentsData'));
+        // Build query for assessments created by this teacher
+        $query = Assessment::where('created_by', $teacher->id)
+            ->with(['assignments.student.studentProfile']);
+        
+        // Apply status filter (default: exclude archived)
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
+        } else {
+            // By default, exclude archived assessments
+            $query->where('status', '!=', 'Archived');
+        }
+        
+        // Apply category filter
+        if ($categoryFilter) {
+            $query->where('category', $categoryFilter);
+        }
+        
+        // Apply difficulty filter
+        if ($difficultyFilter) {
+            $query->where('difficulty', $difficultyFilter);
+        }
+        
+        $assessments = $query->orderBy('created_at', 'desc')->get();
+        
+        return view('admin.teacher.assessments.index', compact(
+            'assessments', 
+            'teacherSections', 
+            'studentsData',
+            'statusFilter',
+            'categoryFilter',
+            'difficultyFilter'
+        ));
     }
 
     public function create()
@@ -140,7 +170,7 @@ class TeacherAssessmentController extends Controller
             'available_from' => $request->available_from,
             'available_until' => $request->available_until,
             'created_by' => $teacherId,
-            'status' => ($request->has('sections') || $request->has('selected_students')) ? 'Active' : 'Draft'
+            'status' => 'Draft' // Will be updated to Active if assignments are created
         ]);
 
         // Handle selected bank questions
@@ -175,6 +205,9 @@ class TeacherAssessmentController extends Controller
             $selectedStudents = array_values(array_intersect($selectedStudents, $existingIds));
         }
 
+        // Track if any assignments were created
+        $assignmentsCreated = false;
+
         if (!empty($selectedStudents)) {
             // Assign directly to specific students
             AssessmentAssignment::where('assessment_id', $assessment->id)
@@ -192,7 +225,7 @@ class TeacherAssessmentController extends Controller
                     'status' => 'Assigned',
                 ]);
             }
-        
+            $assignmentsCreated = true;
         
         } elseif ($request->has('sections')) {
         
@@ -234,6 +267,10 @@ class TeacherAssessmentController extends Controller
                     ]);
                     $createdCount++;
                 }
+                
+                if ($createdCount > 0) {
+                    $assignmentsCreated = true;
+                }
         
             }
             
@@ -243,6 +280,12 @@ class TeacherAssessmentController extends Controller
                 'has_sections' => $request->has('sections'),
                 'assessment_id' => $assessment->id
             ]);
+        }
+
+        // Update status to Active if assignments were created
+        if ($assignmentsCreated) {
+            $assessment->status = 'Active';
+            $assessment->save();
         }
 
         return redirect()->route('teacher.assessments')->with('success', 'Assessment created successfully!');
@@ -806,5 +849,41 @@ class TeacherAssessmentController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Archive an assessment
+     */
+    public function archive(Assessment $assessment)
+    {
+        $teacher = Auth::guard('admin')->user();
+        
+        // Verify teacher owns this assessment
+        if ($assessment->created_by !== $teacher->id) {
+            return redirect()->route('teacher.assessments')->withErrors(['error' => 'Unauthorized']);
+        }
+        
+        $assessment->status = 'Archived';
+        $assessment->save();
+        
+        return redirect()->route('teacher.assessments')->with('success', 'Assessment archived successfully!');
+    }
+
+    /**
+     * Unarchive an assessment
+     */
+    public function unarchive(Assessment $assessment)
+    {
+        $teacher = Auth::guard('admin')->user();
+        
+        // Verify teacher owns this assessment
+        if ($assessment->created_by !== $teacher->id) {
+            return redirect()->route('teacher.assessments')->withErrors(['error' => 'Unauthorized']);
+        }
+        
+        $assessment->status = 'Active';
+        $assessment->save();
+        
+        return redirect()->route('teacher.assessments')->with('success', 'Assessment unarchived successfully!');
     }
 }
