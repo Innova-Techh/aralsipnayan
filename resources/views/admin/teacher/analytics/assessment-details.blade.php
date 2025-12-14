@@ -150,17 +150,17 @@
     <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow p-6 mb-8 border border-blue-200">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <span class="material-symbols-outlined text-blue-600 mr-2">psychology</span>
-            BKT Knowledge Tracing Overview
+            Mastery Score Tracing Overview
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="text-center">
                 <div class="text-3xl font-bold text-blue-600">{{ number_format($avgBktBefore, 4) }}</div>
-                <div class="text-sm font-medium text-gray-700">Average BKT Before</div>
+                <div class="text-sm font-medium text-gray-700">Average Mastery Score Before</div>
                 <div class="text-xs text-gray-500">Initial knowledge level</div>
             </div>
             <div class="text-center">
                 <div class="text-3xl font-bold text-blue-600">{{ number_format($avgBktAfter, 4) }}</div>
-                <div class="text-sm font-medium text-gray-700">Average BKT After</div>
+                <div class="text-sm font-medium text-gray-700">Average Mastery Score After</div>
                 <div class="text-xs text-gray-500">Final knowledge level</div>
             </div>
             <div class="text-center">
@@ -183,7 +183,7 @@
                      style="width: {{ min(max($avgBktAfter * 100, 0), 100) }}%"></div>
             </div>
             <div class="text-xs text-gray-500 mt-2">
-                BKT scores range from 0.0 (no mastery) to 1.0 (complete mastery). This assessment covered {{ $bktQuestionCount }} questions with BKT tracking.
+                Mastery scores range from 0.0 (no mastery) to 1.0 (complete mastery). This assessment covered {{ $bktQuestionCount }} questions with Mastery Score tracking.
             </div>
         </div>
     </div>
@@ -405,17 +405,17 @@
                 <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
                     <h5 class="font-medium text-gray-900 mb-3 flex items-center">
                         <span class="material-symbols-outlined text-blue-600 mr-2">psychology</span>
-                        BKT (Bayesian Knowledge Tracing) Analysis
+                        Mastery Score Analysis
                     </h5>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="text-center">
                             <div class="text-lg font-bold text-blue-600">{{ number_format($details['avg_bkt_before'], 4) }}</div>
-                            <div class="text-sm text-gray-600">Avg. BKT Before</div>
+                            <div class="text-sm text-gray-600">Avg. Mastery Score Before</div>
                             <div class="text-xs text-gray-500">Knowledge before question</div>
                         </div>
                         <div class="text-center">
                             <div class="text-lg font-bold text-blue-600">{{ number_format($details['avg_bkt_after'], 4) }}</div>
-                            <div class="text-sm text-gray-600">Avg. BKT After</div>
+                            <div class="text-sm text-gray-600">Avg. Mastery Score After</div>
                             <div class="text-xs text-gray-500">Knowledge after question</div>
                         </div>
                         <div class="text-center">
@@ -438,7 +438,7 @@
                                  style="width: {{ min(max(($details['avg_bkt_after'] * 100), 0), 100) }}%"></div>
                         </div>
                         <div class="text-xs text-gray-500 mt-1">
-                            BKT Score represents the probability (0-1) that a student has mastered this concept
+                            Mastery Score represents the probability (0-1) that a student has mastered this concept
                         </div>
                     </div>
                 </div>
