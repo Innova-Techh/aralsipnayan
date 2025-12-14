@@ -17,6 +17,67 @@
         </a>
     </div>
 
+    <!-- Filter Section -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-gray-600">filter_list</span>
+                <span class="font-medium text-gray-700">Filters:</span>
+            </div>
+            
+            <!-- Status Filter -->
+            <div class="flex-1 min-w-[150px]">
+                <select id="statusFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Statuses</option>
+                    <option value="Draft" {{ $statusFilter == 'Draft' ? 'selected' : '' }}>Draft</option>
+                    <option value="Active" {{ $statusFilter == 'Active' ? 'selected' : '' }}>Active</option>
+                    <option value="Completed" {{ $statusFilter == 'Completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="Archived" {{ $statusFilter == 'Archived' ? 'selected' : '' }}>Archived</option>
+                </select>
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="flex-1 min-w-[150px]">
+                <select id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Categories</option>
+                    <option value="Number & Algebra" {{ $categoryFilter == 'Number & Algebra' ? 'selected' : '' }}>Number & Algebra</option>
+                    <option value="Measurement & Geometry" {{ $categoryFilter == 'Measurement & Geometry' ? 'selected' : '' }}>Measurement & Geometry</option>
+                    <option value="Data & Probability" {{ $categoryFilter == 'Data & Probability' ? 'selected' : '' }}>Data & Probability</option>
+                </select>
+            </div>
+            
+            <!-- Difficulty Filter -->
+            <div class="flex-1 min-w-[150px]">
+                <select id="difficultyFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Difficulties</option>
+                    <option value="Easy" {{ $difficultyFilter == 'Easy' ? 'selected' : '' }}>Easy</option>
+                    <option value="Medium" {{ $difficultyFilter == 'Medium' ? 'selected' : '' }}>Medium</option>
+                    <option value="Hard" {{ $difficultyFilter == 'Hard' ? 'selected' : '' }}>Hard</option>
+                    <option value="Mixed" {{ $difficultyFilter == 'Mixed' ? 'selected' : '' }}>Mixed</option>
+                </select>
+            </div>
+            
+            <!-- Clear Filters Button -->
+            <button onclick="clearFilters()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">clear</span>
+                Clear
+            </button>
+            
+            <!-- Active Filter Count -->
+            @php
+                $activeFilters = 0;
+                if ($statusFilter) $activeFilters++;
+                if ($categoryFilter) $activeFilters++;
+                if ($difficultyFilter) $activeFilters++;
+            @endphp
+            @if($activeFilters > 0)
+                <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">
+                    {{ $activeFilters }} {{ $activeFilters == 1 ? 'filter' : 'filters' }} active
+                </span>
+            @endif
+        </div>
+    </div>
+
     <!-- Assessment Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($assessments as $assessment)
@@ -125,14 +186,16 @@
                     </p>
                 </div>
                 <div class="flex space-x-2">
-                    @if($assessment->status === 'Active' && $assessment->assignments->count() > 0)
+                    @if(($assessment->status === 'Active' || $assessment->status === 'Completed') && $assessment->assignments->count() > 0)
                         <a href="{{ route('teacher.assessments.results', $assessment->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Results</a>
                     @elseif($assessment->status === 'Draft')
                         <button onclick="openAssignModal({{ $assessment->id }})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Assign</button>
                     @endif
                     <button onclick="openEditModal({{ $assessment->id }}, '{{ $assessment->title }}', '{{ $assessment->description }}', '{{ $assessment->category }}', {{ $assessment->number_of_questions }}, {{ $assessment->time_limit }}, '{{ $assessment->difficulty }}', {{ $assessment->is_live_quiz ? 'true' : 'false' }}, '{{ $assessment->available_from }}', '{{ $assessment->available_until }}')" class="text-gray-600 hover:text-gray-800 text-sm font-medium">Edit</button>
-                    @if($assessment->status === 'Completed')
-                        <button class="text-gray-600 hover:text-gray-800 text-sm font-medium">Archive</button>
+                    @if($assessment->status === 'Archived')
+                        <button onclick="unarchiveAssessment({{ $assessment->id }})" class="text-green-600 hover:text-green-800 text-sm font-medium">Unarchive</button>
+                    @else
+                        <button onclick="archiveAssessment({{ $assessment->id }})" class="text-orange-600 hover:text-orange-800 text-sm font-medium">Archive</button>
                     @endif
                 </div>
             </div>
@@ -1112,5 +1175,75 @@ document.getElementById('classSearch').addEventListener('input', function(e) {
         }
     });
 });
+
+// Filter Functions
+function applyFilters() {
+    const status = document.getElementById('statusFilter').value;
+    const category = document.getElementById('categoryFilter').value;
+    const difficulty = document.getElementById('difficultyFilter').value;
+    
+    // Build query string
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (category) params.append('category', category);
+    if (difficulty) params.append('difficulty', difficulty);
+    
+    // Reload page with filters
+    const queryString = params.toString();
+    window.location.href = '{{ route("teacher.assessments") }}' + (queryString ? '?' + queryString : '');
+}
+
+function clearFilters() {
+    window.location.href = '{{ route("teacher.assessments") }}';
+}
+
+// Archive/Unarchive Functions
+function archiveAssessment(assessmentId) {
+    if (!confirm('Are you sure you want to archive this assessment? It will be hidden from the default view.')) {
+        return;
+    }
+    
+    // Create a form and submit it
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/teacher/assessments/${assessmentId}/archive`;
+    
+    // Add CSRF token
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function unarchiveAssessment(assessmentId) {
+    if (!confirm('Are you sure you want to unarchive this assessment?')) {
+        return;
+    }
+    
+    // Create a form and submit it
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/teacher/assessments/${assessmentId}/unarchive`;
+    
+    // Add CSRF token
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_token';
+    csrfInput.value = '{{ csrf_token() }}';
+    form.appendChild(csrfInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Add event listeners for filter dropdowns
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
+document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
+
 </script>
 @endsection
