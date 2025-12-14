@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Models\AssessmentAssignment;
+use App\Models\QuizResult;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\LeaderboardController;
 
@@ -58,13 +61,50 @@ class DashboardController extends Controller
 
         // REMOVED: Level-Up System Data (for UI-only version)
         // This will be added back when we implement the full backend
+
+        // Get student's section from student_profile
+        $studentProfileData = DB::table('student_profile')->where('user_id', $user->id)->first();
+        $studentSection = $studentProfileData ? $studentProfileData->section : null;
+
+        // Get assessments assigned to this student
+        $allAssignments = AssessmentAssignment::where(function($query) use ($user, $studentSection) {
+            // First check for assignments specifically to this student
+            $query->where('student_id', $user->id)
+                  // Then check for section-wide assignments (where student_id is null)
+                  ->orWhere(function($q) use ($studentSection) {
+                      // Handle both "A" and "Section A" formats
+                      $q->where(function($subQ) use ($studentSection) {
+                          $subQ->where('section', $studentSection)
+                               ->orWhere('section', 'Section ' . $studentSection);
+                      })
+                      ->whereNull('student_id'); // Only section-wide assignments
+                  });
+        })
+        ->with(['assessment' => function($query) {
+            $query->where('status', 'Active');
+        }])
+        ->whereHas('assessment', function($query) {
+            $query->where('status', 'Active');
+        })
+        ->get();
+
+        // Check for completed assessments and filter for pending only
+        $completedAssessmentIds = QuizResult::where('student_id', $user->id)
+            ->pluck('assessment_id')
+            ->toArray();
+
+        $pendingAssessments = $allAssignments->filter(function ($assignment) use ($completedAssessmentIds) {
+            return !in_array($assignment->assessment_id, $completedAssessmentIds);
+        });
+
         
         return view('student.dashboard', compact(
             'recentAchievements', 
             'leaderboardData', 
             'leaderboardTop5', 
             'userAvatarUrl',
-            'userProfile'   // Add user profile for dashboard stats
+            'userProfile',   // Add user profile for dashboard stats
+            'pendingAssessments'
         ));
     }
     
