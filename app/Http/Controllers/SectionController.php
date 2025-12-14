@@ -47,11 +47,20 @@ class SectionController extends Controller
         ->groupBy('assessment_id')
         ->get();
     
+        // Check status from quiz results
+        $completedAssessmentIds = \App\Models\QuizResult::where('student_id', $user->id)
+                                    ->pluck('assessment_id')
+                                    ->toArray();
+
         // Convert to sections format for the view
-        $sections = $assignments->map(function($assignment) {
+        $sections = $assignments->map(function($assignment) use ($completedAssessmentIds) {
             if (!$assignment->assessment) return null;
             
             $assessment = $assignment->assessment;
+            
+            // Check if user has already completed this assessment
+            $isCompleted = in_array($assessment->id, $completedAssessmentIds);
+            
             $colors = [
                 'Number & Algebra' => 'from-blue-400 to-purple-600',
                 'Measurement & Geometry' => 'from-green-400 to-teal-600', 
@@ -68,11 +77,21 @@ class SectionController extends Controller
                 'color' => $colors[$assessment->category] ?? 'from-gray-400 to-gray-600',
                 'is_live_quiz' => $assessment->is_live_quiz,
                 'assignment_id' => $assignment->id,
-                'status' => $assignment->status
+                'status' => $isCompleted ? 'Completed' : $assignment->status // Override status if completed in results
             ];
         })->filter()->values()->toArray();
+
+        // Fetch announcements for the student
+        // Matches assignments for the section or specifically for the student
+        $announcements = \App\Models\Announcement::whereHas('assignments', function($query) use ($studentSection) {
+            $query->where('section', $studentSection)
+                  ->orWhere('section', 'Section ' . $studentSection);
+        })
+        ->with('creator.teacherProfile')
+        ->orderBy('created_at', 'desc')
+        ->get();
     
-        return view('student.sections', compact('sections'));
+        return view('student.sections', compact('sections', 'announcements'));
     }
 
     /**
