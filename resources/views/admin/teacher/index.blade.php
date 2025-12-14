@@ -63,7 +63,7 @@
                 </a>
 
                 <!-- Send Announcement -->
-                <a href="#"
+                <a href="{{ route('teacher.announcements.index') }}"
                     class="bg-white border border-gray-200 rounded-2xl p-6 hover:border-orange-500 hover:shadow-md transition-all duration-200 group">
                     <div class="flex items-start space-x-4">
                         <div class="p-2 bg-gray-50 rounded-lg group-hover:bg-orange-50 transition-colors">
