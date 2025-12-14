@@ -531,6 +531,9 @@ class StudentTeacherAssessmentController extends Controller
             ]);
         }
 
+        // Check if all students have completed this assessment
+        $this->checkAssessmentCompletion($assessment);
+
         // Clear quiz session
         session()->forget([
             'quiz_assessment_id', 'quiz_session_id', 'quiz_questions', 'current_question_index',
@@ -540,6 +543,39 @@ class StudentTeacherAssessmentController extends Controller
         // Redirect with success message
         return redirect()->route('teacher-assessments.show', $assessment->id)
             ->with('success', "Quiz completed! Score: {$session->correct_answers}/{$session->total_questions} ({$accuracyPercentage}%) | Points: {$session->total_points_earned}");
+    }
+
+    /**
+     * Check if all assigned students have completed the assessment
+     * If yes, mark the assessment as Completed
+     */
+    private function checkAssessmentCompletion(Assessment $assessment)
+    {
+        // Get total number of assignments for this assessment
+        $totalAssignments = AssessmentAssignment::where('assessment_id', $assessment->id)->count();
+        
+        // Get number of completed assignments
+        $completedAssignments = AssessmentAssignment::where('assessment_id', $assessment->id)
+            ->where('status', 'Completed')
+            ->count();
+        
+        Log::info('Checking assessment completion', [
+            'assessment_id' => $assessment->id,
+            'total_assignments' => $totalAssignments,
+            'completed_assignments' => $completedAssignments,
+            'current_status' => $assessment->status
+        ]);
+        
+        // If all assignments are completed and assessment is Active, mark it as Completed
+        if ($totalAssignments > 0 && $completedAssignments === $totalAssignments && $assessment->status === 'Active') {
+            $assessment->status = 'Completed';
+            $assessment->save();
+            
+            Log::info('Assessment marked as Completed - all students finished', [
+                'assessment_id' => $assessment->id,
+                'total_students' => $totalAssignments
+            ]);
+        }
     }
 
     /**
