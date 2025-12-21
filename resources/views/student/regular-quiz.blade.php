@@ -1782,26 +1782,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showPointsBreakdown(data) {
         const popup = document.getElementById('points-breakdown-popup');
+        
+        // Check if popup element exists (it might be commented out)
+        if (!popup) {
+            console.log('Points breakdown popup not found - skipping display');
+            return;
+        }
+        
         const breakdownBase = document.getElementById('breakdown-base');
         const breakdownBonus = document.getElementById('breakdown-bonus');
         const breakdownBonusRow = document.getElementById('breakdown-bonus-row');
         const breakdownTotal = document.getElementById('breakdown-total');
         const breakdownStats = document.getElementById('breakdown-stats');
 
-        // Populate breakdown data
-        breakdownBase.textContent = `+${data.base_points || 0}`;
-        breakdownBonus.textContent = `+${data.bonus_points || 0}`;
-        breakdownTotal.textContent = `+${data.points_earned || 0}`;
+        // Populate breakdown data with null checks
+        if (breakdownBase) breakdownBase.textContent = `+${data.base_points || 0}`;
+        if (breakdownBonus) breakdownBonus.textContent = `+${data.bonus_points || 0}`;
+        if (breakdownTotal) breakdownTotal.textContent = `+${data.points_earned || 0}`;
 
         // Hide bonus row if no bonus
-        if (!data.bonus_points || data.bonus_points === 0) {
-            breakdownBonusRow.style.display = 'none';
-        } else {
-            breakdownBonusRow.style.display = 'flex';
+        if (breakdownBonusRow) {
+            if (!data.bonus_points || data.bonus_points === 0) {
+                breakdownBonusRow.style.display = 'none';
+            } else {
+                breakdownBonusRow.style.display = 'flex';
+            }
         }
 
         // Add gamification stats if available
-        if (data.gamification) {
+        if (data.gamification && breakdownStats) {
             const stats = [];
             if (data.gamification.total_points) {
                 stats.push(`Total: ${data.gamification.total_points} pts`);
@@ -1827,6 +1836,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hidePointsBreakdown() {
         const popup = document.getElementById('points-breakdown-popup');
+        if (!popup) return; // Safety check
         popup.style.transform = 'translateY(100%)';
         popup.style.opacity = '0';
     }
