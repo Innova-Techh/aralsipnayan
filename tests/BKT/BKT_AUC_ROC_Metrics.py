@@ -26,7 +26,7 @@ class SimpleBKTAUCTest:
                 host='localhost',
                 database='aralsipnayandb',
                 user='root',
-                password='root',
+                password='',
                 charset='utf8mb4'
             )
             print("✓ Connected to database successfully")
