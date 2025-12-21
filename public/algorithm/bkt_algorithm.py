@@ -16,14 +16,10 @@ from decimal import Decimal, ROUND_HALF_UP
 
 class BKTAlgorithm:
     def __init__(self):
-        # When running locally (XAMPP), set DB_HOST=localhost
-        # When running in Docker, it defaults to laravel_db (the MySQL service name)
-        db_host = os.environ.get('DB_HOST', 'laravel_db')
-        
         self.db_config = {
-            'host': db_host,
+            'host': 'localhost',
             'user': 'root',
-            'password': 'root',
+            'password': '',
             'database': 'aralsipnayandb',
             'charset': 'utf8mb4'
         }
@@ -1394,6 +1390,10 @@ def main():
             else:
                 session_id = sys.argv[2]
                 result = bkt.complete_diagnostic(session_id)
+        
+        elif action == 'update_time_factors':
+            # Update NULL phase time factors in existing sessions
+            result = bkt.update_null_phase_time_factors()
         
         elif action == 'update_time_factors':
             # Update NULL phase time factors in existing sessions
