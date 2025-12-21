@@ -10,18 +10,13 @@ import sys
 import json
 import mysql.connector
 from datetime import datetime, timedelta
-import os
 
 class EnhancedFisherYatesShuffle:
     def __init__(self):
-       # When running locally (XAMPP), set DB_HOST=localhost
-        # When running in Docker, it defaults to laravel_db (the MySQL service name)
-        db_host = os.environ.get('DB_HOST', 'laravel_db')
-        
         self.db_config = {
-            'host': db_host,
+            'host': 'localhost',
             'user': 'root',
-            'password': 'root',
+            'password': '',
             'database': 'aralsipnayandb',
             'charset': 'utf8mb4'
         }
