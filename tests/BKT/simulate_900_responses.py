@@ -20,7 +20,7 @@ class ResponseSimulator:
         self.db_config = {
             'host': 'localhost',
             'user': 'root', 
-            'password': 'root',
+            'password': '',
             'database': 'aralsipnayandb',
             'charset': 'utf8mb4'
         }
