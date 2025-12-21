@@ -17,163 +17,6 @@ class AssessmentController extends Controller
     {
         $this->assessmentGenerator = new AssessmentGenerationController();
     }
-    
-    /**
-     * Get the correct Python command for the environment
-     */
-    private function getPythonCommand()
-    {
-        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        
-        if ($isWindows) {
-            // On Windows, try python first, then python3
-            $testOutput = shell_exec('python --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python';
-            }
-            
-            $testOutput = shell_exec('python3 --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python3';
-            }
-            
-            // Default for Windows
-            return 'python';
-        } else {
-            // On Linux/Unix, try python3 first, then python
-            $python3 = shell_exec('which python3 2>&1');
-            if ($python3 && trim($python3) !== '' && file_exists(trim($python3))) {
-                return 'python3';
-            }
-            
-            $python = shell_exec('which python 2>&1');
-            if ($python && trim($python) !== '' && file_exists(trim($python))) {
-                return 'python';
-            }
-            
-            // Fallback: try direct execution
-            $testOutput = shell_exec('python3 --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python3';
-            }
-            
-            $testOutput = shell_exec('python --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python';
-            }
-            
-            // Default fallback for Linux
-            return 'python3';
-        }
-    }
-    
-    /**
-     * Execute Python script with proper error handling
-     */
-    private function executePythonScript($scriptPath, $args = [])
-    {
-        $python = $this->getPythonCommand();
-        $fullScriptPath = base_path('public/algorithm/' . $scriptPath);
-        
-        // Build command with proper escaping
-        // On Windows, use quotes around the full path; on Linux, use escapeshellarg
-        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        
-        if ($isWindows) {
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($fullScriptPath);
-        } else {
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($fullScriptPath);
-        }
-        
-        foreach ($args as $arg) {
-            $command .= ' ' . escapeshellarg($arg);
-        }
-        
-        // Capture both stdout and stderr
-        $command .= ' 2>&1';
-        
-        Log::info("Executing Python script", [
-            'command' => $command,
-            'script' => $fullScriptPath,
-            'python' => $python,
-            'args' => $args
-        ]);
-        
-        $output = shell_exec($command);
-        
-        if ($output === null || trim($output) === '') {
-            Log::error("Python script returned no output", [
-                'command' => $command,
-                'script' => $fullScriptPath,
-                'python' => $python
-            ]);
-            throw new \Exception('Python script returned no output. Command: ' . $command);
-        }
-        
-        // Filter out ERROR lines that are printed to stderr (captured via 2>&1)
-        // The Python script outputs ERROR messages to stderr which get mixed with JSON output
-        $lines = explode("\n", $output);
-        $jsonLines = [];
-        $errorLines = [];
-        
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line)) {
-                continue;
-            }
-            // Check if line starts with "ERROR:" (from Python's log_error function)
-            if (strpos($line, 'ERROR:') === 0) {
-                $errorLines[] = $line;
-                // Log the error but don't include it in JSON parsing
-                Log::warning("Python script error output", [
-                    'error' => $line,
-                    'script' => $fullScriptPath
-                ]);
-            } else {
-                // Keep non-error lines for JSON parsing
-                $jsonLines[] = $line;
-            }
-        }
-        
-        // Try to find JSON in the output
-        // JSON should be the last complete JSON object in the output
-        $jsonOutput = implode("\n", $jsonLines);
-        
-        // If no JSON lines found, try the original output
-        if (empty($jsonOutput)) {
-            $jsonOutput = $output;
-        }
-        
-        // Try to extract JSON from the output (look for JSON object boundaries)
-        // Find the last occurrence of { and } to extract the JSON
-        // This handles cases where ERROR messages are mixed with JSON
-        $lastOpenBrace = strrpos($jsonOutput, '{');
-        $lastCloseBrace = strrpos($jsonOutput, '}');
-        
-        if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-            $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-            // Verify it's valid JSON before using it
-            $testDecode = json_decode($potentialJson, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $jsonOutput = $potentialJson;
-            }
-        }
-        
-        $result = json_decode($jsonOutput, true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error("Invalid JSON from Python script", [
-                'command' => $command,
-                'raw_output' => $output,
-                'filtered_output' => $jsonOutput,
-                'error_lines' => $errorLines,
-                'json_error' => json_last_error_msg()
-            ]);
-            throw new \Exception('Invalid JSON response from Python script: ' . json_last_error_msg() . '. Output: ' . substr($output, 0, 500));
-        }
-        
-        return $result;
-    }
 
     /**
      * Show assessments page
@@ -344,14 +187,13 @@ class AssessmentController extends Controller
             
             try {
                 // Get current questions for the incomplete session
-                $result = $this->executePythonScript('bkt_algorithm.py', [
-                    'resume_diagnostic',
-                    $user->id,
-                    $dbCompetency,
-                    $incompleteSession->session_id
-                ]);
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $command = "python \"{$scriptPath}\" resume_diagnostic {$user->id} {$dbCompetency} {$incompleteSession->session_id}";
                 
-                if ($result && isset($result['success']) && $result['success']) {
+                $output = shell_exec($command);
+                $result = json_decode($output, true);
+                
+                if ($result && $result['success']) {
                     // Restore session variables
                     session([
                         'diagnostic_session_id' => $incompleteSession->session_id,
@@ -365,91 +207,26 @@ class AssessmentController extends Controller
                         ->with('diagnostic_mode', true)
                         ->with('resumed_session', true);
                 } else {
-                    // If resume fails, clean up the incomplete session from database
-                    $errorMessage = $result['message'] ?? ($result['error'] ?? 'Unknown error');
+                    // If resume fails, continue to start new diagnostic
                     Log::warning("Failed to resume diagnostic session, starting new one", [
                         'session_id' => $incompleteSession->session_id,
-                        'error' => $errorMessage,
-                        'result' => $result
-                    ]);
-                    
-                    // Clean up the failed session from database
-                    try {
-                        $this->executePythonScript('bkt_algorithm.py', [
-                            'cleanup_diagnostic',
-                            $incompleteSession->session_id
-                        ]);
-                    } catch (\Exception $cleanupException) {
-                        Log::warning('Failed to cleanup diagnostic session', [
-                            'session_id' => $incompleteSession->session_id,
-                            'error' => $cleanupException->getMessage()
-                        ]);
-                    }
-                    
-                    // Clear PHP session data as well
-                    session()->forget([
-                        'diagnostic_session_id', 
-                        'diagnostic_competency', 
-                        'diagnostic_phase', 
-                        'diagnostic_questions', 
-                        'current_question_index'
-                    ]);
-                    
-                    Log::info("Cleaned up failed diagnostic session before starting new one", [
-                        'old_session_id' => $incompleteSession->session_id,
-                        'user_id' => $user->id,
-                        'competency' => $dbCompetency
+                        'error' => $result['message'] ?? 'Unknown error'
                     ]);
                 }
             } catch (\Exception $e) {
                 Log::error('Failed to resume diagnostic session: ' . $e->getMessage());
-                
-                // Clean up the incomplete session if resume throws an exception
-                if (isset($incompleteSession)) {
-                    try {
-                        $this->executePythonScript('bkt_algorithm.py', [
-                            'cleanup_diagnostic',
-                            $incompleteSession->session_id
-                        ]);
-                        
-                        // Clear PHP session data as well
-                        session()->forget([
-                            'diagnostic_session_id', 
-                            'diagnostic_competency', 
-                            'diagnostic_phase', 
-                            'diagnostic_questions', 
-                            'current_question_index'
-                        ]);
-                        
-                        Log::info("Cleaned up incomplete diagnostic session after exception", [
-                            'old_session_id' => $incompleteSession->session_id,
-                            'user_id' => $user->id,
-                            'competency' => $dbCompetency
-                        ]);
-                    } catch (\Exception $cleanupException) {
-                        Log::error('Failed to cleanup diagnostic session: ' . $cleanupException->getMessage());
-                    }
-                }
                 // Continue to start new diagnostic if resume fails
             }
         }
         
         try {
-            // Clear any existing diagnostic session data from PHP session first
+            // Clear any existing diagnostic session data first
             $existingSessionId = session('diagnostic_session_id');
             if ($existingSessionId) {
                 // Cleanup existing session in database
-                try {
-                    $this->executePythonScript('bkt_algorithm.py', [
-                        'cleanup_diagnostic',
-                        $existingSessionId
-                    ]);
-                } catch (\Exception $cleanupException) {
-                    Log::warning('Failed to cleanup existing diagnostic session', [
-                        'session_id' => $existingSessionId,
-                        'error' => $cleanupException->getMessage()
-                    ]);
-                }
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $cleanupCommand = "python \"{$scriptPath}\" cleanup_diagnostic {$existingSessionId}";
+                shell_exec($cleanupCommand);
                 
                 // Clear session data
                 session()->forget([
@@ -468,13 +245,13 @@ class AssessmentController extends Controller
             }
             
             // Call Python script to start diagnostic
-            $result = $this->executePythonScript('bkt_algorithm.py', [
-                'start_diagnostic',
-                $user->id,
-                $dbCompetency
-            ]);
+            $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+            $command = "python \"{$scriptPath}\" start_diagnostic {$user->id} {$dbCompetency}";
             
-            if ($result && isset($result['success']) && $result['success']) {
+            $output = shell_exec($command);
+            $result = json_decode($output, true);
+            
+            if ($result && $result['success']) {
                 // Store session in session
                 session([
                     'diagnostic_session_id' => $result['session_id'],
@@ -487,14 +264,7 @@ class AssessmentController extends Controller
                 return redirect()->route('student.quiz.show', $category)
                     ->with('diagnostic_mode', true);
             } else {
-                $errorMessage = $result['message'] ?? ($result['error'] ?? 'Failed to start diagnostic');
-                Log::error('Diagnostic start failed', [
-                    'user_id' => $user->id,
-                    'competency' => $dbCompetency,
-                    'error' => $errorMessage,
-                    'result' => $result
-                ]);
-                throw new \Exception($errorMessage);
+                throw new \Exception($result['message'] ?? 'Failed to start diagnostic');
             }
             
         } catch (\Exception $e) {
@@ -545,16 +315,11 @@ class AssessmentController extends Controller
             $competency = session('diagnostic_competency');
             
             // Record answer via Python script
-            $result = $this->executePythonScript('bkt_algorithm.py', [
-                'record_answer',
-                $userId,
-                $competency,
-                $sessionId,
-                $request->question_id,
-                $request->answer,
-                $request->time_taken,
-                $isCorrect ? 'true' : 'false'
-            ]);
+            $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+            $command = "python \"{$scriptPath}\" record_answer {$userId} {$competency} {$sessionId} {$request->question_id} \"{$request->answer}\" {$request->time_taken} " . ($isCorrect ? 'true' : 'false');
+            
+            $output = shell_exec($command);
+            $result = json_decode($output, true);
             
             // Move to next question
             $nextIndex = $currentIndex + 1;
@@ -648,16 +413,15 @@ class AssessmentController extends Controller
                 return ['success' => false, 'message' => 'Missing session data'];
             }
             
-            $result = $this->executePythonScript('bkt_algorithm.py', [
-                'complete_phase',
-                $userId,
-                $competency,
-                $sessionId
-            ]);
+            $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+            $command = "python \"{$scriptPath}\" complete_phase {$userId} {$competency} {$sessionId}";
+            
+            $output = shell_exec($command);
+            $result = json_decode($output, true);
             
             // Check if result is valid and has required keys
             if (!$result || !isset($result['success'])) {
-                Log::error('Invalid response from Python script', ['result' => $result]);
+                Log::error('Invalid response from Python script: ' . $output);
                 return ['success' => false, 'message' => 'Invalid script response'];
             }
             
@@ -1253,18 +1017,11 @@ class AssessmentController extends Controller
             
             if ($sessionId && $competency) {
                 // Call Python script to cleanup diagnostic session
-                try {
-                    $result = $this->executePythonScript('bkt_algorithm.py', [
-                        'cleanup_diagnostic',
-                        $sessionId
-                    ]);
-                } catch (\Exception $e) {
-                    Log::warning('Failed to cleanup diagnostic session via Python script', [
-                        'session_id' => $sessionId,
-                        'error' => $e->getMessage()
-                    ]);
-                    $result = null;
-                }
+                $scriptPath = base_path('public/algorithm/bkt_algorithm.py');
+                $command = "python \"{$scriptPath}\" cleanup_diagnostic {$sessionId}";
+                
+                $output = shell_exec($command);
+                $result = json_decode($output, true);
                 
                 // Clear session data regardless of Python script result
                 session()->forget([

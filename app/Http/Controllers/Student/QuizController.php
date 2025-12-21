@@ -11,55 +11,6 @@ use Illuminate\Support\Facades\Log;
 class QuizController extends Controller
 {
     /**
-     * Get the correct Python command for the environment
-     */
-    private function getPythonCommand()
-    {
-        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        
-        if ($isWindows) {
-            // On Windows, try python first, then python3
-            $testOutput = shell_exec('python --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python';
-            }
-            
-            $testOutput = shell_exec('python3 --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python3';
-            }
-            
-            // Default for Windows
-            return 'python';
-        } else {
-            // On Linux/Unix, try python3 first, then python
-            $python3 = shell_exec('which python3 2>&1');
-            if ($python3 && trim($python3) !== '' && file_exists(trim($python3))) {
-                return 'python3';
-            }
-            
-            $python = shell_exec('which python 2>&1');
-            if ($python && trim($python) !== '' && file_exists(trim($python))) {
-                return 'python';
-            }
-            
-            // Fallback: try direct execution
-            $testOutput = shell_exec('python3 --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python3';
-            }
-            
-            $testOutput = shell_exec('python --version 2>&1');
-            if ($testOutput && strpos($testOutput, 'Python') !== false) {
-                return 'python';
-            }
-            
-            // Default fallback for Linux
-            return 'python3';
-        }
-    }
-
-    /**
      * Show quiz interface
      */
     public function show(Request $request, $category)
@@ -226,38 +177,10 @@ class QuizController extends Controller
             $questionCount = isset($parts[4]) ? (int)$parts[4] : 15;
             
             // Get available questions using cooldown system
-            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/question_cooldown.py');
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' get_available ' . escapeshellarg($userId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($difficultyLevel) . ' ' . escapeshellarg($questionCount) . ' 2>&1';
+            $command = "python \"{$scriptPath}\" get_available {$userId} {$competency} {$difficultyLevel} {$questionCount}";
             
             $output = shell_exec($command);
-            
-            // Filter out ERROR and DEBUG lines
-            if ($output) {
-                $lines = explode("\n", $output);
-                $jsonLines = [];
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                        continue;
-                    }
-                    $jsonLines[] = $line;
-                }
-                $jsonOutput = implode("\n", $jsonLines);
-                if (!empty($jsonOutput)) {
-                    // Extract JSON
-                    $lastOpenBrace = strrpos($jsonOutput, '{');
-                    $lastCloseBrace = strrpos($jsonOutput, '}');
-                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-                        $testDecode = json_decode($potentialJson, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $output = $potentialJson;
-                        }
-                    }
-                }
-            }
-            
             $result = json_decode($output, true);
             
             if (!$result || !$result['success'] || empty($result['available_questions'])) {
@@ -297,38 +220,10 @@ class QuizController extends Controller
     {
         try {
             // Get available questions using cooldown system
-            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/question_cooldown.py');
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' get_available ' . escapeshellarg($userId) . ' ' . escapeshellarg($competency) . ' ' . escapeshellarg($difficultyLevel) . ' 15 2>&1';
+            $command = "python \"{$scriptPath}\" get_available {$userId} {$competency} {$difficultyLevel} 15";
             
             $output = shell_exec($command);
-            
-            // Filter out ERROR and DEBUG lines
-            if ($output) {
-                $lines = explode("\n", $output);
-                $jsonLines = [];
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                        continue;
-                    }
-                    $jsonLines[] = $line;
-                }
-                $jsonOutput = implode("\n", $jsonLines);
-                if (!empty($jsonOutput)) {
-                    // Extract JSON
-                    $lastOpenBrace = strrpos($jsonOutput, '{');
-                    $lastCloseBrace = strrpos($jsonOutput, '}');
-                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-                        $testDecode = json_decode($potentialJson, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $output = $potentialJson;
-                        }
-                    }
-                }
-            }
-            
             $result = json_decode($output, true);
             
             if (!$result || !$result['success'] || empty($result['available_questions'])) {
@@ -368,39 +263,11 @@ class QuizController extends Controller
      */
     private function createShuffledQuestionPool($assessmentId, $questions)
     {
-        $python = $this->getPythonCommand();
         $shuffleScript = base_path('public/algorithm/fisher_yates.py');
         $questionsJson = json_encode($questions);
-        $shuffleCommand = escapeshellarg($python) . ' ' . escapeshellarg($shuffleScript) . ' create_pool ' . escapeshellarg($assessmentId) . ' ' . escapeshellarg($questionsJson) . ' 2>&1';
+        $shuffleCommand = "python \"{$shuffleScript}\" create_pool {$assessmentId} '" . addslashes($questionsJson) . "'";
         
         $shuffleOutput = shell_exec($shuffleCommand);
-        
-        // Filter out ERROR and DEBUG lines
-        if ($shuffleOutput) {
-            $lines = explode("\n", $shuffleOutput);
-            $jsonLines = [];
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                    continue;
-                }
-                $jsonLines[] = $line;
-            }
-            $jsonOutput = implode("\n", $jsonLines);
-            if (!empty($jsonOutput)) {
-                // Extract JSON
-                $lastOpenBrace = strrpos($jsonOutput, '{');
-                $lastCloseBrace = strrpos($jsonOutput, '}');
-                if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-                    $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-                    $testDecode = json_decode($potentialJson, true);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $shuffleOutput = $potentialJson;
-                    }
-                }
-            }
-        }
-        
         $shuffleResult = json_decode($shuffleOutput, true);
         
         if (!$shuffleResult || !$shuffleResult['success']) {
@@ -416,38 +283,10 @@ class QuizController extends Controller
     private function getCurrentQuestion($assessmentId)
     {
         try {
-            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' next_question ' . escapeshellarg($assessmentId) . ' 2>&1';
+            $command = "python \"{$scriptPath}\" next_question {$assessmentId}";
             
             $output = shell_exec($command);
-            
-            // Filter out ERROR and DEBUG lines
-            if ($output) {
-                $lines = explode("\n", $output);
-                $jsonLines = [];
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                        continue;
-                    }
-                    $jsonLines[] = $line;
-                }
-                $jsonOutput = implode("\n", $jsonLines);
-                if (!empty($jsonOutput)) {
-                    // Extract JSON
-                    $lastOpenBrace = strrpos($jsonOutput, '{');
-                    $lastCloseBrace = strrpos($jsonOutput, '}');
-                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-                        $testDecode = json_decode($potentialJson, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $output = $potentialJson;
-                        }
-                    }
-                }
-            }
-            
             $result = json_decode($output, true);
             
             if ($result && $result['success'] && isset($result['question'])) {
@@ -487,38 +326,10 @@ class QuizController extends Controller
     private function getAssessmentProgress($assessmentId)
     {
         try {
-            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $command = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' progress ' . escapeshellarg($assessmentId) . ' 2>&1';
+            $command = "python \"{$scriptPath}\" progress {$assessmentId}";
             
             $output = shell_exec($command);
-            
-            // Filter out ERROR and DEBUG lines
-            if ($output) {
-                $lines = explode("\n", $output);
-                $jsonLines = [];
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                        continue;
-                    }
-                    $jsonLines[] = $line;
-                }
-                $jsonOutput = implode("\n", $jsonLines);
-                if (!empty($jsonOutput)) {
-                    // Extract JSON
-                    $lastOpenBrace = strrpos($jsonOutput, '{');
-                    $lastCloseBrace = strrpos($jsonOutput, '}');
-                    if ($lastOpenBrace !== false && $lastCloseBrace !== false && $lastCloseBrace > $lastOpenBrace) {
-                        $potentialJson = substr($jsonOutput, $lastOpenBrace, $lastCloseBrace - $lastOpenBrace + 1);
-                        $testDecode = json_decode($potentialJson, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $output = $potentialJson;
-                        }
-                    }
-                }
-            }
-            
             $result = json_decode($output, true);
             
             if ($result && $result['success']) {
@@ -701,25 +512,9 @@ class QuizController extends Controller
                 ]);
             
             // Mark question as answered
-            $python = $this->getPythonCommand();
             $scriptPath = base_path('public/algorithm/fisher_yates.py');
-            $markCommand = escapeshellarg($python) . ' ' . escapeshellarg($scriptPath) . ' mark_answered ' . escapeshellarg($request->assessment_id) . ' ' . escapeshellarg($request->question_id) . ' 2>&1';
+            $markCommand = "python \"{$scriptPath}\" mark_answered {$request->assessment_id} {$request->question_id}";
             $markResult = shell_exec($markCommand);
-            
-            // Filter out ERROR and DEBUG lines from mark result
-            if ($markResult) {
-                $lines = explode("\n", $markResult);
-                $jsonLines = [];
-                foreach ($lines as $line) {
-                    $line = trim($line);
-                    if (empty($line) || strpos($line, 'ERROR:') === 0 || strpos($line, 'DEBUG:') === 0) {
-                        continue;
-                    }
-                    $jsonLines[] = $line;
-                }
-                $markResult = implode("\n", $jsonLines);
-            }
-            
             Log::info("Mark answered result: " . $markResult);
             
             // Small delay to ensure database is updated
