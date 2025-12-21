@@ -13,7 +13,7 @@
         <div class="bg-phase-counter drop-shadow-phase-counter backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 lg:px-9 lg:py-4">
             <span class="text-white font-semibold text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">
                 Question <span id="current-question-number">{{ $currentQuestion }}</span> of <span id="total-questions-number">{{ $totalQuestions }}</span>
-            </span>Your Progress in Number and Algebra
+            </span>
         </div>
 
         <!-- Timer -->
