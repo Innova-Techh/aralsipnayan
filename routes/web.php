@@ -144,14 +144,14 @@ Route::middleware(['student.auth', 'student.role:Student'])->prefix('student')->
         // Get hint for current question
         Route::post('/hint', [StudentQuizController::class, 'getHint'])->name('hint');
         
-        // Save quiz progress
-        Route::post('/save-progress', [AssessmentController::class, 'saveProgress'])->name('save-progress');
+        // Save quiz progress (for regular assessments)
+        Route::post('/save-progress', [RegularAssessmentController::class, 'saveProgress'])->name('save-progress');
         
-        // Get saved progress
-        Route::get('/get-progress/{sessionId}/{questionId}', [AssessmentController::class, 'getProgress'])->name('get-progress');
+        // Get saved progress (for regular assessments)
+        Route::get('/get-progress/{sessionId}/{questionId}', [RegularAssessmentController::class, 'getSavedProgress'])->name('get-progress');
         
-        // Clear progress
-        Route::delete('/clear-progress/{sessionId}', [AssessmentController::class, 'clearProgress'])->name('clear-progress');
+        // Clear progress (for regular assessments)
+        Route::delete('/clear-progress/{sessionId}', [RegularAssessmentController::class, 'clearSavedProgress'])->name('clear-progress');
         
         // Clear diagnostic session
         Route::post('/clear-diagnostic', [AssessmentController::class, 'clearDiagnosticSession'])->name('clear-diagnostic');
