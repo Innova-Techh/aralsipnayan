@@ -5,6 +5,14 @@
 @section('content')
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+@php
+    // Get session_id from assessment_sessions table using the assessmentId
+    $assessmentSession = \App\Models\AssessmentSession::where('assessment_id', $assessmentId)
+        ->where('user_id', auth('student')->id())
+        ->first();
+    $sessionId = $assessmentSession ? $assessmentSession->session_id : null;
+@endphp
+
 <div class="space-y-8 font-baloo mt-8 px-4 xs:px-4 sm:px-4 md:px-8 lg:px-12 pb-24 sm:pb-20 md:pb-16 lg:pb-20">
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-2 sm:mb-2 md:mb-4 gap-2 sm:gap-4">
@@ -262,6 +270,12 @@
 @include('components.music-setting-modal')
 @include('components.retry-modal')
 @include('components.sweetalert-config')
+
+<!-- RADM Intervention Modal (Livewire Component) -->
+@livewire('radm-intervention-modal')
+
+<!-- RADM Tracker Script -->
+<script src="{{ asset('js/radm-tracker.js') }}"></script>
 
 <style>
     /* Points Animation Styles */
@@ -652,6 +666,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Alias for backward compatibility
     const quizState = window.quizState;
     
+    // Initialize RADM Tracker
+    let radmTracker = null;
+    try {
+        @if($sessionId)
+        if (typeof RadmTracker !== 'undefined') {
+            radmTracker = new RadmTracker({
+                sessionId: '{{ $sessionId }}',
+                studentId: {{ auth('student')->id() ?? 0 }},
+                difficultyLevel: '{{ $question->difficulty_level ?? "intermediate" }}',
+                apiEndpoint: '/api/radm/evaluate'
+            });
+            console.log('[RADM] Tracker initialized successfully', {
+                sessionId: '{{ $sessionId }}',
+                studentId: {{ auth('student')->id() ?? 0 }},
+                difficultyLevel: '{{ $question->difficulty_level ?? "intermediate" }}'
+            });
+        } else {
+            console.warn('[RADM] RadmTracker not available - RADM disabled');
+        }
+        @else
+        console.error('[RADM] Cannot initialize - session_id not found for assessment {{ $assessmentId }}');
+        @endif
+    } catch (error) {
+        console.error('[RADM] Failed to initialize tracker:', error);
+    }
+    
     // Debug log quiz state
     console.log('Quiz state initialized:', quizState);
     console.log('Current question from PHP:', {{ $currentQuestion ?? 1 }});
@@ -838,6 +878,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update question counter display
         updateQuestionCounterDisplay();
+
+        // Start tracking question with RADM
+        if (radmTracker) {
+            radmTracker.startQuestion('{{ $question->question_id }}');
+            console.log('[RADM] Started tracking question {{ $question->question_id }}');
+        }
     }
     
     function saveProgressToLocalStorage() {
@@ -1407,6 +1453,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Submit with retry mechanism
         submitAnswerWithRetry(requestData)
         .then(data => {
+            console.log('[DEBUG] Submit answer response:', data);
             if (data.success) {
                 // Note: Question counter will be updated when user clicks "Next"
                 // Don't increment here to avoid double-counting
@@ -1414,6 +1461,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Clear progress from localStorage on successful submission
                 const storageKey = `quiz_progress_${quizState.sessionId}`;
                 localStorage.removeItem(storageKey);
+                
+                // End RADM tracking for this question
+                if (radmTracker) {
+                    console.log('[RADM] Calling endQuestion with:', {
+                        questionId: quizState.questionId,
+                        isCorrect: data.is_correct,
+                        bktProbability: data.bkt_probability_after
+                    });
+                    const bktProbability = data.bkt_probability_after || null;
+                    radmTracker.endQuestion(
+                        quizState.questionId,
+                        data.is_correct,
+                        bktProbability
+                    ).catch(error => {
+                        console.error('[RADM] Failed to end question tracking:', error);
+                    });
+                } else {
+                    console.warn('[RADM] Tracker not available when trying to end question');
+                }
                 
                 showFeedback(data);
             } else {

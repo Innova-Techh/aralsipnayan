@@ -453,6 +453,7 @@ class RegularAssessmentController extends Controller
                 'points_earned' => $totalPoints,
                 'base_points' => $basePoints,
                 'bonus_points' => $bonusPoints,
+                'bkt_probability_after' => $bktAfter, // For RADM tracking
                 'assessment_complete' => $isComplete,
                 'progress' => $progress,
                 'gamification' => [

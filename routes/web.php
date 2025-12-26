@@ -19,6 +19,7 @@ use App\Http\Controllers\TeacherSectionController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\LevelUpController;
+use App\Http\Controllers\Api\RadmController;
 
 // Homepage
 Route::get('/', function () {
@@ -464,4 +465,12 @@ Route::post('/student/logout', [ProfileController::class, 'logout'])->name('stud
         Route::get('/test-weekly-badges', [App\Http\Controllers\LeaderboardBadgeController::class, 'testWeeklyAward'])->name('test-weekly-badges');
         Route::get('/test-monthly-badges', [App\Http\Controllers\LeaderboardBadgeController::class, 'testMonthlyAward'])->name('test-monthly-badges');
     }
+
+    // RADM (Random Answering Detection Model) API Routes
+    Route::prefix('api/radm')->group(function () {
+        Route::post('/evaluate', [RadmController::class, 'evaluate'])->name('radm.evaluate');
+        Route::post('/acknowledge/{detectionId}', [RadmController::class, 'acknowledge'])->name('radm.acknowledge');
+        Route::get('/check-intervention', [RadmController::class, 'checkIntervention'])->name('radm.check-intervention');
+        Route::get('/statistics', [RadmController::class, 'statistics'])->name('radm.statistics');
+    });
 });
