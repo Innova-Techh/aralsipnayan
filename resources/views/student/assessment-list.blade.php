@@ -456,7 +456,7 @@
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">Cannot Start New Assessment</h3>
                     <p class="text-gray-600 leading-relaxed">
-                        You already have an active assessment in progress. Please complete or abandon your current
+                        You already have an active assessment in progress. Please complete your ongoing
                         assessment before starting a new one.
                     </p>
                 </div>
