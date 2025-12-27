@@ -427,6 +427,8 @@
         </div>
     </div>
 
+    @include('components.active-quiz-blocker-modal')
+
     <!-- Active Assessment Notification Modal -->
     <div id="activeAssessmentModal"
         class="fixed inset-0 bg-black bg-opacity-60 justify-center items-center z-[60] hidden px-4 sm:px-0">
@@ -498,14 +500,18 @@
         let assessmentOptions = @json($assessmentOptions ?? []);
         let selectedAssessmentIndex = null;
         let activeAssessments = []; // Initialize as empty array
+        let activeDiagnostics = []; // Track active diagnostics
+        let hasCheckedForActiveQuizzes = false;
 
         // Check for active assessments when page loads
         document.addEventListener('DOMContentLoaded', function () {
-            checkForActiveAssessments();
+            checkForAllActiveQuizzes();
         });
 
-        function checkForActiveAssessments() {
-            fetch('{{ route("student.quiz.check-active") }}', {
+        // Unified checker for both regular assessments and diagnostics
+        function checkForAllActiveQuizzes() {
+            // Check for active regular assessments
+            const checkRegular = fetch('{{ route("student.quiz.check-active") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -514,19 +520,48 @@
                 body: JSON.stringify({
                     category: '{{ $category }}'
                 })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.has_active_assessments) {
-                        activeAssessments = data.active_assessments || []; // Ensure it's an array
-                        updateAssessmentButtons();
+            }).then(response => response.json());
+
+            // Check for active diagnostics
+            const checkDiagnostic = fetch('{{ route("student.quiz.check-active-diagnostics") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    category: '{{ $category }}'
+                })
+            }).then(response => response.json());
+
+            // Wait for both checks to complete
+            Promise.all([checkRegular, checkDiagnostic])
+                .then(([regularData, diagnosticData]) => {
+                    // Handle regular assessments
+                    if (regularData.success && regularData.has_active_assessments) {
+                        activeAssessments = regularData.active_assessments || [];
                     } else {
-                        activeAssessments = []; // Reset to empty array if no active assessments
+                        activeAssessments = [];
                     }
+
+                    // Handle diagnostics
+                    if (diagnosticData.success && diagnosticData.has_active_diagnostics) {
+                        activeDiagnostics = diagnosticData.active_diagnostics || [];
+                    } else {
+                        activeDiagnostics = [];
+                    }
+
+                    hasCheckedForActiveQuizzes = true;
+                    updateAssessmentButtons();
+
+                    console.log('Active assessments:', activeAssessments);
+                    console.log('Active diagnostics:', activeDiagnostics);
                 })
                 .catch(error => {
-                    console.error('Error checking active assessments:', error);
-                    activeAssessments = []; // Reset to empty array on error
+                    console.error('Error checking active quizzes:', error);
+                    activeAssessments = [];
+                    activeDiagnostics = [];
+                    hasCheckedForActiveQuizzes = true;
                 });
         }
 
@@ -550,8 +585,15 @@
         }
 
         function openAssessmentModal(index) {
-            // Check if there are active assessments first
+            // Check if there are ANY active quizzes (regular or diagnostic)
+            if (Array.isArray(activeDiagnostics) && activeDiagnostics.length > 0) {
+                // Show blocker modal for active diagnostic
+                showActiveQuizBlockerModal(activeDiagnostics[0]);
+                return;
+            }
+            
             if (Array.isArray(activeAssessments) && activeAssessments.length > 0) {
+                // Show the regular active assessment notification
                 showActiveAssessmentNotification();
                 return;
             }
