@@ -16,7 +16,7 @@
                             clip-rule="evenodd" />
                     </svg>
                 </div>
-                <h2 class="text-lg sm:text-xl font-bold text-white drop-shadow-lg">Diagnostic Quiz In Progress</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-white drop-shadow-lg">Quiz In Progress</h2>
             </div>
         </div>
 
@@ -25,7 +25,7 @@
             <div class="mb-4 sm:mb-6">
                 <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Cannot Start New Assessment</h3>
                 <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-                    You already have an active quiz in progress. Please complete the ongoing diagnostic
+                    You already have an active quiz in progress. Please complete the ongoing
                     quiz before starting a new one.
                 </p>
             </div>
@@ -74,6 +74,24 @@
             let quizTypeLabel = quizData.type === 'diagnostic' ? 'Diagnostic Test' : 'Regular Assessment';
             let progressText = `${quizData.progress}/${quizData.total_questions} questions`;
             
+            // Format competency name for display
+            let competencyName = 'Unknown';
+            if (quizData.competency) {
+                // Convert competency format to readable name
+                const competencyMap = {
+                    'number_algebra': 'Numbers & Algebra',
+                    'measurement_geometry': 'Measurement & Geometry',
+                    'data_probability': 'Data & Probability',
+                    'Number_Algebra': 'Numbers & Algebra',
+                    'Measurement_Geometry': 'Measurement & Geometry',
+                    'Data_Probability': 'Data & Probability'
+                };
+                competencyName = competencyMap[quizData.competency] || quizData.competency.replace(/_/g, ' & ');
+            }
+            
+            // Get quiz title/difficulty
+            let quizTitle = quizData.title || 'Assessment';
+            
             // Calculate remaining time
             const startTime = new Date(quizData.started_at);
             const timeLimitMinutes = quizData.time_limit || 30;
@@ -94,9 +112,10 @@
 
             infoDiv.innerHTML = `
                 <div><strong>Type:</strong> ${quizTypeLabel}</div>
-                <div><strong>Quiz:</strong> ${quizData.title || quizData.competency || 'Assessment'}</div>
+                <div><strong>Learning Competency:</strong> ${competencyName}</div>
+                <div><strong>Quiz:</strong> ${quizTitle}</div>
                 ${quizData.phase_name ? `<div><strong>Phase:</strong> ${quizData.phase_name}</div>` : ''}
-                <div><strong>Progress:</strong> ${progressText}</div>
+                {{-- <div><strong>Progress:</strong> ${progressText}</div> --}}
                 {{-- <div>${timeDisplay}</div> --}}
                 <div class="text-xs text-gray-500 mt-1">Started: ${new Date(quizData.started_at).toLocaleString()}</div>
             `;

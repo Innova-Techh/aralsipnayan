@@ -667,6 +667,8 @@
         </div>
     </div>
 
+    @include('components.active-quiz-blocker-modal')
+
     <!-- Active Diagnostic Modal -->
     <div id="activeDiagnosticModal"
         class="fixed inset-0 bg-black bg-opacity-60 justify-center items-center z-[60] hidden px-4 sm:px-0">
@@ -841,6 +843,7 @@
         // Keep all your existing functions below (checkDiagnosticBeforeStart, etc.)
 
         let activeDiagnostics = []; // Initialize as empty array
+        let activeRegularAssessments = []; // Track active regular assessments
 
         document.addEventListener('DOMContentLoaded', function () {
             // Animate Number & Algebra progress bar
@@ -865,9 +868,9 @@
             }, 300);
         });
 
-        // Check for active diagnostics before starting new diagnostic
+        // Check for active diagnostics AND regular assessments before starting new diagnostic
         function checkDiagnosticBeforeStart(category) {
-            console.log('Checking for active diagnostics for category:', category);
+            console.log('Checking for active quizzes before starting diagnostic for category:', category);
 
             // Show loading state (optional)
             const button = event.target;
@@ -885,48 +888,73 @@
                 return;
             }
 
-            // For "Take Diagnostic" buttons, check for active diagnostics in ANY competency
-            fetch('{{ route("student.quiz.check-active-diagnostics") }}', {
+            // Check for both active diagnostics AND active regular assessments
+            const checkDiagnostic = fetch('{{ route("student.quiz.check-active-diagnostics") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    category: category
-                })
-            })
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Check diagnostics response:', data);
+                body: JSON.stringify({ category: category })
+            }).then(response => response.json());
 
-                    if (data.success) {
-                        if (data.has_active_diagnostics && data.active_diagnostics.length > 0) {
-                            console.log('Active diagnostics found:', data.active_diagnostics);
-                            // Show active diagnostic modal to prevent starting new diagnostic
-                            activeDiagnostics = data.active_diagnostics;
-                            showActiveDiagnosticModal();
-                        } else {
-                            console.log('No active diagnostics, proceeding to new diagnostic');
-                            // No active diagnostics, proceed to start new diagnostic
-                            window.location.href = `/student/quiz/diagnostic/${category}`;
+            // Check ALL categories for active regular assessments
+            const categories = ['Number_Algebra', 'Measurement_Geometry', 'Data_Probability'];
+            const checkRegularPromises = categories.map(cat => 
+                fetch('{{ route("student.quiz.check-active") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ category: cat })
+                }).then(response => response.json())
+            );
+
+            // Wait for all checks to complete
+            Promise.all([checkDiagnostic, ...checkRegularPromises])
+                .then(([diagnosticData, ...regularDataArray]) => {
+                    console.log('Diagnostic check response:', diagnosticData);
+                    console.log('Regular assessment checks response:', regularDataArray);
+
+                    // Check for active regular assessments in ANY category
+                    let activeRegularFound = null;
+                    for (const regularData of regularDataArray) {
+                        if (regularData.success && regularData.has_active_assessments && regularData.active_assessments.length > 0) {
+                            activeRegularFound = regularData.active_assessments[0];
+                            break;
                         }
-                    } else {
-                        console.error('Error checking diagnostics:', data.message);
-                        // Error checking diagnostics, proceed anyway
-                        window.location.href = `/student/quiz/diagnostic/${category}`;
                     }
-                })
-                .catch(error => {
-                    console.error('Error checking diagnostics:', error);
-                    // Error in request, proceed anyway
+
+                    if (activeRegularFound) {
+                        console.log('Active regular assessment found:', activeRegularFound);
+                        // Show blocker modal - cannot start diagnostic while regular assessment is active
+                        activeRegularAssessments = [activeRegularFound];
+                        showActiveQuizBlockerModal(activeRegularFound);
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        return;
+                    }
+
+                    // Then check for active diagnostics
+                    if (diagnosticData.success && diagnosticData.has_active_diagnostics && diagnosticData.active_diagnostics.length > 0) {
+                        console.log('Active diagnostics found:', diagnosticData.active_diagnostics);
+                        // Show active diagnostic modal to prevent starting new diagnostic
+                        activeDiagnostics = diagnosticData.active_diagnostics;
+                        showActiveDiagnosticModal();
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        return;
+                    }
+
+                    // No active quizzes, proceed to start new diagnostic
+                    console.log('No active quizzes, proceeding to new diagnostic');
                     window.location.href = `/student/quiz/diagnostic/${category}`;
                 })
-                .finally(() => {
-                    // Reset button state
+                .catch(error => {
+                    console.error('Error checking for active quizzes:', error);
+                    // Error in request, proceed anyway
+                    window.location.href = `/student/quiz/diagnostic/${category}`;
                     button.disabled = false;
                     button.innerHTML = originalText;
                 });
