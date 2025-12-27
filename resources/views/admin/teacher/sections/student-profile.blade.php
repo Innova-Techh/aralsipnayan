@@ -133,6 +133,9 @@
                             <button data-tab="achievements" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium text-sm">
                                 Achievements
                             </button>
+                            <button data-tab="radm-flag" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium text-sm">
+                                Random Answer Flags
+                            </button>
                         </nav>
                     </div>
 
@@ -666,6 +669,307 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- RADM Flag Content -->
+                        <div id="radm-flag-content" class="tab-content hidden">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Random Answer Detection Flags</h3>
+                            <p class="text-gray-600 mb-6">Instances where random answering patterns were detected during assessments</p>   
+                            @php
+                            
+                                // Fetch RADM detections for this student with pagination
+                                $radmDetections = DB::table('radm_detections')
+                                    ->where('student_id', $student->id)
+                                    ->orderBy('created_at', 'desc')
+                                    ->paginate(5, ['*'], 'radm_page');
+                                
+                                // Get total counts for summary statistics
+                                $totalDetections = DB::table('radm_detections')
+                                    ->where('student_id', $student->id)
+                                    ->count();
+                                
+                                $totalInterventions = DB::table('radm_detections')
+                                    ->where('student_id', $student->id)
+                                    ->where('intervention_triggered', 1)
+                                    ->count();
+                                
+                                $totalAcknowledged = DB::table('radm_detections')
+                                    ->where('student_id', $student->id)
+                                    ->where('intervention_acknowledged', 1)
+                                    ->count();
+                                
+                                $avgRaiScore = DB::table('radm_detections')
+                                    ->where('student_id', $student->id)
+                                    ->avg('rai_score');
+                            @endphp
+                                                            <!-- Summary Statistics -->
+                                <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                                        <div class="text-2xl font-bold text-gray-900">{{ $totalDetections }}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Total Detections</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                                        <div class="text-2xl font-bold text-purple-600">{{ $totalInterventions }}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Interventions</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                                        <div class="text-2xl font-bold text-green-600">{{ $totalAcknowledged }}</div>
+                                        <div class="text-sm text-gray-600 mt-1">Acknowledged</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                                        <div class="text-2xl font-bold text-blue-600">{{ $avgRaiScore ? number_format($avgRaiScore * 100, 1) : '0.0' }}%</div>
+                                        <div class="text-sm text-gray-600 mt-1">Avg RAI Score</div>
+                                    </div>
+                                </div>
+
+                            <div class="space-y-4 mt-6">
+                                @forelse($radmDetections as $detection)
+                                    @php
+                                        $questionIds = json_decode($detection->question_ids, true);
+                                        $responseTimes = json_decode($detection->response_times, true);
+                                        $correctness = json_decode($detection->correctness, true);
+                                        
+                                        // Determine severity based on RAI score
+                                        if ($detection->rai_score >= 0.7) {
+                                            $severityColor = 'red';
+                                            $severityLabel = 'High Risk';
+                                            $severityBg = 'bg-red-50';
+                                            $severityBorder = 'border-red-200';
+                                        } elseif ($detection->rai_score >= 0.5) {
+                                            $severityColor = 'orange';
+                                            $severityLabel = 'Medium Risk';
+                                            $severityBg = 'bg-orange-50';
+                                            $severityBorder = 'border-orange-200';
+                                        } else {
+                                            $severityColor = 'yellow';
+                                            $severityLabel = 'Low Risk';
+                                            $severityBg = 'bg-yellow-50';
+                                            $severityBorder = 'border-yellow-200';
+                                        }
+                                    @endphp
+
+                                    <div class="border {{ $severityBorder }} {{ $severityBg }} rounded-lg p-6">
+                                        <!-- Header -->
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-12 h-12 {{ $severityBg }} rounded-full flex items-center justify-center border-2 border-{{ $severityColor }}-300">
+                                                    <span class="material-symbols-outlined text-{{ $severityColor }}-600 text-xl">flag</span>
+                                                </div>
+                                                <div>
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <h4 class="font-semibold text-gray-900">Detection #{{ $detection->id }}</h4>
+                                                        <span class="px-2 py-1 bg-{{ $severityColor }}-100 text-{{ $severityColor }}-700 text-xs font-medium rounded-full">
+                                                            {{ $severityLabel }}
+                                                        </span>
+                                                        @if($detection->intervention_triggered)
+                                                            <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                                                                Intervention Triggered
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-gray-600">
+                                                        {{ \Carbon\Carbon::parse($detection->created_at)->format('M d, Y g:i A') }}
+                                                        <span class="text-gray-400">•</span>
+                                                        {{ \Carbon\Carbon::parse($detection->created_at)->diffForHumans() }}
+                                                    </p>
+                                                    <p class="text-xs text-gray-500 mt-1">
+                                                        Session: {{ $detection->session_id }} 
+                                                        @if($detection->assessment_id)
+                                                            • Assessment: {{ $detection->assessment_id }}
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-2xl font-bold text-{{ $severityColor }}-600">
+                                                    {{ number_format($detection->rai_score * 100, 1) }}%
+                                                </div>
+                                                <div class="text-xs text-gray-600">RAI Score</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Indicators -->
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                            <!-- Time Behavior -->
+                                            <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-blue-600 text-lg">schedule</span>
+                                                        <span class="text-sm font-medium text-gray-700">Time Behavior</span>
+                                                    </div>
+                                                    @if($detection->time_flag)
+                                                        <span class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-red-600 text-sm">close</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-green-600 text-sm">check</span>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-xs text-gray-600 space-y-1">
+                                                    <div>Avg: {{ number_format($detection->avg_response_time, 1) }}s</div>
+                                                    <div>Expected: {{ number_format($detection->expected_time, 1) }}s</div>
+                                                    <div>Threshold: {{ number_format($detection->time_threshold, 1) }}s</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Accuracy -->
+                                            <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-green-600 text-lg">check_circle</span>
+                                                        <span class="text-sm font-medium text-gray-700">Accuracy</span>
+                                                    </div>
+                                                    @if($detection->accuracy_flag)
+                                                        <span class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-red-600 text-sm">close</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-green-600 text-sm">check</span>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-xs text-gray-600 space-y-1">
+                                                    <div>Score: {{ number_format($detection->accuracy * 100, 1) }}%</div>
+                                                    <div>Correct: {{ $detection->correct_count }}/{{ $detection->total_count }}</div>
+                                                    <div>Level: {{ ucfirst($detection->difficulty_level) }}</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- BKT Contradiction -->
+                                            <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-purple-600 text-lg">psychology</span>
+                                                        <span class="text-sm font-medium text-gray-700">BKT Pattern</span>
+                                                    </div>
+                                                    @if($detection->bkt_flag)
+                                                        <span class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-red-600 text-sm">close</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                                                            <span class="material-symbols-outlined text-green-600 text-sm">check</span>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-xs text-gray-600 space-y-1">
+                                                    <div>Probability: {{ $detection->bkt_probability ? number_format($detection->bkt_probability * 100, 1) . '%' : 'N/A' }}</div>
+                                                    <div>Consecutive Wrong: {{ $detection->consecutive_wrong }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Question Window Details -->
+                                        <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                            <h5 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-gray-600 text-lg">list</span>
+                                                Question Window ({{ $detection->window_start_index + 1 }} - {{ $detection->window_end_index + 1 }})
+                                            </h5>
+                                            <div class="grid grid-cols-5 gap-2">
+                                                @foreach($responseTimes as $index => $time)
+                                                    <div class="text-center p-2 rounded {{ $correctness[$index] ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }}">
+                                                        <div class="text-xs font-medium {{ $correctness[$index] ? 'text-green-700' : 'text-red-700' }}">
+                                                            Q{{ $index + 1 }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-600 mt-1">{{ number_format($time, 1) }}s</div>
+                                                        <div class="mt-1">
+                                                            @if($correctness[$index])
+                                                                <span class="text-green-600 text-sm">✓</span>
+                                                            @else
+                                                                <span class="text-red-600 text-sm">✗</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- Intervention Status -->
+                                        @if($detection->intervention_triggered)
+                                            <div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                                                <div class="flex items-start gap-3">
+                                                    <span class="material-symbols-outlined text-purple-600 mt-0.5">info</span>
+                                                    <div class="flex-1">
+                                                        <div class="font-medium text-purple-900 mb-1">Intervention Triggered</div>
+                                                        <div class="text-sm text-purple-700">
+                                                            @if($detection->intervention_acknowledged)
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+                                                                    <span>Acknowledged on {{ \Carbon\Carbon::parse($detection->acknowledged_at)->format('M d, Y g:i A') }}</span>
+                                                                </div>
+                                                            @else
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="material-symbols-outlined text-orange-600 text-sm">pending</span>
+                                                                    <span>Not yet acknowledged</span>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                                        <span class="material-symbols-outlined text-gray-400 text-5xl mb-3">verified_user</span>
+                                        <h4 class="text-lg font-medium text-gray-900 mb-2">No Random Answer Flags</h4>
+                                        <p class="text-gray-600">This student has no detected random answering patterns. Great engagement!</p>
+                                    </div>
+                                @endforelse
+                            </div>
+
+                            @if($totalDetections > 0)
+                                <!-- Pagination -->
+                                @if($radmDetections->hasPages())
+                                    <div class="mt-6 flex justify-center">
+                                        <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                            {{-- Previous Button --}}
+                                            @if ($radmDetections->onFirstPage())
+                                                <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                                                </span>
+                                            @else
+                                                <a href="{{ $radmDetections->previousPageUrl() }}&tab=radm-flag#radm-flag-content" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                                                </a>
+                                            @endif
+
+                                            {{-- Page Numbers --}}
+                                            @foreach ($radmDetections->getUrlRange(1, $radmDetections->lastPage()) as $page => $url)
+                                                @if ($page == $radmDetections->currentPage())
+                                                    <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                                        {{ $page }}
+                                                    </span>
+                                                @else
+                                                    <a href="{{ $url }}&tab=radm-flag#radm-flag-content" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                        {{ $page }}
+                                                    </a>
+                                                @endif
+                                            @endforeach
+
+                                            {{-- Next Button --}}
+                                            @if ($radmDetections->hasMorePages())
+                                                <a href="{{ $radmDetections->nextPageUrl() }}&tab=radm-flag#radm-flag-content" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                                                </a>
+                                            @else
+                                                <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                                                </span>
+                                            @endif
+                                        </nav>
+                                    </div>
+
+                                    {{-- Pagination Info --}}
+                                    <div class="mt-3 text-center text-sm text-gray-600">
+                                        Showing {{ $radmDetections->firstItem() }} to {{ $radmDetections->lastItem() }} of {{ $radmDetections->total() }} detections
+                                    </div>
+                                @endif
+                                    
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -742,8 +1046,16 @@
                 });
             });
             
-            // Initialize with overview tab active
-            switchTab('overview');
+            // Check URL for tab parameter (for pagination support)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            
+            // Initialize with overview tab or URL tab parameter
+            if (tabParam) {
+                switchTab(tabParam);
+            } else {
+                switchTab('overview');
+            }
             
             // Assessment tabs functionality
             const assessmentTabs = document.querySelectorAll('.assessment-tab-button');
