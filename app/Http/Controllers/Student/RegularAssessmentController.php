@@ -1961,6 +1961,38 @@ class RegularAssessmentController extends Controller
                 ->get();
             
             foreach ($activeAssessments as $assessment) {
+                // Check time limit - auto-complete if expired
+                $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert to seconds
+                $elapsedTime = time() - strtotime($assessment->started_at);
+                
+                if ($elapsedTime > $timeLimit) {
+                    // Assessment has timed out - auto-complete it
+                    DB::table('assessments')
+                        ->where('assessment_id', $assessment->assessment_id)
+                        ->update([
+                            'status' => 'completed',
+                            'completed_at' => now()
+                        ]);
+                    
+                    // Also update session status
+                    DB::table('assessment_sessions')
+                        ->where('assessment_id', $assessment->assessment_id)
+                        ->where('user_id', $user->id)
+                        ->update([
+                            'status' => 'completed',
+                            'completed_at' => now()
+                        ]);
+                    
+                    Log::info('Auto-completed timed-out assessment', [
+                        'assessment_id' => $assessment->assessment_id,
+                        'user_id' => $user->id,
+                        'elapsed_time' => $elapsedTime,
+                        'time_limit' => $timeLimit
+                    ]);
+                    
+                    continue; // Skip this assessment - it's no longer active
+                }
+                
                 // Check if this assessment has an active session
                 $session = DB::table('assessment_sessions')
                     ->where('assessment_id', $assessment->assessment_id)
@@ -2071,6 +2103,42 @@ class RegularAssessmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Assessment not found or not active'
+                ]);
+            }
+            
+            // Check if assessment has timed out
+            $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert to seconds
+            $elapsedTime = time() - strtotime($assessment->started_at);
+            
+            if ($elapsedTime > $timeLimit) {
+                // Assessment has timed out - auto-complete it
+                DB::table('assessments')
+                    ->where('assessment_id', $assessmentId)
+                    ->update([
+                        'status' => 'completed',
+                        'completed_at' => now()
+                    ]);
+                
+                // Also update session status
+                DB::table('assessment_sessions')
+                    ->where('assessment_id', $assessmentId)
+                    ->where('user_id', $user->id)
+                    ->update([
+                        'status' => 'completed',
+                        'completed_at' => now()
+                    ]);
+                
+                Log::info('Auto-completed timed-out assessment on resume attempt', [
+                    'assessment_id' => $assessmentId,
+                    'user_id' => $user->id,
+                    'elapsed_time' => $elapsedTime,
+                    'time_limit' => $timeLimit
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This assessment has expired due to time limit. Please start a new assessment.',
+                    'timeout' => true
                 ]);
             }
             
