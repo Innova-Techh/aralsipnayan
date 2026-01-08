@@ -41,8 +41,12 @@
                                             class="w-40 h-40 rounded-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 p-1 shadow-xl group-hover:shadow-2xl transition-all duration-300">
                                             <div
                                                 class="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                                                @if(auth()->guard('student')->user()->avatar)
-                                                    <img src="{{ asset('storage/' . auth()->guard('student')->user()->avatar) }}"
+                                                @php
+                                                    $studentProfile = auth()->guard('student')->user()->studentProfile;
+                                                    $avatarUrl = $studentProfile?->avatar_url ?? '/images/profile/default.png';
+                                                @endphp
+                                                @if($studentProfile && $avatarUrl && $avatarUrl !== '/images/profile/default.png')
+                                                    <img src="{{ asset($avatarUrl) }}"
                                                         alt="Profile Picture" class="w-full h-full object-cover">
                                                 @else
                                                     <span class="text-gray-500 text-sm font-medium text-center px-4">Choose
