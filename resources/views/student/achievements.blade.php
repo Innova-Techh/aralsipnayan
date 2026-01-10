@@ -138,9 +138,9 @@
                     </div>
 
                     <!-- Custom Sort Dropdown -->
-                    <div x-data="{ open: false }" class="relative inline-block text-left flex-shrink-0">
+                    <div class="relative inline-block text-left flex-shrink-0">
                         <!-- Button -->
-                        <button @click="open = !open"
+                        <button id="sortDropdownButton"
                             class="flex items-center justify-between w-24 sm:w-40 rounded-xl border border-gray-300 bg-white px-2 sm:px-4 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <div class="flex items-center space-x-2 py-1">
                                 <span class="text-xs sm:text-sm px-1 sm:px-2 truncate">Rarity</span>
@@ -149,8 +149,8 @@
                         </button>
 
                         <!-- Dropdown Menu -->
-                        <div x-show="open" @click.outside="open = false"
-                            class="absolute right-0 mt-2 w-32 sm:w-40 rounded-xl bg-white shadow-lg border border-gray-200 z-10 overflow-hidden">
+                        <div id="sortDropdownMenu" style="display: none;"
+                            class="absolute right-0 mt-2 w-32 sm:w-40 rounded-xl bg-white shadow-lg border border-gray-200 z-10 overflow-hidden transition-all duration-200 opacity-0 scale-95">
                             <a href="{{ route('achievements.index', ['filter' => $filter, 'sort' => 'default']) }}"
                                 class="block px-3 sm:px-4 py-2 text-xs sm:text-sm hover:bg-gray-100">Default</a>
                             <a href="{{ route('achievements.index', ['filter' => $filter, 'sort' => 'rarity']) }}"
@@ -361,6 +361,56 @@
                         }
                     });
                 });
+
+                // Sort Dropdown functionality
+                const sortDropdownButton = document.getElementById('sortDropdownButton');
+                const sortDropdownMenu = document.getElementById('sortDropdownMenu');
+
+                if (sortDropdownButton && sortDropdownMenu) {
+                    // Toggle dropdown on button click
+                    sortDropdownButton.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const isVisible = sortDropdownMenu.style.display === 'block';
+                        
+                        if (isVisible) {
+                            // Hide with animation
+                            sortDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                            sortDropdownMenu.classList.add('opacity-0', 'scale-95');
+                            setTimeout(() => {
+                                sortDropdownMenu.style.display = 'none';
+                            }, 200);
+                        } else {
+                            // Show with animation
+                            sortDropdownMenu.style.display = 'block';
+                            setTimeout(() => {
+                                sortDropdownMenu.classList.remove('opacity-0', 'scale-95');
+                                sortDropdownMenu.classList.add('opacity-100', 'scale-100');
+                            }, 10);
+                        }
+                    });
+
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (!sortDropdownButton.contains(e.target) && !sortDropdownMenu.contains(e.target)) {
+                            sortDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                            sortDropdownMenu.classList.add('opacity-0', 'scale-95');
+                            setTimeout(() => {
+                                sortDropdownMenu.style.display = 'none';
+                            }, 200);
+                        }
+                    });
+
+                    // Close dropdown on escape key
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && sortDropdownMenu.style.display === 'block') {
+                            sortDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                            sortDropdownMenu.classList.add('opacity-0', 'scale-95');
+                            setTimeout(() => {
+                                sortDropdownMenu.style.display = 'none';
+                            }, 200);
+                        }
+                    });
+                }
             </script>
 
 @endsection
