@@ -180,8 +180,8 @@
                     </a>
 
 
-                    <a href="{{ route('assessments.index') }}"
-                        class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('assessments.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
+                    <a href="{{ route('student.assessments') }}"
+                        class="nav-link flex items-center px-3 py-2 rounded-md text-sm xl:text-base font-medium transition-all duration-200 {{ request()->routeIs('student.assessments') || request()->routeIs('student.assessments.*') ? 'text-blue-600 active' : 'text-gray-500 hover:text-blue-600' }}">
                         <span class="material-symbols-outlined mr-2 text-xl">assignment</span>
                         Assessments
                     </a>
@@ -288,8 +288,8 @@
                 </a>
 
 
-                <a href="{{ route('assessments.index') }}"
-                    class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('assessments.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
+                <a href="{{ route('student.assessments') }}"
+                    class="nav-link flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200 {{ request()->routeIs('student.assessments') || request()->routeIs('student.assessments.*') ? 'text-blue-600 bg-blue-50 active' : 'text-gray-500 hover:text-blue-600 hover:bg-gray-50' }}">
                     <span class="material-symbols-outlined text-xl sm:text-2xl">assignment</span>
                     <span class="text-xs sm:text-sm font-medium mt-0.5">Assessment</span>
                 </a>
