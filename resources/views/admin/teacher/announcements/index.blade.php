@@ -204,9 +204,8 @@
                 Assign To <span class="text-rose-500">*</span>
             </label>
             <div class="flex gap-4 mb-3">
-                <label class="flex items-center cursor-pointer bg-white px-4 py-2 rounded-lg border-2 border-slate-300 hover:border-indigo-400 transition-all duration-200">
-                    <input type="radio" name="assign_to" value="section" class="form-radio text-indigo-500 focus:ring-indigo-500" x-model="assignType" checked>
-                    <span class="ml-2 font-medium text-slate-700">Section</span>
+                <label class="flex items-center cursor-pointer bg-white px-4 py-2 transition-all duration-200">
+                    <input type="hidden" name="assign_to" value="section" checked>
                 </label>
                 <!-- Add individual student logic later if needed -->
             </div>
