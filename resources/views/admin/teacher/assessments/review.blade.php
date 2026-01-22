@@ -34,7 +34,7 @@
         <div class="text-center">
             <h2 class="text-lg font-medium text-gray-500 uppercase tracking-wider mb-2">Status: {{ ucfirst($session->status) }}</h2>
             <div class="text-5xl font-bold text-gray-900 mb-2">{{ number_format($session->accuracy_percentage, 1) }}%</div>
-            <p class="text-gray-600">{{ $session->total_points_earned }} / {{ $session->total_questions }} Points</p>
+            <p class="text-gray-600">{{ $session->correct_answers }} / {{ $session->total_questions }} Points</p>
         </div>
     </div>
 
