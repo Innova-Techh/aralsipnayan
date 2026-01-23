@@ -517,9 +517,11 @@
             </h1>
             <p
                 class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ut aliquip ex ea
-                commodo consequat mauris ut diam vitae
+                AralSipnayan is a gamified math assessment tool for elementary students that makes advanced mathematics
+                fun and interactive.
+                It features engaging visuals and adaptive assessments that adjust to each learner’s skill level.
+                Built-in progress tracking helps students and educators monitor growth and learning outcomes.
+
             </p>
             <button
                 class="hero-button bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto">
