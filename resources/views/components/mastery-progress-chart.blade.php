@@ -1,3 +1,9 @@
+@props(['masteryProgress'])
+
+@php
+    $stats = $masteryProgress['stats'] ?? ['current_week' => 0, 'best_week' => 0, 'growth' => 0, 'growth_sign' => ''];
+@endphp
+
 <!-- Mastery Progress Chart Component -->
 <div class="bg-white rounded-3xl shadow-xl p-6 mb-6">
     <div class="flex items-center mb-6">
@@ -17,24 +23,24 @@
         <!-- Current Week -->
         <div class="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-4 text-center transform hover:scale-105 transition-transform shadow-md"
             style="box-shadow: 0 4px 0 0 #2563EB;">
-            <div class="text-3xl mb-1"></div>
-            <div class="text-2xl font-bold text-blue-700">85%</div>
+            {{-- <div class="text-3xl mb-1">📊</div> --}}
+            <div class="text-2xl font-bold text-blue-700">{{ $stats['current_week'] }}%</div>
             <div class="text-xs font-semibold text-blue-600">This Week</div>
         </div>
 
         <!-- Best Week -->
         <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-4 text-center transform hover:scale-105 transition-transform shadow-md"
             style="box-shadow: 0 4px 0 0 #F59E0B;">
-            <div class="text-3xl mb-1"></div>
-            <div class="text-2xl font-bold text-yellow-700">92%</div>
+            {{-- <div class="text-3xl mb-1">🏆</div> --}}
+            <div class="text-2xl font-bold text-yellow-700">{{ $stats['best_week'] }}%</div>
             <div class="text-xs font-semibold text-yellow-600">Best Week</div>
         </div>
 
         <!-- Growth -->
         <div class="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-4 text-center transform hover:scale-105 transition-transform shadow-md"
             style="box-shadow: 0 4px 0 0 #10B981;">
-            <div class="text-3xl mb-1"></div>
-            <div class="text-2xl font-bold text-green-700">+15%</div>
+            {{-- <div class="text-3xl mb-1">📈</div> --}}
+            <div class="text-2xl font-bold text-green-700">{{ $stats['growth_sign'] }}{{ $stats['growth'] }}%</div>
             <div class="text-xs font-semibold text-green-600">Growth</div>
         </div>
     </div>
@@ -44,7 +50,7 @@
         <div id="masteryProgressChart"></div>
     </div>
 
-    <!-- Fun Progress Indicator -->
+    {{-- <!-- Fun Progress Indicator -->
     <div class="mt-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-5">
         <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-bold text-gray-700">🌟 Overall Progress</span>
@@ -56,23 +62,15 @@
             </div>
         </div>
         <p class="text-xs text-gray-600 mt-2 text-center">🎉 You're doing amazing! Keep up the great work!</p>
-    </div>
+    </div> --}}
 </div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Sample data for mastery progress over 6 weeks
-        const masteryData = {
-            weeks: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-            mastery: [70, 75, 82, 78, 88, 85],
-            topics: [
-                { name: 'Number and Algebra', data: [65, 72, 80, 75, 85, 82] },
-                { name: 'Measurement and Geometry', data: [68, 75, 78, 80, 88, 85] },
-                { name: 'Data and Probability', data: [75, 78, 85, 82, 90, 88] }
-            ]
-        };
+        // Dynamic data from backend
+        const masteryData = @json($masteryProgress);
 
         // Mastery Progress Chart Configuration
         const masteryOptions = {
@@ -81,15 +79,15 @@
                 data: masteryData.mastery,
                 type: 'area'
             }, {
-                name: 'Number and Algebra',
+                name: masteryData.topics[0].name,
                 data: masteryData.topics[0].data,
                 type: 'line'
             }, {
-                name: 'Measurement and Geometry',
+                name: masteryData.topics[1].name,
                 data: masteryData.topics[1].data,
                 type: 'line'
             }, {
-                name: 'Data and Probability',
+                name: masteryData.topics[2].name,
                 data: masteryData.topics[2].data,
                 type: 'line'
             }],

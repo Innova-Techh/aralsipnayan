@@ -293,7 +293,7 @@
                 </div>
 
                 <!-- Mastery Progress Chart Component -->
-                <x-mastery-progress-chart />
+                <x-mastery-progress-chart :masteryProgress="$masteryProgress" />
 
                 <!-- Recent Achievements -->
                 <div class="bg-white rounded-3xl shadow-xl p-6">

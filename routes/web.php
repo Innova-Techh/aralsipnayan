@@ -387,7 +387,12 @@ Route::get('/admin/dashboard', function () {
 Route::get('/profile', function() {
     $user = Auth::guard('student')->user();
     $profile = $user->studentProfile;
-    return view('student.profile.student-profile', compact('profile'));
+    
+    // Get mastery progress data
+    $masteryProgressService = new \App\Services\MasteryProgressService();
+    $masteryProgress = $masteryProgressService->getWeeklyMasteryProgress($user->id);
+    
+    return view('student.profile.student-profile', compact('profile', 'masteryProgress'));
 })->name('student.profile');
 // Backward compatibility routes for old assessment references (redirects to student routes)
 Route::group([], function () {
