@@ -295,7 +295,7 @@
                 <!-- Mastery Progress Chart Component -->
                 <x-mastery-progress-chart :masteryProgress="$masteryProgress" />
 
-                <!-- Recent Achievements -->
+                {{-- <!-- Recent Achievements -->
                 <div class="bg-white rounded-3xl shadow-xl p-6">
                     <h2 class="text-2xl font-bold font-poppins text-gray-800 mb-4">Recent Achievements</h2>
                     <div class="space-y-3">
@@ -344,7 +344,7 @@
                             <span class="text-xs text-gray-500">1 week ago</span>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
 
