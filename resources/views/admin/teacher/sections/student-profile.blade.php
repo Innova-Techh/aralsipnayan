@@ -136,6 +136,9 @@
                             <button data-tab="radm-flag" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium text-sm">
                                 Random Answer Flags
                             </button>
+                            <button data-tab="mastery-progress" class="tab-button px-6 py-4 text-gray-500 hover:text-gray-700 font-medium text-sm">
+                                Mastery Progress
+                            </button>
                         </nav>
                     </div>
 
@@ -668,6 +671,14 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Mastery Progress Content -->
+                        <div id="mastery-progress-content" class="tab-content hidden">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Mastery Progress Over Time</h3>
+                            <p class="text-gray-600 mb-6">Track the student's learning progress and competency mastery trends</p>
+                            
+                            <x-mastery-progress-chart-teacher :masteryProgress="$masteryProgress" />
                         </div>
 
                         <!-- RADM Flag Content -->

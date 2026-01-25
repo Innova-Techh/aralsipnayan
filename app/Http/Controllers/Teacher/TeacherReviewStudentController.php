@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Services\MasteryProgressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -231,9 +232,14 @@ class TeacherReviewStudentController extends Controller
             // Get achievements
             $student->achievements = $this->getAchievements($studentId);
             
+            // Get mastery progress data
+            $masteryProgressService = new MasteryProgressService();
+            $masteryProgress = $masteryProgressService->getWeeklyMasteryProgress($studentId);
+            
             return view('admin.teacher.sections.student-profile', [
                 'student' => $student,
-                'section' => $section
+                'section' => $section,
+                'masteryProgress' => $masteryProgress
             ]);
             
         } catch (\Exception $e) {
