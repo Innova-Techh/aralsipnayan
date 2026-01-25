@@ -707,14 +707,14 @@
                                         <div class="text-2xl font-bold text-gray-900">{{ $totalDetections }}</div>
                                         <div class="text-sm text-gray-600 mt-1">Total Detections</div>
                                     </div>
-                                    <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                                    {{-- <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
                                         <div class="text-2xl font-bold text-purple-600">{{ $totalInterventions }}</div>
                                         <div class="text-sm text-gray-600 mt-1">Interventions</div>
                                     </div>
                                     <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
                                         <div class="text-2xl font-bold text-green-600">{{ $totalAcknowledged }}</div>
                                         <div class="text-sm text-gray-600 mt-1">Acknowledged</div>
-                                    </div>
+                                    </div> --}}
                                     <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
                                         <div class="text-2xl font-bold text-blue-600">{{ $avgRaiScore ? number_format($avgRaiScore * 100, 1) : '0.0' }}%</div>
                                         <div class="text-sm text-gray-600 mt-1">Avg RAI Score</div>
