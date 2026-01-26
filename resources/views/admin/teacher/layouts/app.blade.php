@@ -390,8 +390,7 @@
                                 <div id="userDropdown"
                                     class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
                                     <a href="{{ route('teacher.profile') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile
-                                        Settings</a>
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
                                     <form method="POST" action="{{ route('logout') }}" id="header-logout-form">
                                         @csrf
                                         <button type="submit"
