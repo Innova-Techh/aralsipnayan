@@ -28,6 +28,7 @@ class TeacherReviewStudentController extends Controller
                     'users.id',
                     'users.username',
                     'users.email',
+                    'student_profile.avatar_url as avatar',
                     'student_profile.firstname',
                     'student_profile.lastname',
                     'student_profile.section',

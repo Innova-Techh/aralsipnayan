@@ -21,8 +21,13 @@
                     <div class="flex items-start gap-6">
                         <!-- Student Avatar -->
                         <div class="relative">
-                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center border-4 border-white shadow-lg">
-                                <span class="material-symbols-outlined text-3xl text-blue-600">person</span>
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+                                @if($student->avatar && $student->avatar !== '/images/profile/default.png')
+                                    <img src="{{ asset($student->avatar) }}"
+                                        alt="{{ $student->name }}" class="w-full h-full object-cover">
+                                @else
+                                    <span class="material-symbols-outlined text-3xl text-blue-600">person</span>
+                                @endif
                             </div>
                         </div>
                         
