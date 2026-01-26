@@ -1,30 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.user_layout')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'AralSipnayan')</title>
+@section('title', 'Quiz - AralSipnayan')
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ asset('css/quiz.css') }}">
-    <!-- Vite Assets (includes SweetAlert2) -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Baloo Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-</head>
-
-<body class="bg-[#C2DAFF]">
-    @extends('layouts.user_layout')
-
-    @section('title', 'Quiz - AralSipnayan')
-
-    @section('content')
+@section('content')
 
         <!-- Add these classes to your quiz card container div -->
         <!-- Replace the existing quiz card div with this structure -->
@@ -47,7 +25,7 @@
                             </h3>
 
                             @if(session('resumed_session'))
-                                <p class="text-sm sm:text-base md:text-lg text-slate-100">
+                                <p class="text-sm sm:text-base md:text-lg text-slate-900">
                                     Welcome back! You can continue from where you left off.
                                 </p>
                             @endif
@@ -1322,7 +1300,4 @@
             });
         </script>
 
-    @endsection
-</body>
-
-</html>
+@endsection
