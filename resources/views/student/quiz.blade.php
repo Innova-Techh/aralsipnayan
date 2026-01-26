@@ -244,9 +244,7 @@
             </div>
         </div>
 
-        @include('components.retry-modal')
-        @include('components.sweetalert-config')
-
+    @include('components.music-setting-modal')
         </style>
 
         <script>
