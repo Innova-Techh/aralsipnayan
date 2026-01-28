@@ -459,9 +459,9 @@
 
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-row justify-between items-center py-3 sm:py-4">
+            <div class="flex flex-row justify-center md:justify-center items-center py-3 sm:py-4 gap-16 md:gap-10 lg:gap-16 relative">
                 <div class="flex items-center gap-0.5 sm:gap-1 header-logo">
                     <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
@@ -471,17 +471,44 @@
                         <span class="text-blue-600">ral</span><span class="text-red-600">Sipnayan</span>
                     </h1>
                 </div>
+                
+                <!-- Navigation Links (Desktop) -->
+                <div class="hidden md:flex items-center gap-4 lg:gap-6">
+                    <a href="#about" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">About</a>
+                    <a href="#features" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Features</a>
+                    <a href="#media" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a>
+                    <a href="#researchers" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Researchers</a>
+                </div>
+
                 <a href="{{ route('login') }}"
                     class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-lg sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
                     Login
                 </a>
+                
+                <!-- Burger Menu Button (Mobile Only) -->
+                <button id="mobile-menu-button" class="md:hidden absolute right-0 text-blue-900 focus:outline-none">
+                    <svg id="burger-icon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg id="close-icon" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
 
+            </div>
+            
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden absolute left-0 right-0 bg-white shadow-lg rounded-b-lg mt-2 py-4 px-4 z-50">
+                <a href="#about" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">About</a>
+                <a href="#features" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Features</a>
+                <a href="#media" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Media</a>
+                <a href="#researchers" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Researchers</a>
             </div>
         </nav>
     </header>
 
     <!-- Section 1 -->
-    <section class="py-12 md:py-12 text-white full-screen-section">
+    <section class="py-12 md:py-12 text-white full-screen-section" style="padding-top: calc(3rem + 80px);">
         <!-- GSAP animated circles and math symbols container -->
         <div class="moving-circles">
             <!-- Radial circles will be animated by JavaScript -->
@@ -845,6 +872,30 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Register GSAP ScrollTrigger plugin
             gsap.registerPlugin(ScrollTrigger);
+
+            // ===========================
+            // MOBILE MENU TOGGLE
+            // ===========================
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const burgerIcon = document.getElementById('burger-icon');
+            const closeIcon = document.getElementById('close-icon');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                burgerIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    burgerIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                });
+            });
 
             // ===========================
             // HEADER ANIMATIONS
