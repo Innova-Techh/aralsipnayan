@@ -214,7 +214,7 @@
                 </a>
 
                 <!-- Settings -->
-                <a href="#"
+                {{-- <a href="#"
                     class="relative flex items-center px-4 py-3 mb-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group">
                     <div class="flex items-center justify-center w-8">
                         <i class="fas fa-cog text-lg"></i>
@@ -230,7 +230,7 @@
                         class="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50">
                         Settings
                     </div>
-                </a>
+                </a> --}}
 
             </nav>
 
