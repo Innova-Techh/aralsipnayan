@@ -472,7 +472,7 @@
                     </h1>
                 </div>
                 <a href="{{ route('login') }}"
-                    class="header-login font-baloo bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-white text-base sm:text-lg w-auto text-center">
+                    class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-lg sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
                     Login
                 </a>
 
