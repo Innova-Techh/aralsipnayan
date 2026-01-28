@@ -462,17 +462,17 @@
     <header class="bg-white shadow-sm">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row justify-between items-center py-3 sm:py-4">
-                <div class="flex items-center gap-2 sm:gap-3 header-logo">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center">
+                <div class="flex items-center gap-0.5 sm:gap-1 header-logo">
+                    <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
-                            class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl">
+                            class="w-11 h-11 sm:w-13 sm:h-13 rounded-xl">
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tighter">
-                        <span class="text-blue-600">Aral</span><span class="text-red-600">Sipnayan</span>
+                    <h1 class="text-3xl sm:text-4xl font-baloo font-bold tracking-tighter">
+                        <span class="text-blue-600">ral</span><span class="text-red-600">Sipnayan</span>
                     </h1>
                 </div>
                 <a href="{{ route('login') }}"
-                    class="header-login bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-sm sm:text-base w-auto text-center">
+                    class="header-login font-baloo bg-blue-900 hover:bg-blue-800 transition duration-200 ease-in-out px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-white text-base sm:text-lg w-auto text-center">
                     Login
                 </a>
 
