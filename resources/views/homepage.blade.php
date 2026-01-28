@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&display=swap');
@@ -537,46 +538,43 @@
         </div>
         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
 
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div class="font-baloo max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+                <!-- Text Content -->
+                <div class="flex-1 text-center lg:text-left relative z-20">
             <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Master <span class="text-yellow-400">Advanced<br>Mathematics</span> with<br>
                 <span class="text-white">Interactive Learning</span>
             </h1>
             <p
-                class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed text-center">
+                class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 AralSipnayan is a gamified math assessment tool for elementary students that makes advanced mathematics
                 fun and interactive.
                 It features engaging visuals and adaptive assessments that adjust to each learner’s skill level.
                 Built-in progress tracking helps students and educators monitor growth and learning outcomes.
 
             </p>
+            
             <button
-                class="hero-button bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto">
+                class="relative z-30 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto lg:mx-0">
                 <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                 </svg>
                 Start Your Journey
             </button>
-
-            <!-- Quiz Section -->
-            <div class="quiz-card glass-card rounded-2xl p-6 mt-12 max-w-md mx-auto">
-                <p class="quiz-question text-white font-medium mb-4 text-lg">What is the quotient of 3/4 ÷ 1/2 = ?</p>
-                <div class="quiz-buttons grid grid-cols-2 gap-3 mb-4">
-                    <button
-                        class="bg-green-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-green-600 transition-colors hover-pop">1.2</button>
-                    <button
-                        class="bg-blue-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-blue-600 transition-colors hover-pop">1.5</button>
-                    <button
-                        class="bg-red-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-red-600 transition-colors hover-pop">2.0</button>
-                    <button
-                        class="bg-purple-500 text-white px-4 py-3 rounded-full text-sm font-medium hover:bg-purple-600 transition-colors hover-pop">1.7</button>
                 </div>
-                <div class="quiz-progress flex justify-between items-center mb-2">
-                    <span class="text-white text-opacity-70 text-sm">Lessons Completed</span>
-                    <span class="text-white font-bold">75%</span>
-                </div>
-                <div class="w-full bg-white bg-opacity-20 rounded-full h-2">
-                    <div class="quiz-progress-bar bg-yellow-400 h-2 rounded-full" style="width: 0%"></div>
+                
+                <!-- Hero Animation -->
+                <div class="flex-shrink-0 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 relative z-10 overflow-hidden">
+                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+                    <dotlottie-player
+                        src="{{ asset('anim/hero-anim.json') }}"
+                        background="transparent"
+                        speed="1"
+                        style="width: 100%; height: 100%;"
+                        loop
+                        autoplay>
+                    </dotlottie-player>
                 </div>
             </div>
         </div>
@@ -589,8 +587,7 @@
                 How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms
                     learning</span>
             </h2>
-            <p
-                class="section2-description text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
+            <p class="section2-description text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
                 Experience the future of mathematics education with our innovative platform designed specifically for
                 Grade 6 students
             </p>
