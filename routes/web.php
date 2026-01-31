@@ -205,6 +205,9 @@ Route::get('/assessments/review/{student}/{assessment}', [App\Http\Controllers\T
 Route::get('/sections', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'index'])->name('sections');
 Route::get('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'show'])->name('sections.show'); // ADD THIS LINE
 Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'getSectionStudents'])->name('sections.students');
+Route::put('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'update'])->name('sections.update');
+Route::post('/sections/{section}/deactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'deactivate'])->name('sections.deactivate');
+Route::post('/sections/{section}/reactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'reactivate'])->name('sections.reactivate');
     
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

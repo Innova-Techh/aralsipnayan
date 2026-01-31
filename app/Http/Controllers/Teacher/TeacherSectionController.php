@@ -19,25 +19,41 @@ class TeacherSectionController extends Controller
     /**
      * Display the section management page with real data
      */
-    public function index()
+    public function index(Request $request)
     {
         $teacher = Auth::guard('admin')->user();
+        $filter = $request->input('filter', 'all'); // 'active', 'inactive', or 'all' - default to 'all' for page load
+        $search = $request->input('search', '');
         
         // Get teacher's sections with statistics
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
         
         if (!$teacherProfile) {
             $sectionsData = [];
+            $inactiveSectionsData = [];
         } else {
-            // Get sections assigned to this teacher from sections table
-            $teacherSections = DB::table('sections')
+            // Build query for sections - always fetch all sections for initial page load
+            $query = DB::table('sections')
                 ->join('teacher_sections', 'sections.name', '=', 'teacher_sections.section')
                 ->where('teacher_sections.teacher_id', $teacherProfile->id)
-                ->where('sections.is_active', true)
-                ->select('sections.name', 'sections.grade_level', 'sections.school_year')
-                ->get();
+                ->select('sections.name', 'sections.grade_level', 'sections.school_year', 'sections.is_active');
+
+            // Only apply filter for AJAX requests, page load shows all
+            if ($request->ajax() && $filter === 'active') {
+                $query->where('sections.is_active', true);
+            } elseif ($request->ajax() && $filter === 'inactive') {
+                $query->where('sections.is_active', false);
+            }
+
+            // Apply search
+            if (!empty($search)) {
+                $query->where('sections.name', 'LIKE', '%' . $search . '%');
+            }
+
+            $teacherSections = $query->get();
 
             $sectionsData = [];
+            $inactiveSectionsData = [];
             
             foreach ($teacherSections as $section) {
 
@@ -64,20 +80,35 @@ class TeacherSectionController extends Controller
                 // Get average performance for this section
                 $averagePerformance = $this->getSectionAveragePerformance($section->name);
 
-                $sectionsData[] = [
+                $sectionData = [
                     'section' => $section->name,
                     'grade_level' => $section->grade_level,
                     'student_count' => $studentCount,
                     'student_active' => $studentActiveCount,
                     'active_assessments' => $activeAssessmentsCount,
                     'average_performance' => $averagePerformance,
-                    'last_activity' => $this->getLastActivityForSection($section->name)
+                    'last_activity' => $this->getLastActivityForSection($section->name),
+                    'is_active' => $section->is_active
                 ];
+
+                if ($section->is_active) {
+                    $sectionsData[] = $sectionData;
+                } else {
+                    $inactiveSectionsData[] = $sectionData;
+                }
             }
         }
       
+        // If it's an AJAX request, return JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'sectionsData' => $sectionsData,
+                'inactiveSectionsData' => $inactiveSectionsData
+            ]);
+        }
 
-        return view('admin.teacher.sections.index', compact('sectionsData'));
+        return view('admin.teacher.sections.index', compact('sectionsData', 'inactiveSectionsData'));
     }
 
     /**
@@ -444,6 +475,79 @@ class TeacherSectionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Failed to deactivate section: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Reactivate a deactivated section
+     */
+    public function reactivate($section, Request $request)
+    {
+        $teacher = Auth::guard('admin')->user();
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+
+        if (!$teacherProfile) {
+            return response()->json(['error' => 'Teacher profile not found'], 404);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Check if this teacher manages the section
+            $assignedSection = DB::table('teacher_sections')
+                ->where('teacher_id', $teacherProfile->id)
+                ->where('section', $section)
+                ->exists();
+
+            if (!$assignedSection) {
+                return response()->json([
+                    'error' => 'You are not authorized to modify this section.'
+                ], 403);
+            }
+
+            // Check if section exists and is inactive
+            $sectionRecord = DB::table('sections')->where('name', $section)->first();
+            if (!$sectionRecord) {
+                return response()->json(['error' => 'Section not found'], 404);
+            }
+
+            if ($sectionRecord->is_active) {
+                return response()->json([
+                    'error' => 'Section is already active'
+                ], 400);
+            }
+
+            // Reactivate the section
+            DB::table('sections')
+                ->where('name', $section)
+                ->update([
+                    'is_active' => true,
+                    'updated_at' => now()
+                ]);
+
+            // Log notification
+            $this->logNotification(
+                $teacherProfile->id,
+                'section_reactivated',
+                'Reactivated section: ' . $section,
+                json_encode([
+                    'section_name' => $section,
+                    'grade_level' => $sectionRecord->grade_level ?? '6',
+                    'reactivated_at' => now()->toDateTimeString()
+                ]),
+                $request
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Section has been reactivated successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to reactivate section: ' . $e->getMessage()], 500);
         }
     }
 

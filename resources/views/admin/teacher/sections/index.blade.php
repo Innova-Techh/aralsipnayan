@@ -50,8 +50,8 @@
                     <!-- Total Sections -->
                     <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm font-medium text-gray-600">Total Sections</span>
-                            <span class="material-symbols-outlined text-gray-400">book</span>
+                            <span class="text-sm font-medium text-gray-600">Active Sections</span>
+                            <span class="material-symbols-outlined text-green-400">book</span>
                         </div>
                         <div class="text-3xl font-bold text-gray-900">{{ count($sectionsData) }}</div>
                     </div>
@@ -78,22 +78,52 @@
                             {{ array_sum(array_column($sectionsData, 'active_assessments')) }}
                         </div>
                     </div>
+                  
+                  <!-- Inactive Sections -->
+                    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium text-gray-600">Inactive Sections</span>
+                            <span class="material-symbols-outlined text-gray-400">block</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900">
+                            {{ count($inactiveSectionsData) }}
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Search and Filters -->
                 <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-6">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex-1 relative">
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex-1 relative min-w-[200px]">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">search</span>
                             <input type="text" id="searchSections" placeholder="Search sections..."
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
+                        <div class="flex gap-2">
+                            <button onclick="filterSections('all')" id="filterAll"
+                                class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700">
+                                All Sections
+                            </button>
+                            <button onclick="filterSections('active')" id="filterActive"
+                                class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                Active Only
+                            </button>
+                            <button onclick="filterSections('inactive')" id="filterInactive"
+                                class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                Inactive Only
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Sections Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="sectionsGrid">
+                <!-- Active Sections Container -->
+                <div id="activeSectionsContainer">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Active Sections</h3>
+                    </div>
+                    <!-- Sections Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="sectionsGrid">
                     @forelse($sectionsData as $index => $section)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
                             data-section="{{ $section['section'] }}">
@@ -184,6 +214,78 @@
                             <p class="text-gray-500 mb-6">Contact your administrator to create sections</p>
                         </div>
                     @endforelse
+                </div>
+                </div>
+                <!-- End Active Sections Container -->
+
+                <!-- Inactive Sections -->
+                <div id="inactiveSectionsContainer" class="mt-8 {{ count($inactiveSectionsData) > 0 ? '' : 'hidden' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Inactive Sections</h3>
+                        <span class="text-sm text-gray-500">These sections are currently archived</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="inactiveSectionsGrid">
+                        @forelse($inactiveSectionsData as $index => $section)
+                            <div class="bg-gray-50 rounded-xl shadow-sm border-2 border-dashed border-gray-300 overflow-hidden opacity-75"
+                                data-section="{{ $section['section'] }}">
+                                <!-- Section Header with Color Indicator -->
+                                <div class="border-l-4 border-gray-400 p-6">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                                                <span class="material-symbols-outlined text-gray-500">school</span>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-semibold text-gray-700">{{ $section['section'] }}</h3>
+                                                <span
+                                                    class="inline-block px-2 py-0.5 text-xs font-medium bg-red-100 text-red-600 rounded mt-1">INACTIVE</span>
+                                            </div>
+                                        </div>
+                                        <button onclick="reactivateSection('{{ $section['section'] }}')"
+                                            class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                            title="Reactivate Section">
+                                            <span class="material-symbols-outlined text-xl">restart_alt</span>
+                                        </button>
+                                    </div>
+
+                                    <p class="text-sm text-gray-500 mb-4">Basic Mathematics and Arithmetic</p>
+
+                                    <!-- Section Details -->
+                                    <div class="space-y-3 mb-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-gray-400 text-sm">group</span>
+                                                <span class="text-sm text-gray-500">Students</span>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-600">{{ $section['student_count'] }}
+                                                ({{ $section['student_active'] }} active)</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-gray-400 text-sm">analytics</span>
+                                                <span class="text-sm text-gray-500">Average Score</span>
+                                            </div>
+                                            <span class="text-sm font-bold text-gray-500">{{ $section['average_performance'] }}%</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Button -->
+                                    <button onclick="reactivateSection('{{ $section['section'] }}')"
+                                        class="w-full bg-green-50 text-green-600 py-2.5 px-3 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-base">restart_alt</span>
+                                        Reactivate Section
+                                    </button>
+
+                                    <!-- Last Activity -->
+                                    <div class="mt-4 pt-4 border-t border-gray-200">
+                                        <p class="text-xs text-gray-500">Last activity: {{ $section['last_activity'] }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                        @endforelse
+                    </div>
                 </div>
             </div>
 
@@ -348,63 +450,69 @@
             });
 
             // Add Student Form Submission
-            document.getElementById('addStudentForm').addEventListener('submit', function (e) {
-                e.preventDefault();
+            const addStudentForm = document.getElementById('addStudentForm');
+            if (addStudentForm) {
+                addStudentForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                const formData = new FormData(this);
+                    const formData = new FormData(this);
 
-                fetch('/teacher/sections/students', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showMessage(data.message, 'success');
-                            closeAddStudentModal();
-                            loadStudents(currentSection);
-                        } else {
-                            showMessage(data.error || 'Failed to add student', 'error');
-                        }
+                    fetch('/teacher/sections/students', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: formData
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showMessage('An error occurred while adding the student', 'error');
-                    });
-            });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage(data.message, 'success');
+                                closeAddStudentModal();
+                                loadStudents(currentSection);
+                            } else {
+                                showMessage(data.error || 'Failed to add student', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showMessage('An error occurred while adding the student', 'error');
+                        });
+                });
+            }
 
             // Edit Student Form Submission
-            document.getElementById('editStudentForm').addEventListener('submit', function (e) {
-                e.preventDefault();
+            const editStudentForm = document.getElementById('editStudentForm');
+            if (editStudentForm) {
+                editStudentForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                const formData = new FormData(this);
-                const studentId = document.getElementById('editStudentId').value;
+                    const formData = new FormData(this);
+                    const studentId = document.getElementById('editStudentId').value;
 
-                fetch(`/teacher/sections/students/${studentId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showMessage(data.message, 'success');
-                            closeEditStudentModal();
-                            loadStudents(currentSection);
-                        } else {
-                            showMessage(data.error || 'Failed to update student', 'error');
-                        }
+                    fetch(`/teacher/sections/students/${studentId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: formData
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showMessage('An error occurred while updating the student', 'error');
-                    });
-            });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage(data.message, 'success');
+                                closeEditStudentModal();
+                                loadStudents(currentSection);
+                            } else {
+                                showMessage(data.error || 'Failed to update student', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showMessage('An error occurred while updating the student', 'error');
+                        });
+                });
+            }
 
             // Student Management Functions
             let currentSection = null;
@@ -573,12 +681,49 @@
                 `;
             }
 
-            // Search functionality
-            document.getElementById('searchSections').addEventListener('input', function (e) {
-                const searchTerm = e.target.value.toLowerCase();
-                const sectionCards = document.querySelectorAll('[data-section]');
+            // Filter and Search functionality
+            let currentFilter = 'all';
 
-                sectionCards.forEach(card => {
+            function filterSections(filter) {
+                currentFilter = filter;
+
+                // Update button states
+                document.getElementById('filterAll').className = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ' +
+                    (filter === 'all' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
+                document.getElementById('filterActive').className = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ' +
+                    (filter === 'active' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
+                document.getElementById('filterInactive').className = 'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ' +
+                    (filter === 'inactive' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200');
+
+                // Show/hide sections based on filter
+                const activeContainer = document.getElementById('activeSectionsContainer');
+                const inactiveContainer = document.getElementById('inactiveSectionsContainer');
+
+                if (filter === 'active') {
+                    activeContainer.classList.remove('hidden');
+                    inactiveContainer.classList.add('hidden');
+                } else if (filter === 'inactive') {
+                    activeContainer.classList.add('hidden');
+                    inactiveContainer.classList.remove('hidden');
+                } else {
+                    // Show both
+                    activeContainer.classList.remove('hidden');
+                    inactiveContainer.classList.remove('hidden');
+                }
+
+                // Reapply search if there's a search term
+                const searchTerm = document.getElementById('searchSections').value;
+                if (searchTerm) {
+                    performSearch(searchTerm);
+                }
+            }
+
+            function performSearch(searchTerm) {
+                searchTerm = searchTerm.toLowerCase();
+
+                // Search active sections
+                const activeSectionCards = document.querySelectorAll('#sectionsGrid [data-section]');
+                activeSectionCards.forEach(card => {
                     const sectionName = card.getAttribute('data-section').toLowerCase();
                     if (sectionName.includes(searchTerm)) {
                         card.style.display = '';
@@ -586,6 +731,76 @@
                         card.style.display = 'none';
                     }
                 });
+
+                // Search inactive sections
+                const inactiveSectionCards = document.querySelectorAll('#inactiveSectionsGrid [data-section]');
+                inactiveSectionCards.forEach(card => {
+                    const sectionName = card.getAttribute('data-section').toLowerCase();
+                    if (sectionName.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            document.getElementById('searchSections').addEventListener('input', function (e) {
+                performSearch(e.target.value);
             });
+
+            // Reactivate Section Function
+            function reactivateSection(sectionName) {
+                Swal.fire({
+                    title: 'Reactivate Section',
+                    html: `Are you sure you want to reactivate section "<strong>${sectionName}</strong>"?<br><br>This will make the section active again.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, Reactivate',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/teacher/sections/${encodeURIComponent(sectionName)}/reactivate`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.error || 'Failed to reactivate section',
+                                    icon: 'error',
+                                    confirmButtonColor: '#dc2626'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'An error occurred while reactivating the section',
+                                icon: 'error',
+                                confirmButtonColor: '#dc2626'
+                            });
+                        });
+                    }
+                });
+            }
         </script>
 @endsection
