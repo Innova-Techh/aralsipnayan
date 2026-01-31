@@ -380,4 +380,100 @@ class AdminController extends Controller
             \Log::error('Failed to log admin notification: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get notifications for the authenticated admin
+     */
+    public function getNotifications()
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if (!$adminProfile) {
+                return response()->json(['notifications' => []]);
+            }
+
+            $notifications = \DB::table('admin_notifications')
+                ->where('admin_id', $adminProfile->id)
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function($notification) {
+                    $details = json_decode($notification->details, true);
+                    return [
+                        'id' => $notification->id,
+                        'type' => $notification->type,
+                        'action' => $notification->action,
+                        'details' => $details,
+                        'is_read' => (bool)$notification->is_read,
+                        'created_at' => $notification->created_at,
+                        'time_ago' => \Carbon\Carbon::parse($notification->created_at)->diffForHumans()
+                    ];
+                });
+
+            $unreadCount = \DB::table('admin_notifications')
+                ->where('admin_id', $adminProfile->id)
+                ->where('is_read', false)
+                ->count();
+
+            return response()->json([
+                'notifications' => $notifications,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to get admin notifications: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load notifications'], 500);
+        }
+    }
+
+    /**
+     * Mark a notification as read
+     */
+    public function markAsRead($id)
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if (!$adminProfile) {
+                return response()->json(['success' => false], 403);
+            }
+
+            \DB::table('admin_notifications')
+                ->where('id', $id)
+                ->where('admin_id', $adminProfile->id)
+                ->update(['is_read' => true, 'updated_at' => now()]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to mark admin notification as read: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to mark as read'], 500);
+        }
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead()
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if (!$adminProfile) {
+                return response()->json(['success' => false], 403);
+            }
+
+            \DB::table('admin_notifications')
+                ->where('admin_id', $adminProfile->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'updated_at' => now()]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to mark all admin notifications as read: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to mark all as read'], 500);
+        }
+    }
 }

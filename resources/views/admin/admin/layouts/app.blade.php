@@ -320,41 +320,142 @@
                     <!-- Right Side: User Info and Actions -->
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
-                        <div class="relative" x-data="{ notificationOpen: false }">
+                        <div class="relative" x-data="{
+                            notificationOpen: false,
+                            notifications: [],
+                            unreadCount: 0,
+                            loading: false,
+                            
+                            async fetchNotifications() {
+                                this.loading = true;
+                                try {
+                                    const response = await fetch('{{ route('admin.management.notifications') }}');
+                                    const data = await response.json();
+                                    this.notifications = data.notifications || [];
+                                    this.unreadCount = data.unread_count || 0;
+                                } catch (error) {
+                                    console.error('Failed to fetch notifications:', error);
+                                } finally {
+                                    this.loading = false;
+                                }
+                            },
+                            
+                            async markAsRead(notificationId) {
+                                try {
+                                    const response = await fetch(`{{ route('admin.management.notifications.mark-read', ['id' => '__ID__']) }}`.replace('__ID__', notificationId), {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                        }
+                                    });
+                                    
+                                    if (response.ok) {
+                                        await this.fetchNotifications();
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to mark notification as read:', error);
+                                }
+                            },
+                            
+                            async markAllAsRead() {
+                                try {
+                                    const response = await fetch('{{ route('admin.management.notifications.mark-all-read') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                        }
+                                    });
+                                    
+                                    if (response.ok) {
+                                        await this.fetchNotifications();
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to mark all as read:', error);
+                                }
+                            },
+                            
+                            getNotificationIcon(type) {
+                                const icons = {
+                                    'admin_created': 'fas fa-user-plus text-green-500',
+                                    'admin_updated': 'fas fa-user-edit text-blue-500',
+                                    'profile_updated': 'fas fa-user-circle text-blue-500',
+                                    'password_changed': 'fas fa-key text-yellow-500',
+                                    'admin_deleted': 'fas fa-user-minus text-red-500'
+                                };
+                                return icons[type] || 'fas fa-bell text-gray-500';
+                            },
+                            
+                            init() {
+                                this.fetchNotifications();
+                                setInterval(() => this.fetchNotifications(), 30000);
+                            }
+                        }">
                             <button @click="notificationOpen = !notificationOpen"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative">
                                 <i class="fas fa-bell text-gray-600"></i>
-                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                <span x-show="unreadCount > 0" 
+                                    x-text="unreadCount > 9 ? '9+' : unreadCount"
+                                    class="absolute top-0 right-0 min-w-[18px] h-[18px] bg-red-500 text-white text-xs rounded-full flex items-center justify-center px-1"></span>
                             </button>
 
                             <!-- Notification Dropdown -->
-                            <div x-show="notificationOpen" x-transition:enter="transition ease-out duration-200"
+                            <div x-show="notificationOpen" 
+                                x-transition:enter="transition ease-out duration-200"
                                 x-transition:enter-start="opacity-0 scale-95"
                                 x-transition:enter-end="opacity-100 scale-100"
                                 x-transition:leave="transition ease-in duration-150"
                                 x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95" @click.away="notificationOpen = false"
-                                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                                <div class="p-4 border-b border-gray-200">
+                                x-transition:leave-end="opacity-0 scale-95" 
+                                @click.away="notificationOpen = false"
+                                class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                
+                                <!-- Header -->
+                                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
                                     <h3 class="font-semibold text-gray-800">Notifications</h3>
+                                    <button @click="markAllAsRead()" 
+                                        x-show="unreadCount > 0"
+                                        class="text-xs text-blue-600 hover:text-blue-800 transition-colors">
+                                        Mark all as read
+                                    </button>
                                 </div>
+                                
+                                <!-- Notifications List -->
                                 <div class="max-h-96 overflow-y-auto">
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                                        <p class="text-sm text-gray-800">New teacher registration pending</p>
-                                        <p class="text-xs text-gray-500 mt-1">5 minutes ago</p>
-                                    </a>
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                                        <p class="text-sm text-gray-800">System backup completed</p>
-                                        <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
-                                    </a>
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50">
-                                        <p class="text-sm text-gray-800">15 new students enrolled</p>
-                                        <p class="text-xs text-gray-500 mt-1">3 hours ago</p>
-                                    </a>
-                                </div>
-                                <div class="p-3 border-t border-gray-200">
-                                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800">View all
-                                        notifications</a>
+                                    <template x-if="loading">
+                                        <div class="p-4 text-center text-gray-500">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading...
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="!loading && notifications.length === 0">
+                                        <div class="p-4 text-center text-gray-500">
+                                            No notifications yet
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-for="notification in notifications" :key="notification.id">
+                                        <div @click="markAsRead(notification.id)" 
+                                            class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors"
+                                            :class="{'bg-blue-50': !notification.is_read}">
+                                            <div class="flex items-start space-x-3">
+                                                <!-- Icon -->
+                                                <div class="flex-shrink-0 mt-1">
+                                                    <i :class="getNotificationIcon(notification.type)"></i>
+                                                </div>
+                                                
+                                                <!-- Content -->
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-800" x-text="notification.action"></p>
+                                                    <p class="text-xs text-gray-500 mt-1" x-text="notification.time_ago"></p>
+                                                    <template x-if="!notification.is_read">
+                                                        <span class="inline-block mt-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>

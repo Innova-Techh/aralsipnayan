@@ -382,6 +382,11 @@ Route::prefix('admin')
             Route::post('/questions', [App\Http\Controllers\admin\QuestionController::class, 'store'])->name('questions.store');
             Route::put('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'update'])->name('questions.update');
             Route::delete('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'destroy'])->name('questions.destroy');
+            
+            // Admin Notifications
+            Route::get('/notifications', [App\Http\Controllers\AdminController::class, 'getNotifications'])->name('notifications');
+            Route::post('/notifications/{id}/mark-read', [App\Http\Controllers\AdminController::class, 'markAsRead'])->name('notifications.mark-read');
+            Route::post('/notifications/mark-all-read', [App\Http\Controllers\AdminController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
         });
     });
 
