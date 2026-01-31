@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AdminSectionController extends Controller
 {
@@ -230,6 +231,13 @@ class AdminSectionController extends Controller
                 'updated_at' => now()
             ]);
 
+            // Log notification
+            $this->logNotification('section_management', 'Created new section', [
+                'section_name' => $request->name,
+                'grade_level' => $request->grade_level,
+                'school_year' => $request->school_year
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Section created successfully!',
@@ -283,6 +291,18 @@ class AdminSectionController extends Controller
             ]);
 
             DB::commit();
+
+            // Get teacher name for notification
+            $teacher = DB::table('teacher_profile')->where('id', $request->assigned_teacher)->first();
+            $teacherName = $teacher ? $teacher->firstname . ' ' . $teacher->lastname : 'Unknown';
+
+            // Log notification
+            $this->logNotification('section_management', 'Assigned teacher to section', [
+                'section_name' => $request->section_name,
+                'teacher_name' => $teacherName,
+                'teacher_id' => $request->assigned_teacher,
+                'school_year' => $schoolYear
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -356,6 +376,20 @@ class AdminSectionController extends Controller
 
             DB::commit();
 
+            // Get teacher name for notification
+            $teacher = DB::table('teacher_profile')->where('id', $request->assigned_teacher)->first();
+            $teacherName = $teacher ? $teacher->firstname . ' ' . $teacher->lastname : 'Unknown';
+
+            // Log notification
+            $this->logNotification('section_management', 'Created section and assigned teacher', [
+                'section_name' => $request->section_name,
+                'teacher_name' => $teacherName,
+                'teacher_id' => $request->assigned_teacher,
+                'grade_level' => $gradeLevel,
+                'school_year' => $schoolYear,
+                'new_section' => !$sectionExists
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Section created and teacher assigned successfully!'
@@ -390,6 +424,15 @@ class AdminSectionController extends Controller
                     'grade_level' => $request->grade_level,
                     'updated_at' => now()
                 ]);
+
+            // Log notification
+            $this->logNotification('section_management', 'Updated section', [
+                'old_section_name' => $section,
+                'new_section_name' => $request->section_name,
+                'grade_level' => $request->grade_level,
+                'enrolled_students' => $request->enrolled_students,
+                'assigned_teacher' => $request->assigned_teacher
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -428,6 +471,13 @@ class AdminSectionController extends Controller
                     'updated_at' => now(),
                 ]);
 
+            // Log notification
+            $this->logNotification('section_management', 'Archived section', [
+                'section_name' => $section,
+                'grade_level' => $sectionRecord->grade_level,
+                'school_year' => $sectionRecord->school_year
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Section archived successfully!'
@@ -465,6 +515,13 @@ class AdminSectionController extends Controller
                     'updated_at' => now(),
                 ]);
 
+            // Log notification
+            $this->logNotification('section_management', 'Reactivated section', [
+                'section_name' => $section,
+                'grade_level' => $sectionRecord->grade_level,
+                'school_year' => $sectionRecord->school_year
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Section reactivated successfully!'
@@ -485,6 +542,10 @@ class AdminSectionController extends Controller
         try {
             DB::beginTransaction();
 
+            // Get section info before deletion
+            $sectionRecord = DB::table('sections')->where('name', $section)->first();
+            $studentCount = DB::table('student_profile')->where('section', $section)->count();
+
             // Delete student profiles first
             $studentIds = DB::table('student_profile')
                 ->where('section', $section)
@@ -501,6 +562,14 @@ class AdminSectionController extends Controller
 
             DB::commit();
 
+            // Log notification after successful deletion
+            $this->logNotification('section_management', 'Deleted section', [
+                'section_name' => $section,
+                'grade_level' => $sectionRecord ? $sectionRecord->grade_level : 'Unknown',
+                'school_year' => $sectionRecord ? $sectionRecord->school_year : 'Unknown',
+                'students_removed' => $studentCount
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Section deleted successfully!'
@@ -511,6 +580,36 @@ class AdminSectionController extends Controller
                 'success' => false,
                 'message' => 'Failed to delete section: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to log admin notification: ' . $e->getMessage());
         }
     }
 }
