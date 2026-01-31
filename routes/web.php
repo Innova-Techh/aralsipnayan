@@ -275,12 +275,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
     
     // Profile
-    Route::get('/profile', function () {
-        if (!Auth::guard('admin')->check() || Auth::guard('admin')->user()->role !== 'Teacher') {
-            return redirect()->route('login');
-        }
-        return view('admin.teacher.profile.index');
-    })->name('profile');
+    Route::get('/profile', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/update-password', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updatePassword'])->name('profile.update-password');
+    Route::post('/profile/update-photo', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updatePhoto'])->name('profile.update-photo');
 });
 
 
