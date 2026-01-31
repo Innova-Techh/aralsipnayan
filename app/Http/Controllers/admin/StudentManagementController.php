@@ -177,6 +177,15 @@ class StudentManagementController extends Controller
 
             DB::commit();
 
+            // Log notification
+            $this->logNotification('student_management', 'Added new student to section', [
+                'student_name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                'student_id' => $lrn,
+                'email' => $request->email,
+                'section' => $sectionId,
+                'student_user_id' => $user->id
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Student added successfully!',
@@ -301,6 +310,15 @@ class StudentManagementController extends Controller
 
                 DB::commit();
 
+                // Log notification
+                $this->logNotification('student_management', 'Updated student information', [
+                    'student_name' => $request->firstname . ' ' . $request->lastname,
+                    'student_id' => $request->student_id,
+                    'email' => $request->email,
+                    'student_user_id' => $studentId,
+                    'password_changed' => $request->filled('password')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Student updated successfully!',
@@ -372,14 +390,27 @@ class StudentManagementController extends Controller
                 'new_status' => $newStatus
             ]);
     
-            // Remove section only when archiving
+            // Remove section only when archiving (use empty string instead of null)
             if ($newStatus === 'archive') {
                 DB::table('student_profile')
                     ->where('user_id', $studentId)
-                    ->update(['section' => null]);
+                    ->update(['section' => '']);
     
                 Log::info("Student removed from section.", ['user_id' => $user->id]);
             }
+            
+            // Get student name for notification
+            $studentProfile = $user->studentProfile;
+            $studentName = $studentProfile ? $studentProfile->firstname . ' ' . $studentProfile->lastname : 'Unknown';
+            
+            // Log notification
+            $this->logNotification('student_management', "Student {$action}", [
+                'student_name' => $studentName,
+                'student_id' => $studentProfile ? $studentProfile->student_id : 'N/A',
+                'student_user_id' => $studentId,
+                'action' => $action,
+                'new_status' => $newStatus
+            ]);
     
             Log::info("Archive toggle completed successfully.", [
                 'user_id' => $user->id,
@@ -422,10 +453,24 @@ class StudentManagementController extends Controller
 
             DB::beginTransaction();
             try {
+                // Store student info before deletion for notification
+                $studentProfile = $user->studentProfile;
+                $studentName = $studentProfile ? $studentProfile->firstname . ' ' . $studentProfile->lastname : 'Unknown';
+                $studentId = $studentProfile ? $studentProfile->student_id : 'N/A';
+                $section = $studentProfile ? $studentProfile->section : 'N/A';
+                
                 $user->studentProfile()->delete();
                 $user->delete();
 
                 DB::commit();
+
+                // Log notification after successful deletion
+                $this->logNotification('student_management', 'Deleted student', [
+                    'student_name' => $studentName,
+                    'student_id' => $studentId,
+                    'section' => $section,
+                    'deleted_user_id' => $user->id
+                ]);
 
                 return response()->json([
                     'success' => true,
@@ -663,6 +708,15 @@ class StudentManagementController extends Controller
 
             DB::commit();
 
+            // Log notification
+            $this->logNotification('student_management', 'Added new student', [
+                'student_name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                'student_id' => $lrn,
+                'email' => $request->email,
+                'section' => $request->section ?? 'Unassigned',
+                'student_user_id' => $user->id
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Student added successfully!',
@@ -774,11 +828,11 @@ class StudentManagementController extends Controller
                 if ($request->filled('password')) {
                     $user->password = Hash::make($request->password);
                 }
-                // If student is archived → remove from section
+                // If student is archived → remove from section (use empty string instead of null)
                 if ($request->status === 'archive') {
                     DB::table('student_profile')
                         ->where('user_id', $studentId)
-                        ->update(['section' => null]); // or 'section' if that's your actual column
+                        ->update(['section' => '']);
 
                     Log::info("Archived student unassigned from section.", [
                         'user_id' => $studentId
@@ -799,6 +853,17 @@ class StudentManagementController extends Controller
 
                 DB::commit();
 
+                // Log notification
+                $this->logNotification('student_management', 'Updated student information', [
+                    'student_name' => $request->firstname . ' ' . $request->lastname,
+                    'student_id' => $request->student_id,
+                    'email' => $request->email,
+                    'section' => $request->section ?? 'Unassigned',
+                    'student_user_id' => $studentId,
+                    'status' => $request->status,
+                    'password_changed' => $request->filled('password')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Student updated successfully!',
@@ -813,6 +878,36 @@ class StudentManagementController extends Controller
                 'success' => false,
                 'message' => 'Failed to update student: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to log admin notification: ' . $e->getMessage());
         }
     }
 }
