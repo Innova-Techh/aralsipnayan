@@ -330,6 +330,10 @@ class TeacherSectionController extends Controller
         try {
             DB::beginTransaction();
 
+            // Store old section name for notification
+            $oldSectionName = $section;
+            $newSectionName = $request->section;
+
             // Update the section in sections table
             DB::table('sections')
                 ->where('name', $section)
@@ -349,6 +353,20 @@ class TeacherSectionController extends Controller
                     'updated_at' => now()
                 ]);
             
+            // Log notification
+            $this->logNotification(
+                $teacherProfile->id,
+                'section_updated',
+                'Updated section name from ' . $oldSectionName . ' to ' . $newSectionName,
+                json_encode([
+                    'old_section_name' => $oldSectionName,
+                    'new_section_name' => $newSectionName,
+                    'grade_level' => '6',
+                    'school_year' => '2024-2025',
+                    'updated_at' => now()->toDateTimeString()
+                ]),
+                $request
+            );
 
             DB::commit();
 
@@ -357,6 +375,7 @@ class TeacherSectionController extends Controller
                 'message' => 'Section updated successfully!'
             ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['error' => 'Failed to update section: ' . $e->getMessage()], 500);
         }
     }
@@ -364,7 +383,7 @@ class TeacherSectionController extends Controller
     /**
      * Deactivate a section instead of deleting it
      */
-    public function deactivate($section)
+    public function deactivate($section, Request $request)
     {
         $teacher = Auth::guard('admin')->user();
         $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
@@ -401,6 +420,19 @@ class TeacherSectionController extends Controller
                     'is_active' => false,
                     'updated_at' => now()
                 ]);
+
+            // Log notification
+            $this->logNotification(
+                $teacherProfile->id,
+                'section_deactivated',
+                'Deactivated section: ' . $section,
+                json_encode([
+                    'section_name' => $section,
+                    'grade_level' => $sectionRecord->grade_level ?? '6',
+                    'deactivated_at' => now()->toDateTimeString()
+                ]),
+                $request
+            );
 
             DB::commit();
 
@@ -537,5 +569,28 @@ private function formatTime($seconds)
         return $minutes . ' min ' . $secs . ' sec';
     }
     return $secs . ' sec';
+}
+
+/**
+ * Log notification to teacher_notifications table
+ */
+private function logNotification($teacherProfileId, $type, $action, $details, Request $request)
+{
+    try {
+        DB::table('teacher_notifications')->insert([
+            'teacher_id' => $teacherProfileId,
+            'type' => $type,
+            'action' => $action,
+            'details' => $details,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'is_read' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    } catch (\Exception $e) {
+        // Log error but don't fail the main operation
+        Log::error('Failed to log teacher notification: ' . $e->getMessage());
+    }
 }
 }
