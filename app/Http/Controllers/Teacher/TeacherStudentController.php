@@ -189,6 +189,18 @@ class TeacherStudentController extends Controller
 
             DB::commit();
             
+            // Log notification
+            $this->logNotification(
+                'student_created',
+                'Created new student',
+                [
+                    'student_name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                    'student_id' => $lrn,
+                    'email' => $request->email,
+                    'section' => $request->section
+                ]
+            );
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Student processed successfully!',
@@ -259,6 +271,19 @@ class TeacherStudentController extends Controller
 
             DB::commit();
             
+            // Log notification
+            $this->logNotification(
+                'student_updated',
+                'Updated student information',
+                [
+                    'student_name' => trim($request->firstname . ' ' . ($request->middlename ? $request->middlename . ' ' : '') . $request->lastname),
+                    'student_id' => $studentProfile->student_id,
+                    'email' => $request->email,
+                    'section' => $request->section,
+                    'password_changed' => $request->filled('password')
+                ]
+            );
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Student updated successfully!'
@@ -299,9 +324,23 @@ class TeacherStudentController extends Controller
             
             // Delete user account completely
             $user = User::findOrFail($studentId);
+            $studentName = trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname);
+            $studentLrn = $studentProfile->student_id;
+            $studentSection = $studentProfile->section;
             $user->delete();
 
             DB::commit();
+            
+            // Log notification
+            $this->logNotification(
+                'student_deleted',
+                'Deleted student',
+                [
+                    'student_name' => $studentName,
+                    'student_id' => $studentLrn,
+                    'section' => $studentSection
+                ]
+            );
             
             return response()->json([
                 'success' => true,
@@ -342,6 +381,17 @@ class TeacherStudentController extends Controller
             $user->status = 'inactive';
             $user->save();
 
+            // Log notification
+            $this->logNotification(
+                'student_deactivated',
+                'Deactivated student account',
+                [
+                    'student_name' => trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname),
+                    'student_id' => $studentProfile->student_id,
+                    'section' => $studentProfile->section
+                ]
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Student account set to inactive.'
@@ -380,6 +430,17 @@ class TeacherStudentController extends Controller
             $user->status = 'active';
             $user->save();
 
+            // Log notification
+            $this->logNotification(
+                'student_activated',
+                'Activated student account',
+                [
+                    'student_name' => trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname),
+                    'student_id' => $studentProfile->student_id,
+                    'section' => $studentProfile->section
+                ]
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Student account set to active.'
@@ -414,6 +475,10 @@ class TeacherStudentController extends Controller
         }
 
         try {
+            $studentName = trim($studentProfile->firstname . ' ' . ($studentProfile->middlename ? $studentProfile->middlename . ' ' : '') . $studentProfile->lastname);
+            $studentLrn = $studentProfile->student_id;
+            $previousSection = $studentProfile->section;
+            
             // Remove the student from their section
             DB::table('student_profile')
                 ->where('user_id', $studentId)
@@ -424,6 +489,18 @@ class TeacherStudentController extends Controller
             ->update(['status' => 'inactive']);
 
             DB::commit();
+            
+            // Log notification
+            $this->logNotification(
+                'student_removed_from_section',
+                'Removed student from section',
+                [
+                    'student_name' => $studentName,
+                    'student_id' => $studentLrn,
+                    'previous_section' => $previousSection
+                ]
+            );
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Student removed from section successfully.'
@@ -441,7 +518,7 @@ class TeacherStudentController extends Controller
     {
         
         try {
-            Log::info('Active student IDs:', $students->toArray());
+            // Log::info('Active student IDs:', $students->toArray());
             // Get students in this section
             $students = DB::table('student_profile')
                 ->join('users', 'student_profile.user_id', '=', 'users.id')
@@ -544,5 +621,35 @@ class TeacherStudentController extends Controller
         } while (StudentProfile::where('student_id', $lrn)->exists());
         
         return $lrn;
+    }
+
+    /**
+     * Log notification to teacher_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $teacher = Auth::guard('admin')->user();
+            $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+            
+            if ($teacherProfile) {
+                DB::table('teacher_notifications')->insert([
+                    'teacher_id' => $teacherProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'teacher_name' => $teacher->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to log notification: ' . $e->getMessage());
+        }
     }
 }
