@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
 class AdminManagementController extends Controller
@@ -86,6 +87,14 @@ class AdminManagementController extends Controller
             ]);
 
             DB::commit();
+
+            // Log notification
+            $this->logNotification('admin_management', 'Created new admin account', [
+                'admin_name' => $request->firstname . ' ' . $request->lastname,
+                'username' => $user->username,
+                'email' => $user->email,
+                'admin_id' => $user->id
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -210,6 +219,16 @@ class AdminManagementController extends Controller
 
                 DB::commit();
 
+                // Log notification
+                $this->logNotification('admin_management', 'Updated admin account', [
+                    'admin_name' => $request->firstname . ' ' . $request->lastname,
+                    'username' => $request->username,
+                    'email' => $request->email,
+                    'admin_id' => $user->id,
+                    'status' => $request->status,
+                    'password_changed' => $request->filled('password')
+                ]);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Admin updated successfully!',
@@ -286,6 +305,17 @@ class AdminManagementController extends Controller
                 'new_status' => $newStatus
             ]);
 
+            // Log notification
+            $adminProfile = $user->adminProfile;
+            $adminName = $adminProfile ? $adminProfile->firstname . ' ' . $adminProfile->lastname : $user->username;
+            $this->logNotification('admin_management', "Admin account {$action}", [
+                'admin_name' => $adminName,
+                'username' => $user->username,
+                'admin_id' => $user->id,
+                'action' => $action,
+                'new_status' => $newStatus
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => "Admin {$action} successfully!",
@@ -330,6 +360,12 @@ class AdminManagementController extends Controller
 
             DB::beginTransaction();
 
+            // Store admin info before deletion for notification
+            $adminProfile = $user->adminProfile;
+            $adminName = $adminProfile ? $adminProfile->firstname . ' ' . $adminProfile->lastname : $user->username;
+            $adminUsername = $user->username;
+            $adminEmail = $user->email;
+
             // Delete admin profile first (if exists)
             if ($user->adminProfile) {
                 $user->adminProfile()->delete();
@@ -337,6 +373,14 @@ class AdminManagementController extends Controller
 
             $user->delete();
             DB::commit();
+
+            // Log notification after successful deletion
+            $this->logNotification('admin_management', 'Deleted admin account', [
+                'admin_name' => $adminName,
+                'username' => $adminUsername,
+                'email' => $adminEmail,
+                'deleted_admin_id' => $adminId
+            ]);
 
             Log::info("Admin deleted successfully.", [
                 'admin_id' => $adminId,
@@ -360,6 +404,36 @@ class AdminManagementController extends Controller
                 'success' => false,
                 'message' => 'Failed to delete admin: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to log admin notification: ' . $e->getMessage());
         }
     }
 }
