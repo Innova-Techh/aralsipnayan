@@ -48,6 +48,14 @@ class TeacherProfileController extends Controller
             $teacher = Auth::guard('admin')->user();
             $profile = $teacher->teacherProfile;
 
+            // Store old values for logging
+            $oldValues = [
+                'firstname' => $profile->firstname,
+                'lastname' => $profile->lastname,
+                'email' => $teacher->email,
+                'school_name' => $profile->school_name,
+            ];
+
             // Update user email
             $teacher->update([
                 'email' => $request->email,
@@ -59,6 +67,23 @@ class TeacherProfileController extends Controller
                 'lastname' => $request->lastname,
                 'school_name' => $request->school_name ?? $profile->school_name,
             ]);
+
+            // Log notification
+            $this->logNotification(
+                $profile->id,
+                'profile_update',
+                'Updated profile information',
+                json_encode([
+                    'old' => $oldValues,
+                    'new' => [
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'email' => $request->email,
+                        'school_name' => $request->school_name ?? $profile->school_name,
+                    ]
+                ]),
+                $request
+            );
 
             DB::commit();
 
@@ -88,6 +113,7 @@ class TeacherProfileController extends Controller
 
         try {
             $teacher = Auth::guard('admin')->user();
+            $profile = $teacher->teacherProfile;
 
             // Verify current password
             if (!Hash::check($request->current_password, $teacher->password)) {
@@ -101,6 +127,18 @@ class TeacherProfileController extends Controller
             $teacher->update([
                 'password' => Hash::make($request->new_password)
             ]);
+
+            // Log notification
+            $this->logNotification(
+                $profile->id,
+                'password_change',
+                'Changed account password',
+                json_encode([
+                    'timestamp' => now()->toDateTimeString(),
+                    'message' => 'Password was successfully changed'
+                ]),
+                $request
+            );
 
             return response()->json([
                 'success' => true,
@@ -128,6 +166,8 @@ class TeacherProfileController extends Controller
             $profile = $teacher->teacherProfile;
 
             if ($request->hasFile('photo')) {
+                $oldPhotoUrl = $profile->profile_url;
+
                 // Delete old photo if exists
                 if ($profile->profile_url && Storage::disk('public')->exists($profile->profile_url)) {
                     Storage::disk('public')->delete($profile->profile_url);
@@ -140,6 +180,20 @@ class TeacherProfileController extends Controller
                 $profile->update([
                     'profile_url' => $path
                 ]);
+
+                // Log notification
+                $this->logNotification(
+                    $profile->id,
+                    'photo_update',
+                    'Updated profile photo',
+                    json_encode([
+                        'old_photo' => $oldPhotoUrl,
+                        'new_photo' => $path,
+                        'file_size' => $request->file('photo')->getSize(),
+                        'mime_type' => $request->file('photo')->getMimeType()
+                    ]),
+                    $request
+                );
 
                 return response()->json([
                     'success' => true,
@@ -195,5 +249,28 @@ class TeacherProfileController extends Controller
             'total_assessments' => $totalAssessments,
             'active_sections' => $activeSections,
         ];
+    }
+
+    /**
+     * Log notification to teacher_notifications table
+     */
+    private function logNotification($teacherProfileId, $type, $action, $details, Request $request)
+    {
+        try {
+            DB::table('teacher_notifications')->insert([
+                'teacher_id' => $teacherProfileId,
+                'type' => $type,
+                'action' => $action,
+                'details' => $details,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Log error but don't fail the main operation
+            \Log::error('Failed to log teacher notification: ' . $e->getMessage());
+        }
     }
 }
