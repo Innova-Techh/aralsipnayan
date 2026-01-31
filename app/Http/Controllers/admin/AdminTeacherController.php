@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\TeacherProfile;
 
@@ -177,6 +179,16 @@ class AdminTeacherController extends Controller
 
             DB::commit();
 
+            // Log notification
+            $this->logNotification('teacher_management', 'Created new teacher account', [
+                'teacher_name' => $request->firstname . ' ' . $request->lastname,
+                'username' => $user->username,
+                'email' => $user->email,
+                'teacher_id' => $user->id,
+                'sections_assigned' => $request->sections ?? [],
+                'section_count' => count($request->sections ?? [])
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Teacher added successfully!',
@@ -293,6 +305,17 @@ class AdminTeacherController extends Controller
 
             DB::commit();
 
+            // Log notification
+            $this->logNotification('teacher_management', 'Updated teacher account', [
+                'teacher_name' => $request->firstname . ' ' . $request->lastname,
+                'username' => $request->username,
+                'email' => $request->email,
+                'teacher_id' => $id,
+                'password_changed' => $request->filled('password'),
+                'sections_updated' => $request->has('sections'),
+                'new_sections' => $request->sections ?? []
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Teacher updated successfully!'
@@ -322,6 +345,20 @@ class AdminTeacherController extends Controller
             $user->save();
 
             $action = $user->status === 'inactive' ? 'archived' : 'activated';
+            
+            // Get teacher name for notification
+            $teacherProfile = TeacherProfile::where('user_id', $id)->first();
+            $teacherName = $teacherProfile ? $teacherProfile->firstname . ' ' . $teacherProfile->lastname : $user->username;
+            
+            // Log notification
+            $this->logNotification('teacher_management', "Teacher account {$action}", [
+                'teacher_name' => $teacherName,
+                'username' => $user->username,
+                'teacher_id' => $id,
+                'action' => $action,
+                'new_status' => $user->status
+            ]);
+            
             return response()->json([
                 'success' => true,
                 'message' => "Teacher {$action} successfully!",
@@ -345,6 +382,11 @@ class AdminTeacherController extends Controller
 
             $user = User::findOrFail($id);
             $teacherProfile = TeacherProfile::where('user_id', $id)->first();
+            
+            // Store teacher info before deletion for notification
+            $teacherName = $teacherProfile ? $teacherProfile->firstname . ' ' . $teacherProfile->lastname : $user->username;
+            $teacherUsername = $user->username;
+            $teacherEmail = $user->email;
 
             if ($teacherProfile) {
                 // Check if teacher has sections with students
@@ -373,6 +415,14 @@ class AdminTeacherController extends Controller
             $user->delete();
 
             DB::commit();
+
+            // Log notification after successful deletion
+            $this->logNotification('teacher_management', 'Deleted teacher account', [
+                'teacher_name' => $teacherName,
+                'username' => $teacherUsername,
+                'email' => $teacherEmail,
+                'deleted_teacher_id' => $id
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -428,6 +478,18 @@ class AdminTeacherController extends Controller
             $user->status = $user->status === 'active' ? 'inactive' : 'active';
             $user->save();
 
+            // Get teacher name for notification
+            $teacherProfile = TeacherProfile::where('user_id', $id)->first();
+            $teacherName = $teacherProfile ? $teacherProfile->firstname . ' ' . $teacherProfile->lastname : $user->username;
+            
+            // Log notification
+            $this->logNotification('teacher_management', 'Toggled teacher status', [
+                'teacher_name' => $teacherName,
+                'username' => $user->username,
+                'teacher_id' => $id,
+                'new_status' => $user->status
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Teacher status updated successfully!',
@@ -438,6 +500,36 @@ class AdminTeacherController extends Controller
                 'success' => false,
                 'message' => 'Failed to update teacher status: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to log admin notification: ' . $e->getMessage());
         }
     }
 }
