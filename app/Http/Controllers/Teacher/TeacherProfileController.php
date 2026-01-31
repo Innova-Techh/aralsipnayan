@@ -252,6 +252,141 @@ class TeacherProfileController extends Controller
     }
 
     /**
+     * Get teacher notifications
+     */
+    public function getNotifications()
+    {
+        try {
+            $teacher = Auth::guard('admin')->user();
+            $profile = $teacher->teacherProfile;
+
+            if (!$profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Teacher profile not found'
+                ], 404);
+            }
+
+            // Get latest 10 notifications
+            $notifications = DB::table('teacher_notifications')
+                ->where('teacher_id', $profile->id)
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function($notification) {
+                    return [
+                        'id' => $notification->id,
+                        'type' => $notification->type,
+                        'action' => $notification->action,
+                        'details' => $notification->details,
+                        'is_read' => $notification->is_read,
+                        'created_at' => $notification->created_at,
+                        'time_ago' => \Carbon\Carbon::parse($notification->created_at)->diffForHumans(),
+                    ];
+                });
+
+            // Get unread count
+            $unreadCount = DB::table('teacher_notifications')
+                ->where('teacher_id', $profile->id)
+                ->where('is_read', false)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'notifications' => $notifications,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch notifications: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function markAsRead(Request $request)
+    {
+        try {
+            $teacher = Auth::guard('admin')->user();
+            $profile = $teacher->teacherProfile;
+
+            if (!$profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Teacher profile not found'
+                ], 404);
+            }
+
+            $notificationId = $request->input('notification_id');
+
+            // Update notification
+            $updated = DB::table('teacher_notifications')
+                ->where('id', $notificationId)
+                ->where('teacher_id', $profile->id)
+                ->update([
+                    'is_read' => true,
+                    'updated_at' => now()
+                ]);
+
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Notification marked as read'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark notification as read: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead()
+    {
+        try {
+            $teacher = Auth::guard('admin')->user();
+            $profile = $teacher->teacherProfile;
+
+            if (!$profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Teacher profile not found'
+                ], 404);
+            }
+
+            DB::table('teacher_notifications')
+                ->where('teacher_id', $profile->id)
+                ->where('is_read', false)
+                ->update([
+                    'is_read' => true,
+                    'updated_at' => now()
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All notifications marked as read'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark notifications as read: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Log notification to teacher_notifications table
      */
     private function logNotification($teacherProfileId, $type, $action, $details, Request $request)

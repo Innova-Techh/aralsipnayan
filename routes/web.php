@@ -279,6 +279,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/profile/update', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/update-password', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updatePassword'])->name('profile.update-password');
     Route::post('/profile/update-photo', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'updatePhoto'])->name('profile.update-photo');
+    
+    // Notifications
+    Route::get('/notifications', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'getNotifications'])->name('notifications');
+    Route::post('/notifications/mark-read', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Teacher\TeacherProfileController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
 

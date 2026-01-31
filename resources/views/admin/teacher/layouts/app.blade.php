@@ -331,11 +331,88 @@
                     <!-- Right Side: Notifications & User (matches admin layout) -->
                     <div class="flex items-center space-x-4">
                         <!-- Notifications -->
-                        <div class="relative" x-data="{ notificationOpen: false }">
-                            <button @click="notificationOpen = !notificationOpen"
+                        <div class="relative" x-data="{ 
+                            notificationOpen: false, 
+                            notifications: [],
+                            unreadCount: 0,
+                            loading: false,
+                            async fetchNotifications() {
+                                this.loading = true;
+                                try {
+                                    const response = await fetch('{{ route('teacher.notifications') }}', {
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        this.notifications = data.notifications;
+                                        this.unreadCount = data.unread_count;
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to fetch notifications:', error);
+                                } finally {
+                                    this.loading = false;
+                                }
+                            },
+                            async markAsRead(notificationId) {
+                                try {
+                                    const response = await fetch('{{ route('teacher.notifications.mark-read') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Content-Type': 'application/json',
+                                            'Accept': 'application/json'
+                                        },
+                                        body: JSON.stringify({ notification_id: notificationId })
+                                    });
+                                    if (response.ok) {
+                                        await this.fetchNotifications();
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to mark notification as read:', error);
+                                }
+                            },
+                            async markAllAsRead() {
+                                try {
+                                    const response = await fetch('{{ route('teacher.notifications.mark-all-read') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Accept': 'application/json'
+                                        }
+                                    });
+                                    if (response.ok) {
+                                        await this.fetchNotifications();
+                                    }
+                                } catch (error) {
+                                    console.error('Failed to mark all notifications as read:', error);
+                                }
+                            },
+                            getNotificationIcon(type) {
+                                const icons = {
+                                    'profile_update': 'fas fa-user-edit',
+                                    'password_change': 'fas fa-key',
+                                    'photo_update': 'fas fa-image'
+                                };
+                                return icons[type] || 'fas fa-bell';
+                            },
+                            getNotificationColor(type) {
+                                const colors = {
+                                    'profile_update': 'text-blue-600',
+                                    'password_change': 'text-yellow-600',
+                                    'photo_update': 'text-green-600'
+                                };
+                                return colors[type] || 'text-gray-600';
+                            }
+                        }" 
+                        x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000);">
+                            <button @click="notificationOpen = !notificationOpen; if(notificationOpen) fetchNotifications();"
                                 class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 relative">
                                 <i class="fas fa-bell text-gray-600"></i>
-                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                <span x-show="unreadCount > 0" x-text="unreadCount" 
+                                    class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"></span>
                             </button>
 
                             <!-- Notification Dropdown -->
@@ -346,26 +423,41 @@
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95" @click.away="notificationOpen = false"
                                 class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                                <div class="p-4 border-b border-gray-200">
+                                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
                                     <h3 class="font-semibold text-gray-800">Notifications</h3>
+                                    <button @click="markAllAsRead()" x-show="unreadCount > 0"
+                                        class="text-xs text-blue-600 hover:text-blue-800">
+                                        Mark all read
+                                    </button>
                                 </div>
                                 <div class="max-h-96 overflow-y-auto">
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                                        <p class="text-sm text-gray-800">Exam grading completed</p>
-                                        <p class="text-xs text-gray-500 mt-1">5 minutes ago</p>
-                                    </a>
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                                        <p class="text-sm text-gray-800">New student joined your section</p>
-                                        <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
-                                    </a>
-                                    <a href="#" class="block px-4 py-3 hover:bg-gray-50">
-                                        <p class="text-sm text-gray-800">15 new students enrolled</p>
-                                        <p class="text-xs text-gray-500 mt-1">3 hours ago</p>
-                                    </a>
-                                </div>
-                                <div class="p-3 border-t border-gray-200">
-                                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800">View all
-                                        notifications</a>
+                                    <!-- Loading State -->
+                                    <div x-show="loading" class="p-8 text-center">
+                                        <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
+                                        <p class="text-sm text-gray-500 mt-2">Loading notifications...</p>
+                                    </div>
+
+                                    <!-- Empty State -->
+                                    <div x-show="!loading && notifications.length === 0" class="p-8 text-center">
+                                        <i class="fas fa-bell-slash text-gray-300 text-4xl mb-3"></i>
+                                        <p class="text-sm text-gray-500">No notifications yet</p>
+                                    </div>
+
+                                    <!-- Notifications List -->
+                                    <template x-for="notification in notifications" :key="notification.id">
+                                        <div @click="markAsRead(notification.id)"
+                                            class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors"
+                                            :class="!notification.is_read ? 'bg-blue-50' : ''">
+                                            <div class="flex items-start space-x-3">
+                                                <i :class="getNotificationIcon(notification.type) + ' ' + getNotificationColor(notification.type) + ' mt-1'"></i>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-gray-800" x-text="notification.action"></p>
+                                                    <p class="text-xs text-gray-500 mt-1" x-text="notification.time_ago"></p>
+                                                </div>
+                                                <span x-show="!notification.is_read" class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
