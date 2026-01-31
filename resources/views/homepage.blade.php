@@ -543,7 +543,7 @@
                 <!-- Text Content -->
                 <div class="flex-1 text-center lg:text-left relative z-20">
             <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Master <span class="text-yellow-400">Advanced<br>Mathematics</span> with<br>
+                Master <span class="text-yellow-400">Mathematics</span> with<br>
                 <span class="text-white">Interactive Learning</span>
             </h1>
             <p
