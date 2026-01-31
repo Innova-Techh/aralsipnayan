@@ -338,6 +338,40 @@
             content: 'next';
         }
 
+        /* Pagination Styles */
+        .swiper-pagination {
+            bottom: 50px !important;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .swiper-pagination-bullet {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid #1E3A8A;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .swiper-pagination-bullet-active {
+            width: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #FACC15 0%, #F59E0B 100%);
+            border: 3px solid #D97706;
+            opacity: 1;
+            box-shadow: 0 4px 12px rgba(250, 204, 21, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .swiper-pagination {
+                bottom: 30px !important;
+            }
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .swiper {
@@ -478,11 +512,11 @@
                     <a href="#about" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">About</a>
                     <a href="#features" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Features</a>
                     <a href="#media" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a>
-                    <a href="#researchers" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Researchers</a>
+                    <a href="#ourteam" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Our Team</a>
                 </div>
 
                 <a href="{{ route('login') }}"
-                    class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-lg sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
+                    class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-base sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
                     Login
                 </a>
                 
@@ -543,7 +577,7 @@
                 <!-- Text Content -->
                 <div class="flex-1 text-center lg:text-left relative z-20">
             <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Master <span class="text-yellow-400">Mathematics</span> with<br>
+                Master <span class="text-yellow-400">Mathematics</span> with
                 <span class="text-white">Interactive Learning</span>
             </h1>
             <p
@@ -565,7 +599,7 @@
                 </div>
                 
                 <!-- Hero Animation -->
-                <div class="flex-shrink-0 w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 relative z-10 overflow-hidden">
+                <div class="flex-shrink-0 w-96 h-96 md:w-[28rem] md:h-[28rem] lg:w-[36rem] lg:h-[36rem] relative z-10 overflow-hidden">
                     <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
                     <dotlottie-player
                         src="{{ asset('anim/hero-anim.json') }}"
@@ -581,7 +615,7 @@
     </section>
 
     <!-- Section 2 -->
-    <section class="py-12 md:py-12 bg-white">
+    <section class="font-baloo py-12 md:py-12 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="section2-title text-3xl md:text-5xl font-bold text-center mb-8 md:mb-10 text-gray-900">
                 How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms
@@ -656,6 +690,9 @@
                                         d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </div>
+                            
+                            <!-- Pagination -->
+                            <div class="swiper-pagination"></div>
                         </div>
                     </div>
                 </div>
@@ -663,207 +700,8 @@
         </div>
     </section>
 
-    <!-- Section 3 -->
-    <section class="pb-6 md:pb-6 bg-white md:bg-blue-900 relative">
-        <!-- Mobile design (only) -->
-        <div class="block md:hidden relative z-10 py-4">
-            <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-blue-900/90 border border-white/10 rounded-2xl p-5 shadow-2xl relative z-10">
-                    <div class="section3-header text-center pb-4">
-                        <h2 class="text-2xl font-extrabold text-yellow-300">AralSipnayan</h2>
-                        <p class="text-white/80 text-sm">Features Overview</p>
-                    </div>
-
-                    <!-- Card: Adaptive Learning -->
-                    <div
-                        class="feature-card-1 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
-                        <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
-                            <div class="flex-1">
-                                <h3 class="text-white font-semibold">Adaptive Learning</h3>
-                                <p class="text-white/70 text-sm">Engaging quizzes & lessons</p>
-                                <div class="bg-white/20 rounded-lg p-3 mt-3 text-center border border-white/10">
-                                    <div class="text-white/70 text-xs">Current Lesson</div>
-                                    <div class="text-yellow-300 font-semibold text-sm">Fractions</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card: Achievements -->
-                    <div
-                        class="feature-card-2 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
-                        <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features2.png') }}" alt="Achievements"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
-                            <div class="flex-1">
-                                <h3 class="text-white font-semibold">Achievements</h3>
-                                <p class="text-white/70 text-sm">Badges and XP</p>
-                                <div class="bg-white/20 rounded-lg p-3 mt-3 text-center border border-white/10">
-                                    <div class="text-white/70 text-xs">Badges Earned</div>
-                                    <div class="text-yellow-300 font-semibold">15/20</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card: Progress Tracking -->
-                    <div
-                        class="feature-card-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 mb-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
-                        <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
-                            <div class="flex-1">
-                                <h3 class="text-white font-semibold">Progress Tracking</h3>
-                                <p class="text-white/70 text-sm">Real-time progress</p>
-                                <div class="bg-white/20 rounded-lg p-3 mt-3 border border-white/10">
-                                    <div class="text-white/70 text-xs mb-1">Progress</div>
-                                    <div class="w-full h-2 bg-white/20 rounded-full mb-2">
-                                        <div class="h-2 bg-yellow-300 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <div class="text-center text-white/80 text-sm">Level 4</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card: Leaderboard -->
-                    <div
-                        class="feature-card-4 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-4 transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-xl">
-                        <div class="flex items-start gap-3">
-                            <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
-                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg">
-                            <div class="flex-1">
-                                <h3 class="text-white font-semibold">Leaderboard</h3>
-                                <p class="text-white/70 text-sm">Your ranking</p>
-                                <div class="bg-white/20 rounded-lg p-3 mt-3 border border-white/10">
-                                    <div class="flex items-center justify-between text-sm mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-yellow-300">1</span>
-                                            <span class="text-white/90">Mario S.</span>
-                                        </div>
-                                        <div class="text-yellow-300 font-semibold">1580</div>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-yellow-300">2</span>
-                                            <span class="text-white/90">You</span>
-                                        </div>
-                                        <div class="text-yellow-300 font-semibold">1250</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Desktop/Tablet design (md and up) -->
-        <div class="hidden md:block relative z-10">
-            <div class="max-w-7xl mx-auto px-8 lg:px-12">
-                <div class="p-12">
-                    <div class="section3-header-desktop text-center pb-6">
-                        <h2 class="text-4xl font-extrabold text-yellow-300">AralSipnayan</h2>
-                        <p class="text-white/80 text-lg">Features Overview</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-8">
-                        <!-- Adaptive Learning -->
-                        <div
-                            class="feature-card-desktop-1 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
-                            <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features1.png') }}" alt="Adaptive Learning"
-                                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
-                                <div class="flex-1">
-                                    <h3 class="text-white font-semibold">Adaptive Learning</h3>
-                                    <p class="text-white/70 text-sm">Engaging quizzes & lessons</p>
-                                    <div class="bg-white/20 rounded-lg p-4 mt-4 text-center border border-white/10">
-                                        <div class="text-white/70 text-xs">Current Lesson</div>
-                                        <div class="text-yellow-300 font-semibold">Fractions</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Achievements -->
-                        <div
-                            class="feature-card-desktop-2 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
-                            <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features2.png') }}" alt="Achievements"
-                                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
-                                <div class="flex-1">
-                                    <h3 class="text-white font-semibold">Achievements</h3>
-                                    <p class="text-white/70 text-sm">Badges and XP</p>
-                                    <div class="bg-white/20 rounded-lg p-4 mt-4 text-center border border-white/10">
-                                        <div class="text-white/70 text-xs">Badges Earned</div>
-                                        <div class="text-yellow-300 font-semibold">15/20</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Progress Tracking -->
-                        <div
-                            class="feature-card-desktop-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
-                            <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features3.png') }}" alt="Progress Tracking"
-                                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
-                                <div class="flex-1">
-                                    <h3 class="text-white font-semibold">Progress Tracking</h3>
-                                    <p class="text-white/70 text-sm">Real-time progress</p>
-                                    <div class="bg-white/20 rounded-lg p-4 mt-4 border border-white/10">
-                                        <div class="text-white/70 text-xs mb-2">Progress</div>
-                                        <div class="w-full h-2 bg-white/20 rounded-full mb-2">
-                                            <div class="h-2 bg-yellow-300 rounded-full" style="width: 100%"></div>
-                                        </div>
-                                        <div class="text-center text-white/80 text-sm">Level 4</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Leaderboard -->
-                        <div
-                            class="feature-card-desktop-4 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-6 transition-all duration-300 hover:bg-white/20 hover:-translate-y-1 hover:shadow-2xl">
-                            <div class="flex items-start gap-4">
-                                <img src="{{ asset('images/features/features4.png') }}" alt="Leaderboard"
-                                    class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg">
-                                <div class="flex-1">
-                                    <h3 class="text-white font-semibold">Leaderboard</h3>
-                                    <p class="text-white/70 text-sm">Your ranking</p>
-                                    <div class="bg-white/20 rounded-lg p-4 mt-4 border border-white/10">
-                                        <div class="flex items-center justify-between text-sm mb-3">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-yellow-300">1</span>
-                                                <span class="text-white/90">Mario S.</span>
-                                            </div>
-                                            <div class="text-yellow-300 font-semibold">1580</div>
-                                        </div>
-                                        <div class="flex items-center justify-between text-sm">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-yellow-300">2</span>
-                                                <span class="text-white/90">You</span>
-                                            </div>
-                                            <div class="text-yellow-300 font-semibold">1250</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom decorative waves (stick to section bottom, mobile only) -->
-        <div class="absolute bottom-0 left-0 w-full md:hidden pointer-events-none select-none z-0 mt-6">
-            <svg viewBox="0 0 375 120" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-                <path d="M0 40 C80 80 160 0 240 30 C300 52 340 60 375 40 L375 120 L0 120 Z" fill="#FACC15" />
-                <path d="M0 70 C90 100 180 40 260 70 C310 90 350 95 375 80 L375 120 L0 120 Z" fill="#3B82F6" />
-            </svg>
-        </div>
-    </section>
+    <!-- Footer -->
+    @include('footer')
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -1169,12 +1007,22 @@
                     speed: 800,
                     watchSlidesProgress: true,
                     slideToClickedSlide: true,
+                    autoplay: {
+                        delay: 1000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    },
                     coverflowEffect: {
                         rotate: 0,
                         stretch: 0,
                         depth: 200,
                         modifier: 1,
                         slideShadows: false,
+                    },
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true,
+                        dynamicBullets: false,
                     },
                     navigation: {
                         nextEl: ".swiper-button-next",
