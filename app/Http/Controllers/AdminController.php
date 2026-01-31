@@ -67,6 +67,17 @@ class AdminController extends Controller
             'lastname' => $lastname,
         ]);
 
+        // Log notification
+        $this->logNotification(
+            'admin_created',
+            'Created new admin account',
+            [
+                'admin_name' => $validated['fullname'],
+                'username' => $validated['username'],
+                'email' => $validated['email']
+            ]
+        );
+
         return redirect()->route('admin.management.admins')
             ->with('success', 'Admin created successfully.');
     }
@@ -134,6 +145,18 @@ class AdminController extends Controller
             ]
         );
 
+        // Log notification
+        $this->logNotification(
+            'admin_updated',
+            'Updated admin account',
+            [
+                'admin_name' => $validated['firstname'] . ' ' . $validated['lastname'],
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'password_changed' => !empty($validated['password'])
+            ]
+        );
+
         return redirect()->route('admin.management.admins')
             ->with('success', 'Admin updated successfully.');
     }
@@ -198,6 +221,18 @@ class AdminController extends Controller
             );
         }
 
+        // Log notification
+        $this->logNotification(
+            'profile_updated',
+            'Updated profile information',
+            [
+                'admin_name' => $validated['fullname'],
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'photo_updated' => $request->hasFile('profile_photo')
+            ]
+        );
+
         return redirect()->route('admin.profile.index')
             ->with('success', 'Profile updated successfully.');
     }
@@ -225,6 +260,15 @@ class AdminController extends Controller
             'password' => Hash::make($validated['new_password']),
         ]);
 
+        // Log notification
+        $this->logNotification(
+            'password_changed',
+            'Changed account password',
+            [
+                'admin_name' => $user->adminProfile ? $user->adminProfile->firstname . ' ' . $user->adminProfile->lastname : $user->username
+            ]
+        );
+
         return redirect()->route('admin.profile.index')
             ->with('success', 'Password updated successfully.');
     }
@@ -245,8 +289,21 @@ class AdminController extends Controller
                 ->with('error', 'Cannot delete this admin.');
         }
 
+        $adminName = $user->adminProfile ? $user->adminProfile->firstname . ' ' . $user->adminProfile->lastname : $user->username;
+        
         $user->adminProfile()->delete();
         $user->delete();
+
+        // Log notification
+        $this->logNotification(
+            'admin_deleted',
+            'Deleted admin account',
+            [
+                'deleted_admin_name' => $adminName,
+                'deleted_admin_username' => $user->username,
+                'deleted_admin_email' => $user->email
+            ]
+        );
 
         return redirect()->route('admin.management.admins')
             ->with('success', 'Admin deleted successfully.');
@@ -292,5 +349,35 @@ class AdminController extends Controller
 
         return redirect()->route('login')
             ->with('success', 'Account deleted successfully.');
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                \DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to log admin notification: ' . $e->getMessage());
+        }
     }
 }
