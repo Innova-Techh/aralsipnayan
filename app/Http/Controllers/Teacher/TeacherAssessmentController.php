@@ -286,6 +286,21 @@ class TeacherAssessmentController extends Controller
         if ($assignmentsCreated) {
             $assessment->status = 'Active';
             $assessment->save();
+            
+            // Log notification
+            $this->logNotification(
+                'assessment_created',
+                'Created new assessment',
+                [
+                    'assessment_title' => $assessment->title,
+                    'category' => $assessment->category,
+                    'difficulty' => $assessment->difficulty,
+                    'number_of_questions' => $assessment->number_of_questions,
+                    'time_limit' => $assessment->time_limit,
+                    'sections_assigned' => $request->has('sections') ? count((array) $request->sections) : 0,
+                    'students_assigned' => count($selectedStudents)
+                ]
+            );
         }
 
         return redirect()->route('teacher.assessments')->with('success', 'Assessment created successfully!');
@@ -508,6 +523,19 @@ class TeacherAssessmentController extends Controller
             'title', 'description', 'category', 'number_of_questions', 
             'time_limit', 'difficulty', 'is_live_quiz', 'available_from', 'available_until'
         ]));
+
+        // Log notification
+        $this->logNotification(
+            'assessment_updated',
+            'Updated assessment details',
+            [
+                'assessment_title' => $assessment->title,
+                'category' => $assessment->category,
+                'difficulty' => $assessment->difficulty,
+                'number_of_questions' => $assessment->number_of_questions,
+                'time_limit' => $assessment->time_limit
+            ]
+        );
 
         return redirect()->route('teacher.assessments')->with('success', 'Assessment updated successfully!');
     }
@@ -866,6 +894,17 @@ class TeacherAssessmentController extends Controller
         $assessment->status = 'Archived';
         $assessment->save();
         
+        // Log notification
+        $this->logNotification(
+            'assessment_archived',
+            'Archived assessment',
+            [
+                'assessment_title' => $assessment->title,
+                'category' => $assessment->category,
+                'difficulty' => $assessment->difficulty
+            ]
+        );
+        
         return redirect()->route('teacher.assessments')->with('success', 'Assessment archived successfully!');
     }
 
@@ -884,6 +923,47 @@ class TeacherAssessmentController extends Controller
         $assessment->status = 'Active';
         $assessment->save();
         
+        // Log notification
+        $this->logNotification(
+            'assessment_unarchived',
+            'Unarchived assessment',
+            [
+                'assessment_title' => $assessment->title,
+                'category' => $assessment->category,
+                'difficulty' => $assessment->difficulty
+            ]
+        );
+        
         return redirect()->route('teacher.assessments')->with('success', 'Assessment unarchived successfully!');
+    }
+
+    /**
+     * Log notification to teacher_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $teacher = Auth::guard('admin')->user();
+            $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+            
+            if ($teacherProfile) {
+                DB::table('teacher_notifications')->insert([
+                    'teacher_id' => $teacherProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'teacher_name' => $teacher->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to log notification: ' . $e->getMessage());
+        }
     }
 }
