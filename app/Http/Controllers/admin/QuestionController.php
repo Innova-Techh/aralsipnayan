@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Question;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
@@ -342,6 +344,16 @@ class QuestionController extends Controller
 
         $question = Question::create($validated);
         
+        // Log notification
+        $this->logNotification('question_management', 'Created new question', [
+            'question_id' => $validated['question_id'],
+            'competency' => $validated['competency'],
+            'difficulty_level' => $validated['difficulty_level'],
+            'question_type' => $validated['question_type'],
+            'topic_tag' => $validated['topic_tag'],
+            'base_points' => $validated['base_points']
+        ]);
+        
         return redirect()->route('admin.management.questions')
             ->with('success', 'Question created successfully!');
     }
@@ -373,13 +385,25 @@ class QuestionController extends Controller
         if ($question) {
             // Update existing question
             $question->fill($validated)->save();
+            $actionType = 'updated';
         } else {
             // Create new override for built-in question
             $validated['question_id'] = $questionId;
             $validated['question_source'] = 'built_in'; // Mark as override of built-in
             $validated['is_active'] = true;
             Question::create($validated);
+            $actionType = 'created override for';
         }
+        
+        // Log notification
+        $this->logNotification('question_management', "Question {$actionType}", [
+            'question_id' => $questionId,
+            'competency' => $validated['competency'] ?? 'unchanged',
+            'difficulty_level' => $validated['difficulty_level'] ?? 'unchanged',
+            'question_type' => $validated['question_type'] ?? 'unchanged',
+            'action_type' => $actionType,
+            'fields_updated' => array_keys($validated)
+        ]);
         
         return redirect()->route('admin.management.questions')
             ->with('success', 'Question updated successfully!');
@@ -388,7 +412,21 @@ class QuestionController extends Controller
     public function destroy(string $questionId)
     {
         $question = Question::where('question_id', $questionId)->firstOrFail();
+        
+        // Store question info before deletion for notification
+        $questionInfo = [
+            'question_id' => $question->question_id,
+            'competency' => $question->competency,
+            'difficulty_level' => $question->difficulty_level,
+            'question_type' => $question->question_type,
+            'topic_tag' => $question->topic_tag,
+            'question_source' => $question->question_source
+        ];
+        
         $question->delete();
+        
+        // Log notification after successful deletion
+        $this->logNotification('question_management', 'Deleted question', $questionInfo);
         
         return redirect()->route('admin.management.questions')
             ->with('success', 'Question deleted successfully!');
@@ -447,5 +485,35 @@ class QuestionController extends Controller
             'advanced' => 'A'
         ];
         return $prefixes[$difficulty] ?? 'B';
+    }
+
+    /**
+     * Log notification to admin_notifications table
+     */
+    private function logNotification($type, $action, $details = [])
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            $adminProfile = $admin ? $admin->adminProfile : null;
+            
+            if ($adminProfile) {
+                \DB::table('admin_notifications')->insert([
+                    'admin_id' => $adminProfile->id,
+                    'type' => $type,
+                    'action' => $action,
+                    'details' => json_encode(array_merge($details, [
+                        'timestamp' => now()->toDateTimeString(),
+                        'admin_username' => $admin->username
+                    ])),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to log admin notification: ' . $e->getMessage());
+        }
     }
 }
