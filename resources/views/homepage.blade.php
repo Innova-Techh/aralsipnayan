@@ -700,6 +700,9 @@
         </div>
     </section>
 
+    <!-- About Section -->
+    @include('about-section')
+
     <!-- Footer -->
     @include('footer')
 
