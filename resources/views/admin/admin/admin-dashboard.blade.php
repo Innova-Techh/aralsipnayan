@@ -20,10 +20,10 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Registered Teachers</p>
                     <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['teachers'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
+                    {{-- <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+3 from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 7%</span>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg">
                     <i class="fas fa-chalkboard-teacher text-blue-600 text-xl"></i>
@@ -37,10 +37,10 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Active Students</p>
                     <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['students'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
-                        <span class="text-xs text-gray-500">+12% from last month</span>
+                    {{-- <div class="flex items-center mt-2">
+                            <span class="text-xs text-gray-500">+12% from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 12%</span>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg">
                     <i class="fas fa-user-graduate text-blue-600 text-xl"></i>
@@ -54,10 +54,10 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Admins</p>
                     <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['admins'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
+                    {{-- <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+1 from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 14%</span>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg">
                     <i class="fas fa-user-shield text-blue-600 text-xl"></i>
@@ -71,10 +71,10 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Assessments</p>
                     <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['assessments'] ?? 0 }}</p>
-                    <div class="flex items-center mt-2">
+                    {{-- <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+8 new this week</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 5%</span>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="p-2 bg-blue-50 rounded-lg">
                     <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
@@ -118,7 +118,7 @@
             </a>
 
             <!-- Manage Students -->
-            <a href="#"
+            <a href="{{ route('admin.management.students') }}"
                 class="bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all duration-200">
                 <div class="flex items-start space-x-4">
                     <div class="p-2 bg-gray-50 rounded-lg">
@@ -154,26 +154,22 @@
                     <h3 class="text-lg font-semibold text-gray-900">Performance Analytics Overview</h3>
                     <p class="text-sm text-gray-600 mt-1">Section performance metrics and insights</p>
                 </div>
-                <div class="flex space-x-4">
-                    <!-- Month Selector -->
+                <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-wrap gap-4 items-end">
                     <div>
-                        <label for="monthSelector" class="block text-sm font-medium text-gray-700 mb-1">Select Month</label>
-                        <select id="monthSelector" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                            <option value="january">January</option>
-                            <option value="february">February</option>
-                            <option value="march">March</option>
-                            <option value="april">April</option>
-                            <option value="may">May</option>
-                            <option value="june">June</option>
-                            <option value="july">July</option>
-                            <option value="august">August</option>
-                            <option value="september">September</option>
-                            <option value="october">October</option>
-                            <option value="november">November</option>
-                            <option value="december">December</option>
-                        </select>
+                        <label for="fromDate" class="block text-sm font-medium text-gray-700 mb-1">From</label>
+                        <input id="fromDate" name="from" type="date" value="{{ $filterFrom ?? '' }}"
+                            class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     </div>
-                </div>
+                    <div>
+                        <label for="toDate" class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                        <input id="toDate" name="to" type="date" value="{{ $filterTo ?? '' }}"
+                            class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <button type="submit"
+                        class="h-[38px] px-4 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                        Apply
+                    </button>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -1046,11 +1042,13 @@
             // Initialize charts with default month
             initializeCharts();
 
-            // Month selector event listener
-            document.getElementById('monthSelector').addEventListener('change', function() {
-                const selectedMonth = this.value;
-                initializeCharts(selectedMonth);
-            });
+            const monthSelector = document.getElementById('monthSelector');
+            if (monthSelector) {
+                monthSelector.addEventListener('change', function() {
+                    const selectedMonth = this.value;
+                    initializeCharts(selectedMonth);
+                });
+            }
         });
     </script>
 @endpush

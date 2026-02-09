@@ -6,12 +6,29 @@ use Illuminate\Support\Facades\DB;
 
 class AdminDashboardMetricsService
 {
-    public function getAverageScoresBySection(): array
+    private function applyDateRange($query, string $column, $from = null, $to = null)
+    {
+        if ($from && $to) {
+            return $query->whereBetween($column, [$from, $to]);
+        }
+        if ($from) {
+            return $query->where($column, '>=', $from);
+        }
+        if ($to) {
+            return $query->where($column, '<=', $to);
+        }
+        return $query;
+    }
+
+    public function getAverageScoresBySection($from = null, $to = null): array
     {
         $rows = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('student_profile.section')
+            ->when($from || $to, function ($q) use ($from, $to) {
+                $this->applyDateRange($q, 'assessment_sessions.completed_at', $from, $to);
+            })
             ->select(
                 'student_profile.section',
                 DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
@@ -37,23 +54,28 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getAssessmentCompletionRate(): array
+    public function getAssessmentCompletionRate($from = null, $to = null): array
     {
-        $totalStudents = (int) DB::table('student_profile')->count();
+        $totalStudentsQuery = DB::table('student_profile');
+        $this->applyDateRange($totalStudentsQuery, 'created_at', $from, $to);
+        $totalStudents = (int) $totalStudentsQuery->count();
 
-        $completedUsers = DB::table('assessment_sessions')
+        $completedUsersQuery = DB::table('assessment_sessions')
             ->where('status', 'completed')
-            ->distinct('user_id')
-            ->count('user_id');
+            ->distinct('user_id');
+        $this->applyDateRange($completedUsersQuery, 'completed_at', $from, $to);
+        $completedUsers = $completedUsersQuery->count('user_id');
 
-        $inProgressUsers = DB::table('assessment_sessions')
+        $inProgressUsersQuery = DB::table('assessment_sessions')
             ->where('status', 'in_progress')
-            ->distinct('user_id')
-            ->count('user_id');
+            ->distinct('user_id');
+        $this->applyDateRange($inProgressUsersQuery, 'started_at', $from, $to);
+        $inProgressUsers = $inProgressUsersQuery->count('user_id');
 
-        $startedUsers = DB::table('assessment_sessions')
-            ->distinct('user_id')
-            ->count('user_id');
+        $startedUsersQuery = DB::table('assessment_sessions')
+            ->distinct('user_id');
+        $this->applyDateRange($startedUsersQuery, 'started_at', $from, $to);
+        $startedUsers = $startedUsersQuery->count('user_id');
 
         $notStartedUsers = max(0, $totalStudents - $startedUsers);
 
@@ -70,10 +92,13 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getMostMissedTopics(int $limit = 5): array
+    public function getMostMissedTopics(int $limit = 5, $from = null, $to = null): array
     {
         $rows = DB::table('question_responses')
             ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
+            ->when($from || $to, function ($q) use ($from, $to) {
+                $this->applyDateRange($q, 'question_responses.answered_at', $from, $to);
+            })
             ->select(
                 'questions.topic_tag as topic',
                 DB::raw('SUM(CASE WHEN question_responses.is_correct = 1 THEN 1 ELSE 0 END) as correct'),
@@ -99,12 +124,15 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getPerformanceByCompetency(): array
+    public function getPerformanceByCompetency($from = null, $to = null): array
     {
         $rows = DB::table('question_responses')
             ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
             ->join('student_profile', 'question_responses.user_id', '=', 'student_profile.user_id')
             ->whereNotNull('student_profile.section')
+            ->when($from || $to, function ($q) use ($from, $to) {
+                $this->applyDateRange($q, 'question_responses.answered_at', $from, $to);
+            })
             ->select(
                 'student_profile.section',
                 'questions.competency',
@@ -159,10 +187,12 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getSectionPerformanceTrend(int $weeks = 6): array
+    public function getSectionPerformanceTrend(int $weeks = 6, $from = null, $to = null): array
     {
-        $end = now()->startOfWeek();
-        $start = (clone $end)->subWeeks($weeks - 1);
+        $end = $to ? $to->copy()->startOfWeek() : now()->startOfWeek();
+        $start = $from ? $from->copy()->startOfWeek() : (clone $end)->subWeeks($weeks - 1);
+        $diffWeeks = max(1, $start->diffInWeeks($end) + 1);
+        $weeks = min($weeks, $diffWeeks);
 
         $rows = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
@@ -210,13 +240,16 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getSectionInsights(): array
+    public function getSectionInsights($from = null, $to = null): array
     {
         $rows = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('assessment_sessions.completed_at')
             ->whereNotNull('student_profile.section')
+            ->when($from || $to, function ($q) use ($from, $to) {
+                $this->applyDateRange($q, 'assessment_sessions.completed_at', $from, $to);
+            })
             ->select(
                 'student_profile.section',
                 DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
@@ -227,16 +260,16 @@ class AdminDashboardMetricsService
         $top = $rows->sortByDesc('avg_score')->first();
         $bottom = $rows->sortBy('avg_score')->first();
 
-        $now = now()->startOfWeek();
-        $prevStart = (clone $now)->subWeeks(6);
-        $mid = (clone $now)->subWeeks(3);
+        $rangeStart = $from ? $from->copy()->startOfDay() : now()->startOfWeek()->subWeeks(6);
+        $rangeEnd = $to ? $to->copy()->endOfDay() : now()->endOfWeek();
+        $mid = $rangeStart->copy()->addSeconds(intval($rangeStart->diffInSeconds($rangeEnd) / 2));
 
         $trendRows = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('assessment_sessions.completed_at')
             ->whereNotNull('student_profile.section')
-            ->whereBetween('assessment_sessions.completed_at', [$prevStart, (clone $now)->endOfWeek()])
+            ->whereBetween('assessment_sessions.completed_at', [$rangeStart, $rangeEnd])
             ->select(
                 'student_profile.section',
                 DB::raw('AVG(CASE WHEN assessment_sessions.completed_at < "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as prev_avg'),
@@ -275,7 +308,7 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getSectionStatisticsSummary(): array
+    public function getSectionStatisticsSummary($from = null, $to = null): array
     {
         $sections = DB::table('student_profile')
             ->whereNotNull('section')
@@ -284,46 +317,42 @@ class AdminDashboardMetricsService
             ->pluck('section')
             ->all();
 
-        $studentCounts = DB::table('student_profile')
+        $studentCountsQuery = DB::table('student_profile')
             ->whereNotNull('section')
-            ->select('section', DB::raw('COUNT(*) as students'))
-            ->groupBy('section')
-            ->pluck('students', 'section')
-            ->all();
+            ->select('section', DB::raw('COUNT(*) as students'));
+        $this->applyDateRange($studentCountsQuery, 'created_at', $from, $to);
+        $studentCounts = $studentCountsQuery->groupBy('section')->pluck('students', 'section')->all();
 
-        $avgScores = DB::table('assessment_sessions')
+        $avgScoresQuery = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('student_profile.section')
             ->select(
                 'student_profile.section',
                 DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
-            )
-            ->groupBy('student_profile.section')
-            ->pluck('avg_score', 'section')
-            ->all();
+            );
+        $this->applyDateRange($avgScoresQuery, 'assessment_sessions.completed_at', $from, $to);
+        $avgScores = $avgScoresQuery->groupBy('student_profile.section')->pluck('avg_score', 'section')->all();
 
-        $completedUsers = DB::table('assessment_sessions')
+        $completedUsersQuery = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('student_profile.section')
             ->select('student_profile.section', 'assessment_sessions.user_id')
-            ->distinct()
-            ->get()
-            ->groupBy('section')
-            ->map(fn($g) => $g->count())
-            ->all();
+            ->distinct();
+        $this->applyDateRange($completedUsersQuery, 'assessment_sessions.completed_at', $from, $to);
+        $completedUsers = $completedUsersQuery->get()->groupBy('section')->map(fn($g) => $g->count())->all();
 
-        $now = now()->startOfWeek();
-        $prevStart = (clone $now)->subWeeks(6);
-        $mid = (clone $now)->subWeeks(3);
+        $rangeStart = $from ? $from->copy()->startOfDay() : now()->startOfWeek()->subWeeks(6);
+        $rangeEnd = $to ? $to->copy()->endOfDay() : now()->endOfWeek();
+        $mid = $rangeStart->copy()->addSeconds(intval($rangeStart->diffInSeconds($rangeEnd) / 2));
 
         $trendRows = DB::table('assessment_sessions')
             ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
             ->where('assessment_sessions.status', 'completed')
             ->whereNotNull('assessment_sessions.completed_at')
             ->whereNotNull('student_profile.section')
-            ->whereBetween('assessment_sessions.completed_at', [$prevStart, (clone $now)->endOfWeek()])
+            ->whereBetween('assessment_sessions.completed_at', [$rangeStart, $rangeEnd])
             ->select(
                 'student_profile.section',
                 DB::raw('AVG(CASE WHEN assessment_sessions.completed_at < "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as prev_avg'),
@@ -370,19 +399,37 @@ class AdminDashboardMetricsService
         return $rows;
     }
 
-    public function getPlatformGrowth(): array
+    public function getPlatformGrowth($from = null, $to = null): array
     {
-        $months = collect(range(0, 5))
-            ->map(function ($i) {
-                $start = now()->startOfMonth()->subMonths(5 - $i);
-                $end = (clone $start)->endOfMonth();
-                return [
-                    'label' => $start->format('M'),
-                    'start' => $start,
-                    'end' => $end,
-                ];
-            })
-            ->all();
+        if ($from || $to) {
+            $start = ($from ? $from->copy() : now()->startOfMonth()->subMonths(5))->startOfMonth();
+            $end = ($to ? $to->copy() : now()->endOfMonth())->endOfMonth();
+            $monthCount = max(1, $start->diffInMonths($end) + 1);
+            $monthCount = min(12, $monthCount);
+            $months = collect(range(0, $monthCount - 1))
+                ->map(function ($i) use ($start) {
+                    $mStart = (clone $start)->addMonths($i)->startOfMonth();
+                    $mEnd = (clone $mStart)->endOfMonth();
+                    return [
+                        'label' => $mStart->format('M'),
+                        'start' => $mStart,
+                        'end' => $mEnd,
+                    ];
+                })
+                ->all();
+        } else {
+            $months = collect(range(0, 5))
+                ->map(function ($i) {
+                    $start = now()->startOfMonth()->subMonths(5 - $i);
+                    $end = (clone $start)->endOfMonth();
+                    return [
+                        'label' => $start->format('M'),
+                        'start' => $start,
+                        'end' => $end,
+                    ];
+                })
+                ->all();
+        }
 
         $labels = [];
         $students = [];
@@ -408,12 +455,22 @@ class AdminDashboardMetricsService
         ];
     }
 
-    public function getSummaryCards(): array
+    public function getSummaryCards($from = null, $to = null): array
     {
-        $teachers = (int) DB::table('users')->where('role', 'Teacher')->count();
-        $admins = (int) DB::table('users')->where('role', 'Admin')->count();
-        $students = (int) DB::table('student_profile')->count();
-        $assessments = (int) DB::table('assessment_sessions')->distinct('session_id')->count('session_id');
+        $teachersQuery = DB::table('users')->where('role', 'Teacher');
+        $adminsQuery = DB::table('users')->where('role', 'Admin');
+        $studentsQuery = DB::table('student_profile');
+        $assessmentsQuery = DB::table('assessment_sessions')->distinct('session_id');
+
+        $this->applyDateRange($teachersQuery, 'created_at', $from, $to);
+        $this->applyDateRange($adminsQuery, 'created_at', $from, $to);
+        $this->applyDateRange($studentsQuery, 'created_at', $from, $to);
+        $this->applyDateRange($assessmentsQuery, 'completed_at', $from, $to);
+
+        $teachers = (int) $teachersQuery->count();
+        $admins = (int) $adminsQuery->count();
+        $students = (int) $studentsQuery->count();
+        $assessments = (int) $assessmentsQuery->count('session_id');
 
         return [
             'teachers' => $teachers,
