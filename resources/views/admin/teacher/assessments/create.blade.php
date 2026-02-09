@@ -126,34 +126,46 @@
                     <p class="text-sm text-gray-600 mb-4">Leave unselected to save as draft. Select sections to immediately assign the quiz.</p>
                     <div class="space-y-3">
                         @if(!empty($teacherSections))
-                            @foreach($teacherSections as $section)
+                            <div class="flex flex-wrap items-center gap-6">
                                 <label class="flex items-center">
-                                    <input type="checkbox" name="sections[]" value="{{ $section }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" {{ in_array($section, old('sections', [])) ? 'checked' : '' }}>
-                                    <span class="ml-3 text-sm text-gray-700">Section {{ $section }}</span>
+                                    <input type="radio" name="assignment_mode" value="sections" id="assignBySections" checked
+                                        class="rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                    <span class="ml-3 text-base text-gray-700">Assign by sections</span>
                                 </label>
-                            @endforeach
+                                <label class="flex items-center">
+                                    <input type="radio" name="assignment_mode" value="students" id="pickSpecificStudents"
+                                        class="rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                    <span class="ml-3 text-base text-gray-700">Pick specific students</span>
+                                </label>
+                            </div>
+
+                            <div id="sectionsDropdownWrapper">
+                                <label class="block text-base font-semibold text-gray-700">Select Sections</label>
+                                <select name="sections[]" multiple
+                                    size="12"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-700 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 min-h-[320px]">
+                                    @foreach($teacherSections as $section)
+                                        <option value="{{ $section }}" {{ in_array($section, old('sections', [])) ? 'selected' : '' }}>
+                                            Section {{ $section }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-500">Hold Ctrl (Windows) or Command (Mac) to select multiple sections.</p>
+                            </div>
                         @else
                             <p class="text-sm text-gray-500">No sections assigned to your account. Contact your administrator.</p>
                         @endif
                     </div>
                     
-                    <!-- Pick Specific Students Option -->
-                    <div class="mt-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="pickSpecificStudents" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            <span class="ml-3 text-sm text-gray-700">Pick specific students instead of entire sections</span>
-                        </label>
-                    </div>
-                    
                     <!-- Student Selection (Hidden by default) -->
                     <div id="studentSelectionSection" class="mt-4 hidden">
-                        <h3 class="text-md font-medium text-gray-900 mb-3">Select Students</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Select Students</h3>
                         <div class="space-y-4" id="studentSectionsContainer">
                             @if(!empty($teacherSections))
                                 @foreach($teacherSections as $section)
                                     <div id="section{{ strtolower($section) }}Students" class="hidden">
-                                        <h4 class="text-sm font-medium text-gray-700 mb-2">Section {{ $section }} Students</h4>
-                                        <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                        <h4 class="text-base font-semibold text-gray-700 mb-2">Section {{ $section }} Students</h4>
+                                        <div class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
                                             <div id="section{{ strtolower($section) }}StudentsList"></div>
                                         </div>
                                     </div>
@@ -164,7 +176,7 @@
                         <!-- Selected Students Summary -->
                         <div id="selectedStudentsSummary" class="mt-4 hidden">
                             <h4 class="text-sm font-medium text-gray-900 mb-2">Selected Students</h4>
-                            <div id="selectedStudentsList" class="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-blue-50">
+                            <div id="selectedStudentsList" class="max-h-80 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-blue-50">
                                 <!-- Selected students will appear here -->
                             </div>
                         </div>
@@ -319,30 +331,43 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Toggle specific students selection
-document.getElementById('pickSpecificStudents').addEventListener('change', function() {
+const assignBySectionsRadio = document.getElementById('assignBySections');
+const pickSpecificStudentsRadio = document.getElementById('pickSpecificStudents');
+const sectionsDropdownWrapper = document.getElementById('sectionsDropdownWrapper');
+const sectionsSelect = document.querySelector('select[name="sections[]"]');
+
+function updateAssignmentModeUI() {
     const studentSelectionSection = document.getElementById('studentSelectionSection');
-    if (this.checked) {
+    if (pickSpecificStudentsRadio && pickSpecificStudentsRadio.checked) {
         studentSelectionSection.classList.remove('hidden');
+        if (sectionsDropdownWrapper) sectionsDropdownWrapper.classList.remove('hidden');
         loadStudentsForSelectedSections();
     } else {
         studentSelectionSection.classList.add('hidden');
         selectedStudents = [];
         updateSelectedStudentsList();
     }
-});
+}
 
-// Listen for section checkbox changes
-document.querySelectorAll('input[name="sections[]"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        if (document.getElementById('pickSpecificStudents').checked) {
+if (assignBySectionsRadio) {
+    assignBySectionsRadio.addEventListener('change', updateAssignmentModeUI);
+}
+if (pickSpecificStudentsRadio) {
+    pickSpecificStudentsRadio.addEventListener('change', updateAssignmentModeUI);
+}
+
+if (sectionsSelect) {
+    sectionsSelect.addEventListener('change', function() {
+        if (pickSpecificStudentsRadio && pickSpecificStudentsRadio.checked) {
             loadStudentsForSelectedSections();
         }
     });
-});
+}
 
 function loadStudentsForSelectedSections() {
-    const selectedSections = Array.from(document.querySelectorAll('input[name="sections[]"]:checked'))
-        .map(cb => cb.value);
+    const selectedSections = sectionsSelect
+        ? Array.from(sectionsSelect.selectedOptions).map(opt => opt.value)
+        : [];
     
     // Hide all section student lists dynamically
     const teacherSections = @json($teacherSections ?? []);
@@ -362,7 +387,7 @@ function loadStudentsForSelectedSections() {
         if (studentsData[section] && studentsData[section].length > 0) {
             studentsDiv.classList.remove('hidden');
             studentsListDiv.innerHTML = studentsData[section].map(student => `
-                <label class="flex items-center p-2 hover:bg-gray-50 rounded">
+                <label class="flex items-center p-2 hover:bg-gray-50 rounded text-base">
                     <input type="checkbox" value="${student.user_id}" class="mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500 student-checkbox">
                     <span class="text-sm">${student.firstname} ${student.lastname}</span>
                 </label>
@@ -395,9 +420,9 @@ function updateSelectedStudentsList() {
     if (selectedStudents.length > 0) {
         selectedStudentsSummary.classList.remove('hidden');
         selectedStudentsList.innerHTML = selectedStudents.map(student => `
-            <div class="flex items-center justify-between py-1">
-                <span class="text-sm text-gray-700">${student.firstname} ${student.lastname} (${student.section})</span>
-                <button type="button" onclick="removeStudent('${student.user_id}')" class="text-red-600 hover:text-red-800 text-xs">Remove</button>
+            <div class="flex items-center justify-between py-1 text-base">
+                <span class="text-base text-gray-700">${student.firstname} ${student.lastname} (${student.section})</span>
+                <button type="button" onclick="removeStudent('${student.user_id}')" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
             </div>
         `).join('');
     } else {
@@ -560,7 +585,7 @@ function removeBankQuestion(questionId) {
 }
 // Validate and finalize payload on submit
 createForm.addEventListener('submit', function(e) {
-    const pickingSpecific = document.getElementById('pickSpecificStudents').checked;
+    const pickingSpecific = pickSpecificStudentsRadio && pickSpecificStudentsRadio.checked;
     if (pickingSpecific) {
         if (selectedStudents.length === 0) {
             e.preventDefault();
