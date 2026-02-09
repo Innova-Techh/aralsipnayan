@@ -134,11 +134,36 @@
             <!-- Table Header -->
             <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-800">Questions Management</h2>
-                <button onclick="openModal('add')"
-                    class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
-                    <i class="fas fa-plus"></i>
-                    Add Question
-                </button>
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <button type="button" id="exportDropdownButton"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
+                            <i class="fas fa-file-export"></i>
+                            Export
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="exportDropdownMenu"
+                            class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                            <a href="{{ route('admin.management.questions.export.csv', request()->query()) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Export as CSV
+                            </a>
+                            <a href="{{ route('admin.management.questions.export.excel', request()->query()) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Export as Excel
+                            </a>
+                            <a href="{{ route('admin.management.questions.export.tiff', request()->query()) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Export as TIFF
+                            </a>
+                        </div>
+                    </div>
+                    <button onclick="openModal('add')"
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        Add Question
+                    </button>
+                </div>
             </div>
 
             <!-- Table -->
@@ -983,6 +1008,21 @@
                 closeViewModal();
             }
         });
+
+        // Export dropdown
+        const exportDropdownButton = document.getElementById('exportDropdownButton');
+        const exportDropdownMenu = document.getElementById('exportDropdownMenu');
+
+        if (exportDropdownButton && exportDropdownMenu) {
+            exportDropdownButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportDropdownMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                exportDropdownMenu.classList.add('hidden');
+            });
+        }
 
         // Initialize on page load
         updateChoiceFields();

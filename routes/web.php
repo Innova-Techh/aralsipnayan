@@ -382,6 +382,9 @@ Route::prefix('admin')
             // Questions Management
             Route::get('/questions', [App\Http\Controllers\admin\QuestionController::class, 'index'])->name('questions');
             Route::get('/questions/data', [App\Http\Controllers\admin\QuestionController::class, 'data'])->name('questions.data');
+            Route::get('/questions/export/csv', [App\Http\Controllers\admin\QuestionExportController::class, 'exportCsv'])->name('questions.export.csv');
+            Route::get('/questions/export/excel', [App\Http\Controllers\admin\QuestionExportController::class, 'exportExcel'])->name('questions.export.excel');
+            Route::get('/questions/export/tiff', [App\Http\Controllers\admin\QuestionExportController::class, 'exportTiff'])->name('questions.export.tiff');
             Route::post('/questions', [App\Http\Controllers\admin\QuestionController::class, 'store'])->name('questions.store');
             Route::put('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'update'])->name('questions.update');
             Route::delete('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'destroy'])->name('questions.destroy');
