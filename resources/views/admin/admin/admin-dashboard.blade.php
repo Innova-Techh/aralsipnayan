@@ -521,9 +521,13 @@
                     'completion_rate' => 0,
                     'total_students' => 0,
                 ];
+                $mostMissedTopicsData = $mostMissedTopics ?? ['topics' => [], 'accuracy' => []];
+                $performanceByCompetencyData = $performanceByCompetency ?? ['sections' => [], 'series' => []];
             @endphp
             const averageScoresData = @json($averageScoresData);
             const completionRateData = @json($completionRateData);
+            const mostMissedTopicsData = @json($mostMissedTopicsData);
+            const performanceByCompetencyData = @json($performanceByCompetencyData);
             const sections = averageScoresData.sections || [];
             const currentScores = averageScoresData.scores || [];
             const monthlyData = {
@@ -815,7 +819,7 @@
                 const missedTopicsOptions = {
                     series: [{
                         name: 'Accuracy Rate',
-                        data: [52, 58, 65, 71, 76]
+                        data: mostMissedTopicsData.accuracy || []
                     }],
                     chart: {
                         type: 'bar',
@@ -846,7 +850,7 @@
                         }
                     },
                     xaxis: {
-                        categories: ['Fractions & Decimals', 'Algebraic Expressions', 'Geometry (Angles)', 'Data Interpretation', 'Word Problems'],
+                        categories: mostMissedTopicsData.topics || [],
                         min: 0,
                         max: 100,
                         labels: {
@@ -892,16 +896,7 @@
 
                 // 5. Performance by Competency Chart
                 const competencyOptions = {
-                    series: [{
-                        name: 'Number and Algebra',
-                        data: competencyData[month]['Number and Algebra']
-                    }, {
-                        name: 'Measurement and Geometry',
-                        data: competencyData[month]['Measurement and Geometry']
-                    }, {
-                        name: 'Data and Probability',
-                        data: competencyData[month]['Data and Probability']
-                    }],
+                    series: performanceByCompetencyData.series || [],
                     chart: {
                         type: 'bar',
                         height: 350,
@@ -927,7 +922,7 @@
                         colors: ['transparent']
                     },
                     xaxis: {
-                        categories: sections,
+                        categories: performanceByCompetencyData.sections || [],
                         labels: {
                             style: {
                                 colors: '#6B7280',

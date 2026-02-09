@@ -11,10 +11,14 @@ class AdminDashboardController extends Controller
     {
         $averageScores = $metrics->getAverageScoresBySection();
         $completionRate = $metrics->getAssessmentCompletionRate();
+        $mostMissedTopics = $metrics->getMostMissedTopics();
+        $performanceByCompetency = $metrics->getPerformanceByCompetency();
 
         return view('admin.admin.index', [
             'averageScores' => $averageScores,
             'completionRate' => $completionRate,
+            'mostMissedTopics' => $mostMissedTopics,
+            'performanceByCompetency' => $performanceByCompetency,
         ]);
     }
 }

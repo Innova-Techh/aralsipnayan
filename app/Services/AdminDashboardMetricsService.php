@@ -69,4 +69,84 @@ class AdminDashboardMetricsService
             'total_students' => $totalStudents,
         ];
     }
+
+    public function getMostMissedTopics(int $limit = 5): array
+    {
+        $rows = DB::table('question_responses')
+            ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
+            ->select(
+                'questions.topic_tag as topic',
+                DB::raw('SUM(CASE WHEN question_responses.is_correct = 1 THEN 1 ELSE 0 END) as correct'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('questions.topic_tag')
+            ->havingRaw('COUNT(*) > 0')
+            ->get()
+            ->map(function ($row) {
+                $accuracy = $row->total > 0 ? round(($row->correct / $row->total) * 100, 1) : 0;
+                return [
+                    'topic' => $row->topic ?: 'Unknown',
+                    'accuracy' => $accuracy,
+                ];
+            })
+            ->sortBy('accuracy')
+            ->take($limit)
+            ->values();
+
+        return [
+            'topics' => $rows->pluck('topic')->all(),
+            'accuracy' => $rows->pluck('accuracy')->all(),
+        ];
+    }
+
+    public function getPerformanceByCompetency(): array
+    {
+        $rows = DB::table('question_responses')
+            ->join('questions', 'question_responses.question_id', '=', 'questions.question_id')
+            ->join('student_profile', 'question_responses.user_id', '=', 'student_profile.user_id')
+            ->whereNotNull('student_profile.section')
+            ->select(
+                'student_profile.section',
+                'questions.competency',
+                DB::raw('SUM(CASE WHEN question_responses.is_correct = 1 THEN 1 ELSE 0 END) as correct'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('student_profile.section', 'questions.competency')
+            ->orderBy('student_profile.section')
+            ->get();
+
+        $sections = $rows->pluck('section')->unique()->values()->all();
+        $competencies = ['number_algebra', 'measurement_geometry', 'data_probability'];
+
+        $series = [];
+        foreach ($competencies as $competency) {
+            $data = [];
+            foreach ($sections as $section) {
+                $row = $rows->first(function ($r) use ($section, $competency) {
+                    return $r->section === $section && $r->competency === $competency;
+                });
+                $accuracy = ($row && $row->total > 0)
+                    ? round(($row->correct / $row->total) * 100, 1)
+                    : 0;
+                $data[] = $accuracy;
+            }
+
+            $name = match ($competency) {
+                'number_algebra' => 'Number and Algebra',
+                'measurement_geometry' => 'Measurement and Geometry',
+                'data_probability' => 'Data and Probability',
+                default => ucwords(str_replace('_', ' ', $competency)),
+            };
+
+            $series[] = [
+                'name' => $name,
+                'data' => $data,
+            ];
+        }
+
+        return [
+            'sections' => $sections,
+            'series' => $series,
+        ];
+    }
 }
