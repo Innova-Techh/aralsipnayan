@@ -701,6 +701,7 @@
 
     <!-- About Section -->
     @include('about-section')
+    @include('features-section')
 
     <!-- Footer -->
     @include('footer')
