@@ -407,4 +407,19 @@ class AdminDashboardMetricsService
             'assessments' => $assessments,
         ];
     }
+
+    public function getSummaryCards(): array
+    {
+        $teachers = (int) DB::table('users')->where('role', 'Teacher')->count();
+        $admins = (int) DB::table('users')->where('role', 'Admin')->count();
+        $students = (int) DB::table('student_profile')->count();
+        $assessments = (int) DB::table('assessment_sessions')->distinct('session_id')->count('session_id');
+
+        return [
+            'teachers' => $teachers,
+            'students' => $students,
+            'admins' => $admins,
+            'assessments' => $assessments,
+        ];
+    }
 }

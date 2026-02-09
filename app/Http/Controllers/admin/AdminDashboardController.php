@@ -17,6 +17,7 @@ class AdminDashboardController extends Controller
         $sectionInsights = $metrics->getSectionInsights();
         $sectionStatsSummary = $metrics->getSectionStatisticsSummary();
         $platformGrowth = $metrics->getPlatformGrowth();
+        $summaryCards = $metrics->getSummaryCards();
 
         return view('admin.admin.index', [
             'averageScores' => $averageScores,
@@ -27,6 +28,7 @@ class AdminDashboardController extends Controller
             'sectionInsights' => $sectionInsights,
             'sectionStatsSummary' => $sectionStatsSummary,
             'platformGrowth' => $platformGrowth,
+            'summaryCards' => $summaryCards,
         ]);
     }
 }

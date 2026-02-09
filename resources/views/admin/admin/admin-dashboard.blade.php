@@ -19,7 +19,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Registered Teachers</p>
-                    <p class="text-3xl font-bold text-gray-900">45</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['teachers'] ?? 0 }}</p>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+3 from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 7%</span>
@@ -36,7 +36,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Active Students</p>
-                    <p class="text-3xl font-bold text-gray-900">1,950</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['students'] ?? 0 }}</p>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+12% from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 12%</span>
@@ -53,7 +53,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Admins</p>
-                    <p class="text-3xl font-bold text-gray-900">8</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['admins'] ?? 0 }}</p>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+1 from last month</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 14%</span>
@@ -70,7 +70,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Assessments</p>
-                    <p class="text-3xl font-bold text-gray-900">342</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $summaryCards['assessments'] ?? 0 }}</p>
                     <div class="flex items-center mt-2">
                         <span class="text-xs text-gray-500">+8 new this week</span>
                         <span class="ml-2 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">↑ 5%</span>
@@ -98,7 +98,7 @@
                     </div>
                     <div>
                         <h4 class="font-semibold text-gray-900">Manage Admins</h4>
-                        <p class="text-sm text-gray-500 mt-1">8 total admins</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ $summaryCards['admins'] ?? 0 }}</p>
                     </div>
                 </div>
             </a>
@@ -112,7 +112,7 @@
                     </div>
                     <div>
                         <h4 class="font-semibold text-gray-900">Manage Teachers</h4>
-                        <p class="text-sm text-gray-500 mt-1">45 registered teachers</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ $summaryCards['teachers'] ?? 0 }} registered teachers</p>
                     </div>
                 </div>
             </a>
@@ -126,7 +126,7 @@
                     </div>
                     <div>
                         <h4 class="font-semibold text-gray-900">Manage Students</h4>
-                        <p class="text-sm text-gray-500 mt-1">1,950 active students</p>
+                        <p class="text-sm text-gray-500 mt-1">{{ $summaryCards['students'] ?? 0 }} active students</p>
                     </div>
                 </div>
             </a>
