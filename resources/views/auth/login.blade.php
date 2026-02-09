@@ -226,9 +226,33 @@
                     </div>
                     <div class="mb-6">
                         <label for="password" class="block text-white text-sm font-medium mb-2">Password</label>
-                        <input type="password"
-                            class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
-                            name="password" id="password" placeholder="••••••••" required>
+                        <div class="relative">
+    <input type="password"
+        class="glass-input w-full px-4 py-3 pr-12 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
+        name="password" id="password" placeholder="••••••••" required>
+    <button type="button" data-toggle-password="password"
+        class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800"
+        aria-label="Toggle password visibility">
+        <span class="password-icon-on hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 1l22 22"></path>
+                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39"></path>
+                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02"></path>
+                <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
+            </svg>
+        </span>
+        <span class="password-icon-off">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        </span>
+    </button>
+</div>
                     </div>
                     <div class="mb-6">
                         <label for="captcha" class="block text-white text-base font-medium mb-2">Security Code</label>
@@ -309,9 +333,33 @@
                     <div class="mb-8">
                         <label for="desktop-password"
                             class="block text-gray-700 text-base font-medium mb-2">Password</label>
-                        <input type="password"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
-                            name="password" id="desktop-password" required>
+                        <div class="relative">
+    <input type="password"
+        class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
+        name="password" id="desktop-password" required>
+    <button type="button" data-toggle-password="desktop-password"
+        class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+        aria-label="Toggle password visibility">
+        <span class="password-icon-on hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 1l22 22"></path>
+                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39"></path>
+                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02"></path>
+                <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
+            </svg>
+        </span>
+        <span class="password-icon-off">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        </span>
+    </button>
+</div>
                     </div>
                     <div class="mb-8">
                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
@@ -345,6 +393,22 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const passwordToggles = document.querySelectorAll('[data-toggle-password]');
+            passwordToggles.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-toggle-password');
+                    const input = document.getElementById(targetId);
+                    if (!input) return;
+                    const willShow = input.type === 'password';
+                    input.type = willShow ? 'text' : 'password';
+                    const iconOn = this.querySelector('.password-icon-on');
+                    const iconOff = this.querySelector('.password-icon-off');
+                    if (iconOn && iconOff) {
+                        iconOn.classList.toggle('hidden', !willShow);
+                        iconOff.classList.toggle('hidden', willShow);
+                    }
+                });
+            });
             // Initialize Vanta.js FOG effect for all screen sizes (from josh-branch)
             const isMobile = window.innerWidth < 768;
 
@@ -494,3 +558,4 @@
         </div>
     </div>
 @endif
+
