@@ -399,9 +399,9 @@ Route::prefix('admin')
     });
 
 // Admin Dashboard (placeholder)
-Route::get('/admin/dashboard', function () {
-    return view('admin.admin.index');
-})->middleware(['admin.auth', 'admin.role:Admin'])->name('admin.dashboard');
+Route::get('/admin/dashboard', [App\Http\Controllers\admin\AdminDashboardController::class, 'index'])
+    ->middleware(['admin.auth', 'admin.role:Admin'])
+    ->name('admin.dashboard');
 
 Route::get('/profile', function() {
     $user = Auth::guard('student')->user();

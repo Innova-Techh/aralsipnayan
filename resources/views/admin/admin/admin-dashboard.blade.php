@@ -185,7 +185,7 @@
                             <p class="text-sm text-gray-600 mt-1">Performance across different sections</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold text-blue-600">78.5%</p>
+                            <p class="text-2xl font-bold text-blue-600">{{ $averageScores['overall'] ?? 0 }}%</p>
                             <p class="text-xs text-gray-500">Overall Average</p>
                         </div>
                     </div>
@@ -512,24 +512,22 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Sample data for 10 sections
-            const sections = ['Section 1-A', 'Section 2-B', 'Section 3-C', 'Section 4-A', 'Section 5-B', 
-                             'Section 6-C', 'Section 7-A', 'Section 8-B', 'Section 9-C', 'Section 10-A'];
-
-            // Monthly data for dynamic charts
+            const averageScoresData = @json($averageScores ?? ['sections' => [], 'scores' => [], 'overall' => 0]);
+            const sections = averageScoresData.sections || [];
+            const currentScores = averageScoresData.scores || [];
             const monthlyData = {
-                january: [82, 79, 76, 78, 75, 81, 77, 80, 74, 79],
-                february: [83, 80, 77, 79, 76, 82, 78, 81, 75, 80],
-                march: [84, 81, 78, 80, 77, 83, 79, 82, 76, 81],
-                april: [85, 82, 79, 81, 78, 84, 80, 83, 77, 82],
-                may: [86, 83, 80, 82, 79, 85, 81, 84, 78, 83],
-                june: [87, 84, 81, 83, 80, 86, 82, 85, 79, 84],
-                july: [88, 85, 82, 84, 81, 87, 83, 86, 80, 85],
-                august: [89, 86, 83, 85, 82, 88, 84, 87, 81, 86],
-                september: [90, 87, 84, 86, 83, 89, 85, 88, 82, 87],
-                october: [91, 88, 85, 87, 84, 90, 86, 89, 83, 88],
-                november: [92, 89, 86, 88, 85, 91, 87, 90, 84, 89],
-                december: [93, 90, 87, 89, 86, 92, 88, 91, 85, 90]
+                january: currentScores,
+                february: currentScores,
+                march: currentScores,
+                april: currentScores,
+                may: currentScores,
+                june: currentScores,
+                july: currentScores,
+                august: currentScores,
+                september: currentScores,
+                october: currentScores,
+                november: currentScores,
+                december: currentScores
             };
 
             // Competency data for sections
