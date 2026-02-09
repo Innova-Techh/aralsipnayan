@@ -34,7 +34,7 @@
                 <ul class="space-y-3">
                     <li><a href="#about" class="text-white/90 hover:text-yellow-300 hover:font-bold transition-all duration-200 text-base">About</a></li>
                     <li><a href="#features" class="text-white/90 hover:text-yellow-300 hover:font-bold transition-all duration-200 text-base">Features</a></li>
-                    <li><a href="#media" class="text-white/90 hover:text-yellow-300 hover:font-bold transition-all duration-200 text-base">Media</a></li>
+                    {{-- <li><a href="#media" class="text-white/90 hover:text-yellow-300 hover:font-bold transition-all duration-200 text-base">Media</a></li> --}}
                     <li><a href="#researchers" class="text-white/90 hover:text-yellow-300 hover:font-bold transition-all duration-200 text-base">Our Team</a></li>
                 </ul>
                 </div>

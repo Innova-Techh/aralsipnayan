@@ -511,7 +511,7 @@
                 <div class="hidden md:flex items-center gap-4 lg:gap-6">
                     <a href="#about" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">About</a>
                     <a href="#features" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Features</a>
-                    <a href="#media" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a>
+                    {{-- <a href="#media" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a> --}}
                     <a href="#ourteam" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Our Team</a>
                 </div>
 
@@ -535,7 +535,7 @@
             <div id="mobile-menu" class="hidden md:hidden absolute left-0 right-0 bg-white shadow-lg rounded-b-lg mt-2 py-4 px-4 z-50">
                 <a href="#about" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">About</a>
                 <a href="#features" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Features</a>
-                <a href="#media" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Media</a>
+                {{-- <a href="#media" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Media</a> --}}
                 <a href="#researchers" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Researchers</a>
             </div>
         </nav>
