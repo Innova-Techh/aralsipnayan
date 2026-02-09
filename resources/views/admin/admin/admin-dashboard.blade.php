@@ -200,7 +200,7 @@
                             <p class="text-sm text-gray-600 mt-1">Student completion statistics</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold text-green-600">85.3%</p>
+                            <p class="text-2xl font-bold text-green-600">{{ $completionRate['completion_rate'] ?? 0 }}%</p>
                             <p class="text-xs text-gray-500">Completion Rate</p>
                         </div>
                     </div>
@@ -208,15 +208,15 @@
                     <div class="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
                         <div class="text-center">
                             <p class="text-xs text-gray-500">Completed</p>
-                            <p class="text-lg font-semibold text-green-600">1,663</p>
+                            <p class="text-lg font-semibold text-green-600">{{ $completionRate['completed'] ?? 0 }}</p>
                         </div>
                         <div class="text-center">
                             <p class="text-xs text-gray-500">In Progress</p>
-                            <p class="text-lg font-semibold text-yellow-600">198</p>
+                            <p class="text-lg font-semibold text-yellow-600">{{ $completionRate['in_progress'] ?? 0 }}</p>
                         </div>
                         <div class="text-center">
                             <p class="text-xs text-gray-500">Not Started</p>
-                            <p class="text-lg font-semibold text-red-600">89</p>
+                            <p class="text-lg font-semibold text-red-600">{{ $completionRate['not_started'] ?? 0 }}</p>
                         </div>
                     </div>
                 </div>
@@ -512,7 +512,18 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const averageScoresData = @json($averageScores ?? ['sections' => [], 'scores' => [], 'overall' => 0]);
+            @php
+                $averageScoresData = $averageScores ?? ['sections' => [], 'scores' => [], 'overall' => 0];
+                $completionRateData = $completionRate ?? [
+                    'completed' => 0,
+                    'in_progress' => 0,
+                    'not_started' => 0,
+                    'completion_rate' => 0,
+                    'total_students' => 0,
+                ];
+            @endphp
+            const averageScoresData = @json($averageScoresData);
+            const completionRateData = @json($completionRateData);
             const sections = averageScoresData.sections || [];
             const currentScores = averageScoresData.scores || [];
             const monthlyData = {
@@ -747,7 +758,11 @@
 
                 // 3. Assessment Completion Rate Chart
                 const completionOptions = {
-                    series: [1663, 198, 89],
+                    series: [
+                        completionRateData.completed || 0,
+                        completionRateData.in_progress || 0,
+                        completionRateData.not_started || 0
+                    ],
                     chart: {
                         type: 'donut',
                         height: 250,
@@ -782,8 +797,8 @@
                         theme: 'dark',
                         y: {
                             formatter: function(val) {
-                                const total = 1663 + 198 + 89;
-                                const percentage = ((val / total) * 100).toFixed(1);
+                                const total = completionRateData.total_students || 0;
+                                const percentage = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
                                 return val + ' (' + percentage + '%)';
                             }
                         }

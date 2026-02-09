@@ -10,9 +10,11 @@ class AdminDashboardController extends Controller
     public function index(AdminDashboardMetricsService $metrics)
     {
         $averageScores = $metrics->getAverageScoresBySection();
+        $completionRate = $metrics->getAssessmentCompletionRate();
 
         return view('admin.admin.index', [
             'averageScores' => $averageScores,
+            'completionRate' => $completionRate,
         ]);
     }
 }

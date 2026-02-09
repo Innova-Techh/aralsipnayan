@@ -36,4 +36,37 @@ class AdminDashboardMetricsService
             'overall' => $overall,
         ];
     }
+
+    public function getAssessmentCompletionRate(): array
+    {
+        $totalStudents = (int) DB::table('student_profile')->count();
+
+        $completedUsers = DB::table('assessment_sessions')
+            ->where('status', 'completed')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $inProgressUsers = DB::table('assessment_sessions')
+            ->where('status', 'in_progress')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $startedUsers = DB::table('assessment_sessions')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $notStartedUsers = max(0, $totalStudents - $startedUsers);
+
+        $completionRate = $totalStudents > 0
+            ? round(($completedUsers / $totalStudents) * 100, 1)
+            : 0.0;
+
+        return [
+            'completed' => $completedUsers,
+            'in_progress' => $inProgressUsers,
+            'not_started' => $notStartedUsers,
+            'completion_rate' => $completionRate,
+            'total_students' => $totalStudents,
+        ];
+    }
 }
