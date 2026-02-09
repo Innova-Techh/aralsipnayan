@@ -274,4 +274,99 @@ class AdminDashboardMetricsService
             'insight_detail' => 'Consider curriculum adjustment for lower sections',
         ];
     }
+
+    public function getSectionStatisticsSummary(): array
+    {
+        $sections = DB::table('student_profile')
+            ->whereNotNull('section')
+            ->distinct()
+            ->orderBy('section')
+            ->pluck('section')
+            ->all();
+
+        $studentCounts = DB::table('student_profile')
+            ->whereNotNull('section')
+            ->select('section', DB::raw('COUNT(*) as students'))
+            ->groupBy('section')
+            ->pluck('students', 'section')
+            ->all();
+
+        $avgScores = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('student_profile.section')
+            ->select(
+                'student_profile.section',
+                DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
+            )
+            ->groupBy('student_profile.section')
+            ->pluck('avg_score', 'section')
+            ->all();
+
+        $completedUsers = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('student_profile.section')
+            ->select('student_profile.section', 'assessment_sessions.user_id')
+            ->distinct()
+            ->get()
+            ->groupBy('section')
+            ->map(fn($g) => $g->count())
+            ->all();
+
+        $now = now()->startOfWeek();
+        $prevStart = (clone $now)->subWeeks(6);
+        $mid = (clone $now)->subWeeks(3);
+
+        $trendRows = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('assessment_sessions.completed_at')
+            ->whereNotNull('student_profile.section')
+            ->whereBetween('assessment_sessions.completed_at', [$prevStart, (clone $now)->endOfWeek()])
+            ->select(
+                'student_profile.section',
+                DB::raw('AVG(CASE WHEN assessment_sessions.completed_at < "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as prev_avg'),
+                DB::raw('AVG(CASE WHEN assessment_sessions.completed_at >= "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as recent_avg')
+            )
+            ->groupBy('student_profile.section')
+            ->get()
+            ->keyBy('section');
+
+        $rows = [];
+        foreach ($sections as $section) {
+            $students = (int) ($studentCounts[$section] ?? 0);
+            $avg = isset($avgScores[$section]) ? round((float) $avgScores[$section], 1) : 0;
+            $completed = (int) ($completedUsers[$section] ?? 0);
+            $completion = $students > 0 ? round(($completed / $students) * 100, 1) : 0;
+
+            $trendRow = $trendRows[$section] ?? null;
+            $prev = $trendRow->prev_avg ?? 0;
+            $recent = $trendRow->recent_avg ?? 0;
+            $trend = round(($recent ?? 0) - ($prev ?? 0), 1);
+
+            if ($avg >= 85) {
+                $status = 'Excellent';
+            } elseif ($avg >= 80) {
+                $status = 'Good';
+            } elseif ($avg >= 75) {
+                $status = 'Average';
+            } elseif ($avg >= 70) {
+                $status = 'Below Avg';
+            } else {
+                $status = 'Needs Help';
+            }
+
+            $rows[] = [
+                'section' => $section,
+                'students' => $students,
+                'avg_score' => $avg,
+                'completion' => $completion,
+                'trend' => $trend,
+                'status' => $status,
+            ];
+        }
+
+        return $rows;
+    }
 }

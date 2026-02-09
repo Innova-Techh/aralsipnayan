@@ -331,96 +331,41 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 5-A</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">32</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-green-600">86.2%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">94%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-green-600">
-                                            <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                            <span class="font-medium">+5.2%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Excellent</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 4-C</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">28</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-blue-600">81.7%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">89%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-green-600">
-                                            <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                            <span class="font-medium">+12.3%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Good</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 6-B</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">30</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-gray-700">78.4%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">87%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-green-600">
-                                            <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                            <span class="font-medium">+2.1%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Average</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 2-A</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">25</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-gray-700">75.9%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">82%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-gray-600">
-                                            <i class="fas fa-minus text-xs mr-1"></i>
-                                            <span class="font-medium">+0.3%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Average</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 1-C</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">22</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-yellow-600">71.3%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">78%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-red-600">
-                                            <i class="fas fa-arrow-down text-xs mr-1"></i>
-                                            <span class="font-medium">-1.8%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Below Avg</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">Section 3-B</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">27</td>
-                                    <td class="px-4 py-3 text-sm font-semibold text-red-600">68.5%</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">74%</td>
-                                    <td class="px-4 py-3 text-sm">
-                                        <span class="inline-flex items-center text-red-600">
-                                            <i class="fas fa-arrow-down text-xs mr-1"></i>
-                                            <span class="font-medium">-4.2%</span>
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Needs Help</span>
-                                    </td>
-                                </tr>
+                                @forelse($sectionStatsSummary ?? [] as $row)
+                                    @php
+                                        $trend = $row['trend'] ?? 0;
+                                        $trendClass = $trend > 0 ? 'text-green-600' : ($trend < 0 ? 'text-red-600' : 'text-gray-600');
+                                        $trendIcon = $trend > 0 ? 'fa-arrow-up' : ($trend < 0 ? 'fa-arrow-down' : 'fa-minus');
+                                        $status = $row['status'] ?? 'Average';
+                                        $statusClass = match ($status) {
+                                            'Excellent' => 'bg-green-100 text-green-800',
+                                            'Good' => 'bg-blue-100 text-blue-800',
+                                            'Average' => 'bg-gray-100 text-gray-800',
+                                            'Below Avg' => 'bg-yellow-100 text-yellow-800',
+                                            'Needs Help' => 'bg-red-100 text-red-800',
+                                            default => 'bg-gray-100 text-gray-800',
+                                        };
+                                    @endphp
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $row['section'] }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-600">{{ $row['students'] }}</td>
+                                        <td class="px-4 py-3 text-sm font-semibold {{ ($row['avg_score'] ?? 0) >= 85 ? 'text-green-600' : (($row['avg_score'] ?? 0) >= 75 ? 'text-blue-600' : (($row['avg_score'] ?? 0) >= 70 ? 'text-yellow-600' : 'text-red-600')) }}">{{ $row['avg_score'] }}%</td>
+                                        <td class="px-4 py-3 text-sm text-gray-600">{{ $row['completion'] }}%</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <span class="inline-flex items-center {{ $trendClass }}">
+                                                <i class="fas {{ $trendIcon }} text-xs mr-1"></i>
+                                                <span class="font-medium">{{ $trend > 0 ? '+' : '' }}{{ $trend }}%</span>
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusClass }}">{{ $status }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-6 text-sm text-gray-500 text-center">No section statistics available.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

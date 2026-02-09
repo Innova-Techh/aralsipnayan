@@ -15,6 +15,7 @@ class AdminDashboardController extends Controller
         $performanceByCompetency = $metrics->getPerformanceByCompetency();
         $sectionPerformanceTrend = $metrics->getSectionPerformanceTrend();
         $sectionInsights = $metrics->getSectionInsights();
+        $sectionStatsSummary = $metrics->getSectionStatisticsSummary();
 
         return view('admin.admin.index', [
             'averageScores' => $averageScores,
@@ -23,6 +24,7 @@ class AdminDashboardController extends Controller
             'performanceByCompetency' => $performanceByCompetency,
             'sectionPerformanceTrend' => $sectionPerformanceTrend,
             'sectionInsights' => $sectionInsights,
+            'sectionStatsSummary' => $sectionStatsSummary,
         ]);
     }
 }
