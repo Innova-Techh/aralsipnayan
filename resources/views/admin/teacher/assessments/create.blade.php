@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Live Quiz Option -->
+                {{-- <!-- Live Quiz Option -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Quiz Type</h2>
                     <div class="space-y-3">
@@ -118,7 +118,7 @@
                             <span class="ml-3 text-sm text-gray-700">Live Quiz (Still in Development)</span>
                         </label>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Section Assignment -->
                 <div class="mb-8">

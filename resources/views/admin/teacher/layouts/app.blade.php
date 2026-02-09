@@ -200,7 +200,7 @@
                                     </div>
                                 </a>
                             </li>
-                            <li class="submenu-item tooltip-container">
+                            {{-- <li class="submenu-item tooltip-container">
                                 <a href="#"
                                     class="group relative flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined mr-2 text-sm">quiz</span>
@@ -212,7 +212,7 @@
                                         Quiz Templates
                                     </div>
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </li>
 

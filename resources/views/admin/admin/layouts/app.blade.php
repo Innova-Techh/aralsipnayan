@@ -500,7 +500,7 @@
                                         <i class="fas fa-user-circle w-5 mr-3 text-gray-400"></i>
                                         My Profile
                                     </a>
-                                    <a href="#"
+                                    {{-- <a href="#"
                                         class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                         <i class="fas fa-cog w-5 mr-3 text-gray-400"></i>
                                         Settings
@@ -509,7 +509,7 @@
                                         class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                         <i class="fas fa-question-circle w-5 mr-3 text-gray-400"></i>
                                         Help & Support
-                                    </a>
+                                    </a> --}}
                                 </div>
                                 <div class="border-t border-gray-200 py-2">
                                     <form method="POST" action="{{ route('logout') }}">
