@@ -199,6 +199,20 @@
                                     </button>
                                 </div>
 
+                                <!-- Export Buttons -->
+                                <div class="mt-2 flex gap-2">
+                                    <a href="{{ route('teacher.sections.export.csv', $section['section']) }}"
+                                        class="flex-1 bg-purple-50 text-purple-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-purple-100 transition-colors flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">download</span>
+                                        Export CSV
+                                    </a>
+                                    <a href="{{ route('teacher.sections.export.excel', $section['section']) }}"
+                                        class="flex-1 bg-orange-50 text-orange-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">table_chart</span>
+                                        Export Excel
+                                    </a>
+                                </div>
+
                                 <!-- Last Activity -->
                                 <div class="mt-4 pt-4 border-t border-gray-100">
                                     <p class="text-xs text-gray-500">Last activity: {{ $section['last_activity'] }}</p>

@@ -208,6 +208,8 @@ Route::get('/sections/students/{section}', [App\Http\Controllers\Teacher\Teacher
 Route::put('/sections/{section}', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'update'])->name('sections.update');
 Route::post('/sections/{section}/deactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'deactivate'])->name('sections.deactivate');
 Route::post('/sections/{section}/reactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'reactivate'])->name('sections.reactivate');
+Route::get('/sections/{section}/export/csv', [App\Http\Controllers\Teacher\TeacherSectionExportController::class, 'exportSectionCSV'])->name('sections.export.csv');
+Route::get('/sections/{section}/export/excel', [App\Http\Controllers\Teacher\TeacherSectionExportController::class, 'exportSectionExcel'])->name('sections.export.excel');
     
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
