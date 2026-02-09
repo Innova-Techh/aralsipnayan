@@ -192,6 +192,63 @@ class TeacherSectionExportController extends Controller
     }
 
     /**
+     * Export section students data as TIFF (image)
+     */
+    public function exportSectionTiff($section)
+    {
+        $teacher = Auth::guard('admin')->user();
+        $teacherProfile = DB::table('teacher_profile')->where('user_id', $teacher->id)->first();
+
+        if (!$teacherProfile) {
+            abort(404, 'Teacher profile not found');
+        }
+
+        // Verify teacher has access to this section
+        $hasAccess = DB::table('teacher_sections')
+            ->where('teacher_id', $teacherProfile->id)
+            ->where('section', $section)
+            ->exists();
+
+        if (!$hasAccess) {
+            abort(403, 'Access denied to this section');
+        }
+
+        if (!extension_loaded('imagick') || !class_exists(\Imagick::class)) {
+            \Log::error('TIFF export failed: Imagick extension not available', [
+                'section' => $section,
+                'teacher_id' => $teacher->id ?? null,
+            ]);
+            return response(
+                'TIFF export requires the Imagick PHP extension (php_imagick). Enable it in php.ini and restart the server.',
+                501,
+                ['Content-Type' => 'text/plain']
+            );
+        }
+
+        try {
+            $studentsData = $this->getSectionStudentsData($section);
+            $lines = $this->buildTiffLines($section, $studentsData);
+
+            $tiff = $this->renderTiffFromLines($lines);
+            $filename = $section . '_students_performance_' . date('Y-m-d') . '.tiff';
+
+            return response($tiff, 200, [
+                'Content-Type' => 'image/tiff',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('TIFF export failed with exception', [
+                'section' => $section,
+                'teacher_id' => $teacher->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+            return response('TIFF export failed. Check laravel.log for details.', 500, [
+                'Content-Type' => 'text/plain'
+            ]);
+        }
+    }
+
+    /**
      * Get comprehensive student data for a section
      */
     private function getSectionStudentsData($section)
@@ -649,5 +706,110 @@ class TeacherSectionExportController extends Controller
         }
         
         return empty($needsImprovement) ? ['None'] : $needsImprovement;
+    }
+
+    /**
+     * Build printable lines for TIFF export
+     */
+    private function buildTiffLines($section, $studentsData)
+    {
+        $lines = [];
+        $lines[] = 'Section: ' . $section;
+        $lines[] = 'Exported: ' . date('Y-m-d H:i');
+        $lines[] = str_repeat('-', 120);
+
+        $widths = [10, 22, 28, 8, 8, 7, 10, 12];
+        $headers = [
+            'Student ID',
+            'Name',
+            'Email',
+            'Points',
+            'Overall',
+            'Streak',
+            'Last Score',
+            'Last Date'
+        ];
+
+        $lines[] = $this->formatTiffRow($headers, $widths);
+        $lines[] = str_repeat('-', 120);
+
+        foreach ($studentsData as $student) {
+            $lines[] = $this->formatTiffRow([
+                $student['student_id'] ?? 'N/A',
+                $student['name'],
+                $student['email'],
+                $student['total_points'],
+                $student['overall_score'],
+                $student['current_streak'],
+                $student['last_assessment_score'],
+                $student['last_assessment_date'] ?? 'N/A'
+            ], $widths);
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Render TIFF bytes from lines
+     */
+    private function renderTiffFromLines($lines)
+    {
+        $width = 1600;
+        $height = 2200;
+        $margin = 40;
+        $lineHeight = 18;
+        $linesPerPage = (int) floor(($height - ($margin * 2)) / $lineHeight);
+
+        $pages = array_chunk($lines, max(1, $linesPerPage));
+        $tiff = new \Imagick();
+
+        foreach ($pages as $pageLines) {
+            $img = new \Imagick();
+            $img->newImage($width, $height, new \ImagickPixel('white'));
+            $img->setImageFormat('tiff');
+
+            $draw = new \ImagickDraw();
+            $draw->setFontSize(12);
+            $draw->setFillColor('black');
+
+            $y = $margin + $lineHeight;
+            foreach ($pageLines as $line) {
+                $img->annotateImage($draw, $margin, $y, 0, $line);
+                $y += $lineHeight;
+            }
+
+            $tiff->addImage($img);
+        }
+
+        $tiff->setFormat('tiff');
+        return $tiff->getImagesBlob();
+    }
+
+    /**
+     * Format a row for TIFF output
+     */
+    private function formatTiffRow($columns, $widths)
+    {
+        $out = [];
+        foreach ($columns as $i => $value) {
+            $width = $widths[$i] ?? 10;
+            $text = $this->truncateText((string) $value, $width);
+            $out[] = str_pad($text, $width);
+        }
+        return implode(' ', $out);
+    }
+
+    /**
+     * Truncate text to a fixed width (ASCII-safe)
+     */
+    private function truncateText($text, $width)
+    {
+        if (strlen($text) <= $width) {
+            return $text;
+        }
+        if ($width <= 3) {
+            return substr($text, 0, $width);
+        }
+        return substr($text, 0, $width - 3) . '...';
     }
 }

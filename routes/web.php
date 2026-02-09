@@ -210,6 +210,7 @@ Route::post('/sections/{section}/deactivate', [App\Http\Controllers\Teacher\Teac
 Route::post('/sections/{section}/reactivate', [App\Http\Controllers\Teacher\TeacherSectionController::class, 'reactivate'])->name('sections.reactivate');
 Route::get('/sections/{section}/export/csv', [App\Http\Controllers\Teacher\TeacherSectionExportController::class, 'exportSectionCSV'])->name('sections.export.csv');
 Route::get('/sections/{section}/export/excel', [App\Http\Controllers\Teacher\TeacherSectionExportController::class, 'exportSectionExcel'])->name('sections.export.excel');
+Route::get('/sections/{section}/export/tiff', [App\Http\Controllers\Teacher\TeacherSectionExportController::class, 'exportSectionTiff'])->name('sections.export.tiff');
     
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

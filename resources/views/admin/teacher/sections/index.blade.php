@@ -211,6 +211,11 @@
                                         <span class="material-symbols-outlined text-sm">table_chart</span>
                                         Export Excel
                                     </a>
+                                    <a href="{{ route('teacher.sections.export.tiff', $section['section']) }}"
+                                        class="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors flex items-center justify-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">image</span>
+                                        Export TIFF
+                                    </a>
                                 </div>
 
                                 <!-- Last Activity -->
