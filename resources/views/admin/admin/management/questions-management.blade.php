@@ -158,6 +158,29 @@
                             </a>
                         </div>
                     </div>
+                    <div class="relative">
+                        <button type="button" id="bulkDropdownButton"
+                            class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
+                            <i class="fas fa-file-import"></i>
+                            Add Bulk Question
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="bulkDropdownMenu"
+                            class="hidden absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                            <a href="{{ route('admin.management.questions.bulk.show', ['type' => 'csv']) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Bulk via CSV
+                            </a>
+                            <a href="{{ route('admin.management.questions.bulk.show', ['type' => 'excel']) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Bulk via Excel
+                            </a>
+                            <a href="{{ route('admin.management.questions.bulk.show', ['type' => 'tiff']) }}"
+                                class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                Bulk via TIFF
+                            </a>
+                        </div>
+                    </div>
                     <button onclick="openModal('add')"
                         class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
                         <i class="fas fa-plus"></i>
@@ -1012,6 +1035,8 @@
         // Export dropdown
         const exportDropdownButton = document.getElementById('exportDropdownButton');
         const exportDropdownMenu = document.getElementById('exportDropdownMenu');
+        const bulkDropdownButton = document.getElementById('bulkDropdownButton');
+        const bulkDropdownMenu = document.getElementById('bulkDropdownMenu');
 
         if (exportDropdownButton && exportDropdownMenu) {
             exportDropdownButton.addEventListener('click', (e) => {
@@ -1021,6 +1046,17 @@
 
             document.addEventListener('click', () => {
                 exportDropdownMenu.classList.add('hidden');
+            });
+        }
+
+        if (bulkDropdownButton && bulkDropdownMenu) {
+            bulkDropdownButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                bulkDropdownMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                bulkDropdownMenu.classList.add('hidden');
             });
         }
 

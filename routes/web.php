@@ -385,6 +385,8 @@ Route::prefix('admin')
             Route::get('/questions/export/csv', [App\Http\Controllers\admin\QuestionExportController::class, 'exportCsv'])->name('questions.export.csv');
             Route::get('/questions/export/excel', [App\Http\Controllers\admin\QuestionExportController::class, 'exportExcel'])->name('questions.export.excel');
             Route::get('/questions/export/tiff', [App\Http\Controllers\admin\QuestionExportController::class, 'exportTiff'])->name('questions.export.tiff');
+            Route::get('/questions/bulk/{type}', [App\Http\Controllers\admin\QuestionBulkImportController::class, 'show'])->name('questions.bulk.show');
+            Route::post('/questions/bulk/{type}', [App\Http\Controllers\admin\QuestionBulkImportController::class, 'upload'])->name('questions.bulk.upload');
             Route::post('/questions', [App\Http\Controllers\admin\QuestionController::class, 'store'])->name('questions.store');
             Route::put('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'update'])->name('questions.update');
             Route::delete('/questions/{question}', [App\Http\Controllers\admin\QuestionController::class, 'destroy'])->name('questions.destroy');
