@@ -252,6 +252,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     <!-- Chart -->
                     <div class="lg:col-span-2">
+                        <div id="sectionPerformanceLegend" class="flex flex-wrap items-center gap-3 mb-3"></div>
                         <div id="sectionPerformanceChart"></div>
                     </div>
 
@@ -264,8 +265,8 @@
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-green-800 uppercase tracking-wide">Top Performer</p>
-                                    <p class="text-lg font-bold text-green-900 mt-1">Section 5-A</p>
-                                    <p class="text-sm text-green-700 mt-1">Average Score: 86.2%</p>
+                                    <p class="text-lg font-bold text-green-900 mt-1">{{ $sectionInsights['top']['section'] ?? 'N/A' }}</p>
+                                    <p class="text-sm text-green-700 mt-1">Average Score: {{ $sectionInsights['top']['avg'] ?? 0 }}%</p>
                                     <p class="text-xs text-green-600 mt-2">Consistent improvement over 3 months</p>
                                 </div>
                             </div>
@@ -278,8 +279,8 @@
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-red-800 uppercase tracking-wide">Needs Attention</p>
-                                    <p class="text-lg font-bold text-red-900 mt-1">Section 3-B</p>
-                                    <p class="text-sm text-red-700 mt-1">Average Score: 68.5%</p>
+                                    <p class="text-lg font-bold text-red-900 mt-1">{{ $sectionInsights['needs_attention']['section'] ?? 'N/A' }}</p>
+                                    <p class="text-sm text-red-700 mt-1">Average Score: {{ $sectionInsights['needs_attention']['avg'] ?? 0 }}%</p>
                                     <p class="text-xs text-red-600 mt-2">Declining trend in recent weeks</p>
                                 </div>
                             </div>
@@ -292,8 +293,8 @@
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-blue-800 uppercase tracking-wide">Most Improved</p>
-                                    <p class="text-lg font-bold text-blue-900 mt-1">Section 4-C</p>
-                                    <p class="text-sm text-blue-700 mt-1">Growth: +12.3%</p>
+                                    <p class="text-lg font-bold text-blue-900 mt-1">{{ $sectionInsights['most_improved']['section'] ?? 'N/A' }}</p>
+                                    <p class="text-sm text-blue-700 mt-1">Growth: {{ $sectionInsights['most_improved']['growth'] ?? 0 }}%</p>
                                     <p class="text-xs text-blue-600 mt-2">Significant progress this quarter</p>
                                 </div>
                             </div>
@@ -306,8 +307,8 @@
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold text-yellow-800 uppercase tracking-wide">Insight</p>
-                                    <p class="text-sm text-yellow-900 mt-1 font-medium">Higher sections show better performance in Algebra topics</p>
-                                    <p class="text-xs text-yellow-700 mt-2">Consider curriculum adjustment for lower sections</p>
+                                    <p class="text-sm text-yellow-900 mt-1 font-medium">{{ $sectionInsights['insight'] ?? 'No insight available' }}</p>
+                                    <p class="text-xs text-yellow-700 mt-2">{{ $sectionInsights['insight_detail'] ?? '' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -523,11 +524,13 @@
                 ];
                 $mostMissedTopicsData = $mostMissedTopics ?? ['topics' => [], 'accuracy' => []];
                 $performanceByCompetencyData = $performanceByCompetency ?? ['sections' => [], 'series' => []];
+                $sectionPerformanceTrendData = $sectionPerformanceTrend ?? ['labels' => ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6'], 'series' => []];
             @endphp
             const averageScoresData = @json($averageScoresData);
             const completionRateData = @json($completionRateData);
             const mostMissedTopicsData = @json($mostMissedTopicsData);
             const performanceByCompetencyData = @json($performanceByCompetencyData);
+            const sectionPerformanceTrendData = @json($sectionPerformanceTrendData);
             const sections = averageScoresData.sections || [];
             const currentScores = averageScoresData.scores || [];
             const monthlyData = {
@@ -978,26 +981,9 @@
                 competencyChart.render();
 
                 // 6. Section Performance Trend Chart
+                const sectionTrendColors = ['#10B981', '#3B82F6', '#6B7280', '#F59E0B', '#FCD34D', '#EF4444'];
                 const sectionPerformanceOptions = {
-                    series: [{
-                        name: 'Section 5-A',
-                        data: [80.5, 82.1, 83.7, 84.9, 85.5, 86.2]
-                    }, {
-                        name: 'Section 4-C',
-                        data: [69.4, 72.8, 75.2, 77.5, 79.8, 81.7]
-                    }, {
-                        name: 'Section 6-B',
-                        data: [76.3, 76.8, 77.2, 77.5, 78.0, 78.4]
-                    }, {
-                        name: 'Section 2-A',
-                        data: [75.6, 75.4, 75.8, 75.9, 75.7, 75.9]
-                    }, {
-                        name: 'Section 1-C',
-                        data: [73.1, 72.8, 71.9, 71.5, 71.0, 71.3]
-                    }, {
-                        name: 'Section 3-B',
-                        data: [72.7, 71.5, 70.2, 69.8, 68.9, 68.5]
-                    }],
+                    series: sectionPerformanceTrendData.series || [],
                     chart: {
                         type: 'line',
                         height: 350,
@@ -1015,7 +1001,7 @@
                         },
                         fontFamily: 'Inter, sans-serif'
                     },
-                    colors: ['#10B981', '#3B82F6', '#6B7280', '#F59E0B', '#FCD34D', '#EF4444'],
+                    colors: sectionTrendColors,
                     stroke: {
                         curve: 'smooth',
                         width: 3
@@ -1032,7 +1018,7 @@
                         enabled: false
                     },
                     xaxis: {
-                        categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                        categories: sectionPerformanceTrendData.labels || ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
                         labels: {
                             style: {
                                 colors: '#6B7280',
@@ -1091,6 +1077,23 @@
                 }
                 sectionPerformanceChart = new ApexCharts(document.querySelector("#sectionPerformanceChart"), sectionPerformanceOptions);
                 sectionPerformanceChart.render();
+
+                const legendEl = document.getElementById('sectionPerformanceLegend');
+                if (legendEl) {
+                    legendEl.innerHTML = '';
+                    (sectionPerformanceTrendData.series || []).forEach((s, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center gap-2 text-xs text-gray-700';
+                        const dot = document.createElement('span');
+                        dot.className = 'inline-block w-2.5 h-2.5 rounded-full';
+                        dot.style.backgroundColor = sectionTrendColors[idx % sectionTrendColors.length];
+                        const label = document.createElement('span');
+                        label.textContent = s.name || 'Section';
+                        item.appendChild(dot);
+                        item.appendChild(label);
+                        legendEl.appendChild(item);
+                    });
+                }
             }
 
             // Initialize charts with default month

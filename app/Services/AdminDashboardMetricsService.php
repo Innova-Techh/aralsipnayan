@@ -115,7 +115,16 @@ class AdminDashboardMetricsService
             ->orderBy('student_profile.section')
             ->get();
 
-        $sections = $rows->pluck('section')->unique()->values()->all();
+        $sections = DB::table('student_profile')
+            ->whereNotNull('section')
+            ->distinct()
+            ->orderBy('section')
+            ->pluck('section')
+            ->all();
+
+        if (empty($sections)) {
+            $sections = $rows->pluck('section')->unique()->values()->all();
+        }
         $competencies = ['number_algebra', 'measurement_geometry', 'data_probability'];
 
         $series = [];
@@ -147,6 +156,122 @@ class AdminDashboardMetricsService
         return [
             'sections' => $sections,
             'series' => $series,
+        ];
+    }
+
+    public function getSectionPerformanceTrend(int $weeks = 6): array
+    {
+        $end = now()->startOfWeek();
+        $start = (clone $end)->subWeeks($weeks - 1);
+
+        $rows = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('assessment_sessions.completed_at')
+            ->whereNotNull('student_profile.section')
+            ->whereBetween('assessment_sessions.completed_at', [$start, (clone $end)->endOfWeek()])
+            ->select(
+                'student_profile.section',
+                DB::raw("YEARWEEK(assessment_sessions.completed_at, 1) as yearweek"),
+                DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
+            )
+            ->groupBy('student_profile.section', DB::raw("YEARWEEK(assessment_sessions.completed_at, 1)"))
+            ->get();
+
+        $weeksList = [];
+        for ($i = 0; $i < $weeks; $i++) {
+            $weekStart = (clone $start)->addWeeks($i);
+            $weeksList[] = [
+                'label' => 'Week ' . ($i + 1),
+                'yearweek' => (int) $weekStart->format('oW'),
+            ];
+        }
+
+        $sections = $rows->pluck('section')->unique()->values()->all();
+        $series = [];
+
+        foreach ($sections as $section) {
+            $data = [];
+            foreach ($weeksList as $week) {
+                $row = $rows->first(function ($r) use ($section, $week) {
+                    return $r->section === $section && (int) $r->yearweek === $week['yearweek'];
+                });
+                $data[] = $row ? round((float) $row->avg_score, 1) : 0;
+            }
+            $series[] = [
+                'name' => $section,
+                'data' => $data,
+            ];
+        }
+
+        return [
+            'labels' => array_column($weeksList, 'label'),
+            'series' => $series,
+        ];
+    }
+
+    public function getSectionInsights(): array
+    {
+        $rows = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('assessment_sessions.completed_at')
+            ->whereNotNull('student_profile.section')
+            ->select(
+                'student_profile.section',
+                DB::raw('AVG(COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage)) as avg_score')
+            )
+            ->groupBy('student_profile.section')
+            ->get();
+
+        $top = $rows->sortByDesc('avg_score')->first();
+        $bottom = $rows->sortBy('avg_score')->first();
+
+        $now = now()->startOfWeek();
+        $prevStart = (clone $now)->subWeeks(6);
+        $mid = (clone $now)->subWeeks(3);
+
+        $trendRows = DB::table('assessment_sessions')
+            ->join('student_profile', 'assessment_sessions.user_id', '=', 'student_profile.user_id')
+            ->where('assessment_sessions.status', 'completed')
+            ->whereNotNull('assessment_sessions.completed_at')
+            ->whereNotNull('student_profile.section')
+            ->whereBetween('assessment_sessions.completed_at', [$prevStart, (clone $now)->endOfWeek()])
+            ->select(
+                'student_profile.section',
+                DB::raw('AVG(CASE WHEN assessment_sessions.completed_at < "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as prev_avg'),
+                DB::raw('AVG(CASE WHEN assessment_sessions.completed_at >= "' . $mid->toDateTimeString() . '" THEN COALESCE(assessment_sessions.final_mastery_score, assessment_sessions.accuracy_percentage) END) as recent_avg')
+            )
+            ->groupBy('student_profile.section')
+            ->get();
+
+        $mostImproved = $trendRows->map(function ($r) {
+            $prev = $r->prev_avg ?? 0;
+            $recent = $r->recent_avg ?? 0;
+            $growth = ($recent ?? 0) - ($prev ?? 0);
+            return [
+                'section' => $r->section,
+                'growth' => round($growth, 1),
+                'recent' => round((float) $recent, 1),
+            ];
+        })->sortByDesc('growth')->first();
+
+        return [
+            'top' => [
+                'section' => $top->section ?? 'N/A',
+                'avg' => isset($top->avg_score) ? round((float) $top->avg_score, 1) : 0,
+            ],
+            'needs_attention' => [
+                'section' => $bottom->section ?? 'N/A',
+                'avg' => isset($bottom->avg_score) ? round((float) $bottom->avg_score, 1) : 0,
+            ],
+            'most_improved' => [
+                'section' => $mostImproved['section'] ?? 'N/A',
+                'growth' => $mostImproved['growth'] ?? 0,
+                'recent' => $mostImproved['recent'] ?? 0,
+            ],
+            'insight' => 'Higher sections show better performance in Algebra topics',
+            'insight_detail' => 'Consider curriculum adjustment for lower sections',
         ];
     }
 }
