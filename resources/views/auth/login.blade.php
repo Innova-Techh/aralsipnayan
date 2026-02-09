@@ -233,20 +233,22 @@
                     <div class="mb-6">
                         <label for="captcha" class="block text-white text-base font-medium mb-2">Security Code</label>
                         <div class="flex flex-col gap-3">
+                            <div class="glass-input rounded-xl p-3 w-full">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div
+                                        class="w-full max-w-[200px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px] sm:max-w-[180px] sm:[&>img]:!min-h-[45px]">
+                                        {!! $captchaHtml !!}
+                                    </div>
+                                    <button type="button" onclick="refreshCaptcha()"
+                                        class="text-white text-sm underline hover:no-underline whitespace-nowrap">
+                                        &#x21bb; Refresh
+                                    </button>
+                                </div>
+                            </div>
                             <input type="text"
                                 class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
                                 name="captcha" placeholder="Enter security code">
-                            <div class="glass-input rounded-xl p-3 w-full flex items-center justify-center">
-                                <div
-                                    class="w-full max-w-[140px] min-h-[40px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[40px] sm:max-w-[120px] sm:[&>img]:!min-h-[35px]">
-                                    {!! $captchaHtml !!}
-                                </div>
-                            </div>
                         </div>
-                        <button type="button" onclick="refreshCaptcha()"
-                            class="text-white text-sm mt-2 underline hover:no-underline">
-                            Refresh Code
-                        </button>
                     </div>
                     <button type="submit" id="loginBtn"
                         class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg">
@@ -314,18 +316,23 @@
                     <div class="mb-8">
                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
                             Code</label>
-                        <div class="flex gap-3 items-center">
-                            <input type="text"
-                                class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
-                                name="captcha" placeholder="Enter security code">
-                            <div class="border border-gray-300 rounded-xl p-2 bg-gray-50">
-                                {!! $captchaHtml !!}
+                        <div class="border border-gray-300 rounded-xl p-3 bg-gray-50">
+                            <div class="flex items-center justify-between gap-3">
+                                <div
+                                    class="w-full max-w-[220px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px]">
+                                    {!! $captchaHtml !!}
+                                </div>
+                                <button type="button" onclick="refreshCaptcha()"
+                                    class="text-primary-blue text-sm underline hover:no-underline whitespace-nowrap">
+                                    &#x21bb; Refresh
+                                </button>
                             </div>
                         </div>
-                        <button type="button" onclick="refreshCaptcha()"
-                            class="text-primary-blue text-sm mt-2 underline hover:no-underline">
-                            Refresh Code
-                        </button>
+                        <div class="mt-3">
+                            <input type="text"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
+                                name="captcha" placeholder="Enter security code">
+                        </div>
                     </div>
                     <button type="submit" id="desktopLoginBtn"
                         class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300">

@@ -24,9 +24,9 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
-           // 'captcha' => 'required|captcha',
+           'captcha' => 'required|captcha',
         ], [
-            //'captcha.captcha' => 'Invalid Captcha',
+            'captcha.captcha' => 'Invalid Captcha',
         ]);
 
         // delay to test the loader (remove in production)
