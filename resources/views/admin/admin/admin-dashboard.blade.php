@@ -374,7 +374,7 @@
         </div>
 
         <!-- Platform Growth and Recent Activities -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
             <!-- Platform Growth Chart -->
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Platform Growth</h3>
@@ -384,7 +384,7 @@
                 <div id="growthChart"></div>
             </div>
 
-            <!-- Recent Activities -->
+            {{-- <!-- Recent Activities -->
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Recent Activities</h3>
                 <p class="text-sm text-gray-600 mb-6">Latest system activities</p>
@@ -450,7 +450,7 @@
                         <span class="text-xs text-gray-400">2h ago</span>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
 @endsection
 
@@ -470,12 +470,14 @@
                 $mostMissedTopicsData = $mostMissedTopics ?? ['topics' => [], 'accuracy' => []];
                 $performanceByCompetencyData = $performanceByCompetency ?? ['sections' => [], 'series' => []];
                 $sectionPerformanceTrendData = $sectionPerformanceTrend ?? ['labels' => ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6'], 'series' => []];
+                $platformGrowthData = $platformGrowth ?? ['labels' => [], 'students' => [], 'assessments' => []];
             @endphp
             const averageScoresData = @json($averageScoresData);
             const completionRateData = @json($completionRateData);
             const mostMissedTopicsData = @json($mostMissedTopicsData);
             const performanceByCompetencyData = @json($performanceByCompetencyData);
             const sectionPerformanceTrendData = @json($sectionPerformanceTrendData);
+            const platformGrowthData = @json($platformGrowthData);
             const sections = averageScoresData.sections || [];
             const currentScores = averageScoresData.scores || [];
             const monthlyData = {
@@ -567,10 +569,10 @@
                 const growthOptions = {
                     series: [{
                         name: 'Assessments',
-                        data: [245, 268, 289, 312, 328, 342]
+                        data: platformGrowthData.assessments || []
                     }, {
                         name: 'Students',
-                        data: [1650, 1720, 1805, 1860, 1920, 1950]
+                        data: platformGrowthData.students || []
                     }],
                     chart: {
                         type: 'area',
@@ -596,7 +598,7 @@
                         }
                     },
                     xaxis: {
-                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        categories: platformGrowthData.labels || [],
                         labels: {
                             style: {
                                 colors: '#6B7280',

@@ -369,4 +369,42 @@ class AdminDashboardMetricsService
 
         return $rows;
     }
+
+    public function getPlatformGrowth(): array
+    {
+        $months = collect(range(0, 5))
+            ->map(function ($i) {
+                $start = now()->startOfMonth()->subMonths(5 - $i);
+                $end = (clone $start)->endOfMonth();
+                return [
+                    'label' => $start->format('M'),
+                    'start' => $start,
+                    'end' => $end,
+                ];
+            })
+            ->all();
+
+        $labels = [];
+        $students = [];
+        $assessments = [];
+
+        foreach ($months as $m) {
+            $labels[] = $m['label'];
+
+            $students[] = DB::table('student_profile')
+                ->whereBetween('created_at', [$m['start'], $m['end']])
+                ->count();
+
+            $assessments[] = DB::table('assessment_sessions')
+                ->where('status', 'completed')
+                ->whereBetween('completed_at', [$m['start'], $m['end']])
+                ->count();
+        }
+
+        return [
+            'labels' => $labels,
+            'students' => $students,
+            'assessments' => $assessments,
+        ];
+    }
 }
