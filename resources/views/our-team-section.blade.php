@@ -1,0 +1,109 @@
+<!-- Our Team Section -->
+<section id="ourteam" class="font-baloo py-16 md:py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-5xl font-bold text-blue-600">Our <span class="text-yellow-400">Team</span></h2>
+      <p class="text-base md:text-lg text-gray-600 mt-3">Researchers, advisers, and panelists who guided AralSipnayan.</p>
+      <div class="w-24 h-1 bg-yellow-300 mx-auto rounded-full mt-5"></div>
+    </div>
+
+    <!-- Researchers -->
+    <div class="mb-12">
+      <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-6">Researchers</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-[125%] -mx-[12.5%]">
+        @php
+          $researchers = [
+            ['role' => 'Lead and Full Stack Developer', 'name' => 'Eduardo II Buscato', 'id' => '0001'],
+            ['role' => 'Quality Assurance, UI/UX and Business Analyst', 'name' => 'Krissa Mae Beringuel', 'id' => '0002'],
+            ['role' => 'UI/UX and Frontend Developer', 'name' => 'Joshua Fernandez', 'id' => '0003'],
+            ['role' => 'Full-Stack Developer', 'name' => 'Sean Russel Sicat', 'id' => '0004'],
+          ];
+        @endphp
+        @foreach ($researchers as $r)
+          <div class="rounded-2xl border-2 border-slate-900 shadow-md overflow-hidden">
+            <div class="flex">
+              <div class="w-1/2 bg-yellow-300 p-5 flex flex-col items-center justify-center">
+                <div class="w-24 h-28 rounded-lg bg-yellow-200"></div>
+                <div class="mt-3 text-xs text-slate-900 text-center">{{ $r['role'] }}</div>
+              </div>
+              <div class="w-1/2 bg-blue-600 p-5 flex flex-col justify-between">
+                <div>
+                  <div class="text-[10px] uppercase tracking-widest text-white/70 font-semibold flex justify-between">
+                    <span>ID</span>
+                    <span>#{{ $r['id'] }}</span>
+                  </div>
+                  <p class="text-lg font-bold text-white">{{ $r['name'] }}</p>
+                  <div class="mt-3 h-1.5 w-20 bg-yellow-300 rounded-full"></div>
+                </div>
+                <div class="text-xs text-white/80">2025-2026</div>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <!-- Advisers -->
+    <div class="mb-12">
+      <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-6">Advisers</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[120%] -mx-[10%]">
+        @php
+          $advisers = [
+            ['role' => 'Research Adviser', 'name' => 'Prof. Mary Ellaine Cervantes', 'id' => '1001'],
+            ['role' => 'Technical Adviser', 'name' => 'Prof. Lester Glover Diampoc', 'id' => '1002'],
+            ['role' => 'DEPED Adviser', 'name' => 'Prof. Michael Lee', 'id' => '1003'],
+          ];
+        @endphp
+        @foreach ($advisers as $a)
+          <div class="rounded-2xl border-2 border-slate-900 shadow-md overflow-hidden">
+            <div class="flex">
+              <div class="w-1/2 bg-yellow-300 p-5 flex flex-col items-center justify-center">
+                <div class="w-24 h-28 rounded-lg bg-yellow-200"></div>
+                <div class="mt-3 text-xs text-slate-900 text-center">{{ $a['role'] }}</div>
+              </div>
+              <div class="w-1/2 bg-blue-600 p-5 flex flex-col justify-between">
+                <div>
+                  <div class="text-[10px] uppercase tracking-widest text-white/70 font-semibold flex justify-between">
+                    <span>ID</span>
+                    <span>#{{ $a['id'] }}</span>
+                  </div>
+                  <p class="text-lg font-bold text-white">{{ $a['name'] }}</p>
+                  <div class="mt-3 h-1.5 w-20 bg-yellow-300 rounded-full"></div>
+                </div>
+                <div class="text-xs text-white/80">2025-2026</div>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      </div>
+    </div>
+
+    <!-- Panelists -->
+    <div>
+      <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-6">Panelists</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-[120%] -mx-[10%]">
+        @for ($i = 0; $i < 3; $i++)
+          <div class="rounded-2xl border-2 border-slate-900 shadow-md overflow-hidden">
+            <div class="flex">
+              <div class="w-1/2 bg-yellow-300 p-5 flex flex-col items-center justify-center">
+                <div class="w-24 h-28 rounded-lg bg-yellow-200"></div>
+                <div class="mt-3 text-xs text-slate-900 text-center">Title</div>
+              </div>
+              <div class="w-1/2 bg-blue-600 p-5 flex flex-col justify-between">
+                <div>
+                  <div class="text-[10px] uppercase tracking-widest text-white/70 font-semibold flex justify-between">
+                    <span>ID</span>
+                    <span>#200{{ $i + 1 }}</span>
+                  </div>
+                  <p class="text-lg font-bold text-white">Name</p>
+                  <div class="mt-3 h-1.5 w-20 bg-yellow-300 rounded-full"></div>
+                </div>
+                <div class="text-xs text-white/80">2025-2026</div>
+              </div>
+            </div>
+          </div>
+        @endfor
+      </div>
+    </div>
+  </div>
+</section>
