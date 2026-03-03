@@ -497,7 +497,7 @@
     <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div
-                class="flex flex-row justify-center md:justify-center items-center py-3 sm:py-4 gap-16 md:gap-10 lg:gap-16 relative">
+                class="flex flex-row justify-between md:justify-center items-center py-3 sm:py-4 gap-4 md:gap-10 lg:gap-16 relative">
                 <div class="flex items-center gap-0.5 sm:gap-1 header-logo">
                     <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
@@ -523,7 +523,7 @@
                 </div>
 
                 <a href="{{ route('login') }}"
-                    class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-base sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
+                    class="header-login hidden md:block font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-base sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
                     Login
                 </a>
 
@@ -552,12 +552,18 @@
                 --}}
                 <a href="#researchers"
                     class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Researchers</a>
+                <div class="pt-2 pb-1 px-4">
+                    <a href="{{ route('login') }}"
+                        class="block font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-4 py-2 rounded-xl text-lg text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
+                        Login
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
 
     <!-- Section 1 -->
-    <section class="py-12 md:py-12 text-white full-screen-section" style="padding-top: calc(3rem + 80px);">
+    <section class="py-8 md:py-12 text-white full-screen-section" style="padding-top: calc(2rem + 70px);">
         <!-- GSAP animated circles and math symbols container -->
         <div class="moving-circles">
             <!-- Radial circles will be animated by JavaScript -->
@@ -586,16 +592,17 @@
         </div>
         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
 
-        <div class="font-baloo max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="font-baloo max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full overflow-hidden">
             <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
                 <!-- Text Content -->
-                <div class="flex-1 text-center lg:text-left relative z-20">
-                    <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                <div class="flex-1 text-center lg:text-left relative z-20 w-full">
+                    <h1
+                        class="hero-title text-3xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight break-words w-full">
                         Master <span class="text-yellow-400">Mathematics</span> with
                         <span class="text-white">Interactive Learning</span>
                     </h1>
                     <p
-                        class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        class="hero-description text-base sm:text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
                         AralSipnayan is a gamified math assessment tool for elementary students that makes advanced
                         mathematics
                         fun and interactive.
