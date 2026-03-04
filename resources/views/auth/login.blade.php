@@ -25,6 +25,7 @@
             animation: float-symbol 20s infinite ease-in-out;
         }
 
+
         @keyframes float-symbol {
 
             0%,
@@ -163,6 +164,15 @@
             z-index: 1;
             min-height: 100vh;
         }
+
+        /* Ensure mobile vanta covers fully on tablets */
+        @media (max-width: 1023px) {
+            .mobile-vanta-container {
+                position: fixed;
+                width: 100vw;
+                height: 100vh;
+            }
+        }
     </style>
 </head>
 
@@ -183,7 +193,7 @@
 
 <body class="min-h-screen font-baloo overflow-x-hidden">
     <!-- Mobile/Tablet layout with full-screen background (from josh-branch) -->
-    <div class="md:hidden">
+    <div class="lg:hidden">
         <!-- Vanta.js Background for Mobile/Tablet -->
         <div class="mobile-vanta-container" id="mobile-vanta-bg">
             <!-- Floating Math Symbols for Mobile -->
@@ -291,7 +301,7 @@
     </div>
 
     <!-- Desktop layout (combining both branches) -->
-    <div class="hidden md:flex min-h-screen">
+    <div class="hidden lg:flex min-h-screen">
         <!-- Left Section with Vanta.js Background (from josh-branch) -->
         <div class="flex-1 relative overflow-hidden">
             <!-- Vanta.js container -->
@@ -325,8 +335,11 @@
         </div>
 
         <!-- Right Section (from main-branch with all functionality intact) -->
-        <div class="flex-1 bg-gray-100 flex items-center justify-center">
-            <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
+        <div class="flex-1 flex items-center justify-center"
+            style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('{{ asset('images/login/login-form-bg-latest.png') }}'); background-size: cover; background-repeat: no-repeat; background-position: bottom top;">
+            {{-- <img src="{{ asset('images/login/login-form-bg.png') }}" alt=""> --}}
+
+            <div class="bg-white/60 rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
 
                 <h2 class="text-gray-800 text-2xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm" class="font-baloo">
@@ -336,7 +349,7 @@
                             class="block text-gray-700 text-base font-medium mb-2 font-baloo">Username or
                             Email</label>
                         <input type="text"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/45 text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
                             name="username" id="desktop-username" required>
                     </div>
                     <div class="mb-8">
@@ -344,7 +357,7 @@
                             class="block text-gray-700 text-base font-medium mb-2 font-baloo">Password</label>
                         <div class="relative font-baloo">
                             <input type="password"
-                                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
+                                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 bg-white/45 text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
                                 name="password" id="desktop-password" required>
                             <button type="button" data-toggle-password="desktop-password"
                                 class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700 font-baloo"
@@ -391,7 +404,7 @@
                         </div>
                         <div class="mt-3">
                             <input type="text"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/45 text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
@@ -422,8 +435,8 @@
                     }
                 });
             });
-            // Initialize Vanta.js FOG effect for all screen sizes (from josh-branch)
-            const isMobile = window.innerWidth < 768;
+            // Initialize Vanta.js FOG effect for all screen sizes
+            const isMobile = window.innerWidth < 1024;
 
             if (isMobile) {
                 // Mobile/Tablet Vanta.js initialization
@@ -515,8 +528,8 @@
                     });
 
                     // Hide the forms to show only the loader
-                    const mobileLayout = document.querySelector('.md\\:hidden');
-                    const desktopLayout = document.querySelector('.hidden.md\\:flex');
+                    const mobileLayout = document.querySelector('.lg\\:hidden');
+                    const desktopLayout = document.querySelector('.hidden.lg\\:flex');
                     if (mobileLayout) mobileLayout.style.display = 'none';
                     if (desktopLayout) desktopLayout.style.display = 'none';
 
@@ -532,8 +545,8 @@
                 loaderWrapper.style.display = "none";
 
                 // Show the appropriate form based on screen size
-                const mobileLayout = document.querySelector('.md\\:hidden');
-                const desktopLayout = document.querySelector('.hidden.md\\:flex');
+                const mobileLayout = document.querySelector('.lg\\:hidden');
+                const desktopLayout = document.querySelector('.hidden.lg\\:flex');
 
                 // Re-enable submit buttons
                 const submitBtns = document.querySelectorAll('button[type="submit"]');
