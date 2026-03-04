@@ -15,7 +15,12 @@
             <h1 class="text-3xl font-bold text-gray-900">Item Analysis</h1>
             <p class="text-gray-600 mt-1">Detailed question-by-question performance analysis</p>
         </div>
-        <div>
+        <div class="flex gap-3">
+            <a href="{{ route('teacher.assessments.item-analysis.export', $assessment->id) }}" 
+               class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+                <span class="material-symbols-outlined mr-2">download</span>
+                Export to Excel
+            </a>
             <a href="{{ route('teacher.assessments') }}" 
                class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
                 <span class="material-symbols-outlined mr-2">arrow_back</span>
