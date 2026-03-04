@@ -223,6 +223,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::put('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'update'])->name('assessments.update');
     Route::delete('/assessments/{assessment}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'destroy'])->name('assessments.destroy');
     Route::get('/assessments/{assessment}/results', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'results'])->name('assessments.results');
+    Route::get('/assessments/{assessment}/item-analysis', [App\Http\Controllers\Teacher\ItemAnalysisController::class, 'show'])->name('assessments.item-analysis');
     Route::get('/assessments/{assessment}/student/{student}/attempts', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'getStudentAttempts'])->name('assessments.student.attempts');
     Route::get('/assessments/review-session/{session}', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'reviewSession'])->name('assessments.review-session');
     Route::post('/assessments/{assessment}/archive', [App\Http\Controllers\Teacher\TeacherAssessmentController::class, 'archive'])->name('assessments.archive');
