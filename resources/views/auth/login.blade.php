@@ -225,7 +225,7 @@
 
             <!-- Glassmorphism Login Card (from josh-branch) -->
             <div class="glass-card rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-                <h2 class="text-white text-xl font-bold text-center mb-6 font-baloo">Login</h2>
+                <h2 class="text-white text-4xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
                     @csrf
                     <div class="mb-5 font-baloo">
@@ -275,15 +275,13 @@
                             Code</label>
                         <div class="flex flex-col gap-3 font-baloo">
                             <div class="glass-input rounded-xl p-3 w-full font-baloo">
-                                <div class="flex items-center justify-between gap-3 font-baloo">
+                                <div class="flex items-center justify-start gap-8 font-baloo">
                                     <div
-                                        class="w-full max-w-[200px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px] sm:max-w-[180px] sm:[&>img]:!min-h-[45px]">
+                                        class="w-auto max-w-[280px] min-h-[64px] flex items-center justify-center [&>img]:!w-[260px] [&>img]:!h-[60px] [&>img]:!object-contain [&>img]:[image-rendering:auto] sm:max-w-[240px] sm:[&>img]:!w-[220px] sm:[&>img]:!h-[52px]">
                                         {!! $captchaHtml !!}
                                     </div>
                                     <button type="button" onclick="refreshCaptcha()"
-                                        class="text-white text-sm underline hover:no-underline whitespace-nowrap">
-                                        &#x21bb; Refresh
-                                    </button>
+                                        class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap bg-white/90 rounded-full p-1" aria-label="Refresh captcha">&#x21bb;</button>
                                 </div>
                             </div>
                             <input type="text"
@@ -291,10 +289,18 @@
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                    <button type="submit" id="loginBtn"
-                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg font-baloo">
-                        Login
-                    </button>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                        transition-all duration-150
+                        shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
+                        hover:-translate-y-1
+                        hover:shadow-[0_10px_0_0_rgba(29,78,216,1),0_16px_25px_rgba(0,0,0,0.3)]
+                        active:translate-y-2
+                        active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
+                        focus:outline-none focus:ring-4 focus:ring-blue-300
+                        font-baloo">
+                    Login
+                </button>
                 </form>
             </div>
         </div>
@@ -341,7 +347,7 @@
 
             <div class="bg-white/60 rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
 
-                <h2 class="text-gray-800 text-2xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
+                <h2 class="text-gray-800 text-4xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm" class="font-baloo">
                     @csrf
                     <div class="mb-6">
@@ -391,15 +397,13 @@
                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
                             Code</label>
                         <div class="border border-gray-300 rounded-xl p-3 bg-gray-50">
-                            <div class="flex items-center justify-between gap-3 font-baloo">
+                            <div class="flex items-center justify-start gap-8 font-baloo">
                                 <div
-                                    class="w-full max-w-[220px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px]">
+                                    class="w-auto max-w-[300px] min-h-[64px] flex items-center justify-center [&>img]:!w-[280px] [&>img]:!h-[60px] [&>img]:!object-contain [&>img]:[image-rendering:auto]">
                                     {!! $captchaHtml !!}
                                 </div>
                                 <button type="button" onclick="refreshCaptcha()"
-                                    class="text-primary-blue text-sm underline hover:no-underline whitespace-nowrap">
-                                    &#x21bb; Refresh
-                                </button>
+                                    class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap" aria-label="Refresh captcha">&#x21bb;</button>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -408,10 +412,18 @@
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                    <button type="submit" id="desktopLoginBtn"
-                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 font-baloo">
-                        Login
-                    </button>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                        transition-all duration-150
+                        shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
+                        hover:-translate-y-1
+                        hover:shadow-[0_10px_0_0_rgba(29,78,216,1),0_16px_25px_rgba(0,0,0,0.3)]
+                        active:translate-y-2
+                        active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
+                        focus:outline-none focus:ring-4 focus:ring-blue-300
+                        font-baloo">
+                    Login
+                </button>
                 </form>
             </div>
         </div>
@@ -567,7 +579,7 @@
         <div class="bg-white rounded-2xl shadow-lg w-96 p-6 relative">
             <!-- Close button - moved to upper right -->
             <button onclick="document.getElementById('errorModal').classList.add('hidden')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-4xl">&times;</button>
 
             <!-- Logo -->
             <div class="flex flex-col items-center">
@@ -584,3 +596,6 @@
         </div>
     </div>
 @endif
+
+
+

@@ -86,13 +86,29 @@
                             <div class="flex-1">
                                 <div class="space-y-4">
                                     <!-- Name - Full Width -->
-                                    <div class="space-y-1">
-                                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</label>
-                                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                                            <p class="text-base font-bold text-gray-800">
-                                                {{ auth()->guard('student')->user()->name ?? 'John Doe' }}</p>
-                                        </div>
+                            <div class="flex gap-6">
+                                <div class="flex-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Name
+                                    </label>
+                                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                        <p class="text-base font-bold text-gray-800">
+                                            {{ auth()->guard('student')->user()->name ?? 'John Doe' }}
+                                        </p>
                                     </div>
+                                </div>
+
+                                <div class="flex-1">
+                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Section
+                                    </label>
+                                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                        <p class="text-base font-bold text-gray-800">
+                                            {{ auth()->guard('student')->user()->section ?? 'Einstein' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
                                     <!-- LRN and School - Split -->
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
