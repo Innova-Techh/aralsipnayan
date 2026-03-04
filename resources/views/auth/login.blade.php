@@ -181,7 +181,7 @@
     }
 </script>
 
-<body class="min-h-screen font-sans overflow-x-hidden">
+<body class="min-h-screen font-baloo overflow-x-hidden">
     <!-- Mobile/Tablet layout with full-screen background (from josh-branch) -->
     <div class="md:hidden">
         <!-- Vanta.js Background for Mobile/Tablet -->
@@ -215,69 +215,82 @@
 
             <!-- Glassmorphism Login Card (from josh-branch) -->
             <div class="glass-card rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-                <h2 class="text-white text-xl font-bold text-center mb-6">Login</h2>
+                <h2 class="text-white text-4xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
                 <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
                     @csrf
-                    <div class="mb-5">
-                        <label for="username" class="block text-white text-sm font-medium mb-2">Username</label>
+                    <div class="mb-5 font-baloo">
+                        <label for="username"
+                            class="block text-white text-sm font-medium mb-2 font-baloo">Username</label>
                         <input type="text"
-                            class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
+                            class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40 font-baloo"
                             name="username" id="username" placeholder="Enter your username" required>
                     </div>
-                    <div class="mb-6">
-                        <label for="password" class="block text-white text-sm font-medium mb-2">Password</label>
-                        <div class="relative">
-    <input type="password"
-        class="glass-input w-full px-4 py-3 pr-12 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
-        name="password" id="password" placeholder="••••••••" required>
-    <button type="button" data-toggle-password="password"
-        class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800"
-        aria-label="Toggle password visibility">
-        <span class="password-icon-on hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M1 1l22 22"></path>
-                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39"></path>
-                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02"></path>
-                <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
-            </svg>
-        </span>
-        <span class="password-icon-off">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-        </span>
-    </button>
-</div>
+                    <div class="mb-6 font-baloo">
+                        <label for="password"
+                            class="block text-white text-sm font-medium mb-2 font-baloo">Password</label>
+                        <div class="relative font-baloo">
+                            <input type="password"
+                                class="glass-input w-full px-4 py-3 pr-12 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40 font-baloo"
+                                name="password" id="password" placeholder="••••••••" required>
+                            <button type="button" data-toggle-password="password"
+                                class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800 font-baloo"
+                                aria-label="Toggle password visibility">
+                                <span class="password-icon-on hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M1 1l22 22"></path>
+                                        <path
+                                            d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39">
+                                        </path>
+                                        <path
+                                            d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02">
+                                        </path>
+                                        <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
+                                    </svg>
+                                </span>
+                                <span class="password-icon-off">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
                     </div>
                     <div class="mb-6">
-                        <label for="captcha" class="block text-white text-base font-medium mb-2">Security Code</label>
-                        <div class="flex flex-col gap-3">
-                            <div class="glass-input rounded-xl p-3 w-full">
-                                <div class="flex items-center justify-between gap-3">
+                        <label for="captcha" class="block text-white text-base font-medium mb-2 font-baloo">Security
+                            Code</label>
+                        <div class="flex flex-col gap-3 font-baloo">
+                            <div class="glass-input rounded-xl p-3 w-full font-baloo">
+                                <div class="flex items-center justify-start gap-8 font-baloo">
                                     <div
-                                        class="w-full max-w-[200px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px] sm:max-w-[180px] sm:[&>img]:!min-h-[45px]">
+                                        class="w-auto max-w-[280px] min-h-[64px] flex items-center justify-center [&>img]:!w-[260px] [&>img]:!h-[60px] [&>img]:!object-contain [&>img]:[image-rendering:auto] sm:max-w-[240px] sm:[&>img]:!w-[220px] sm:[&>img]:!h-[52px]">
                                         {!! $captchaHtml !!}
                                     </div>
                                     <button type="button" onclick="refreshCaptcha()"
-                                        class="text-white text-sm underline hover:no-underline whitespace-nowrap">
-                                        &#x21bb; Refresh
-                                    </button>
+                                        class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap bg-white/90 rounded-full p-1" aria-label="Refresh captcha">&#x21bb;</button>
                                 </div>
                             </div>
                             <input type="text"
-                                class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40"
+                                class="glass-input w-full px-4 py-3 rounded-xl border-0 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-40 font-baloo"
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                    <button type="submit" id="loginBtn"
-                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-lg">
-                        Login
-                    </button>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                        transition-all duration-150
+                        shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
+                        hover:-translate-y-1
+                        hover:shadow-[0_10px_0_0_rgba(29,78,216,1),0_16px_25px_rgba(0,0,0,0.3)]
+                        active:translate-y-2
+                        active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
+                        focus:outline-none focus:ring-4 focus:ring-blue-300
+                        font-baloo">
+                    Login
+                </button>
                 </form>
             </div>
         </div>
@@ -320,72 +333,84 @@
         <!-- Right Section (from main-branch with all functionality intact) -->
         <div class="flex-1 bg-gray-100 flex items-center justify-center">
             <div class="bg-white rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
-                <h2 class="text-gray-800 text-2xl xl:text-3xl font-bold text-center mb-8">Login</h2>
-                <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm">
+
+                <h2 class="text-gray-800 text-4xl xl:text-3xl font-bold text-center mb-8 font-baloo">Login</h2>
+                <form method="POST" action="{{ route('login.submit') }}" id="desktopLoginForm" class="font-baloo">
                     @csrf
                     <div class="mb-6">
-                        <label for="desktop-username" class="block text-gray-700 text-base font-medium mb-2">Username or
+                        <label for="desktop-username"
+                            class="block text-gray-700 text-base font-medium mb-2 font-baloo">Username or
                             Email</label>
                         <input type="text"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
                             name="username" id="desktop-username" required>
                     </div>
                     <div class="mb-8">
                         <label for="desktop-password"
-                            class="block text-gray-700 text-base font-medium mb-2">Password</label>
-                        <div class="relative">
-    <input type="password"
-        class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
-        name="password" id="desktop-password" required>
-    <button type="button" data-toggle-password="desktop-password"
-        class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-        aria-label="Toggle password visibility">
-        <span class="password-icon-on hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M1 1l22 22"></path>
-                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39"></path>
-                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02"></path>
-                <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
-            </svg>
-        </span>
-        <span class="password-icon-off">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-        </span>
-    </button>
-</div>
+                            class="block text-gray-700 text-base font-medium mb-2 font-baloo">Password</label>
+                        <div class="relative font-baloo">
+                            <input type="password"
+                                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
+                                name="password" id="desktop-password" required>
+                            <button type="button" data-toggle-password="desktop-password"
+                                class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700 font-baloo"
+                                aria-label="Toggle password visibility">
+                                <span class="password-icon-on hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M1 1l22 22"></path>
+                                        <path
+                                            d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.11 1 12c.74-1.67 1.82-3.17 3.17-4.39">
+                                        </path>
+                                        <path
+                                            d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.89 11 8a11.07 11.07 0 0 1-2.6 4.02">
+                                        </path>
+                                        <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"></path>
+                                    </svg>
+                                </span>
+                                <span class="password-icon-off">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
                     </div>
                     <div class="mb-8">
                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
                             Code</label>
                         <div class="border border-gray-300 rounded-xl p-3 bg-gray-50">
-                            <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center justify-start gap-8 font-baloo">
                                 <div
-                                    class="w-full max-w-[220px] min-h-[50px] flex items-center justify-center [&>img]:!w-full [&>img]:!h-auto [&>img]:!min-h-[50px]">
+                                    class="w-auto max-w-[300px] min-h-[64px] flex items-center justify-center [&>img]:!w-[280px] [&>img]:!h-[60px] [&>img]:!object-contain [&>img]:[image-rendering:auto]">
                                     {!! $captchaHtml !!}
                                 </div>
                                 <button type="button" onclick="refreshCaptcha()"
-                                    class="text-primary-blue text-sm underline hover:no-underline whitespace-nowrap">
-                                    &#x21bb; Refresh
-                                </button>
+                                    class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap" aria-label="Refresh captcha">&#x21bb;</button>
                             </div>
                         </div>
                         <div class="mt-3">
                             <input type="text"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-20 focus:border-primary-blue font-baloo"
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                    <button type="submit" id="desktopLoginBtn"
-                        class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl transition-all duration-200 hover:bg-blue-800 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                        Login
-                    </button>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                        transition-all duration-150
+                        shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
+                        hover:-translate-y-1
+                        hover:shadow-[0_10px_0_0_rgba(29,78,216,1),0_16px_25px_rgba(0,0,0,0.3)]
+                        active:translate-y-2
+                        active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
+                        focus:outline-none focus:ring-4 focus:ring-blue-300
+                        font-baloo">
+                    Login
+                </button>
                 </form>
             </div>
         </div>
@@ -541,7 +566,7 @@
         <div class="bg-white rounded-2xl shadow-lg w-96 p-6 relative">
             <!-- Close button - moved to upper right -->
             <button onclick="document.getElementById('errorModal').classList.add('hidden')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-4xl">&times;</button>
 
             <!-- Logo -->
             <div class="flex flex-col items-center">
@@ -558,4 +583,6 @@
         </div>
     </div>
 @endif
+
+
 

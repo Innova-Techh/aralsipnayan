@@ -188,6 +188,7 @@
                 <div class="flex space-x-2">
                     @if(($assessment->status === 'Active' || $assessment->status === 'Completed') && $assessment->assignments->count() > 0)
                         <a href="{{ route('teacher.assessments.results', $assessment->id) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View Results</a>
+                        <a href="{{ route('teacher.assessments.item-analysis', $assessment->id) }}" class="text-purple-600 hover:text-purple-800 text-sm font-medium">Item Analysis</a>
                     @elseif($assessment->status === 'Draft')
                         <button onclick="openAssignModal({{ $assessment->id }})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Assign</button>
                     @endif

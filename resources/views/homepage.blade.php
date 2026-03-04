@@ -496,7 +496,8 @@
     <!-- Header -->
     <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-row justify-center md:justify-center items-center py-3 sm:py-4 gap-16 md:gap-10 lg:gap-16 relative">
+            <div
+                class="flex flex-row justify-between md:justify-center items-center py-3 sm:py-4 gap-4 md:gap-10 lg:gap-16 relative">
                 <div class="flex items-center gap-0.5 sm:gap-1 header-logo">
                     <div class="w-11 h-11 sm:w-13 sm:h-13 rounded-lg flex items-center justify-center">
                         <img src="{{ asset('images/Icons/Icon2.png') }}" alt="AralSipnayan Logo"
@@ -506,43 +507,63 @@
                         <span class="text-blue-600">ral</span><span class="text-red-600">Sipnayan</span>
                     </h1>
                 </div>
-                
+
                 <!-- Navigation Links (Desktop) -->
                 <div class="hidden md:flex items-center gap-4 lg:gap-6">
-                    <a href="#about" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">About</a>
-                    <a href="#features" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Features</a>
-                    {{-- <a href="#media" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a> --}}
-                    <a href="#ourteam" class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Our Team</a>
+                    <a href="#about"
+                        class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">About</a>
+                    <a href="#features"
+                        class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Features</a>
+                    {{-- <a href="#media"
+                        class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Media</a>
+                    --}}
+                    <a href="#ourteam"
+                        class="font-baloo text-gray-700 hover:font-bold hover:text-blue-900 hover:scale-110 transition-all duration-200 text-base lg:text-lg">Our
+                        Team</a>
                 </div>
 
                 <a href="{{ route('login') }}"
-                    class="header-login font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-base sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
+                    class="header-login hidden md:block font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-base sm:text-xl w-auto text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
                     Login
                 </a>
-                
+
                 <!-- Burger Menu Button (Mobile Only) -->
                 <button id="mobile-menu-button" class="md:hidden absolute right-0 text-blue-900 focus:outline-none">
                     <svg id="burger-icon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                     <svg id="close-icon" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            
+
             <!-- Mobile Menu Dropdown -->
-            <div id="mobile-menu" class="hidden md:hidden absolute left-0 right-0 bg-white shadow-lg rounded-b-lg mt-2 py-4 px-4 z-50">
-                <a href="#about" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">About</a>
-                <a href="#features" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Features</a>
-                {{-- <a href="#media" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Media</a> --}}
-                <a href="#researchers" class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Researchers</a>
+            <div id="mobile-menu"
+                class="hidden md:hidden absolute left-0 right-0 bg-white shadow-lg rounded-b-lg mt-2 py-4 px-4 z-50">
+                <a href="#about"
+                    class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">About</a>
+                <a href="#features"
+                    class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Features</a>
+                {{-- <a href="#media"
+                    class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Media</a>
+                --}}
+                <a href="#researchers"
+                    class="block font-baloo text-gray-700 hover:text-blue-900 hover:bg-blue-50 py-3 px-4 rounded-lg transition-all duration-200 text-lg">Researchers</a>
+                <div class="pt-2 pb-1 px-4">
+                    <a href="{{ route('login') }}"
+                        class="block font-baloo border-4 border-blue-900 bg-transparent hover:bg-blue-900 text-blue-900 hover:text-white transition-all duration-300 ease-in-out px-4 py-2 rounded-xl text-lg text-center shadow-[4px_4px_0px_0px_rgba(30,58,138,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(30,58,138,0.5)] hover:translate-x-[2px] hover:translate-y-[2px]">
+                        Login
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
 
     <!-- Section 1 -->
-    <section class="py-12 md:py-12 text-white full-screen-section" style="padding-top: calc(3rem + 80px);">
+    <section class="py-8 md:py-12 text-white full-screen-section" style="padding-top: calc(2rem + 70px);">
         <!-- GSAP animated circles and math symbols container -->
         <div class="moving-circles">
             <!-- Radial circles will be animated by JavaScript -->
@@ -571,42 +592,42 @@
         </div>
         <div class="absolute bottom-72 right-16 text-purple-300 opacity-70 text-xl animate-float z-10">✦</div>
 
-        <div class="font-baloo max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="font-baloo max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full overflow-hidden">
             <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
                 <!-- Text Content -->
-                <div class="flex-1 text-center lg:text-left relative z-20">
-            <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Master <span class="text-yellow-400">Mathematics</span> with
-                <span class="text-white">Interactive Learning</span>
-            </h1>
-            <p
-                class="hero-description text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                AralSipnayan is a gamified math assessment tool for elementary students that makes advanced mathematics
-                fun and interactive.
-                It features engaging visuals and adaptive assessments that adjust to each learner’s skill level.
-                Built-in progress tracking helps students and educators monitor growth and learning outcomes.
+                <div class="flex-1 text-center lg:text-left relative z-20 w-full">
+                    <h1
+                        class="hero-title text-3xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight break-words w-full">
+                        Master <span class="text-yellow-400">Mathematics</span> with
+                        <span class="text-white">Interactive Learning</span>
+                    </h1>
+                    <p
+                        class="hero-description text-base sm:text-lg md:text-xl mb-12 opacity-90 max-w-2xl mx-auto lg:mx-0 leading-relaxed px-2 sm:px-0">
+                        AralSipnayan is a gamified math assessment tool for elementary students that makes advanced
+                        mathematics
+                        fun and interactive.
+                        It features engaging visuals and adaptive assessments that adjust to each learner’s skill level.
+                        Built-in progress tracking helps students and educators monitor growth and learning outcomes.
 
-            </p>
-            
-            <button
-                class="relative z-30 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto lg:mx-0">
-                <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
-                Start Your Journey
-            </button>
+                    </p>
+
+                    <button type="button"
+                        onclick="document.getElementById('loginForm') ? document.getElementById('loginForm').submit() : window.location.href='{{ route('login') }}'"
+                        class="relative z-30 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 flex items-center mx-auto lg:mx-0">
+                        <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        Start Your Journey
+                    </button>
                 </div>
-                
+
                 <!-- Hero Animation -->
-                <div class="flex-shrink-0 w-96 h-96 md:w-[28rem] md:h-[28rem] lg:w-[36rem] lg:h-[36rem] relative z-10 overflow-hidden">
-                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
-                    <dotlottie-player
-                        src="{{ asset('anim/hero-anim.json') }}"
-                        background="transparent"
-                        speed="1"
-                        style="width: 100%; height: 100%;"
-                        loop
-                        autoplay>
+                <div
+                    class="flex-shrink-0 w-96 h-96 md:w-[28rem] md:h-[28rem] lg:w-[36rem] lg:h-[36rem] relative z-10 overflow-hidden">
+                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+                        type="module"></script>
+                    <dotlottie-player src="{{ asset('anim/hero-anim.json') }}" background="transparent" speed="1"
+                        style="width: 100%; height: 100%;" loop autoplay>
                     </dotlottie-player>
                 </div>
             </div>
@@ -620,7 +641,8 @@
                 How <span class="text-blue-600">AralSipnayan</span> <span class="text-blue-600">transforms
                     learning</span>
             </h2>
-            <p class="section2-description text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
+            <p
+                class="section2-description text-center text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto text-base md:text-lg">
                 Experience the future of mathematics education with our innovative platform designed specifically for
                 Grade 6 students
             </p>
@@ -689,7 +711,7 @@
                                         d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </div>
-                            
+
                             <!-- Pagination -->
                             <div class="swiper-pagination"></div>
                         </div>
@@ -719,17 +741,17 @@
             const mobileMenu = document.getElementById('mobile-menu');
             const burgerIcon = document.getElementById('burger-icon');
             const closeIcon = document.getElementById('close-icon');
-            
-            mobileMenuButton.addEventListener('click', function() {
+
+            mobileMenuButton.addEventListener('click', function () {
                 mobileMenu.classList.toggle('hidden');
                 burgerIcon.classList.toggle('hidden');
                 closeIcon.classList.toggle('hidden');
             });
-            
+
             // Close mobile menu when clicking on a link
             const mobileMenuLinks = mobileMenu.querySelectorAll('a');
             mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', function() {
+                link.addEventListener('click', function () {
                     mobileMenu.classList.add('hidden');
                     burgerIcon.classList.remove('hidden');
                     closeIcon.classList.add('hidden');
