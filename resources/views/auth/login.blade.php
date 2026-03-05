@@ -281,7 +281,8 @@
                                         {!! $captchaHtml !!}
                                     </div>
                                     <button type="button" onclick="refreshCaptcha()"
-                                        class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap bg-white/90 rounded-full p-1" aria-label="Refresh captcha">&#x21bb;</button>
+                                        class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap bg-white/90 rounded-full p-1"
+                                        aria-label="Refresh captcha">&#x21bb;</button>
                                 </div>
                             </div>
                             <input type="text"
@@ -289,8 +290,7 @@
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                <button type="submit" id="loginBtn"
-                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                    <button type="submit" id="loginBtn" class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
                         transition-all duration-150
                         shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
                         hover:-translate-y-1
@@ -299,8 +299,8 @@
                         active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
                         focus:outline-none focus:ring-4 focus:ring-blue-300
                         font-baloo">
-                    Login
-                </button>
+                        Login
+                    </button>
                 </form>
             </div>
         </div>
@@ -342,7 +342,7 @@
 
         <!-- Right Section (from main-branch with all functionality intact) -->
         <div class="flex-1 flex items-center justify-center"
-            style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('{{ asset('images/login/login-form-bg-latest.png') }}'); background-size: cover; background-repeat: no-repeat; background-position: bottom top;">
+            style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2)), url('{{ asset('images/login/login-form-bg-latest.png') }}'); background-size: cover; background-repeat: no-repeat; background-position: bottom top;">
             {{-- <img src="{{ asset('images/login/login-form-bg.png') }}" alt=""> --}}
 
             <div class="bg-white/60 rounded-2xl p-12 xl:p-16 w-full max-w-md xl:max-w-lg shadow-xl">
@@ -403,7 +403,8 @@
                                     {!! $captchaHtml !!}
                                 </div>
                                 <button type="button" onclick="refreshCaptcha()"
-                                    class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap" aria-label="Refresh captcha">&#x21bb;</button>
+                                    class="text-primary-blue text-4xl leading-none hover:opacity-80 whitespace-nowrap"
+                                    aria-label="Refresh captcha">&#x21bb;</button>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -412,8 +413,7 @@
                                 name="captcha" placeholder="Enter security code">
                         </div>
                     </div>
-                <button type="submit" id="loginBtn"
-                    class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
+                    <button type="submit" id="loginBtn" class="w-full bg-primary-blue text-white font-semibold py-3.5 rounded-xl
                         transition-all duration-150
                         shadow-[0_8px_0_0_rgba(29,78,216,1),0_12px_20px_rgba(0,0,0,0.25)]
                         hover:-translate-y-1
@@ -422,8 +422,8 @@
                         active:shadow-[0_2px_0_0_rgba(29,78,216,1)]
                         focus:outline-none focus:ring-4 focus:ring-blue-300
                         font-baloo">
-                    Login
-                </button>
+                        Login
+                    </button>
                 </form>
             </div>
         </div>
@@ -596,6 +596,3 @@
         </div>
     </div>
 @endif
-
-
-
