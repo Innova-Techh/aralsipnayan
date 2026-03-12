@@ -13,7 +13,8 @@ class MasteryProgressService
      */
     public function getWeeklyMasteryProgress(int $userId): array
     {
-        $sixWeeksAgo = Carbon::now()->subWeeks(6)->startOfWeek();
+        // Include current week + previous 5 weeks
+        $sixWeeksAgo = Carbon::now()->subWeeks(5)->startOfWeek();
         $now = Carbon::now();
 
         // Get completed sessions from the last 6 weeks
@@ -109,7 +110,8 @@ class MasteryProgressService
         $dataProbability = [];
         
         // Get last 6 weeks in order
-        $sixWeeksAgo = Carbon::now()->subWeeks(6)->startOfWeek();
+        // Include current week + previous 5 weeks
+        $sixWeeksAgo = Carbon::now()->subWeeks(5)->startOfWeek();
         
         for ($i = 0; $i < 6; $i++) {
             $weekStart = $sixWeeksAgo->copy()->addWeeks($i);
@@ -213,7 +215,8 @@ class MasteryProgressService
     private function getEmptyProgressData(): array
     {
         $weeks = [];
-        $sixWeeksAgo = Carbon::now()->subWeeks(6)->startOfWeek();
+        // Include current week + previous 5 weeks
+        $sixWeeksAgo = Carbon::now()->subWeeks(5)->startOfWeek();
         
         for ($i = 0; $i < 6; $i++) {
             $weekStart = $sixWeeksAgo->copy()->addWeeks($i);
