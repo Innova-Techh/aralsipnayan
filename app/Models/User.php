@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->hasOne(AdminProfile::class);
     }
 
+    public function studentMastery()
+    {
+        return $this->hasMany(StudentMastery::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Role Helpers
