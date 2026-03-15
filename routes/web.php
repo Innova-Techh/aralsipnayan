@@ -20,6 +20,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\LevelUpController;
 use App\Http\Controllers\Api\RadmController;
+use App\Http\Controllers\Auth\PasswordResetController;
 
 // Homepage
 Route::get('/', function () {
@@ -30,6 +31,12 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 
 // Admin/Teacher Auth Routes - removed in favor of unified login
 

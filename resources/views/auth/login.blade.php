@@ -270,6 +270,12 @@
                             </button>
                         </div>
                     </div>
+                    <div class="mb-5 text-right">
+                        <a href="{{ route('password.request') }}"
+                            class="text-white/90 hover:text-white underline text-sm font-baloo">
+                            Forgot password?
+                        </a>
+                    </div>
                     <div class="mb-6">
                         <label for="captcha" class="block text-white text-base font-medium mb-2 font-baloo">Security
                             Code</label>
@@ -392,6 +398,12 @@
                                 </span>
                             </button>
                         </div>
+                    </div>
+                    <div class="mb-6 text-right">
+                        <a href="{{ route('password.request') }}"
+                            class="text-gray-700 hover:text-gray-900 underline text-sm font-baloo">
+                            Forgot password?
+                        </a>
                     </div>
                     <div class="mb-8">
                         <label for="captcha" class="block text-gray-700 text-base font-medium mb-2">Security
