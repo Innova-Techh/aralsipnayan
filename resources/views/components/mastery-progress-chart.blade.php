@@ -3,6 +3,7 @@
 @php
     $stats = $masteryProgress['stats'] ?? ['current_week' => 0, 'best_week' => 0, 'growth' => 0, 'growth_sign' => ''];
     $nowWeekStart = \Carbon\Carbon::now()->startOfWeek();
+    $currentWeekLabel = $nowWeekStart->format('M d') . ' - ' . $nowWeekStart->copy()->endOfWeek()->format('M d');
     $fallbackWeeks = [];
     $fallbackStart = $nowWeekStart->copy()->subWeeks(5);
     for ($i = 0; $i < 6; $i++) {
@@ -39,7 +40,7 @@
             style="box-shadow: 0 4px 0 0 #2563EB;">
             {{-- <div class="text-3xl mb-1">📊</div> --}}
             <div class="text-2xl font-bold text-blue-700">{{ $stats['current_week'] }}%</div>
-            <div class="text-xs font-semibold text-blue-600">This Week</div>
+            <div class="text-xs font-semibold text-blue-600">{{ $currentWeekLabel }}</div>
         </div>
 
         <!-- Best Week -->
