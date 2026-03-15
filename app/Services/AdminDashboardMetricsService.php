@@ -401,34 +401,24 @@ class AdminDashboardMetricsService
 
     public function getPlatformGrowth($from = null, $to = null): array
     {
-        if ($from || $to) {
-            $start = ($from ? $from->copy() : now()->startOfMonth()->subMonths(5))->startOfMonth();
-            $end = ($to ? $to->copy() : now()->endOfMonth())->endOfMonth();
-            $monthCount = max(1, $start->diffInMonths($end) + 1);
-            $monthCount = min(12, $monthCount);
-            $months = collect(range(0, $monthCount - 1))
-                ->map(function ($i) use ($start) {
-                    $mStart = (clone $start)->addMonths($i)->startOfMonth();
-                    $mEnd = (clone $mStart)->endOfMonth();
-                    return [
-                        'label' => $mStart->format('M'),
-                        'start' => $mStart,
-                        'end' => $mEnd,
-                    ];
-                })
-                ->all();
-        } else {
-            $months = collect(range(0, 5))
-                ->map(function ($i) {
-                    $start = now()->startOfMonth()->subMonths(5 - $i);
-                    $end = (clone $start)->endOfMonth();
-                    return [
-                        'label' => $start->format('M'),
-                        'start' => $start,
-                        'end' => $end,
-                    ];
-                })
-                ->all();
+        $start = ($from ? $from->copy() : now()->startOfMonth()->subMonths(5))->startOfMonth();
+        $end = ($to ? $to->copy() : now()->endOfMonth())->endOfMonth();
+
+        if ($start->greaterThan($end)) {
+            [$start, $end] = [$end->copy()->startOfMonth(), $start->copy()->endOfMonth()];
+        }
+
+        $months = [];
+        $cursor = $start->copy()->startOfMonth();
+        for ($i = 0; $i < 12 && $cursor->lte($end); $i++) {
+            $mStart = $cursor->copy()->startOfMonth();
+            $mEnd = $cursor->copy()->endOfMonth();
+            $months[] = [
+                'label' => $mStart->format('M'),
+                'start' => $mStart,
+                'end' => $mEnd,
+            ];
+            $cursor->addMonth();
         }
 
         $labels = [];

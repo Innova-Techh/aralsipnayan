@@ -89,9 +89,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @php
           $panelists = [
-            ["role" => "Panelist", "name" => "Dr. Maria Santos", "id" => "2001", "image" => "charac-9.png"],
-            ["role" => "Panelist", "name" => "Dr. Juan Dela Cruz", "id" => "2002", "image" => "charac-10.png"],
-            ["role" => "Panelist", "name" => "Dr. Ana Reyes", "id" => "2003", "image" => "charac-11.png"],
+            ["role" => "Panelist", "name" => "Prof. Abelardo T. Bucad", "id" => "2001", "image" => "charac-9.png"],
+            ["role" => "Panelist", "name" => "Prof. Christian Michael M. Mansueto", "id" => "2002", "image" => "charac-10.png"],
+            ["role" => "Panelist", "name" => "Prof. Jomariss B. Plan", "id" => "2003", "image" => "charac-11.png"],
           ];
         @endphp
         @foreach ($panelists as $p)

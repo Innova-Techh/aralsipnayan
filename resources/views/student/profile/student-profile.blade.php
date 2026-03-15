@@ -244,14 +244,14 @@
 
                     <!-- Competency Level -->
                     <div class="rounded-2xl p-5 mb-4">
-                        <!-- Highlighted Stats: Difficulty Level and Accuracy Rate -->
+                        <!-- Highlighted Stats: Login Streak and Accuracy Rate -->
                         <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
-                            <!-- Difficulty Level -->
+                            <!-- Login Streak -->
                             <div class="rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md min-h-[100px] flex items-center justify-center"
                                 style="background: linear-gradient(to bottom, #064E3B 0%, #059669 100%); box-shadow: 0 4px 0 0 #045C41;">
                                 <div class="text-[#F8FAFC]">
-                                    <div class="text-xl sm:text-2xl font-bold text-[#22C55E]">Beginner</div>
-                                    <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Difficulty Level</div>
+                                    <div class="text-xl sm:text-2xl font-bold text-[#22C55E]">{{ auth()->guard('student')->user()->studentProfile?->current_streak ?? 0 }} days</div>
+                                    <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Login Streak</div>
                                 </div>
                             </div>
 
@@ -271,37 +271,41 @@
                             <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-3 sm:p-4">
                                 <div class="flex items-center justify-between text-sm sm:text-base">
                                     <span class="text-gray-700 font-medium">📅 Login Streak</span>
-                                    <span class="text-orange-700 font-bold">10 days</span>
+                                    <span class="text-orange-700 font-bold">{{ auth()->guard('student')->user()->studentProfile?->current_streak ?? 0 }} days</span>
                                 </div>
                             </div>
 
-                            <!-- Highest Correct Streak -->
+                            <!-- Number and Algebra -->
                             <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4">
                                 <div class="flex items-center justify-between text-sm sm:text-base">
-                                    <span class="text-gray-700 font-medium">⭐ Highest Correct Streak</span>
-                                    <span class="text-green-700 font-bold">7 streak</span>
+                                    <span class="text-gray-700 font-medium">🔢 Number & Algebra</span>
+                                    @php
+                                        $user = auth()->guard('student')->user();
+                                        $numberAlgebra = $user->studentMastery()->where('current_difficulty', 'number_algebra')->first()?->current_difficulty ?? 'beginner';
+                                    @endphp
+                                    <span class="text-green-700 font-bold">{{ $numberAlgebra }}</span>
                                 </div>
                             </div>
 
-                            <!-- Highest Points Earned -->
+                            <!-- Measurement and Geometry -->
                             <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-3 sm:p-4">
                                 <div class="flex items-center justify-between text-sm sm:text-base">
-                                    <span class="text-gray-700 font-medium">💎 Highest Points Earned</span>
-                                    <span class="text-purple-700 font-bold">7 streak</span>
+                                    <span class="text-gray-700 font-medium">📐 Measurement & Geometry</span>
+                                    @php
+                                        $measurementGeometry = $user->studentMastery()->where('current_difficulty', 'measurement_geometry')->first()?->current_difficulty ?? 'beginner';
+                                    @endphp
+                                    <span class="text-purple-700 font-bold">{{ $measurementGeometry }}</span>
                                 </div>
                             </div>
 
-                            <!-- Average Score -->
-                            <div class="bg-indigo-50 rounded-2xl p-5 mb-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        <span class="font-semibold text-gray-700">Average Score</span>
-                                    </div>
-                                    <span class="text-2xl font-bold text-indigo-600">93%</span>
+                            <!-- Data and Probability -->
+                            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4">
+                                <div class="flex items-center justify-between text-sm sm:text-base">
+                                    <span class="text-gray-700 font-medium">📊 Data & Probability</span>
+                                    @php
+                                        $dataProbability = $user->studentMastery()->where('current_difficulty', 'data_probability')->first()?->current_difficulty ?? 'beginner';
+                                    @endphp
+                                    <span class="text-blue-700 font-bold">{{ $dataProbability }}</span>
                                 </div>
                             </div>
                         </div>

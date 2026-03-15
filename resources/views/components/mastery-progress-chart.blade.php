@@ -2,6 +2,21 @@
 
 @php
     $stats = $masteryProgress['stats'] ?? ['current_week' => 0, 'best_week' => 0, 'growth' => 0, 'growth_sign' => ''];
+    $nowWeekStart = \Carbon\Carbon::now()->startOfWeek();
+    $currentWeekLabel = $nowWeekStart->format('M d') . ' - ' . $nowWeekStart->copy()->endOfWeek()->format('M d');
+    $fallbackWeeks = [];
+    $fallbackStart = $nowWeekStart->copy()->subWeeks(5);
+    for ($i = 0; $i < 6; $i++) {
+        $weekStart = $fallbackStart->copy()->addWeeks($i);
+        $weeksSince = $nowWeekStart->diffInWeeks($weekStart);
+        if ($weeksSince === 0) {
+            $fallbackWeeks[] = 'This Week';
+        } elseif ($weeksSince === 1) {
+            $fallbackWeeks[] = 'Last Week';
+        } else {
+            $fallbackWeeks[] = $weekStart->format('M d');
+        }
+    }
 @endphp
 
 <!-- Mastery Progress Chart Component -->
@@ -25,7 +40,7 @@
             style="box-shadow: 0 4px 0 0 #2563EB;">
             {{-- <div class="text-3xl mb-1">📊</div> --}}
             <div class="text-2xl font-bold text-blue-700">{{ $stats['current_week'] }}%</div>
-            <div class="text-xs font-semibold text-blue-600">This Week</div>
+            <div class="text-xs font-semibold text-blue-600">{{ $currentWeekLabel }}</div>
         </div>
 
         <!-- Best Week -->
@@ -70,7 +85,38 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Dynamic data from backend
-        const masteryData = @json($masteryProgress);
+        let masteryData = @json($masteryProgress);
+
+        // Temporary UI data when there is no real mastery data yet
+        const fallbackWeeks = @json($fallbackWeeks);
+        const fallbackMastery = [72, 75, 73, 78, 76, 80];
+        const fallbackTopics = [
+            { name: 'Number and Algebra', data: [68, 70, 69, 74, 72, 77] },
+            { name: 'Measurement and Geometry', data: [65, 68, 67, 72, 70, 74] },
+            { name: 'Data and Probability', data: [70, 73, 71, 76, 74, 79] }
+        ];
+
+        const hasSeriesData = arr => Array.isArray(arr) && arr.some(v => Number(v) > 0);
+
+        if (!hasSeriesData(masteryData?.mastery)) {
+            masteryData.mastery = fallbackMastery;
+        }
+
+        if (!Array.isArray(masteryData?.topics) || masteryData.topics.length < 3) {
+            masteryData.topics = fallbackTopics;
+        } else {
+            masteryData.topics = masteryData.topics.map((t, i) => {
+                const fallback = fallbackTopics[i];
+                if (!hasSeriesData(t?.data)) {
+                    return fallback;
+                }
+                return t;
+            });
+        }
+
+        if (!Array.isArray(masteryData?.weeks) || masteryData.weeks.length !== 6) {
+            masteryData.weeks = fallbackWeeks;
+        }
 
         // Mastery Progress Chart Configuration
         const masteryOptions = {
@@ -167,9 +213,9 @@
                 }
             },
             yaxis: {
-                min: 60,
+                min: 0,
                 max: 100,
-                tickAmount: 4,
+                tickAmount: 5,
                 labels: {
                     style: {
                         colors: '#6B7280',
