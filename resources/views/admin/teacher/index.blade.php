@@ -3,6 +3,64 @@
 @section('title', 'AralSipnayan')
 
 @section('content')
+    @php
+        $demoSectionPerformance = [
+            ['section' => 'Einstein', 'averageScore' => 87.2, 'color' => 'green'],
+            ['section' => 'Curie', 'averageScore' => 82.5, 'color' => 'blue'],
+            ['section' => 'Newton', 'averageScore' => 78.4, 'color' => 'indigo'],
+            ['section' => 'Faraday', 'averageScore' => 71.6, 'color' => 'yellow'],
+            ['section' => 'Tesla', 'averageScore' => 69.3, 'color' => 'orange'],
+            ['section' => 'Darwin', 'averageScore' => 64.8, 'color' => 'red'],
+        ];
+
+        $realSectionPerformance = (isset($sectionPerformance) && is_array($sectionPerformance)) ? $sectionPerformance : [];
+
+        $demoBySection = collect($demoSectionPerformance)->keyBy('section')->all();
+        $realBySection = collect($realSectionPerformance)->keyBy('section')->all();
+
+        $mergedBySection = $demoBySection;
+        foreach ($realBySection as $sec => $row) {
+            $mergedBySection[$sec] = array_replace($demoBySection[$sec] ?? [], (array) $row);
+        }
+
+        $orderedSections = [];
+        foreach ($realSectionPerformance as $row) {
+            $sec = $row['section'] ?? null;
+            if ($sec !== null) {
+                $orderedSections[] = (string) $sec;
+            }
+        }
+        foreach (array_keys($demoBySection) as $sec) {
+            if (!in_array($sec, $orderedSections, true)) {
+                $orderedSections[] = $sec;
+            }
+        }
+
+        $sectionPerformanceView = array_values(array_filter(array_map(
+            fn ($sec) => $mergedBySection[$sec] ?? null,
+            $orderedSections
+        )));
+
+        $scores = array_values(array_filter(array_map(
+            fn ($r) => isset($r['averageScore']) ? (float) $r['averageScore'] : null,
+            $sectionPerformanceView
+        ), fn ($v) => $v !== null));
+
+        $overallAccuracyView = count($scores) ? round(array_sum($scores) / count($scores), 1) : (float) ($overallAccuracy ?? 0);
+        $overallAccuracyView = max(0, min(100, $overallAccuracyView));
+
+        $totalStudentsCount = (int) (($totalStudents['count'] ?? 0) ?: 0);
+        $totalStudentsView = ['count' => $totalStudentsCount > 0 ? $totalStudentsCount : 180];
+
+        $topPerformingSectionView = null;
+        $worstPerformingSectionView = null;
+        if (count($sectionPerformanceView)) {
+            $sorted = collect($sectionPerformanceView)->sortByDesc('averageScore')->values();
+            $topPerformingSectionView = $sorted->first();
+            $worstPerformingSectionView = $sorted->last();
+        }
+    @endphp
+
     <div>
         <!-- Welcome Section -->
         <div class="mb-8">
@@ -91,7 +149,7 @@
                 <div class="bg-white rounded-2xl border border-gray-200 p-6">
                     <h4 class="font-semibold text-gray-900 mb-4">Average Accuracy by Section</h4>
                     <div class="space-y-4">
-                        @forelse($sectionPerformance as $index => $section)
+                        @forelse($sectionPerformanceView as $index => $section)
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-medium text-gray-700">{{ $section['section'] }}</span>
@@ -104,7 +162,7 @@
                                 <span class="text-xs text-gray-500">
                                     @if($index === 0)
                                         Highest performing
-                                    @elseif($index === count($sectionPerformance) - 1)
+                                    @elseif($index === count($sectionPerformanceView) - 1)
                                         Needs improvement
                                     @else
                                         Average performance
@@ -148,11 +206,11 @@
                                                 a 15.9155 15.9155 0 0 1 0 31.831
                                                 a 15.9155 15.9155 0 0 1 0 -31.831"
                                             fill="none" stroke="#10B981" stroke-width="3"
-                                            stroke-dasharray="{{ $overallAccuracy }}, 100"
+                                            stroke-dasharray="{{ $overallAccuracyView }}, 100"
                                             stroke-linecap="round" />
                                         <text x="18" y="20.5" text-anchor="middle"
                                             fill="#111827" font-size="8" font-weight="bold">
-                                            {{ number_format($overallAccuracy, 0) }}%
+                                            {{ number_format($overallAccuracyView, 0) }}%
                                         </text>
                                     </svg>
                                 </div>
@@ -163,24 +221,24 @@
                                 <!-- Total Students Count -->
                                 <div class="bg-gray-100 rounded-md px-3 py-1 mt-1">
                                     <p class="text-xs font-medium text-gray-700">
-                                         Total Students: {{ $totalStudents['count'] }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                                         Total Students: {{ $totalStudentsView['count'] }}
+                                     </p>
+                                 </div>
+                             </div>
+                         </div>
 
                         <div class="flex flex-col gap-4">
-                            @if($topPerformingSection)
+                            @if($topPerformingSectionView)
                             <!-- Top Performing Section -->
                             <div class="bg-green-50 border border-green-100 rounded-2xl p-4 shadow-sm">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-sm font-semibold text-green-900">Top Performing Section</p>
-                                        <p class="text-xs text-green-700">{{ $topPerformingSection['section'] }}</p>
+                                        <p class="text-xs text-green-700">{{ $topPerformingSectionView['section'] }}</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-xl font-bold text-green-900">
-                                            {{ number_format($topPerformingSection['averageScore'], 0) }}%
+                                            {{ number_format($topPerformingSectionView['averageScore'], 0) }}%
                                         </p>
                                         <p class="text-xs text-green-600">Average Score</p>
                                     </div>
@@ -188,17 +246,17 @@
                             </div>
                             @endif
 
-                            @if($worstPerformingSection)
+                            @if($worstPerformingSectionView)
                             <!-- Worst Performing Section -->
                             <div class="bg-red-50 border border-red-100 rounded-2xl p-4 shadow-sm">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-sm font-semibold text-red-900">Needs Attention</p>
-                                        <p class="text-xs text-red-700">{{ $worstPerformingSection['section'] }}</p>
+                                        <p class="text-xs text-red-700">{{ $worstPerformingSectionView['section'] }}</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-xl font-bold text-red-900">
-                                            {{ number_format($worstPerformingSection['averageScore'], 0) }}%
+                                            {{ number_format($worstPerformingSectionView['averageScore'], 0) }}%
                                         </p>
                                         <p class="text-xs text-red-600">Average Score</p>
                                     </div>
