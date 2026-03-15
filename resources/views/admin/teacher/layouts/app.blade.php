@@ -271,10 +271,20 @@
             <!-- User Profile & Logout Section (preserved logic) -->
             <div class="border-t border-gray-200 p-4">
                 <div class="flex items-center mb-3 tooltip-container" :class="sidebarOpen ? '' : 'justify-center'">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Teacher') }}&background=3B82F6&color=fff"
+                    @php
+                        // Teacher routes use the "admin" guard in this project.
+                        $user = Auth::guard('admin')->user() ?? Auth::user();
+                        $teacherProfile = $user?->teacherProfile;
+                        $teacherName = trim(($teacherProfile?->firstname ?? '') . ' ' . ($teacherProfile?->lastname ?? ''));
+                        if ($teacherName === '') {
+                            $teacherName = $user?->name ?? $user?->username ?? 'Teacher';
+                        }
+                    @endphp
+
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($teacherName) }}&background=3B82F6&color=fff"
                         alt="Teacher Avatar" class="w-10 h-10 rounded-full flex-shrink-0">
                     <div x-show="sidebarOpen" x-transition class="ml-3">
-                        <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name ?? 'Teacher' }}</p>
+                        <p class="text-sm font-semibold text-gray-800">{{ $teacherName }}</p>
                         <p class="text-xs text-gray-500">Educator</p>
                     </div>
                 </div>
