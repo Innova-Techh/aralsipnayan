@@ -154,8 +154,23 @@
                                     data-email="{{ strtolower($admin->email) }}"
                                     data-status="{{ strtolower($admin->status) }}">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900 admin-username">
-                                            {{ $admin->username }}
+                                        @php
+                                            $adminFullName = $admin->adminProfile
+                                                ? trim($admin->adminProfile->firstname . ' ' . $admin->adminProfile->lastname)
+                                                : $admin->username;
+                                            $adminPhoto = $admin->adminProfile->profile_url ?? null;
+                                            $adminPhotoSrc = $adminPhoto
+                                                ? (\Illuminate\Support\Str::startsWith($adminPhoto, ['http://', 'https://'])
+                                                    ? $adminPhoto
+                                                    : asset('storage/' . ltrim($adminPhoto, '/')))
+                                                : 'https://ui-avatars.com/api/?name=' . urlencode($adminFullName) . '&background=3B82F6&color=fff';
+                                        @endphp
+                                        <div class="flex items-center gap-3">
+                                            <img src="{{ $adminPhotoSrc }}" alt="{{ $adminFullName }}"
+                                                class="w-9 h-9 rounded-full object-cover border border-gray-200">
+                                            <div class="text-sm font-medium text-gray-900 admin-username">
+                                                {{ $admin->username }}
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">

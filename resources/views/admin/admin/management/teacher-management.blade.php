@@ -69,7 +69,18 @@
                         @forelse($teachers as $teacher)
                             <tr class="hover:bg-gray-50 transition teacher-row" data-status="{{ $teacher->status }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $teacherFullName = trim($teacher->firstname . ' ' . $teacher->lastname);
+                                        $teacherPhoto = $teacher->profile_url ?? null;
+                                        $teacherPhotoSrc = $teacherPhoto
+                                            ? (\Illuminate\Support\Str::startsWith($teacherPhoto, ['http://', 'https://'])
+                                                ? $teacherPhoto
+                                                : asset('storage/' . ltrim($teacherPhoto, '/')))
+                                            : 'https://ui-avatars.com/api/?name=' . urlencode($teacherFullName) . '&background=3B82F6&color=fff';
+                                    @endphp
                                     <div class="flex items-center">
+                                        <img src="{{ $teacherPhotoSrc }}" alt="{{ $teacherFullName }}"
+                                            class="w-9 h-9 rounded-full object-cover border border-gray-200 mr-3">
 
                                         <div>
                                             <div class="text-sm font-medium text-gray-900 teacher-name">
