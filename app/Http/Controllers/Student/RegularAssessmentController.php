@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Student\AssessmentGenerationController;
 use App\Http\Controllers\Student\GamificationController;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,15 @@ class RegularAssessmentController extends Controller
     {
         $this->assessmentGenerator = new AssessmentGenerationController();
         $this->gamificationController = new GamificationController();
+    }
+
+    private function getElapsedSeconds($startedAt): int
+    {
+        $appTimezone = config('app.timezone', 'UTC');
+        $start = Carbon::parse($startedAt, $appTimezone);
+        $now = Carbon::now($appTimezone);
+
+        return max(0, $start->diffInSeconds($now, false));
     }
 
     /**
@@ -589,7 +599,7 @@ class RegularAssessmentController extends Controller
         
         // Check time limit
         $timeLimit = ($assessment->time_limit ?? 30) * 60;
-        $elapsedTime = time() - strtotime($assessment->started_at);
+        $elapsedTime = $this->getElapsedSeconds($assessment->started_at);
         
         if ($elapsedTime > $timeLimit && $assessment->status === 'in_progress') {
             // Auto-complete due to timeout
@@ -1963,7 +1973,7 @@ class RegularAssessmentController extends Controller
             foreach ($activeAssessments as $assessment) {
                 // Check time limit - auto-complete if expired
                 $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert to seconds
-                $elapsedTime = time() - strtotime($assessment->started_at);
+                $elapsedTime = $this->getElapsedSeconds($assessment->started_at);
                 
                 if ($elapsedTime > $timeLimit) {
                     // Assessment has timed out - auto-complete it
@@ -2108,7 +2118,7 @@ class RegularAssessmentController extends Controller
             
             // Check if assessment has timed out
             $timeLimit = ($assessment->time_limit ?? 30) * 60; // Convert to seconds
-            $elapsedTime = time() - strtotime($assessment->started_at);
+            $elapsedTime = $this->getElapsedSeconds($assessment->started_at);
             
             if ($elapsedTime > $timeLimit) {
                 // Assessment has timed out - auto-complete it
