@@ -168,13 +168,17 @@
                                         Average performance
                                     @endif
                                 </span>
-                                <span class="text-xs {{ $section['averageScore'] >= 80 ? 'text-green-600' : ($section['averageScore'] >= 70 ? 'text-yellow-600' : 'text-red-600') }} font-medium">
-                                    @if($section['averageScore'] >= 80)
-                                        +{{ round($section['averageScore'] - 80, 1) }}% above target
-                                    @elseif($section['averageScore'] >= 70)
-                                        {{ round($section['averageScore'] - 80, 1) }}% below target
+                                @php
+                                    $targetAccuracy = 75;
+                                    $deltaFromTarget = round(((float) $section['averageScore']) - $targetAccuracy, 1);
+                                @endphp
+                                <span class="text-xs {{ $deltaFromTarget >= 0 ? 'text-green-600' : ($deltaFromTarget >= -10 ? 'text-yellow-600' : 'text-red-600') }} font-medium">
+                                    @if($deltaFromTarget > 0)
+                                        +{{ $deltaFromTarget }}% above target
+                                    @elseif($deltaFromTarget < 0)
+                                        {{ abs($deltaFromTarget) }}% below target
                                     @else
-                                        {{ round($section['averageScore'] - 80, 1) }}% below target
+                                        0% on target
                                     @endif
                                 </span>
                             </div>
