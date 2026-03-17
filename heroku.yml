@@ -1,7 +1,0 @@
-build:
-  languages:
-    - nodejs
-    - php
-
-release:
-  command: php artisan migrate --force
