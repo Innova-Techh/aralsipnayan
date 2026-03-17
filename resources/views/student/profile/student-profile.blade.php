@@ -244,7 +244,7 @@
 
                     <!-- Competency Level -->
                     <div class="rounded-2xl p-5 mb-4">
-                        <!-- Highlighted Stats: Login Streak and Accuracy Rate -->
+                        <!-- Highlighted Stats: Login Streak and Total Points Acquired -->
                         <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
                             <!-- Login Streak -->
                             <div class="rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md min-h-[100px] flex items-center justify-center"
@@ -255,12 +255,12 @@
                                 </div>
                             </div>
 
-                            <!-- Accuracy Rate -->
+                            <!-- Total Points Acquired -->
                             <div class="rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md min-h-[100px] flex items-center justify-center"
                                 style="background: linear-gradient(to bottom, #1E3A8A 0%, #2563EB 100%); box-shadow: 0 4px 0 0 #091F5E;">
                                 <div class="text-[#F8FAFC]">
-                                    <div class="text-xl sm:text-2xl font-bold text-[#73A8FF]">98%</div>
-                                    <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Accuracy Rate</div>
+                                    <div class="text-xl sm:text-2xl font-bold text-[#73A8FF]">{{ (int) ($totalPoints ?? 0) }}</div>
+                                    <div class="text-xs sm:text-sm font-semibold mb-1 opacity-90">Total Points Acquired</div>
                                 </div>
                             </div>
                         </div>

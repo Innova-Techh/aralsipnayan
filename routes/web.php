@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -415,12 +416,15 @@ Route::get('/admin/dashboard', [App\Http\Controllers\admin\AdminDashboardControl
 Route::get('/profile', function() {
     $user = Auth::guard('student')->user();
     $profile = $user->studentProfile;
+    $totalPoints = (int) (DB::table('user_progress')
+        ->where('user_id', $user->id)
+        ->value('total_points') ?? 0);
     
     // Get mastery progress data
     $masteryProgressService = new \App\Services\MasteryProgressService();
     $masteryProgress = $masteryProgressService->getWeeklyMasteryProgress($user->id);
     
-    return view('student.profile.student-profile', compact('profile', 'masteryProgress'));
+    return view('student.profile.student-profile', compact('profile', 'masteryProgress', 'totalPoints'));
 })->name('student.profile');
 // Backward compatibility routes for old assessment references (redirects to student routes)
 Route::group([], function () {
