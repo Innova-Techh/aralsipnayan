@@ -8,6 +8,3 @@ build:
 
 release:
   command: php artisan migrate --force
-
-run:
-  web: heroku-php-apache2 public/
