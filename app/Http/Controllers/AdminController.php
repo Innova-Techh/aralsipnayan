@@ -7,8 +7,8 @@ use App\Models\AdminProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
+use Cloudinary\Cloudinary;
 
 class AdminController extends Controller
 {
@@ -99,13 +99,8 @@ class AdminController extends Controller
      */
     public function update(Request $request, User $user = null)
     {
-        // If no user is passed, this is a profile update for the logged-in admin
-        if (!$user) {
-            $user = Auth::guard('admin')->user();
-        }
-
-        // Check if this is a profile update (no user parameter in route)
-        if (request()->is('admin/profile')) {
+        // Always route admin profile form submissions to profile update handler.
+        if ($request->routeIs('admin.profile.update') || !$user) {
             return $this->updateProfile($request);
         }
 
@@ -188,38 +183,44 @@ class AdminController extends Controller
             'email' => $validated['email'],
         ]);
 
+        $profileData = [
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'school_name' => $validated['school_name'] ?? null,
+            'grade_level_focus' => $validated['grade_level_focus'] ?? null,
+        ];
+
         // Handle profile photo upload
         if ($request->hasFile('profile_photo')) {
-            // Delete old photo if exists
-            if ($user->adminProfile && $user->adminProfile->profile_photo) {
-                Storage::disk('public')->delete($user->adminProfile->profile_photo);
+            $oldPhotoUrl = $user->adminProfile->profile_url ?? null;
+            try {
+                $upload = $this->getCloudinaryClient()->uploadApi()->upload(
+                    $request->file('profile_photo')->getRealPath(),
+                    [
+                        'folder' => 'aralsipnayan/admin-profiles',
+                        'resource_type' => 'image',
+                    ]
+                );
+            } catch (\Throwable $e) {
+                return redirect()->route('admin.profile.index')
+                    ->with('error', 'Photo upload failed: ' . $e->getMessage());
             }
 
-            // Store new photo
-            $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
-            
-            $user->adminProfile()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'firstname' => $firstname,
-                    'lastname' => $lastname,
-                    'school_name' => $validated['school_name'] ?? null,
-                    'grade_level_focus' => $validated['grade_level_focus'] ?? null,
-                    'profile_photo' => $photoPath,
-                ]
-            );
-        } else {
-            // Update profile without changing photo
-            $user->adminProfile()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'firstname' => $firstname,
-                    'lastname' => $lastname,
-                    'school_name' => $validated['school_name'] ?? null,
-                    'grade_level_focus' => $validated['grade_level_focus'] ?? null,
-                ]
-            );
+            $profileData['profile_url'] = $upload['secure_url'] ?? null;
+
+            if ($oldPublicId = $this->extractCloudinaryPublicId($oldPhotoUrl)) {
+                try {
+                    $this->getCloudinaryClient()->uploadApi()->destroy($oldPublicId, ['resource_type' => 'image']);
+                } catch (\Throwable $e) {
+                    // Keep profile update successful even if old asset cleanup fails.
+                }
+            }
         }
+
+        $user->adminProfile()->updateOrCreate(
+            ['user_id' => $user->id],
+            $profileData
+        );
 
         // Log notification
         $this->logNotification(
@@ -333,9 +334,15 @@ class AdminController extends Controller
                 ->with('error', 'Cannot delete the last admin account.');
         }
 
-        // Delete profile photo if exists
-        if ($user->adminProfile && $user->adminProfile->profile_photo) {
-            Storage::disk('public')->delete($user->adminProfile->profile_photo);
+        // Delete profile photo from Cloudinary if available
+        if ($user->adminProfile && $user->adminProfile->profile_url) {
+            if ($publicId = $this->extractCloudinaryPublicId($user->adminProfile->profile_url)) {
+                try {
+                    $this->getCloudinaryClient()->uploadApi()->destroy($publicId, ['resource_type' => 'image']);
+                } catch (\Throwable $e) {
+                    // Ignore cleanup failures during account deletion.
+                }
+            }
         }
 
         // Delete profile and user
@@ -475,5 +482,51 @@ class AdminController extends Controller
             \Log::error('Failed to mark all admin notifications as read: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to mark all as read'], 500);
         }
+    }
+
+    private function getCloudinaryClient(): Cloudinary
+    {
+        $cloudinaryUrl = config('services.cloudinary.url')
+            ?: env('CLOUDINARY_URL')
+            ?: getenv('CLOUDINARY_URL');
+
+        if (!$cloudinaryUrl) {
+            throw new \RuntimeException('Cloudinary is not configured. Set CLOUDINARY_URL in environment variables.');
+        }
+
+        return new Cloudinary($cloudinaryUrl);
+    }
+
+    private function extractCloudinaryPublicId(?string $url): ?string
+    {
+        if (!$url || !preg_match('#https?://res\.cloudinary\.com/#', $url)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (!$path) {
+            return null;
+        }
+
+        $segments = explode('/', ltrim($path, '/'));
+        $uploadIndex = array_search('upload', $segments, true);
+        if ($uploadIndex === false) {
+            return null;
+        }
+
+        $publicSegments = array_slice($segments, $uploadIndex + 1);
+        if (!empty($publicSegments) && preg_match('/^v\d+$/', $publicSegments[0])) {
+            array_shift($publicSegments);
+        }
+
+        if (empty($publicSegments)) {
+            return null;
+        }
+
+        $last = array_pop($publicSegments);
+        $lastWithoutExt = preg_replace('/\.[^.]+$/', '', $last);
+        $publicSegments[] = $lastWithoutExt;
+
+        return implode('/', $publicSegments);
     }
 }

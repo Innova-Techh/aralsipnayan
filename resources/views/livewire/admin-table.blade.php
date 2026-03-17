@@ -113,8 +113,14 @@
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
                                         @if($admin->adminProfile && $admin->adminProfile->profile_url)
+                                            @php
+                                                $adminProfileUrl = $admin->adminProfile->profile_url;
+                                                $adminAvatar = \Illuminate\Support\Str::startsWith($adminProfileUrl, ['http://', 'https://'])
+                                                    ? $adminProfileUrl
+                                                    : asset(ltrim($adminProfileUrl, '/'));
+                                            @endphp
                                             <img class="h-10 w-10 rounded-full object-cover"
-                                                src="{{ asset($admin->adminProfile->profile_url) }}"
+                                                src="{{ $adminAvatar }}"
                                                 alt="{{ $admin->username }}">
                                         @else
                                             <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">

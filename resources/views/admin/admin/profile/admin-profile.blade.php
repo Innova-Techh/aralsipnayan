@@ -34,7 +34,15 @@
                         <!-- Profile Photo -->
                         <div class="mb-6 flex items-start space-x-4">
                             <div class="flex-shrink-0">
-                                <img src="{{ auth()->guard('admin')->user()->adminProfile->profile_photo ?? asset('images/default-avatar.png') }}"
+                                @php
+                                    $adminPhoto = auth()->guard('admin')->user()->adminProfile->profile_url ?? null;
+                                    $adminPhotoSrc = $adminPhoto
+                                        ? (\Illuminate\Support\Str::startsWith($adminPhoto, ['http://', 'https://'])
+                                            ? $adminPhoto
+                                            : asset('storage/' . ltrim($adminPhoto, '/')))
+                                        : asset('images/default-avatar.png');
+                                @endphp
+                                <img src="{{ $adminPhotoSrc }}"
                                     alt="Profile Photo" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
                                     id="profilePhotoPreview">
                             </div>

@@ -245,8 +245,10 @@
                         $adminProfile = $admin->adminProfile ?? null;
                         $fullName = $adminProfile ? trim($adminProfile->firstname . ' ' . $adminProfile->lastname) : $admin->username;
                         $initials = collect(explode(' ', $fullName))->map(fn($word) => strtoupper(substr($word, 0, 1)))->take(2)->implode('');
-                        $profilePhoto = $adminProfile && $adminProfile->profile_photo
-                            ? asset('storage/' . $adminProfile->profile_photo)
+                        $profilePhoto = $adminProfile && $adminProfile->profile_url
+                            ? (\Illuminate\Support\Str::startsWith($adminProfile->profile_url, ['http://', 'https://'])
+                                ? $adminProfile->profile_url
+                                : asset('storage/' . ltrim($adminProfile->profile_url, '/')))
                             : "https://ui-avatars.com/api/?name=" . urlencode($initials) . "&background=3B82F6&color=fff";
                     @endphp
                     <img src="{{ $profilePhoto }}" alt="Admin Avatar"
@@ -469,8 +471,10 @@
                                     $adminProfile = $admin->adminProfile ?? null;
                                     $fullName = $adminProfile ? trim($adminProfile->firstname . ' ' . $adminProfile->lastname) : $admin->username;
                                     $initials = collect(explode(' ', $fullName))->map(fn($word) => strtoupper(substr($word, 0, 1)))->take(2)->implode('');
-                                    $profilePhoto = $adminProfile && $adminProfile->profile_photo
-                                        ? asset('storage/' . $adminProfile->profile_photo)
+                                    $profilePhoto = $adminProfile && $adminProfile->profile_url
+                                        ? (\Illuminate\Support\Str::startsWith($adminProfile->profile_url, ['http://', 'https://'])
+                                            ? $adminProfile->profile_url
+                                            : asset('storage/' . ltrim($adminProfile->profile_url, '/')))
                                         : "https://ui-avatars.com/api/?name=" . urlencode($initials) . "&background=3B82F6&color=fff";
                                 @endphp
                                 <div class="text-right">

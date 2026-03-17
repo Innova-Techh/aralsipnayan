@@ -17,8 +17,16 @@
             <form id="profileForm">
                 @csrf
                 <div class="flex items-center space-x-6 mb-6">
+                    @php
+                        $teacherPhoto = $profile->profile_url;
+                        $teacherPhotoSrc = $teacherPhoto
+                            ? (\Illuminate\Support\Str::startsWith($teacherPhoto, ['http://', 'https://'])
+                                ? $teacherPhoto
+                                : asset('storage/' . ltrim($teacherPhoto, '/')))
+                            : asset('images/profile/avatar1.png');
+                    @endphp
                     <img id="profileImage" class="h-20 w-20 rounded-full object-cover" 
-                         src="{{ $profile->profile_url ? asset('storage/' . $profile->profile_url) : asset('images/profile/avatar1.png') }}" 
+                         src="{{ $teacherPhotoSrc }}" 
                          alt="Profile Picture">
                     <div>
                         <input type="file" id="photoInput" name="photo" accept="image/*" class="hidden">

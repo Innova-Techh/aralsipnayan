@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Models\TeacherProfile;
+use Cloudinary\Cloudinary;
 
 class TeacherProfileController extends Controller
 {
@@ -168,18 +168,28 @@ class TeacherProfileController extends Controller
             if ($request->hasFile('photo')) {
                 $oldPhotoUrl = $profile->profile_url;
 
-                // Delete old photo if exists
-                if ($profile->profile_url && Storage::disk('public')->exists($profile->profile_url)) {
-                    Storage::disk('public')->delete($profile->profile_url);
-                }
-
-                // Store new photo
-                $path = $request->file('photo')->store('profiles/teachers', 'public');
+                // Store new photo in Cloudinary
+                $upload = $this->getCloudinaryClient()->uploadApi()->upload(
+                    $request->file('photo')->getRealPath(),
+                    [
+                        'folder' => 'aralsipnayan/teacher-profiles',
+                        'resource_type' => 'image',
+                    ]
+                );
+                $path = $upload['secure_url'] ?? null;
 
                 // Update profile
                 $profile->update([
                     'profile_url' => $path
                 ]);
+
+                if ($oldPublicId = $this->extractCloudinaryPublicId($oldPhotoUrl)) {
+                    try {
+                        $this->getCloudinaryClient()->uploadApi()->destroy($oldPublicId, ['resource_type' => 'image']);
+                    } catch (\Throwable $e) {
+                        // Keep profile update successful even if old asset cleanup fails.
+                    }
+                }
 
                 // Log notification
                 $this->logNotification(
@@ -198,7 +208,7 @@ class TeacherProfileController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Profile photo updated successfully!',
-                    'photo_url' => asset('storage/' . $path)
+                    'photo_url' => $path
                 ]);
             }
 
@@ -407,5 +417,51 @@ class TeacherProfileController extends Controller
             // Log error but don't fail the main operation
             \Log::error('Failed to log teacher notification: ' . $e->getMessage());
         }
+    }
+
+    private function getCloudinaryClient(): Cloudinary
+    {
+        $cloudinaryUrl = config('services.cloudinary.url')
+            ?: env('CLOUDINARY_URL')
+            ?: getenv('CLOUDINARY_URL');
+
+        if (!$cloudinaryUrl) {
+            throw new \RuntimeException('Cloudinary is not configured. Set CLOUDINARY_URL in environment variables.');
+        }
+
+        return new Cloudinary($cloudinaryUrl);
+    }
+
+    private function extractCloudinaryPublicId(?string $url): ?string
+    {
+        if (!$url || !preg_match('#https?://res\.cloudinary\.com/#', $url)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (!$path) {
+            return null;
+        }
+
+        $segments = explode('/', ltrim($path, '/'));
+        $uploadIndex = array_search('upload', $segments, true);
+        if ($uploadIndex === false) {
+            return null;
+        }
+
+        $publicSegments = array_slice($segments, $uploadIndex + 1);
+        if (!empty($publicSegments) && preg_match('/^v\d+$/', $publicSegments[0])) {
+            array_shift($publicSegments);
+        }
+
+        if (empty($publicSegments)) {
+            return null;
+        }
+
+        $last = array_pop($publicSegments);
+        $lastWithoutExt = preg_replace('/\.[^.]+$/', '', $last);
+        $publicSegments[] = $lastWithoutExt;
+
+        return implode('/', $publicSegments);
     }
 }

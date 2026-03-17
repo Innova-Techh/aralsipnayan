@@ -153,8 +153,14 @@
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 flex-shrink-0">
                                         @if($teacher->teacherProfile && $teacher->teacherProfile->profile_url)
+                                            @php
+                                                $teacherProfileUrl = $teacher->teacherProfile->profile_url;
+                                                $teacherAvatar = \Illuminate\Support\Str::startsWith($teacherProfileUrl, ['http://', 'https://'])
+                                                    ? $teacherProfileUrl
+                                                    : asset(ltrim($teacherProfileUrl, '/'));
+                                            @endphp
                                             <img class="h-10 w-10 rounded-full object-cover"
-                                                src="{{ asset($teacher->teacherProfile->profile_url) }}"
+                                                src="{{ $teacherAvatar }}"
                                                 alt="{{ $teacher->username }}">
                                         @else
                                             <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">

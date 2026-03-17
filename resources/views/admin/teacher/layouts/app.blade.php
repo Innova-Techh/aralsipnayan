@@ -474,17 +474,30 @@
 
                         <!-- User Profile (keeps your JS dropdown IDs intact) -->
                         <div class="flex items-center space-x-3">
+                            @php
+                                $teacherUser = Auth::guard('admin')->user() ?? Auth::user();
+                                $teacherProfile = $teacherUser?->teacherProfile;
+                                $teacherDisplayName = trim(($teacherProfile?->firstname ?? '') . ' ' . ($teacherProfile?->lastname ?? ''));
+                                if ($teacherDisplayName === '') {
+                                    $teacherDisplayName = $teacherUser?->name ?? $teacherUser?->username ?? 'Teacher';
+                                }
+                                $teacherPhoto = $teacherProfile?->profile_url;
+                                $teacherPhotoSrc = $teacherPhoto
+                                    ? (\Illuminate\Support\Str::startsWith($teacherPhoto, ['http://', 'https://'])
+                                        ? $teacherPhoto
+                                        : asset('storage/' . ltrim($teacherPhoto, '/')))
+                                    : 'https://ui-avatars.com/api/?name=' . urlencode($teacherDisplayName) . '&background=3B82F6&color=fff';
+                            @endphp
                             <div class="text-right">
-                                <!-- preserved original teacher profile display call -->
                                 <p class="text-sm font-medium text-gray-900">
-                                    {{ Auth::guard('admin')->user()?->teacherProfile?->firstname }}
+                                    {{ $teacherDisplayName }}
                                 </p>
                                 <p class="text-xs text-gray-500">Grade 6 Teacher</p>
                             </div>
                             <div class="relative">
                                 <button id="user-menu-button"
                                     class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
-                                    <img src="{{ asset('images/profile/avatar1.png') }}" alt="Profile"
+                                    <img src="{{ $teacherPhotoSrc }}" alt="Profile"
                                         class="w-full h-full object-cover">
                                 </button>
 
