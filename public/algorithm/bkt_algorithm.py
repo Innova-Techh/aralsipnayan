@@ -12,17 +12,32 @@ import math
 import uuid
 import os
 import time
+from urllib.parse import urlparse
 from decimal import Decimal, ROUND_HALF_UP
 
 class BKTAlgorithm:
     def __init__(self):
-        self.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '',
-            'database': 'aralsipnayandb',
-            'charset': 'utf8mb4'
-        }
+        jawsdb_url = os.getenv('JAWSDB_URL')
+
+        if jawsdb_url:
+            parsed = urlparse(jawsdb_url)
+            self.db_config = {
+                'host': parsed.hostname,
+                'user': parsed.username,
+                'password': parsed.password,
+                'database': parsed.path.lstrip('/'),
+                'port': parsed.port or 3306,
+                'charset': 'utf8mb4'
+            }
+        else:
+            self.db_config = {
+                'host': 'localhost',
+                'user': 'root',
+                'password': '',
+                'database': 'aralsipnayandb',
+                'port': 3306,
+                'charset': 'utf8mb4'
+            }
         
         # BKT Default Parameters - HYPER-EXTREME Discrimination Model (0.85-0.90+ AUC-ROC Target)
         self.default_params = {

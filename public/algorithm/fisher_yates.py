@@ -8,18 +8,34 @@ Prevents duplicate questions and respects cooldown periods
 import random
 import sys
 import json
+import os
 import mysql.connector
+from urllib.parse import urlparse
 from datetime import datetime, timedelta
 
 class EnhancedFisherYatesShuffle:
     def __init__(self):
-        self.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '',
-            'database': 'aralsipnayandb',
-            'charset': 'utf8mb4'
-        }
+        jawsdb_url = os.getenv('JAWSDB_URL')
+
+        if jawsdb_url:
+            parsed = urlparse(jawsdb_url)
+            self.db_config = {
+                'host': parsed.hostname,
+                'user': parsed.username,
+                'password': parsed.password,
+                'database': parsed.path.lstrip('/'),
+                'port': parsed.port or 3306,
+                'charset': 'utf8mb4'
+            }
+        else:
+            self.db_config = {
+                'host': 'localhost',
+                'user': 'root',
+                'password': '',
+                'database': 'aralsipnayandb',
+                'port': 3306,
+                'charset': 'utf8mb4'
+            }
         
         # Cooldown rules (in minutes)
         self.cooldown_rules = {
