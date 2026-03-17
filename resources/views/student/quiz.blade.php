@@ -1227,7 +1227,7 @@
                         feedbackIcon.innerHTML = '✕';
                         feedbackIcon.className = 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white text-red-700 text-2xl font-bold';
                         feedbackMessage.style.color = '#F87171';
-                        feedbackMessage.textContent = 'You are wrong!';
+                        feedbackMessage.textContent = 'Incorrect. Try Again!';
                         explanationText.style.color = '#F3F4F6';
                     }
 
