@@ -661,29 +661,31 @@
         function showActiveAssessmentNotification() {
             const modal = document.getElementById('activeAssessmentModal');
             const activeAssessment = activeAssessments[0]; // Get the first (should be only) active assessment
+            let remainingSeconds = Number(activeAssessment?.time_remaining_seconds ?? -1);
 
             // Function to update the time display
             function updateTimeDisplay() {
                 const infoDiv = document.getElementById('activeAssessmentInfo');
                 if (activeAssessment && infoDiv) {
-                    // Calculate remaining time
-                    const startTime = new Date(activeAssessment.started_at);
-                    const timeLimitMinutes = activeAssessment.time_limit || 30;
-                    const timeLimitMs = timeLimitMinutes * 60 * 1000; // Convert to milliseconds
-                    const elapsedMs = Date.now() - startTime.getTime();
-                    const remainingMs = Math.max(0, timeLimitMs - elapsedMs);
+                    // Prefer server-calculated remaining time to avoid timezone parsing issues.
+                    if (remainingSeconds < 0) {
+                        const startTime = new Date(activeAssessment.started_at);
+                        const timeLimitMinutes = activeAssessment.time_limit || 30;
+                        const timeLimitMs = timeLimitMinutes * 60 * 1000;
+                        const elapsedMs = Date.now() - startTime.getTime();
+                        remainingSeconds = Math.max(0, Math.floor((timeLimitMs - elapsedMs) / 1000));
+                    }
 
-                    // Convert remaining time to readable format
-                    const remainingMinutes = Math.floor(remainingMs / 60000);
-                    const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
+                    const mins = Math.floor(remainingSeconds / 60);
+                    const secs = remainingSeconds % 60;
 
                     let timeDisplay;
-                    if (remainingMs <= 0) {
+                    if (remainingSeconds <= 0) {
                         timeDisplay = '<span class="text-red-600 font-bold">⏰ Time Expired</span>';
-                    } else if (remainingMinutes > 0) {
-                        timeDisplay = `<span class="text-orange-600 font-semibold">⏱️ ${remainingMinutes}m ${remainingSeconds}s remaining</span>`;
+                    } else if (mins > 0) {
+                        timeDisplay = `<span class="text-orange-600 font-semibold">⏱️ ${mins}m ${secs}s remaining</span>`;
                     } else {
-                        timeDisplay = `<span class="text-red-500 font-semibold">⏱️ ${remainingSeconds}s remaining</span>`;
+                        timeDisplay = `<span class="text-red-500 font-semibold">⏱️ ${secs}s remaining</span>`;
                     }
 
                     infoDiv.innerHTML = `
@@ -692,6 +694,10 @@
                                                                                                 ${timeDisplay}
                                                                                             </div>
                                                                                         `;
+
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                    }
                 }
             }
 

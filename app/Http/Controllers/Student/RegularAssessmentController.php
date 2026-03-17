@@ -2018,6 +2018,8 @@ class RegularAssessmentController extends Controller
                     $result = json_decode($output, true);
                     
                     if ($result && $result['success'] && isset($result['total_questions'])) {
+                        $timeRemainingSeconds = max(0, $timeLimit - $elapsedTime);
+
                         $activeAssessmentData[] = [
                             'assessment_id' => $assessment->assessment_id,
                             'session_id' => $session->session_id,
@@ -2028,6 +2030,7 @@ class RegularAssessmentController extends Controller
                             'started_at' => $assessment->started_at,
                             'difficulty' => $assessment->difficulty_level,
                             'time_limit' => $assessment->time_limit ?? 30,
+                            'time_remaining_seconds' => $timeRemainingSeconds,
                             'is_paused' => $session->is_paused ?? false,
                             'title' => ucfirst($assessment->difficulty_level) . ' Assessment',
                             'can_resume' => true
@@ -2048,6 +2051,9 @@ class RegularAssessmentController extends Controller
                     ->get();
                 
                 foreach ($activeSessions as $session) {
+                    $sessionTimeLimit = ($session->time_limit_minutes ?? 30) * 60;
+                    $sessionElapsed = $this->getElapsedSeconds($session->started_at);
+
                     $activeAssessmentData[] = [
                         'assessment_id' => $session->assessment_id,
                         'session_id' => $session->session_id,
@@ -2058,6 +2064,7 @@ class RegularAssessmentController extends Controller
                         'started_at' => $session->started_at,
                         'difficulty' => $session->difficulty_level,
                         'time_limit' => $session->time_limit_minutes ?? 30,
+                        'time_remaining_seconds' => max(0, $sessionTimeLimit - $sessionElapsed),
                         'is_paused' => $session->is_paused ?? false,
                         'title' => ucfirst($session->difficulty_level) . ' Assessment',
                         'can_resume' => true
