@@ -4,6 +4,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use App\Providers\StudentUserProvider;
 use App\Providers\AdminUserProvider;
@@ -24,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+    if (app()->environment('production')) {
+        URL::forceScheme('https');
+    }
+
     // Register custom authentication providers
     Auth::provider('student_eloquent', function ($app, array $config) {
         return new StudentUserProvider($app['hash'], $config['model']);
