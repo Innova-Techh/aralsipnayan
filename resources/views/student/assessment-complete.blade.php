@@ -94,7 +94,7 @@
         <div class="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center relative z-30 celebration-card">
             <!-- Trophy Image with Animation -->
             <div class="mb-4 trophy-container">
-                <img src="{{ asset('images/assessments/trophy.png') }}" alt="Trophy"
+                <img src="{{ asset('images/assessments/Trophy.png') }}" alt="Trophy"
                     class="mx-auto w-24 h-24 trophy-bounce">
                 <!-- Sparkle elements around trophy -->
                 <div class="sparkle-container">
