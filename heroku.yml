@@ -2,9 +2,6 @@ build:
   languages:
     - nodejs
     - php
-  config:
-    YARN_PRODUCTION: false
-    NPM_CONFIG_PRODUCTION: false
 
 release:
   command: php artisan migrate --force
