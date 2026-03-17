@@ -8,21 +8,17 @@ import sys
 import json
 import os
 import mysql.connector
-from urllib.parse import urlparse
 from datetime import datetime, timedelta
 
 class QuestionCooldown:
     def __init__(self):
-        jawsdb_url = os.getenv('JAWSDB_URL')
-
-        if jawsdb_url:
-            parsed = urlparse(jawsdb_url)
+        if os.getenv('DYNO') or os.getenv('JAWSDB_URL'):
             self.db_config = {
-                'host': parsed.hostname,
-                'user': parsed.username,
-                'password': parsed.password,
-                'database': parsed.path.lstrip('/'),
-                'port': parsed.port or 3306,
+                'host': 'nuskkyrsgmn5rw8c.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+                'user': 'imnsg8f1wjljg1p2',
+                'password': 'q5qgardw1jlkpqa3',
+                'database': 'ir2h6saapp46zwh1',
+                'port': 3306,
                 'charset': 'utf8mb4'
             }
         else:
