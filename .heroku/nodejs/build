@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Running Vite build..."
+npm run build
