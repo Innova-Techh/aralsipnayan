@@ -600,11 +600,11 @@
              </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Most Missed Topics -->
+                <!-- Average Accuracy by Topic -->
                 <div class="bg-white rounded-lg border border-gray-200 p-6">
                     <div class="mb-4">
-                        <h4 class="text-base font-semibold text-gray-900">Most Missed Topics</h4>
-                        <p class="text-sm text-gray-600 mt-1">Topics with lowest accuracy rates</p>
+                        <h4 class="text-base font-semibold text-gray-900">Average Accuracy by Topic</h4>
+                        <p class="text-sm text-gray-600 mt-1">Average performance across different topics</p>
                     </div>
                     <div id="missedTopicsChart"></div>
                 </div>
