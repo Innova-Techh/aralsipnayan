@@ -1,0 +1,28 @@
+{
+  "mode": "intervention_triggered",
+  "threshold": null,
+  "result": {
+    "confusion_matrix": {
+      "tn": 561,
+      "fp": 61,
+      "fn": 39,
+      "tp": 339
+    },
+    "metrics": {
+      "accuracy": 0.9,
+      "precision": 0.8475,
+      "recall": 0.8968253968253969,
+      "specificity": 0.9019292604501608,
+      "f1": 0.8714652956298201,
+      "fpr": 0.09807073954983923,
+      "fnr": 0.10317460317460317
+    },
+    "support": {
+      "total": 1000,
+      "actual_positive": 378,
+      "actual_negative": 622,
+      "pred_positive": 400,
+      "pred_negative": 600
+    }
+  }
+}
