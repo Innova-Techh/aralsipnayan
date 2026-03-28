@@ -137,6 +137,7 @@ php artisan config:cache
 - Open phpMyAdmin: `http://localhost/phpmyadmin`
 - Create new database: `aralsipnayandb`
 
+
 #### 2. Import Database Structure
 - Import `aralsipnayandb.sql` from the `dbfolder` directory
 - Alternatively, run migrations: `php artisan migrate`
