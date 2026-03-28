@@ -2,6 +2,7 @@
 
 **AralSipnayan** is an intelligent gamified mathematics assessment tool designed for Grade 6 elementary students. The system dynamically evaluates students' understanding of mathematical concepts through adaptive testing, fair question distribution, and personalized tracking of learning progress aligned with the Department of Education's MATATAG curriculum.
 
+
 ## 🎯 Project Overview
 
 AralSipnayan addresses the significant gap in mathematics proficiency among Filipino students, as highlighted by the 2022 PISA results where only 16% of Filipino 15-year-olds reached basic proficiency in math compared to the OECD average of 69%. The system serves as a supplemental tool for the MATATAG curriculum, focusing on three core learning competencies:
