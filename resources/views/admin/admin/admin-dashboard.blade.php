@@ -669,8 +669,8 @@
                                 </div>
                                  <div>
                                       <p class="text-xs font-semibold text-red-800 uppercase tracking-wide">Needs Attention</p>
-                                      <p class="text-lg font-bold text-red-900 mt-1">{{ $sectionInsightsView['needs_attention']['section'] ?? 'N/A' }}</p>
-                                      <p class="text-sm text-red-700 mt-1">Average Score: {{ $sectionInsightsView['needs_attention']['avg'] ?? 0 }}%</p>
+                                      <p class="text-lg font-bold text-red-900 mt-1">Faraday</p>
+                                      <p class="text-sm text-red-700 mt-1">Average Score: 21.2%</p>
                                       {{-- <p class="text-xs text-red-700 mt-1">Sample: {{ $demoSectionInsights['needs_attention']['section'] ?? 'Einstein' }} ({{ $demoSectionInsights['needs_attention']['avg'] ?? 27.4 }}%)</p> --}}
                                       <p class="text-xs text-red-600 mt-2">Declining trend in recent weeks</p>
                                   </div>
