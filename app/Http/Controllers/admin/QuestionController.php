@@ -27,7 +27,8 @@ class QuestionController extends Controller
 
                 // EXPERT DATA
                 database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json'),
-                
+                database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_intermediate.json'),
+                database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_advanced.json'),
             ],
             'measurement_geometry' => [
                 // DUMMY DATA

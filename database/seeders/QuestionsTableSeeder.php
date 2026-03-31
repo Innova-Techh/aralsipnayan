@@ -28,7 +28,9 @@ class QuestionsTableSeeder extends Seeder
             // database_path('data/data_probability/data_probability_advanced.json'),
 
             // EXPERT DATA
-            database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json')
+            database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json'),
+            database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_intermediate.json'),
+            database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_advanced.json')
         ];
 
         foreach ($files as $file) {
