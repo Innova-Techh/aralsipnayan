@@ -45,6 +45,7 @@ class QuestionsTableSeeder extends Seeder
                 $competency = strtolower(str_replace(' ', '_', $q['competency']));
                 $difficulty = strtolower($q['difficulty_level']);
                 $questionType = strtolower(str_replace(' ', '_', $q['question_type']));
+                $bloomsTaxonomy = strtolower($q['blooms_taxonomy'] ?? 'remember');
 
                 // Set max_allowed_time based on difficulty
                 $maxTime = match($difficulty) {
@@ -80,6 +81,7 @@ class QuestionsTableSeeder extends Seeder
                     'question_source' => 'built_in',
                     'is_active' => true,
                     'base_points' => $basePoints,
+                    'blooms_taxonomy' => $bloomsTaxonomy,
                     'created_by' => null,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),

@@ -16,6 +16,7 @@ class QuestionController extends Controller
         $category = $request->get('category');
         $difficulty = $request->get('difficulty');
         $type = $request->get('type');
+        $bloomsLevel = $request->get('blooms_level');
         $search = $request->get('search');
 
         $files = [
@@ -107,6 +108,7 @@ class QuestionController extends Controller
                     $q['competency'] = Str::of($q['competency'] ?? $cat)->snake()->lower()->value();
                     $q['difficulty_level'] = Str::of($q['difficulty_level'] ?? 'beginner')->snake()->lower()->value();
                     $q['question_type'] = Str::of($q['question_type'] ?? 'multiple_choice')->snake()->lower()->value();
+                    $q['blooms_level'] = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? 'remember'))->snake()->lower()->value();
                     $q['question_source'] = 'built_in';
 
                     $all[] = $q;
@@ -134,10 +136,15 @@ class QuestionController extends Controller
                             'question_text',
                             'choice_a', 'choice_b', 'choice_c', 'choice_d',
                             'correct_answer',
+                            'blooms_taxonomy',
                         ] as $field) {
                             if (array_key_exists($field, $dbq) && $dbq[$field] !== null) {
                                 $q[$field] = $dbq[$field];
                             }
+                        }
+
+                        if (!empty($dbq['blooms_taxonomy'])) {
+                            $q['blooms_level'] = Str::of($dbq['blooms_taxonomy'])->snake()->lower()->value();
                         }
                     }
                 }
@@ -156,9 +163,10 @@ class QuestionController extends Controller
         if ($type) {
             $dbQuery->where('question_type', $type);
         }
-        $db = $dbQuery->get()->map(function ($q) {
-            return $q->toArray();
-        })->all();
+        if ($bloomsLevel) {
+            $dbQuery->where('blooms_taxonomy', $bloomsLevel);
+        }
+        $db = $dbQuery->get()->toArray();
 
         $combined = array_merge($all, $db);
 
@@ -166,6 +174,12 @@ class QuestionController extends Controller
         if ($type) {
             $combined = array_values(array_filter($combined, function ($q) use ($type) {
                 return ($q['question_type'] ?? null) === $type;
+            }));
+        }
+        if ($bloomsLevel) {
+            $combined = array_values(array_filter($combined, function ($q) use ($bloomsLevel) {
+                $questionBlooms = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? ''))->snake()->lower()->value();
+                return $questionBlooms === $bloomsLevel;
             }));
         }
 
@@ -205,6 +219,7 @@ class QuestionController extends Controller
         $category = $request->get('category');
         $difficulty = $request->get('difficulty');
         $type = $request->get('type');
+        $bloomsLevel = $request->get('blooms_level');
 
         $files = [
             'number_algebra' => [
@@ -258,6 +273,7 @@ class QuestionController extends Controller
                     $q['competency'] = Str::of($q['competency'] ?? $cat)->snake()->lower()->value();
                     $q['difficulty_level'] = Str::of($q['difficulty_level'] ?? 'beginner')->snake()->lower()->value();
                     $q['question_type'] = Str::of($q['question_type'] ?? 'multiple_choice')->snake()->lower()->value();
+                    $q['blooms_level'] = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? 'remember'))->snake()->lower()->value();
                     $q['question_source'] = 'built_in';
                     
                     
@@ -286,10 +302,15 @@ class QuestionController extends Controller
                             'question_text',
                             'choice_a', 'choice_b', 'choice_c', 'choice_d',
                             'correct_answer',
+                            'blooms_taxonomy',
                         ] as $field) {
                             if (array_key_exists($field, $dbq) && $dbq[$field] !== null) {
                                 $q[$field] = $dbq[$field];
                             }
+                        }
+
+                        if (!empty($dbq['blooms_taxonomy'])) {
+                            $q['blooms_level'] = Str::of($dbq['blooms_taxonomy'])->snake()->lower()->value();
                         }
                     }
                 }
@@ -308,9 +329,10 @@ class QuestionController extends Controller
         if ($type) {
             $dbQuery->where('question_type', $type);
         }
-        $db = $dbQuery->get()->map(function ($q) {
-            return $q->toArray();
-        })->all();
+        if ($bloomsLevel) {
+            $dbQuery->where('blooms_taxonomy', $bloomsLevel);
+        }
+        $db = $dbQuery->get()->toArray();
 
         $combined = array_merge($all, $db);
 
@@ -323,6 +345,12 @@ class QuestionController extends Controller
         if ($type) {
             $combined = array_values(array_filter($combined, function ($q) use ($type) {
                 return ($q['question_type'] ?? null) === $type;
+            }));
+        }
+        if ($bloomsLevel) {
+            $combined = array_values(array_filter($combined, function ($q) use ($bloomsLevel) {
+                $questionBlooms = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? ''))->snake()->lower()->value();
+                return $questionBlooms === $bloomsLevel;
             }));
         }
 

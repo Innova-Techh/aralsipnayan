@@ -56,7 +56,7 @@
         <!-- Filter Bar -->
         <div class="bg-white rounded-lg shadow-sm mb-6">
             <form id="filterForm" method="GET" action="{{ route('admin.management.questions') }}" class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
 
                     <!-- Category Filter -->
                     <div>
@@ -98,6 +98,21 @@
                                 Blanks</option>
                             <option value="true_false" {{ request('type') == 'true_false' ? 'selected' : '' }}>True/False
                             </option>
+                        </select>
+                    </div>
+
+                    <!-- Bloom's Taxonomy Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bloom's Taxonomy</label>
+                        <select name="blooms_level"
+                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">All Levels</option>
+                            <option value="remember" {{ request('blooms_level') == 'remember' ? 'selected' : '' }}>Remember</option>
+                            <option value="understand" {{ request('blooms_level') == 'understand' ? 'selected' : '' }}>Understand</option>
+                            <option value="apply" {{ request('blooms_level') == 'apply' ? 'selected' : '' }}>Apply</option>
+                            <option value="analyze" {{ request('blooms_level') == 'analyze' ? 'selected' : '' }}>Analyze</option>
+                            <option value="evaluate" {{ request('blooms_level') == 'evaluate' ? 'selected' : '' }}>Evaluate</option>
+                            <option value="create" {{ request('blooms_level') == 'create' ? 'selected' : '' }}>Create</option>
                         </select>
                     </div>
 
@@ -240,7 +255,7 @@
                                             'evaluate' => 'bg-blue-100 text-blue-800 border-blue-200',
                                             'create' => 'bg-purple-100 text-purple-800 border-purple-200'
                                         ];
-                                        $bloomsLevel = $question['blooms_level'] ?? 'remember';
+                                        $bloomsLevel = $question['blooms_level'] ?? ($question['blooms_taxonomy'] ?? 'remember');
                                         $bloomsClass = $bloomsColors[$bloomsLevel] ?? $bloomsColors['remember'];
                                     @endphp
                                     <span
