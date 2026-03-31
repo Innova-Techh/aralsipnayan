@@ -37,7 +37,7 @@ return new class extends Migration
             $table->integer('usage_count')->default(0);
             $table->decimal('success_rate', 5, 4)->default(0.0000);
             $table->integer('base_points');
-
+            $table->enum('blooms_taxonomy', ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'])->default('remember');
             // Metadata
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();

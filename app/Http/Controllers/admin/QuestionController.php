@@ -20,19 +20,30 @@ class QuestionController extends Controller
 
         $files = [
             'number_algebra' => [
-                database_path('data/number_algebra/number_algebra_beginner.json'),
-                database_path('data/number_algebra/number_algebra_intermediate.json'),
-                database_path('data/number_algebra/number_algebra_advanced.json'),
+                // DUMMY DATA
+                // database_path('data/number_algebra/number_algebra_beginner.json'),
+                // database_path('data/number_algebra/number_algebra_intermediate.json'),
+                // database_path('data/number_algebra/number_algebra_advanced.json'),
+
+                // EXPERT DATA
+                database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json'),
+                
             ],
             'measurement_geometry' => [
-                database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
-                database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
-                database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
+                // DUMMY DATA
+                // database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
+                // database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
+                // database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
+
+                // EXPERT DATA
             ],
             'data_probability' => [
-                database_path('data/data_probability/data_probability_beginner.json'),
-                database_path('data/data_probability/data_probability_intermediate.json'),
-                database_path('data/data_probability/data_probability_advanced.json'),
+                // DUMMY DATA
+                // database_path('data/data_probability/data_probability_beginner.json'),
+                // database_path('data/data_probability/data_probability_intermediate.json'),
+                // database_path('data/data_probability/data_probability_advanced.json'),
+
+                // EXPERT DATA
             ],
         ];
 
@@ -54,8 +65,10 @@ class QuestionController extends Controller
                     'intermediate' => 1,
                     'advanced' => 2
                 ];
-                if (isset($difficultyIndex[$difficulty])) {
+                if (isset($difficultyIndex[$difficulty], $files[$cat][$difficultyIndex[$difficulty]])) {
                     $filesToLoad = [$files[$cat][$difficultyIndex[$difficulty]]];
+                } else {
+                    $filesToLoad = [];
                 }
             }
             
@@ -191,9 +204,7 @@ class QuestionController extends Controller
 
         $files = [
             'number_algebra' => [
-                database_path('data/number_algebra/number_algebra_beginner.json'),
-                database_path('data/number_algebra/number_algebra_intermediate.json'),
-                database_path('data/number_algebra/number_algebra_advanced.json'),
+                database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json'),
             ],
             'measurement_geometry' => [
                 database_path('data/measurement_geometry/measurement_geometry_beginner.json'),

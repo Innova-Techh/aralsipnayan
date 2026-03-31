@@ -11,17 +11,24 @@ class QuestionsTableSeeder extends Seeder
 {
     public function run()
     {
+        // Keep custom/admin-authored questions and refresh only built-in seed data.
+        DB::table('questions')->where('question_source', 'built_in')->delete();
+
         // Path to your JSON files
         $files = [
-            database_path('data/number_algebra/number_algebra_beginner.json'),
-            database_path('data/number_algebra/number_algebra_intermediate.json'),
-            database_path('data/number_algebra/number_algebra_advanced.json'),
-            database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
-            database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
-            database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
-            database_path('data/data_probability/data_probability_beginner.json'),
-            database_path('data/data_probability/data_probability_intermediate.json'),
-            database_path('data/data_probability/data_probability_advanced.json'),
+            // DUMMY DATA
+            // database_path('data/number_algebra/number_algebra_beginner.json'),
+            // database_path('data/number_algebra/number_algebra_intermediate.json'),
+            // database_path('data/number_algebra/number_algebra_advanced.json'),
+            // database_path('data/measurement_geometry/measurement_geometry_beginner.json'),
+            // database_path('data/measurement_geometry/measurement_geometry_intermediate.json'),
+            // database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
+            // database_path('data/data_probability/data_probability_beginner.json'),
+            // database_path('data/data_probability/data_probability_intermediate.json'),
+            // database_path('data/data_probability/data_probability_advanced.json'),
+
+            // EXPERT DATA
+            database_path('expertdata/number_algebra/decimals_add_subtract/decimals_add_subtract_beginner.json')
         ];
 
         foreach ($files as $file) {
