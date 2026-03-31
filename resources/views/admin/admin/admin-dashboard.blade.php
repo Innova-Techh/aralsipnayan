@@ -323,8 +323,16 @@
             'series' => $mergedSeries,
         ];
 
-        $trendLabels = (array) (($sectionPerformanceTrendView['labels'] ?? []) ?: ($demoSectionPerformanceTrend['labels'] ?? []));
-        $trendLabelCount = count($trendLabels);
+        $trendLabelCount = 5;
+        $trendLabels = [];
+        for ($weeksAgo = 4; $weeksAgo >= 0; $weeksAgo--) {
+            if ($weeksAgo === 0) {
+                $trendLabels[] = 'Current Week';
+                continue;
+            }
+
+            $trendLabels[] = $weeksAgo . ' Week' . ($weeksAgo > 1 ? 's' : '') . ' Ago';
+        }
         $trendSeriesByNameReal = collect((array) ($sectionPerformanceTrendView['series'] ?? []))->keyBy('name')->all();
         $trendSeriesByNameDemo = collect((array) ($demoSectionPerformanceTrend['series'] ?? []))->keyBy('name')->all();
         $trendSeriesNames = array_values(array_unique(array_merge(array_keys($trendSeriesByNameReal), array_keys($trendSeriesByNameDemo))));
@@ -334,7 +342,11 @@
             $real = (array) ($trendSeriesByNameReal[$name] ?? []);
             $demo = (array) ($trendSeriesByNameDemo[$name] ?? []);
             $data = (array) (($real['data'] ?? []) ?: ($demo['data'] ?? []));
-            $data = array_slice(array_pad($data, $trendLabelCount, 0), 0, $trendLabelCount);
+            if (count($data) >= $trendLabelCount) {
+                $data = array_slice($data, -$trendLabelCount);
+            } else {
+                $data = array_pad($data, -$trendLabelCount, 0);
+            }
             $trendSeries[] = ['name' => $name, 'data' => $data];
         }
         $sectionPerformanceTrendView = [
@@ -854,7 +866,7 @@
                 ];
                 $mostMissedTopicsData = $mostMissedTopicsView ?? ['topics' => [], 'accuracy' => []];
                 $performanceByCompetencyData = $performanceByCompetencyView ?? ['sections' => [], 'series' => []];
-                $sectionPerformanceTrendData = $sectionPerformanceTrendView ?? ['labels' => ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6'], 'series' => []];
+                $sectionPerformanceTrendData = $sectionPerformanceTrendView ?? ['labels' => ['4 Weeks Ago', '3 Weeks Ago', '2 Weeks Ago', '1 Week Ago', 'Current Week'], 'series' => []];
                 $platformGrowthData = $platformGrowthView ?? ['labels' => [], 'students' => [], 'assessments' => []];
              @endphp
             const averageScoresData = @json($averageScoresData);
@@ -1356,7 +1368,7 @@
                         enabled: false
                     },
                     xaxis: {
-                        categories: sectionPerformanceTrendData.labels || ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                        categories: sectionPerformanceTrendData.labels || ['4 Weeks Ago', '3 Weeks Ago', '2 Weeks Ago', '1 Week Ago', 'Current Week'],
                         labels: {
                             style: {
                                 colors: '#6B7280',
