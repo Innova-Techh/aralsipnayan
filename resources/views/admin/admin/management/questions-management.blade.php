@@ -491,8 +491,8 @@
                                     <option value="multiple_choice">Multiple Choice</option>
                                     <option value="fill_blanks">Fill in the Blanks</option>
                                     <option value="true_false">True/False</option>
-                                    <option value="drag_drop">Drag & Drop</option>
-                                    <option value="connect_dots">Connect Dots</option>
+                                    {{-- <option value="drag_drop">Drag & Drop</option>
+                                    <option value="connect_dots">Connect Dots</option> --}}
                                 </select>
                             </div>
                         </div>
