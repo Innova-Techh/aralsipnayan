@@ -40,6 +40,10 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/decimals_division/decimals_division_beginner.json'),
             database_path('expertdata/number_algebra/decimals_division/decimals_division_intermediate.json'),
             database_path('expertdata/number_algebra/decimals_division/decimals_division_advanced.json'),
+            database_path('expertdata/number_algebra/fraction_division/fraction_division_beginner.json'),
+            database_path('expertdata/number_algebra/fraction_division/fraction_division_intermediate.json'),
+            database_path('expertdata/number_algebra/fraction_division/fraction_division_advanced.json'),
+           
             ];
 
         foreach ($files as $file) {
