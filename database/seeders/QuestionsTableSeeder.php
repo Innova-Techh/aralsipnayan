@@ -133,6 +133,12 @@ class QuestionsTableSeeder extends Seeder
              database_path('expertdata/data_probability/pie_graphs/pie_graphs_beginner.json'),
              database_path('expertdata/data_probability/pie_graphs/pie_graphs_intermediate.json'),
               database_path('expertdata/data_probability/pie_graphs/pie_graphs_advanced.json'),
+       
+              //Pie Graphs: Word Problem
+                database_path('expertdata/data_probability/pie_graphs_wordprob/pie_graphs_wordprob_beginner.json'),
+                database_path('expertdata/data_probability/pie_graphs_wordprob/pie_graphs_wordprob_intermediate.json'),
+                database_path('expertdata/data_probability/pie_graphs_wordprob/pie_graphs_wordprob_advanced.json'),
+
             ];
 
 
