@@ -86,6 +86,12 @@ class QuestionController extends Controller
                 database_path('expertdata/measurement_geometry/area_composite/area_composite_beginner.json'),
                 database_path('expertdata/measurement_geometry/area_composite/area_composite_intermediate.json'),
                 database_path('expertdata/measurement_geometry/area_composite/area_composite_advanced.json'),
+
+                //Circles: Word Problem
+                database_path('expertdata/measurement_geometry/circles_wordprob/circles_wordprob_beginner.json'),
+                database_path('expertdata/measurement_geometry/circles_wordprob/circles_wordprob_intermediate.json'),
+                database_path('expertdata/measurement_geometry/circles_wordprob/circles_wordprob_advanced.json'),
+
             ],
             'data_probability' => [
                 // DUMMY DATA
