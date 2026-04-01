@@ -111,7 +111,14 @@ class QuestionController extends Controller
                  database_path('expertdata/measurement_geometry/parts_circle/parts_circle_beginner.json'),
                  database_path('expertdata/measurement_geometry/parts_circle/parts_circle_intermediate.json'),
                  database_path('expertdata/measurement_geometry/parts_circle/parts_circle_advanced.json'),
-            ],
+        
+                //Tessallation
+                database_path('expertdata/measurement_geometry/tessalations/tessalations_beginner.json'),
+                database_path('expertdata/measurement_geometry/tessalations/tessalations_intermediate.json'),
+                database_path('expertdata/measurement_geometry/tessalations/tessalations_advanced.json'),
+
+
+                 ],
             'data_probability' => [
                 // DUMMY DATA
                 // database_path('data/data_probability/data_probability_beginner.json'),
