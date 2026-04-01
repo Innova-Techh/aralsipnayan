@@ -70,7 +70,12 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_beginner.json'),
             database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_intermediate.json'),
             database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_advanced.json'),
+            // Composite Area
+            database_path('expertdata/measurement_geometry/area_composite/area_composite_beginner.json'),
+            database_path('expertdata/measurement_geometry/area_composite/area_composite_intermediate.json'),
+            database_path('expertdata/measurement_geometry/area_composite/area_composite_advanced.json'),
             ];
+
 
         foreach ($files as $file) {
             $json = File::get($file);
