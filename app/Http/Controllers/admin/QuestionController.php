@@ -126,7 +126,13 @@ class QuestionController extends Controller
                 database_path('expertdata/measurement_geometry/cuboid_prism/cuboid_prism_beginner.json'),
                 database_path('expertdata/measurement_geometry/cuboid_prism/cuboid_prism_intermediate.json'),
                 database_path('expertdata/measurement_geometry/cuboid_prism/cuboid_prism_advanced.json'),
-                 ],
+              
+             //Volume and Capacity: Word Problem
+                database_path('expertdata/measurement_geometry/volume_capacity_wordprob/volume_capacity_wordprob_beginner.json'),
+                database_path('expertdata/measurement_geometry/volume_capacity_wordprob/volume_capacity_wordprob_intermediate.json'),
+                database_path('expertdata/measurement_geometry/volume_capacity_wordprob/volume_capacity_wordprob_advanced.json'),
+            
+                ],
             'data_probability' => [
                 // DUMMY DATA
                 // database_path('data/data_probability/data_probability_beginner.json'),
