@@ -37,6 +37,9 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/decimals_division_wordprob/decimals_division_wordprob_beginner.json'),
             database_path('expertdata/number_algebra/decimals_division_wordprob/decimals_division_wordprob_intermediate.json'),
             database_path('expertdata/number_algebra/decimals_division_wordprob/decimals_division_wordprob_advanced.json'),
+            database_path('expertdata/number_algebra/decimals_division/decimals_division_beginner.json'),
+            database_path('expertdata/number_algebra/decimals_division/decimals_division_intermediate.json'),
+            database_path('expertdata/number_algebra/decimals_division/decimals_division_advanced.json'),
             ];
 
         foreach ($files as $file) {
