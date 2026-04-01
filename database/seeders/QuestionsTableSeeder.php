@@ -71,9 +71,9 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_intermediate.json'),
             database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_advanced.json'),
             // Composite Area
-            database_path('expertdata/measurement_geometry/area_composite/area_composite_beginner.json'),
-            database_path('expertdata/measurement_geometry/area_composite/area_composite_intermediate.json'),
-            database_path('expertdata/measurement_geometry/area_composite/area_composite_advanced.json'),
+            database_path('expertdata/measurement_geometry/area_composite_wordprob/area_composite_wordprob_beginner.json'),
+            database_path('expertdata/measurement_geometry/area_composite_wordprob/area_composite_wordprob_intermediate.json'),
+            database_path('expertdata/measurement_geometry/area_composite_wordprob/area_composite_wordprob_advanced.json'),
             // Circle Area
             database_path('expertdata/measurement_geometry/area_circle/area_circle_beginner.json'),
             database_path('expertdata/measurement_geometry/area_circle/area_circle_intermediate.json'),
