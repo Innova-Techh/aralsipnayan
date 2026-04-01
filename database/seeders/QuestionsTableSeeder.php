@@ -104,6 +104,10 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/measurement_geometry/converting_units/converting_units_intermediate.json'),
             database_path('expertdata/measurement_geometry/converting_units/converting_units_advanced.json'),
 
+             //Parts of Circle
+             database_path('expertdata/measurement_geometry/parts_circle/parts_circle_beginner.json'),
+            database_path('expertdata/measurement_geometry/parts_circle/parts_circle_intermediate.json'),
+            database_path('expertdata/measurement_geometry/parts_circle/parts_circle_advanced.json'),
             ];
 
 
