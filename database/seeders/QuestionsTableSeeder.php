@@ -64,7 +64,12 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/percentage/percentage_beginner.json'),
             database_path('expertdata/number_algebra/percentage/percentage_intermediate.json'),
             database_path('expertdata/number_algebra/percentage/percentage_advanced.json'),
+            
 
+            // Measurement and Geometry
+            database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_beginner.json'),
+            database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_intermediate.json'),
+            database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_advanced.json'),
             ];
 
         foreach ($files as $file) {

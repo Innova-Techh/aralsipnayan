@@ -63,9 +63,6 @@ class QuestionController extends Controller
                 database_path('expertdata/number_algebra/percentage/percentage_beginner.json'),
                 database_path('expertdata/number_algebra/percentage/percentage_intermediate.json'),
                 database_path('expertdata/number_algebra/percentage/percentage_advanced.json'),
-
-
-
                 ],
             'measurement_geometry' => [
                 // DUMMY DATA
@@ -74,6 +71,9 @@ class QuestionController extends Controller
                 // database_path('data/measurement_geometry/measurement_geometry_advanced.json'),
 
                 // EXPERT DATA
+                 database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_beginner.json'),
+                 database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_intermediate.json'),
+                 database_path('expertdata/measurement_geometry/area_perimeter/area_perimeter_advanced.json'),
             ],
             'data_probability' => [
                 // DUMMY DATA
