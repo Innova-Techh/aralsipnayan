@@ -61,7 +61,9 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/order_operations/order_operations_beginner.json'),
             database_path('expertdata/number_algebra/order_operations/order_operations_intermediate.json'),
             database_path('expertdata/number_algebra/order_operations/order_operations_advanced.json'),
-
+            database_path('expertdata/number_algebra/percentage/percentage_beginner.json'),
+            database_path('expertdata/number_algebra/percentage/percentage_intermediate.json'),
+            database_path('expertdata/number_algebra/percentage/percentage_advanced.json'),
 
             ];
 
