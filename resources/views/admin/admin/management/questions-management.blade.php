@@ -266,7 +266,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">
-                                        {{ $question['school_year'] ?? '2024-2025' }}
+                                        {{ $question['school_year'] ?? '2025-2026' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700 max-w-md">
