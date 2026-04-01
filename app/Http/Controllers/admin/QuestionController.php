@@ -117,7 +117,11 @@ class QuestionController extends Controller
                 database_path('expertdata/measurement_geometry/tessalations/tessalations_intermediate.json'),
                 database_path('expertdata/measurement_geometry/tessalations/tessalations_advanced.json'),
 
-
+                //Volume and Capacity
+                database_path('expertdata/measurement_geometry/volume_capacity/volume_capacity_beginner.json'),
+                database_path('expertdata/measurement_geometry/volume_capacity/volume_capacity_intermediate.json'),
+                database_path('expertdata/measurement_geometry/volume_capacity/volume_capacity_advanced.json'),
+                
                  ],
             'data_probability' => [
                 // DUMMY DATA
