@@ -52,6 +52,9 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_beginner.json'),
             database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_intermediate.json'),
             database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_advanced.json'),
+            database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_beginner.json'),
+            database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_intermediate.json'),
+            database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_advanced.json'),
 
             ];
 
