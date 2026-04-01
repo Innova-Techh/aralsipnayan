@@ -55,6 +55,10 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_beginner.json'),
             database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_intermediate.json'),
             database_path('expertdata/number_algebra/decimals_multiplication_wordprob/decimals_multiplication_wordprob_advanced.json'),
+            database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_beginner.json'),
+            database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_intermediate.json'),
+            database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_advanced.json'),
+
 
             ];
 
