@@ -48,6 +48,10 @@ class QuestionController extends Controller
                 database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_beginner.json'),
                 database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_intermediate.json'),
                 database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_advanced.json'),
+                database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_beginner.json'),
+                database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_intermediate.json'),
+                database_path('expertdata/number_algebra/gcf_lcm/gcf_lcm_advanced.json'),
+
                 ],
             'measurement_geometry' => [
                 // DUMMY DATA
