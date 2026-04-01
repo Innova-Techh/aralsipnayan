@@ -45,7 +45,9 @@ class QuestionController extends Controller
                 database_path('expertdata/number_algebra/fraction_division_wordprob/fraction_division_wordprob_beginner.json'),
                 database_path('expertdata/number_algebra/fraction_division_wordprob/fraction_division_wordprob_intermediate.json'),
                 database_path('expertdata/number_algebra/fraction_division_wordprob/fraction_division_wordprob_advanced.json'),
-          
+                database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_beginner.json'),
+                database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_intermediate.json'),
+                database_path('expertdata/number_algebra/fraction_multiplication/fraction_multiplication_advanced.json'),
                 ],
             'measurement_geometry' => [
                 // DUMMY DATA
