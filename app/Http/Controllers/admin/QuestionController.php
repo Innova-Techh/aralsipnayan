@@ -57,7 +57,10 @@ class QuestionController extends Controller
                 database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_beginner.json'),
                 database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_intermediate.json'),
                 database_path('expertdata/number_algebra/fraction_multiplication_wordprob/fraction_multiplication_wordprob_advanced.json'),
-                
+                database_path('expertdata/number_algebra/order_operations/order_operations_beginner.json'),
+                database_path('expertdata/number_algebra/order_operations/order_operations_intermediate.json'),
+                database_path('expertdata/number_algebra/order_operations/order_operations_advanced.json'),
+
 
                 ],
             'measurement_geometry' => [
