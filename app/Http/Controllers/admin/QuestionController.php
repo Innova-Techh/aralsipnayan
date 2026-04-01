@@ -92,6 +92,10 @@ class QuestionController extends Controller
                 database_path('expertdata/measurement_geometry/circles_wordprob/circles_wordprob_intermediate.json'),
                 database_path('expertdata/measurement_geometry/circles_wordprob/circles_wordprob_advanced.json'),
 
+               //Circumference: Circle
+                database_path('expertdata/measurement_geometry/circumference_circle/circumference_circle_beginner.json'),
+                database_path('expertdata/measurement_geometry/circumference_circle/circumference_circle_intermediate.json'),
+                database_path('expertdata/measurement_geometry/circumference_circle/circumference_circle_advanced.json'),
             ],
             'data_probability' => [
                 // DUMMY DATA
