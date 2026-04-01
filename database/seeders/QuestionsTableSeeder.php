@@ -129,6 +129,10 @@ class QuestionsTableSeeder extends Seeder
             database_path('expertdata/measurement_geometry/volume_capacity_wordprob/volume_capacity_wordprob_intermediate.json'),
             database_path('expertdata/measurement_geometry/volume_capacity_wordprob/volume_capacity_wordprob_advanced.json'),
         
+         //Pie Graphs
+             database_path('expertdata/data_probability/pie_graphs/pie_graphs_beginner.json'),
+             database_path('expertdata/data_probability/pie_graphs/pie_graphs_intermediate.json'),
+              database_path('expertdata/data_probability/pie_graphs/pie_graphs_advanced.json'),
             ];
 
 
