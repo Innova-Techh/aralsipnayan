@@ -311,12 +311,12 @@
 
                     <!-- Center: Search Bar -->
                     <div class="flex-1 max-w-2xl mx-8">
-                        <div class="relative">
+                        {{-- <div class="relative">
                             <input type="text" placeholder="Search..."
                                 class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <i
                                 class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <!-- Right Side: User Info and Actions -->
