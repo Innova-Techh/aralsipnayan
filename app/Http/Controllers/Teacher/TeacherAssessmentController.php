@@ -181,8 +181,8 @@ class TeacherAssessmentController extends Controller
                 // Bank questions from JSON files don't need database verification
                 // They are valid as long as they follow the correct ID format
                 $validBankQuestions = array_filter($bankQuestionIds, function($questionId) {
-                    // Validate question ID format (e.g., NA-B-001, MG-I-002, DP-A-003)
-                    return preg_match('/^(NA|MG|DP)-(B|I|A)-\d{3}$/', $questionId);
+                    // Accept both classic IDs (NA-B-001) and expertdata IDs (DP-B-PG-001)
+                    return preg_match('/^(NA|MG|DP)-(B|I|A)(?:-[A-Z]+)?-\d{3}$/', $questionId);
                 });
                 
                 if (!empty($validBankQuestions)) {
@@ -337,7 +337,7 @@ class TeacherAssessmentController extends Controller
         ];
 
         $questions = [];
-        $basePath = base_path("database/data/{$categoryPrefix}");
+        $basePath = base_path("database/expertdata/{$categoryPrefix}");
 
         // Determine which difficulty files to load
         $difficultiesToLoad = [];
@@ -348,22 +348,25 @@ class TeacherAssessmentController extends Controller
             $difficultiesToLoad = ['beginner', 'intermediate', 'advanced'];
         }
 
-        // Load questions from the appropriate JSON files
+        // Load questions from nested topic folders inside each competency
         foreach ($difficultiesToLoad as $difficulty) {
-            $filePath = "{$basePath}/{$categoryPrefix}_{$difficulty}.json";
-            
-            if (file_exists($filePath)) {
+            $files = glob("{$basePath}/*/*_{$difficulty}.json") ?: [];
+
+            foreach ($files as $filePath) {
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
                 $fileContent = file_get_contents($filePath);
                 $fileQuestions = json_decode($fileContent, true);
-                
+
                 if ($fileQuestions && is_array($fileQuestions)) {
-                    // Apply topic filter if provided
                     if ($request->topic) {
                         $fileQuestions = array_filter($fileQuestions, function($question) use ($request) {
                             return isset($question['topic_tag']) && $question['topic_tag'] === $request->topic;
                         });
                     }
-                    
+
                     $questions = array_merge($questions, $fileQuestions);
                 }
             }
@@ -409,17 +412,18 @@ class TeacherAssessmentController extends Controller
 
         foreach ($categories as $categoryName => $categoryPrefix) {
             $topics = [];
-            $basePath = base_path("database/data/{$categoryPrefix}");
-            
-            // Check beginner file for topics (assuming all files have similar topic distribution)
-            $filePath = "{$basePath}/{$categoryPrefix}_beginner.json";
-            
-            if (file_exists($filePath)) {
+            $basePath = base_path("database/expertdata/{$categoryPrefix}");
+            $beginnerFiles = glob("{$basePath}/*/*_beginner.json") ?: [];
+
+            foreach ($beginnerFiles as $filePath) {
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
                 $fileContent = file_get_contents($filePath);
                 $questions = json_decode($fileContent, true);
-                
+
                 if ($questions && is_array($questions)) {
-                    // Get first 100 questions to sample topics
                     $sampleQuestions = array_slice($questions, 0, 100);
                     foreach ($sampleQuestions as $question) {
                         if (isset($question['topic_tag']) && !in_array($question['topic_tag'], $topics)) {
@@ -845,19 +849,24 @@ class TeacherAssessmentController extends Controller
         ];
 
         // Parse question ID (e.g., NA-B-001)
-        if (preg_match('/^(NA|MG|DP)-(B|I|A)-(\d{3})$/', $questionId, $matches)) {
+        if (preg_match('/^(NA|MG|DP)-(B|I|A)(?:-[A-Z]+)?-(\d{3})$/', $questionId, $matches)) {
             $categoryPrefix = $categoryMap[$matches[1]];
             $difficulty = $difficultyMap[$matches[2]];
             
-            $filePath = base_path("database/data/{$categoryPrefix}/{$categoryPrefix}_{$difficulty}.json");
-            
-            if (file_exists($filePath)) {
+            $basePath = base_path("database/expertdata/{$categoryPrefix}");
+            $files = glob("{$basePath}/*/*_{$difficulty}.json") ?: [];
+
+            foreach ($files as $filePath) {
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
                 $content = file_get_contents($filePath);
                 $questions = json_decode($content, true);
-                
+
                 if ($questions) {
                     foreach ($questions as $question) {
-                        if ($question['question_id'] === $questionId) {
+                        if (($question['question_id'] ?? null) === $questionId) {
                             return [
                                 'question_id' => $question['question_id'],
                                 'question_text' => $question['question_text'],

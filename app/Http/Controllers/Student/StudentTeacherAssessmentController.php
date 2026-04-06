@@ -346,8 +346,8 @@ class StudentTeacherAssessmentController extends Controller
             'I' => 'intermediate',
             'A' => 'advanced'
         ];
-        preg_match('/^(NA|MG|DP)-(B|I|A)-(\d{3})$/', $question['question_id'], $matches);
-        $difficultyLevel = $difficultyMap[$matches[2]] ?? 'intermediate';
+        preg_match('/^(NA|MG|DP)-(B|I|A)(?:-[A-Z]+)?-(\d{3})$/', $question['question_id'], $matches);
+        $difficultyLevel = $difficultyMap[$matches[2] ?? null] ?? 'intermediate';
         
         // Calculate time limit for this difficulty
         $timeLimits = [
@@ -770,19 +770,24 @@ class StudentTeacherAssessmentController extends Controller
         ];
 
         // Parse question ID (e.g., NA-B-001)
-        if (preg_match('/^(NA|MG|DP)-(B|I|A)-(\d{3})$/', $questionId, $matches)) {
+        if (preg_match('/^(NA|MG|DP)-(B|I|A)(?:-[A-Z]+)?-(\d{3})$/', $questionId, $matches)) {
             $categoryPrefix = $categoryMap[$matches[1]];
             $difficulty = $difficultyMap[$matches[2]];
-            
-            $filePath = base_path("database/data/{$categoryPrefix}/{$categoryPrefix}_{$difficulty}.json");
-            
-            if (file_exists($filePath)) {
+
+            $basePath = base_path("database/expertdata/{$categoryPrefix}");
+            $files = glob("{$basePath}/*/*_{$difficulty}.json") ?: [];
+
+            foreach ($files as $filePath) {
+                if (!file_exists($filePath)) {
+                    continue;
+                }
+
                 $content = file_get_contents($filePath);
                 $questions = json_decode($content, true);
-                
+
                 if ($questions) {
                     foreach ($questions as $question) {
-                        if ($question['question_id'] === $questionId) {
+                        if (($question['question_id'] ?? null) === $questionId) {
                             return [
                                 'question_id' => $question['question_id'],
                                 'question_text' => $question['question_text'],
