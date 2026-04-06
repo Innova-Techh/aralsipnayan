@@ -17,6 +17,7 @@ class QuestionController extends Controller
         $difficulty = $request->get('difficulty');
         $type = $request->get('type');
         $bloomsLevel = $request->get('blooms_level');
+        $schoolYear = $request->get('school_year');
         $search = $request->get('search');
 
         $files = [
@@ -237,6 +238,7 @@ class QuestionController extends Controller
                             'question_text',
                             'choice_a', 'choice_b', 'choice_c', 'choice_d',
                             'correct_answer',
+                            'school_year',
                             'blooms_taxonomy',
                         ] as $field) {
                             if (array_key_exists($field, $dbq) && $dbq[$field] !== null) {
@@ -267,6 +269,9 @@ class QuestionController extends Controller
         if ($bloomsLevel) {
             $dbQuery->where('blooms_taxonomy', $bloomsLevel);
         }
+        if ($schoolYear) {
+            $dbQuery->where('school_year', $schoolYear);
+        }
         $db = $dbQuery->get()->toArray();
 
         $combined = array_merge($all, $db);
@@ -281,6 +286,11 @@ class QuestionController extends Controller
             $combined = array_values(array_filter($combined, function ($q) use ($bloomsLevel) {
                 $questionBlooms = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? ''))->snake()->lower()->value();
                 return $questionBlooms === $bloomsLevel;
+            }));
+        }
+        if ($schoolYear) {
+            $combined = array_values(array_filter($combined, function ($q) use ($schoolYear) {
+                return ($q['school_year'] ?? '2025-2026') === $schoolYear;
             }));
         }
 
@@ -321,6 +331,7 @@ class QuestionController extends Controller
         $difficulty = $request->get('difficulty');
         $type = $request->get('type');
         $bloomsLevel = $request->get('blooms_level');
+        $schoolYear = $request->get('school_year');
 
         $files = [
             'number_algebra' => [
@@ -403,6 +414,7 @@ class QuestionController extends Controller
                             'question_text',
                             'choice_a', 'choice_b', 'choice_c', 'choice_d',
                             'correct_answer',
+                            'school_year',
                             'blooms_taxonomy',
                         ] as $field) {
                             if (array_key_exists($field, $dbq) && $dbq[$field] !== null) {
@@ -433,6 +445,9 @@ class QuestionController extends Controller
         if ($bloomsLevel) {
             $dbQuery->where('blooms_taxonomy', $bloomsLevel);
         }
+        if ($schoolYear) {
+            $dbQuery->where('school_year', $schoolYear);
+        }
         $db = $dbQuery->get()->toArray();
 
         $combined = array_merge($all, $db);
@@ -452,6 +467,11 @@ class QuestionController extends Controller
             $combined = array_values(array_filter($combined, function ($q) use ($bloomsLevel) {
                 $questionBlooms = Str::of($q['blooms_level'] ?? ($q['blooms_taxonomy'] ?? ''))->snake()->lower()->value();
                 return $questionBlooms === $bloomsLevel;
+            }));
+        }
+        if ($schoolYear) {
+            $combined = array_values(array_filter($combined, function ($q) use ($schoolYear) {
+                return ($q['school_year'] ?? '2025-2026') === $schoolYear;
             }));
         }
 
@@ -481,7 +501,10 @@ class QuestionController extends Controller
             'max_allowed_time' => 'required|integer|min:5',
             'estimated_difficulty_weight' => 'nullable|numeric|min:0|max:5',
             'base_points' => 'required|integer|min:1',
+            'school_year' => ['nullable', 'regex:/^\d{4}-\d{4}$/'],
         ]);
+
+        $validated['school_year'] = $validated['school_year'] ?? '2025-2026';
 
         $validated['question_source'] = 'custom';
         $validated['is_active'] = true;
@@ -523,6 +546,7 @@ class QuestionController extends Controller
             'max_allowed_time' => 'sometimes|integer|min:5',
             'estimated_difficulty_weight' => 'nullable|numeric|min:0|max:5',
             'base_points' => 'sometimes|integer|min:1',
+            'school_year' => ['sometimes', 'regex:/^\d{4}-\d{4}$/'],
             'is_active' => 'sometimes|boolean',
         ]);
 

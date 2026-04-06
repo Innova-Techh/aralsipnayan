@@ -35,6 +35,7 @@ class Question extends Model
         'usage_count',
         'success_rate',
         'base_points',
+        'school_year',
         'created_by',
     ];
 }

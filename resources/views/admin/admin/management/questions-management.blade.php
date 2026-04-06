@@ -121,7 +121,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">School Year</label>
                         <select name="school_year"
                             class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">All School Years</option>
+                            <option value="" {{ request('school_year') == '' ? 'selected' : '' }}>All School Years</option>
                             <option value="2023-2024" {{ request('school_year') == '2023-2024' ? 'selected' : '' }}>2023-2024
                             </option>
                             <option value="2024-2025" {{ request('school_year') == '2024-2025' ? 'selected' : '' }}>2024-2025
@@ -543,8 +543,8 @@
                                     class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 >
                                     <option value="2023-2024">2023-2024</option>
-                                    <option value="2024-2025" selected>2024-2025</option>
-                                    <option value="2025-2026">2025-2026</option>
+                                    <option value="2024-2025">2024-2025</option>
+                                    <option value="2025-2026" selected>2025-2026</option>
                                 </select>
                             </div>
                         </div>
@@ -962,7 +962,7 @@
             document.getElementById('qDifficulty').value = (question.difficulty_level || 'beginner');
             document.getElementById('qType').value = (question.question_type || 'multiple_choice');
             document.getElementById('qBlooms').value = (question.blooms_level || 'remember');
-            document.getElementById('qSchoolYear').value = (question.school_year || '2024-2025');
+            document.getElementById('qSchoolYear').value = (question.school_year || '2025-2026');
             document.getElementById('qTopic').value = question.topic_tag || '';
             document.getElementById('qPoints').value = (question.base_points != null ? question.base_points : 10);
             document.getElementById('qTime').value = (question.max_allowed_time != null ? question.max_allowed_time : 60);
@@ -1002,7 +1002,7 @@
             document.getElementById('viewCategory').textContent = ucwords((question.competency || '').replace(/_/g, ' & ') || 'N/A');
             document.getElementById('viewDifficulty').textContent = ucfirst(question.difficulty_level || 'N/A');
             document.getElementById('viewBlooms').textContent = ucfirst(question.blooms_level || 'N/A');
-            document.getElementById('viewSchoolYear').textContent = question.school_year || '2024-2025';
+            document.getElementById('viewSchoolYear').textContent = question.school_year || '2025-2026';
             document.getElementById('viewTopic').textContent = question.topic_tag || 'N/A';
             document.getElementById('viewPoints').textContent = ((question.base_points != null ? question.base_points : 10)) + ' points';
             document.getElementById('viewTime').textContent = ((question.max_allowed_time != null ? question.max_allowed_time : 60)) + ' seconds';
